@@ -12,10 +12,15 @@ import {
   Gift, 
   Users, 
   ShieldAlert,
-  ChevronRight
+  ChevronRight,
+  Monitor,
+  Folder,
+  FileText,
+  HelpCircle,
+  HardDrive
 } from 'lucide-react';
 import { InfographicSlot } from '@/components/infographic/InfographicSlot';
-import { getEventBySlug, getEventContentBlocks } from '@/lib/db/store';
+import { getEventBySlug, getEventContentBlocks } from '@/services/event-service';
 import { formatThaiDate, formatTimeRange } from '@/lib/utils/format';
 
 export default async function HomePage() {
@@ -24,307 +29,280 @@ export default async function HomePage() {
   if (!event) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <h2 className="text-xl font-bold text-[#29272A]">ไม่พบข้อมูลกิจกรรมบริจาคโลหิต</h2>
-        <p className="mt-2 text-xs text-gray-500">กรุณาตรวจสอบ URL หรือติดต่อผู้ดูแลระบบ</p>
+        <div className="win95-window p-6 text-center">
+          <div className="win95-titlebar mb-4">
+            <span>Error 404 — Event Not Found</span>
+            <div className="flex gap-1">
+              <span className="win95-control-btn">X</span>
+            </div>
+          </div>
+          <h2 className="text-base font-bold text-red-700">ไม่พบข้อมูลกิจกรรมบริจาคโลหิต</h2>
+          <p className="mt-2 text-xs text-gray-700">กรุณาตรวจสอบ URL หรือติดต่อผู้ดูแลระบบ</p>
+        </div>
       </div>
     );
   }
 
   const contentBlocks = await getEventContentBlocks(event.id);
 
-  const heroPoster = contentBlocks.find(b => b.content_key === 'hero_poster');
-  const locationInfographic = contentBlocks.find(b => b.content_key === 'location_infographic');
-  const transportInfographic = contentBlocks.find(b => b.content_key === 'transportation_infographic');
-  const prepInfographic = contentBlocks.find(b => b.content_key === 'preparation_infographic');
-  const whatToBringInfographic = contentBlocks.find(b => b.content_key === 'what_to_bring');
-  const boothInfographic = contentBlocks.find(b => b.content_key === 'booth_infographic');
-  const sponsorBanner = contentBlocks.find(b => b.content_key === 'sponsor_banner');
+  const heroPoster = contentBlocks.find(b => (b as any).contentKey === 'hero_poster' || (b as any).content_key === 'hero_poster');
+  const locationInfographic = contentBlocks.find(b => (b as any).contentKey === 'location_infographic' || (b as any).content_key === 'location_infographic');
+  const transportInfographic = contentBlocks.find(b => (b as any).contentKey === 'transportation_infographic' || (b as any).content_key === 'transportation_infographic');
+  const prepInfographic = contentBlocks.find(b => (b as any).contentKey === 'preparation_infographic' || (b as any).content_key === 'preparation_infographic');
 
-  const eventDateFormatted = formatThaiDate(event.start_at);
-  const eventTimeFormatted = formatTimeRange(event.start_at, event.end_at);
+  const startAt = (event as any).startAt || (event as any).start_at;
+  const endAt = (event as any).endAt || (event as any).end_at;
+  const venueName = (event as any).venueName || (event as any).venue_name;
+
+  const eventDateFormatted = formatThaiDate(startAt);
+  const eventTimeFormatted = formatTimeRange(startAt, endAt);
 
   return (
-    <div className="flex flex-col gap-12 pb-16">
+    <div className="mx-auto max-w-7xl px-3 py-6 sm:px-6">
 
-      {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#7A1020] via-[#8F1327] to-[#7A1020] px-4 py-16 text-white sm:px-6 sm:py-24">
-        <div className="absolute inset-0 bg-[radial-gradient(#FFF9F9_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
-        <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-[#B42336]/40 blur-3xl" />
-        <div className="absolute -left-20 -bottom-20 h-96 w-96 rounded-full bg-red-900/50 blur-3xl" />
-
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-12">
+      {/* WIN95 DESKTOP ENVIRONMENT */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* DESKTOP ICONS SHORTCUTS COLUMN */}
+        <div className="lg:col-span-2 hidden sm:grid grid-cols-2 lg:grid-cols-1 gap-4 select-none mb-4 lg:mb-0">
           
-          <div className="lg:col-span-7">
-            <div className="mb-4 flex flex-wrap items-center gap-3">
-              <div className="rounded-2xl bg-white p-2 shadow-xl shadow-black/20">
-                <img src="/images/logo.png" alt="MUMT LOVE UNIT Logo" className="h-14 w-auto object-contain" />
-              </div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">
-                <Sparkles className="h-4 w-4 text-amber-300" />
-                <span className="text-xs font-bold tracking-wide text-amber-200 uppercase">โครงการบริจาคโลหิตครั้งใหญ่ มหิดล ศาลายา</span>
-              </div>
+          <Link href="/register" className="group flex flex-col items-center p-2 text-center rounded hover:bg-white/10">
+            <div className="win95-sunken p-2 bg-white group-hover:scale-105 transition-transform">
+              <Calendar className="h-8 w-8 text-[#7A1020]" />
             </div>
+            <span className="mt-1 text-xs font-bold text-white shadow-text bg-black/40 px-1 py-0.5 rounded">
+              ลงทะเบียน.exe
+            </span>
+          </Link>
 
-            <h1 className="mt-4 text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl">
-              {event.name}
-            </h1>
-
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-red-50/90 sm:text-base">
-              {event.description}
-            </p>
-
-            {/* Dynamic Event Key Meta Cards */}
-            <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 p-3 backdrop-blur-md">
-                <Calendar className="h-6 w-6 text-amber-300 shrink-0" />
-                <div>
-                  <span className="text-[10px] font-semibold text-red-200 uppercase">วันที่จัดงาน</span>
-                  <p className="text-xs font-extrabold text-white">{eventDateFormatted}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 p-3 backdrop-blur-md">
-                <Clock className="h-6 w-6 text-amber-300 shrink-0" />
-                <div>
-                  <span className="text-[10px] font-semibold text-red-200 uppercase">เวลาบริการ</span>
-                  <p className="text-xs font-extrabold text-white">{eventTimeFormatted}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/10 p-3 backdrop-blur-md">
-                <MapPin className="h-6 w-6 text-amber-300 shrink-0" />
-                <div>
-                  <span className="text-[10px] font-semibold text-red-200 uppercase">สถานที่</span>
-                  <p className="text-xs font-extrabold text-white line-clamp-1">{event.venue_name}</p>
-                </div>
-              </div>
+          <Link href="/prepare" className="group flex flex-col items-center p-2 text-center rounded hover:bg-white/10">
+            <div className="win95-sunken p-2 bg-white group-hover:scale-105 transition-transform">
+              <BookOpen className="h-8 w-8 text-[#7A1020]" />
             </div>
+            <span className="mt-1 text-xs font-bold text-white shadow-text bg-black/40 px-1 py-0.5 rounded">
+              คู่มือผู้บริจาค.doc
+            </span>
+          </Link>
 
-            {/* CTA Buttons */}
-            <div className="mt-8 flex flex-col gap-3.5 sm:flex-row sm:items-center">
-              <Link
-                href="/register"
-                className="flex items-center justify-center gap-2 rounded-2xl bg-white px-7 py-4 text-base font-extrabold text-[#7A1020] shadow-xl shadow-black/20 transition-all hover:scale-105 hover:bg-amber-50 active:scale-95"
-              >
-                <Heart className="h-5 w-5 fill-[#7A1020] text-[#7A1020]" />
-                ลงทะเบียนเข้าร่วมบริจาคโลหิต
-              </Link>
-
-              <Link
-                href="#event-details"
-                className="flex items-center justify-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-6 py-4 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/20"
-              >
-                ดูรายละเอียดกิจกรรม
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+          <Link href="/location" className="group flex flex-col items-center p-2 text-center rounded hover:bg-white/10">
+            <div className="win95-sunken p-2 bg-white group-hover:scale-105 transition-transform">
+              <MapPin className="h-8 w-8 text-[#7A1020]" />
             </div>
+            <span className="mt-1 text-xs font-bold text-white shadow-text bg-black/40 px-1 py-0.5 rounded">
+              แผนที่วันงาน.bmp
+            </span>
+          </Link>
 
-            <p className="mt-3 text-xs text-red-100/80">
-              * การเลือกรอบเวลาเป็นการเลือกช่วงเวลาแนะนำเดินทางมาถึง ไม่ใช่เวลารับบริจาคที่รับประกัน
-            </p>
-          </div>
-
-          <div className="lg:col-span-5">
-            <InfographicSlot
-              contentKey="hero_poster"
-              title={heroPoster?.title || 'โปสเตอร์ประชาสัมพันธ์โครงการ'}
-              description={heroPoster?.description}
-              imageUrl={heroPoster?.image_url}
-              altText={heroPoster?.alt_text}
-              aspectRatio="poster"
-              className="shadow-2xl ring-4 ring-white/20"
-            />
-          </div>
-
-        </div>
-      </section>
-
-      {/* EVENT OVERVIEW */}
-      <section id="event-details" className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="rounded-3xl border border-[#FCE8EC] bg-white p-6 shadow-sm sm:p-10">
-          
-          <div className="flex flex-col items-start justify-between gap-4 border-b border-[#FCE8EC] pb-6 sm:flex-row sm:items-center">
-            <div>
-              <span className="text-xs font-bold tracking-wider text-[#B42336] uppercase">Event Overview</span>
-              <h2 className="text-2xl font-extrabold text-[#29272A] sm:text-3xl">
-                เกี่ยวกับกิจกรรม {event.short_name}
-              </h2>
+          <Link href="/staff/login" className="group flex flex-col items-center p-2 text-center rounded hover:bg-white/10">
+            <div className="win95-sunken p-2 bg-white group-hover:scale-105 transition-transform">
+              <HardDrive className="h-8 w-8 text-amber-700" />
             </div>
-            <Link
-              href="/register"
-              className="flex items-center gap-1.5 text-xs font-bold text-[#7A1020] hover:underline"
-            >
-              เลือกรอบเวลาเดินทางมาถึง <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3">
-            
-            <div className="rounded-2xl bg-[#FFF9F9] p-6 border border-[#FCE8EC]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#7A1020] text-white">
-                <Users className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 text-base font-bold text-[#29272A]">ใครบ้างที่ร่วมบริจาคได้?</h3>
-              <ul className="mt-3 space-y-2 text-xs text-[#29272A]/80">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>นักศึกษามหาวิทยาลัยมหิดล ทุกชั้นปี</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>อาจารย์และบุคลากรมหาวิทยาลัยมหิดล</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>ประชาชนทั่วไป ผู้มีจิตศรัทธา</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-2xl bg-[#FFF9F9] p-6 border border-[#FCE8EC]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#B42336] text-white">
-                <MapPin className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 text-base font-bold text-[#29272A]">สถานที่จัดงาน</h3>
-              <p className="mt-2 text-xs text-[#29272A]/80 leading-relaxed">
-                {event.venue_detail}
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-[#FFF9F9] p-6 border border-[#FCE8EC]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#7A1020] text-white">
-                <BookOpen className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 text-base font-bold text-[#29272A]">ขั้นตอนง่ายๆ ในวันงาน</h3>
-              <ol className="mt-3 space-y-2 text-xs text-[#29272A]/80 list-decimal list-inside">
-                <li>แสดง QR Code ลงทะเบียนหน้างาน</li>
-                <li>คัดกรองสุขภาพและวัดความดันโดยเจ้าหน้าที่สภากาชาดไทย</li>
-                <li>บริจาคโลหิตและพักสังเกตอาการ 10-15 นาที</li>
-              </ol>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* PREPARATION & WHAT TO BRING INFOGRAPHICS */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold tracking-wider text-[#B42336] uppercase">Donor Guide</span>
-            <h2 className="text-2xl font-extrabold text-[#29272A]">ข้อปฏิบัติและการเตรียมตัว</h2>
-          </div>
-          <Link href="/prepare" className="text-xs font-bold text-[#7A1020] hover:underline">
-            ดูคำแนะนำทั้งหมด →
+            <span className="mt-1 text-xs font-bold text-white shadow-text bg-black/40 px-1 py-0.5 rounded">
+              StaffPortal.sys
+            </span>
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <InfographicSlot
-            contentKey="preparation_infographic"
-            title={prepInfographic?.title || 'ข้อปฏิบัติตัวก่อนบริจาคโลหิต'}
-            description={prepInfographic?.description || 'พักผ่อนให้เพียงพอ 6-8 ชั่วโมง ดื่มน้ำ 3-4 แก้วก่อนบริจาค'}
-            imageUrl={prepInfographic?.image_url}
-            aspectRatio="banner"
-          />
-
-          <InfographicSlot
-            contentKey="what_to_bring"
-            title={whatToBringInfographic?.title || 'สิ่งที่ต้องเตรียมมาในวันงาน'}
-            description={whatToBringInfographic?.description || 'บัตรประชาชน หรือบัตรผู้บริจาคโลหิตสภากาชาดไทย'}
-            imageUrl={whatToBringInfographic?.image_url}
-            aspectRatio="banner"
-          />
-        </div>
-      </section>
-
-      {/* LOCATION & TRANSPORTATION INFOGRAPHICS */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold tracking-wider text-[#B42336] uppercase">Location & Map</span>
-            <h2 className="text-2xl font-extrabold text-[#29272A]">สถานที่จัดงานและการเดินทาง</h2>
-          </div>
-          <Link href="/location" className="text-xs font-bold text-[#7A1020] hover:underline">
-            ดูรายละเอียดแผนที่ →
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <InfographicSlot
-            contentKey="location_infographic"
-            title={locationInfographic?.title || 'แผนที่สถานที่จัดงาน อาคารสิริวิทยา'}
-            description={locationInfographic?.description}
-            imageUrl={locationInfographic?.image_url}
-            aspectRatio="banner"
-          />
-
-          <InfographicSlot
-            contentKey="transportation_infographic"
-            title={transportInfographic?.title || 'การเดินทางและจุดจอดรถ'}
-            description={transportInfographic?.description}
-            imageUrl={transportInfographic?.image_url}
-            aspectRatio="banner"
-          />
-        </div>
-      </section>
-
-      {/* KNOWLEDGE BOOTH SECTION */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="rounded-3xl border border-[#FCE8EC] bg-gradient-to-r from-[#FCE8EC]/60 via-white to-[#FCE8EC]/60 p-6 sm:p-10">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-center">
+        {/* MAIN APPLICATION WINDOW */}
+        <div className="lg:col-span-10">
+          <div className="win95-window">
             
-            <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#7A1020] px-3 py-1 text-xs font-bold text-white">
-                <Sparkles className="h-3.5 w-3.5" />
-                กิจกรรมเสริมในวันงาน
+            {/* Title Bar */}
+            <div className="win95-titlebar win95-titlebar-burgundy">
+              <div className="flex items-center gap-2">
+                <Heart className="h-4 w-4 fill-white text-white" />
+                <span className="font-extrabold text-xs sm:text-sm text-white truncate">
+                  MUMT Blood Donation 2026 — [เติมรักให้เต็ม Unit ครั้งที่ 9]
+                </span>
               </div>
-              <h3 className="mt-3 text-2xl font-extrabold text-[#29272A] sm:text-3xl">
-                บูธกิจกรรมให้ความรู้เรื่องหมู่เลือดและเซลล์โลหิต
-              </h3>
-              <p className="mt-3 text-xs leading-relaxed text-[#29272A]/80 sm:text-sm">
-                พบกับบูธกิจกรรมความรู้ทางเทคนิคการแพทย์ นิทรรศการให้ความรู้เกี่ยวกับหมู่เลือด 
-                และการดูแลสุขภาพหลอดเลือด โดยทีมนักศึกษาคณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล
-              </p>
+              <div className="flex items-center gap-1 shrink-0">
+                <span className="win95-control-btn">_</span>
+                <span className="win95-control-btn">▢</span>
+                <span className="win95-control-btn text-red-900">X</span>
+              </div>
             </div>
 
-            <div className="lg:col-span-5">
-              <InfographicSlot
-                contentKey="booth_infographic"
-                title={boothInfographic?.title || 'นิทรรศการบูธกิจกรรมความรู้'}
-                description={boothInfographic?.description}
-                imageUrl={boothInfographic?.image_url}
-                aspectRatio="square"
-              />
+            {/* Window Content */}
+            <div className="p-4 sm:p-6 bg-[#C0C0C0]">
+              
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                
+                {/* Left Text & Actions */}
+                <div className="lg:col-span-7 space-y-4">
+                  
+                  <div className="win95-sunken p-4 bg-white">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <div className="win95-sunken p-1 bg-white inline-block">
+                        <img src="/images/logo.png" alt="MUMT LOVE UNIT Logo" className="h-12 w-auto object-contain" />
+                      </div>
+                      <span className="win95-raised px-2 py-0.5 text-xs font-bold bg-[#7A1020] text-white">
+                        โครงการบริจาคโลหิต มหิดล ศาลายา
+                      </span>
+                    </div>
+
+                    <h1 className="text-xl font-black text-black sm:text-2xl lg:text-3xl leading-tight">
+                      {event.name}
+                    </h1>
+
+                    <p className="mt-2 text-xs leading-relaxed text-gray-800 sm:text-sm">
+                      {event.description}
+                    </p>
+                  </div>
+
+                  {/* Dynamic Event Key Meta Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                    
+                    <div className="win95-sunken p-2.5 bg-white flex items-center gap-2.5">
+                      <Calendar className="h-5 w-5 text-[#7A1020] shrink-0" />
+                      <div>
+                        <span className="text-[10px] font-bold text-gray-500 block uppercase">วันที่จัดงาน</span>
+                        <span className="font-extrabold text-black">{eventDateFormatted}</span>
+                      </div>
+                    </div>
+
+                    <div className="win95-sunken p-2.5 bg-white flex items-center gap-2.5">
+                      <Clock className="h-5 w-5 text-[#7A1020] shrink-0" />
+                      <div>
+                        <span className="text-[10px] font-bold text-gray-500 block uppercase">เวลาบริการ</span>
+                        <span className="font-extrabold text-black">{eventTimeFormatted}</span>
+                      </div>
+                    </div>
+
+                    <div className="win95-sunken p-2.5 bg-white flex items-center gap-2.5">
+                      <MapPin className="h-5 w-5 text-[#7A1020] shrink-0" />
+                      <div>
+                        <span className="text-[10px] font-bold text-gray-500 block uppercase">สถานที่</span>
+                        <span className="font-extrabold text-black truncate block">{venueName}</span>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Win95 Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <Link
+                      href="/register"
+                      className="win95-btn win95-btn-primary py-3 px-6 text-sm justify-center"
+                    >
+                      <Heart className="h-5 w-5 fill-white text-white" />
+                      <span>ลงทะเบียนเข้าร่วมบริจาคโลหิต</span>
+                    </Link>
+
+                    <Link
+                      href="/prepare"
+                      className="win95-btn py-3 px-5 text-xs justify-center"
+                    >
+                      <BookOpen className="h-4 w-4 text-[#7A1020]" />
+                      <span>ดูข้อปฏิบัติตัวก่อนบริจาค</span>
+                    </Link>
+                  </div>
+
+                  <div className="win95-tooltip text-[11px]">
+                    * การเลือกรอบเวลาเป็นการเลือกช่วงเวลาแนะนำเดินทางมาถึง เพื่อบริหารการสม่ำเสมอของคิว
+                  </div>
+
+                </div>
+
+                {/* Right Hero Poster Box */}
+                <div className="lg:col-span-5">
+                  <div className="win95-sunken p-2 bg-white">
+                    <InfographicSlot
+                      contentKey="hero_poster"
+                      title={heroPoster?.title || 'โปสเตอร์ประชาสัมพันธ์โครงการ'}
+                      description={heroPoster?.description || undefined}
+                      imageUrl={(heroPoster as any)?.imageUrl || (heroPoster as any)?.image_url}
+                      altText={(heroPoster as any)?.altText || (heroPoster as any)?.alt_text}
+                      aspectRatio="poster"
+                    />
+                  </div>
+                </div>
+
+              </div>
+
+              {/* SECTIONS GRID */}
+              <div className="mt-8 space-y-6">
+                
+                {/* Preparation Guide Card */}
+                <div className="win95-raised p-4 bg-[#C0C0C0]">
+                  <div className="win95-titlebar mb-3">
+                    <span>SECTION 01: การเตรียมตัวก่อนมาบริจาคโลหิต</span>
+                    <span>[WinHelp 95]</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="win95-sunken p-3 bg-white space-y-2 text-xs">
+                      <h3 className="font-extrabold text-[#7A1020] text-sm border-b pb-1">
+                        ข้อควรปฏิบัติสำคัญ
+                      </h3>
+                      <ul className="space-y-1.5 list-disc pl-4 text-gray-800">
+                        <li>พักผ่อนให้เพียงพอ นอนหลับไม่น้อยกว่า 6 ชั่วโมง</li>
+                        <li>ดื่มน้ำเปล่า 3-4 แก้ว ก่อนบริจาคประมาณ 30 นาที</li>
+                        <li>ทานอาหารมื้อหลัก หลีกเลี่ยงอาหารไขมันสูง</li>
+                        <li>งดเครื่องดื่มแอลกอฮอล์อย่างน้อย 24 ชั่วโมง</li>
+                        <li>นำบัตรประชาชนตัวจริงมาแสดงในวันงาน</li>
+                      </ul>
+                    </div>
+
+                    <div className="win95-sunken p-2 bg-white">
+                      <InfographicSlot
+                        contentKey="preparation_infographic"
+                        title={prepInfographic?.title || 'การเตรียมตัวก่อนบริจาคโลหิต'}
+                        description={prepInfographic?.description || undefined}
+                        imageUrl={(prepInfographic as any)?.imageUrl || (prepInfographic as any)?.image_url}
+                        altText={(prepInfographic as any)?.altText || (prepInfographic as any)?.alt_text}
+                        aspectRatio="banner"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location & Transport Card */}
+                <div className="win95-raised p-4 bg-[#C0C0C0]">
+                  <div className="win95-titlebar mb-3">
+                    <span>SECTION 02: แผนที่และการเดินทาง</span>
+                    <span>[MapViewer 95]</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="win95-sunken p-2 bg-white">
+                      <InfographicSlot
+                        contentKey="location_infographic"
+                        title={locationInfographic?.title || 'แผนที่สถานที่จัดงาน'}
+                        description={locationInfographic?.description || undefined}
+                        imageUrl={(locationInfographic as any)?.imageUrl || (locationInfographic as any)?.image_url}
+                        altText={(locationInfographic as any)?.altText || (locationInfographic as any)?.alt_text}
+                        aspectRatio="banner"
+                      />
+                    </div>
+
+                    <div className="win95-sunken p-2 bg-white">
+                      <InfographicSlot
+                        contentKey="transportation_infographic"
+                        title={transportInfographic?.title || 'การเดินทางและจุดจอดรถ'}
+                        description={transportInfographic?.description || undefined}
+                        imageUrl={(transportInfographic as any)?.imageUrl || (transportInfographic as any)?.image_url}
+                        altText={(transportInfographic as any)?.altText || (transportInfographic as any)?.alt_text}
+                        aspectRatio="banner"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Statusbar */}
+              <div className="win95-statusbar">
+                <span>MUMT Blood Donation System</span>
+                <span>|</span>
+                <span>Venue: Sirividhya Building (Room 217-218)</span>
+              </div>
+
             </div>
 
           </div>
         </div>
-      </section>
 
-      {/* SPONSOR BANNER PLACEHOLDER */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6">
-        <InfographicSlot
-          contentKey="sponsor_banner"
-          title={sponsorBanner?.title || 'ผู้สนับสนุนกิจกรรม MUMT Blood Donation 2026'}
-          description={sponsorBanner?.description}
-          imageUrl={sponsorBanner?.image_url}
-          aspectRatio="banner"
-        />
-      </section>
-
-      {/* DISCLAIMER / MEDICAL NON-ELIGIBILITY BANNER */}
-      <section className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
-          <ShieldAlert className="h-5 w-5 shrink-0 text-amber-700 mt-0.5" />
-          <div className="text-xs leading-relaxed">
-            <span className="font-bold">หมายเหตุสำคัญ:</span> ระบบนี้เป็นระบบลงทะเบียนและประมาณการเวลาเดินทางล่วงหน้า 
-            <span className="font-bold underline"> ไม่ใช่ระบบคัดกรองหรือประเมินคุณสมบัติทางแพทย์</span> 
-            การประเมินความพร้อมและคุณสมบัติผู้บริจาคโลหิตจะดำเนินการโดยเจ้าหน้าที่สภากาชาดไทย ณ จุดคัดกรองหน้างานตามมาตรฐานแพทยสภา
-          </div>
-        </div>
-      </section>
+      </div>
 
     </div>
   );

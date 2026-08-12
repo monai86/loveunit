@@ -198,62 +198,71 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      {/* Step Indicator Bar */}
-      <div className="mt-8 mb-8">
-        <div className="flex items-center justify-between">
-          
-          <div className={`flex flex-col items-center gap-1 ${step >= 1 ? 'text-[#7A1020]' : 'text-gray-400'}`}>
-            <div className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold ${step >= 1 ? 'bg-[#7A1020] text-white shadow-md shadow-[#7A1020]/20' : 'bg-gray-200 text-gray-600'}`}>
-              1
-            </div>
-            <span className="text-[11px] font-semibold">ข้อมูลพื้นฐาน</span>
+      {/* Win95 Registration Wizard Window */}
+      <div className="win95-window">
+        
+        {/* Title Bar */}
+        <div className="win95-titlebar win95-titlebar-burgundy">
+          <div className="flex items-center gap-2">
+            <Heart className="h-4 w-4 fill-white text-white" />
+            <span>Registration Wizard 95 — [ขั้นตอนที่ {step}/3]</span>
           </div>
-
-          <div className={`h-1 flex-1 mx-2 rounded ${step >= 2 ? 'bg-[#7A1020]' : 'bg-gray-200'}`} />
-
-          <div className={`flex flex-col items-center gap-1 ${step >= 2 ? 'text-[#7A1020]' : 'text-gray-400'}`}>
-            <div className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold ${step >= 2 ? 'bg-[#7A1020] text-white shadow-md shadow-[#7A1020]/20' : 'bg-gray-200 text-gray-600'}`}>
-              2
-            </div>
-            <span className="text-[11px] font-semibold">ประเภทผู้เข้าร่วม</span>
+          <div className="flex items-center gap-1 shrink-0">
+            <span className="win95-control-btn">_</span>
+            <span className="win95-control-btn">▢</span>
+            <span className="win95-control-btn text-red-900">X</span>
           </div>
-
-          <div className={`h-1 flex-1 mx-2 rounded ${step >= 3 ? 'bg-[#7A1020]' : 'bg-gray-200'}`} />
-
-          <div className={`flex flex-col items-center gap-1 ${step >= 3 ? 'text-[#7A1020]' : 'text-gray-400'}`}>
-            <div className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold ${step >= 3 ? 'bg-[#7A1020] text-white shadow-md shadow-[#7A1020]/20' : 'bg-gray-200 text-gray-600'}`}>
-              3
-            </div>
-            <span className="text-[11px] font-semibold">เลือกช่วงเวลา</span>
-          </div>
-
         </div>
-      </div>
 
-      {/* Main Card Container */}
-      <div className="rounded-3xl border border-[#FCE8EC] bg-white p-6 shadow-sm sm:p-10">
+        {/* Win95 Wizard Body */}
+        <div className="p-4 sm:p-6 bg-[#C0C0C0]">
+          
+          {/* Win95 Tab Indicators */}
+          <div className="flex items-center border-b-2 border-white mb-6">
+            <button 
+              type="button" 
+              onClick={() => setStep(1)} 
+              className={`win95-tab ${step === 1 ? 'active' : ''}`}
+            >
+              1. ข้อมูลทั่วไป
+            </button>
+            <button 
+              type="button" 
+              onClick={() => { if (validateStep1()) setStep(2); }} 
+              className={`win95-tab ${step === 2 ? 'active' : ''}`}
+            >
+              2. ประเภทผู้บริจาค
+            </button>
+            <button 
+              type="button" 
+              onClick={() => { if (validateStep1() && validateStep2()) setStep(3); }} 
+              className={`win95-tab ${step === 3 ? 'active' : ''}`}
+            >
+              3. เลือกช่วงเวลา & ยืนยัน
+            </button>
+          </div>
 
-        {/* Global Error Alert */}
-        {errorMsg && (
-          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-bold text-sm">{errorMsg}</h4>
-                {duplicateCode && (
-                  <div className="mt-3">
-                    <Link
-                      href={`/registration/${duplicateCode}`}
-                      className="inline-flex items-center gap-2 rounded-xl bg-[#7A1020] px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#8F1327]"
-                    >
-                      ดูข้อมูลการลงทะเบียนของคุณ ({duplicateCode}) →
-                    </Link>
-                  </div>
-                )}
+          {/* Global Error Alert */}
+          {errorMsg && (
+            <div className="mb-6 win95-sunken p-3 bg-red-50 border-red-300 text-red-900 text-xs">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold">{errorMsg}</h4>
+                  {duplicateCode && (
+                    <div className="mt-2">
+                      <Link
+                        href={`/registration/${duplicateCode}`}
+                        className="win95-btn win95-btn-primary py-1 px-3 text-xs"
+                      >
+                        ดูข้อมูลการลงทะเบียนของคุณ ({duplicateCode}) →
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
         <form onSubmit={handleSubmit}>
 
@@ -276,10 +285,10 @@ export default function RegisterPage() {
                       placeholder="เช่น สมชาย"
                       value={formData.firstName}
                       onChange={(e) => handleChange('firstName', e.target.value)}
-                      className={`w-full rounded-xl border px-3.5 py-2.5 text-sm text-[#29272A] focus:outline-none focus:ring-2 focus:ring-[#7A1020] ${fieldErrors.firstName ? 'border-red-500 bg-red-50/50' : 'border-gray-300'}`}
+                      className={`win95-input w-full ${fieldErrors.firstName ? 'border-red-500 bg-red-50' : ''}`}
                     />
                   </div>
-                  {fieldErrors.firstName && <p className="mt-1 text-xs text-red-500">{fieldErrors.firstName}</p>}
+                  {fieldErrors.firstName && <p className="mt-1 text-xs text-red-500 font-bold">{fieldErrors.firstName}</p>}
                 </div>
 
                 <div>
@@ -291,9 +300,9 @@ export default function RegisterPage() {
                     placeholder="เช่น ใจดี"
                     value={formData.lastName}
                     onChange={(e) => handleChange('lastName', e.target.value)}
-                    className={`w-full rounded-xl border px-3.5 py-2.5 text-sm text-[#29272A] focus:outline-none focus:ring-2 focus:ring-[#7A1020] ${fieldErrors.lastName ? 'border-red-500 bg-red-50/50' : 'border-gray-300'}`}
+                    className={`win95-input w-full ${fieldErrors.lastName ? 'border-red-500 bg-red-50' : ''}`}
                   />
-                  {fieldErrors.lastName && <p className="mt-1 text-xs text-red-500">{fieldErrors.lastName}</p>}
+                  {fieldErrors.lastName && <p className="mt-1 text-xs text-red-500 font-bold">{fieldErrors.lastName}</p>}
                 </div>
               </div>
 
@@ -302,19 +311,18 @@ export default function RegisterPage() {
                   เบอร์โทรศัพท์มือถือ <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
                   <input
                     type="tel"
                     placeholder="0812345678"
                     value={formData.phone}
                     onChange={(e) => handleChange('phone', e.target.value)}
-                    className={`w-full rounded-xl border pl-10 pr-3.5 py-2.5 text-sm text-[#29272A] focus:outline-none focus:ring-2 focus:ring-[#7A1020] ${fieldErrors.phone ? 'border-red-500 bg-red-50/50' : 'border-gray-300'}`}
+                    className={`win95-input w-full ${fieldErrors.phone ? 'border-red-500 bg-red-50' : ''}`}
                   />
                 </div>
                 {fieldErrors.phone ? (
-                  <p className="mt-1 text-xs text-red-500">{fieldErrors.phone}</p>
+                  <p className="mt-1 text-xs text-red-500 font-bold">{fieldErrors.phone}</p>
                 ) : (
-                  <p className="mt-1 text-[11px] text-gray-500">ใช้สำหรับค้นหาข้อมูลกรณีลืม QR Code หน้างาน</p>
+                  <p className="mt-1 text-[11px] text-gray-700">ใช้สำหรับค้นหาข้อมูลกรณีลืม QR Code หน้างาน</p>
                 )}
               </div>
 
@@ -323,16 +331,15 @@ export default function RegisterPage() {
                   อีเมล (ไม่บังคับ)
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
                   <input
                     type="email"
                     placeholder="example@mahidol.ac.th"
                     value={formData.email}
                     onChange={(e) => handleChange('email', e.target.value)}
-                    className={`w-full rounded-xl border pl-10 pr-3.5 py-2.5 text-sm text-[#29272A] focus:outline-none focus:ring-2 focus:ring-[#7A1020] ${fieldErrors.email ? 'border-red-500 bg-red-50/50' : 'border-gray-300'}`}
+                    className={`win95-input w-full ${fieldErrors.email ? 'border-red-500 bg-red-50' : ''}`}
                   />
                 </div>
-                {fieldErrors.email && <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>}
+                {fieldErrors.email && <p className="mt-1 text-xs text-red-500 font-bold">{fieldErrors.email}</p>}
               </div>
 
               <div className="pt-4 flex justify-end">
@@ -341,7 +348,7 @@ export default function RegisterPage() {
                   onClick={() => {
                     if (validateStep1()) setStep(2);
                   }}
-                  className="flex items-center gap-2 rounded-xl bg-[#7A1020] px-6 py-3 text-sm font-bold text-white shadow-md shadow-[#7A1020]/20 hover:bg-[#8F1327]"
+                  className="win95-btn win95-btn-primary py-2 px-5 text-xs gap-2"
                 >
                   ถัดไป: ประเภทผู้เข้าร่วม <ArrowRight className="h-4 w-4" />
                 </button>
@@ -623,6 +630,7 @@ export default function RegisterPage() {
           )}
 
         </form>
+        </div>
       </div>
 
     </div>
