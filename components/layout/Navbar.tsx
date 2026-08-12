@@ -11,7 +11,6 @@ import {
   ShieldCheck, 
   Menu, 
   X, 
-  Sparkles,
   Home
 } from 'lucide-react';
 
@@ -32,12 +31,12 @@ export function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#F9D5DC] bg-white/95 backdrop-blur-md shadow-xs select-none" suppressHydrationWarning>
+    <header className="sticky top-0 z-50 w-full border-b border-[#F0C4CC] bg-white/95 backdrop-blur-md shadow-xs select-none" suppressHydrationWarning>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         
         {/* Brand Logo & Event Title */}
         <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FFF8F9] p-1.5 border border-[#F9D5DC] shadow-xs">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#FFF5F7] p-1.5 border border-[#F0C4CC] shadow-xs">
             <img 
               src="/images/logo.png" 
               alt="MUMT LOVE UNIT Logo" 
@@ -49,7 +48,7 @@ export function Navbar() {
               <span className="text-[11px] font-black tracking-wider text-[#7A1020] uppercase">MUMT Blood Donation 2026</span>
               <span className="bloom-badge py-0.5 px-2 text-[10px]">ครั้งที่ 9</span>
             </div>
-            <h1 className="text-xs font-extrabold text-[#1F1A1C] sm:text-sm">
+            <h1 className="text-xs font-extrabold text-ink-dark sm:text-sm">
               เติมรักให้เต็ม Unit <span className="text-[#B42336]">ต่อชีวิตด้วยโลหิตคุณ</span>
             </h1>
           </div>
@@ -64,13 +63,13 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-extrabold transition-all ${
                   isActive
                     ? 'bg-[#FCE8EC] text-[#7A1020]'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-[#7A1020]'
+                    : 'text-body-dark hover:bg-[#FCE8EC]/50 hover:text-[#7A1020]'
                 }`}
               >
-                <Icon className={`h-4 w-4 ${isActive ? 'text-[#7A1020]' : 'text-gray-500'}`} />
+                <Icon className={`h-4 w-4 ${isActive ? 'text-[#7A1020]' : 'text-[#7A1020]'}`} />
                 <span>{item.label}</span>
               </Link>
             );
@@ -99,7 +98,7 @@ export function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#F9D5DC] bg-[#FFF8F9] text-[#7A1020] hover:bg-[#FCE8EC]"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#F0C4CC] bg-[#FFF5F7] text-[#7A1020] hover:bg-[#FCE8EC]"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -109,7 +108,7 @@ export function Navbar() {
 
       {/* Mobile Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="border-t border-[#F9D5DC] bg-white px-4 py-4 shadow-xl lg:hidden animate-in slide-in-from-top-2 duration-150">
+        <div className="border-t border-[#F0C4CC] bg-white px-4 py-4 shadow-xl lg:hidden animate-in slide-in-from-top-2 duration-150">
           <div className="flex flex-col gap-1.5">
             {navLinks.map((item) => {
               const Icon = item.icon;
@@ -119,13 +118,13 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold transition-all ${
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-extrabold transition-all ${
                     isActive
                       ? 'bg-[#FCE8EC] text-[#7A1020]'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      : 'text-body-dark hover:bg-gray-50'
                   }`}
                 >
-                  <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-[#7A1020]' : 'text-gray-500'}`} />
+                  <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-[#7A1020]' : 'text-[#7A1020]'}`} />
                   <span>{item.label}</span>
                 </Link>
               );

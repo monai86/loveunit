@@ -6,22 +6,22 @@ import { Heart, MapPin, Phone, Mail, ShieldCheck, ExternalLink, Calendar, BookOp
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-[#F9D5DC] bg-white text-[#1F1A1C] select-none">
+    <footer className="mt-16 border-t border-[#F0C4CC] bg-white text-ink-dark select-none">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           
           {/* Brand Info Column */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FFF8F9] p-1 border border-[#F9D5DC]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FFF5F7] p-1 border border-[#F0C4CC]">
                 <img src="/images/logo.png" alt="MUMT Logo" className="h-full w-auto object-contain" />
               </div>
               <div>
                 <span className="text-xs font-black tracking-wider text-[#7A1020] uppercase block">MUMT Blood Donation 2026</span>
-                <span className="text-sm font-extrabold text-[#1F1A1C]">ครั้งที่ 9 “เติมรักให้เต็ม Unit”</span>
+                <span className="text-sm font-extrabold text-ink-dark">ครั้งที่ 9 “เติมรักให้เต็ม Unit”</span>
               </div>
             </div>
-            <p className="text-xs leading-relaxed text-gray-600">
+            <p className="text-xs leading-relaxed text-body-dark font-medium">
               โครงการบริจาคโลหิต จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ สภากาชาดไทย ณ อาคารสิริวิทยา มหาวิทยาลัยมหิดล ศาลายา
             </p>
             <div className="pt-1">
@@ -37,7 +37,7 @@ export function Footer() {
             <h3 className="text-xs font-black tracking-wider text-[#7A1020] uppercase mb-3 pb-1 border-b border-[#FCE8EC]">
               📌 ลิงก์เมนูด่วน
             </h3>
-            <ul className="space-y-2 text-xs font-bold text-gray-700">
+            <ul className="space-y-2 text-xs font-bold text-body-dark">
               <li>
                 <Link href="/" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5">
                   <span>• หน้าหลัก</span>
@@ -59,7 +59,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/staff/login" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5 text-gray-500">
+                <Link href="/staff/login" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5 text-gray-600">
                   <span>• ระบบเจ้าหน้าที่ (Staff Portal)</span>
                 </Link>
               </li>
@@ -71,7 +71,7 @@ export function Footer() {
             <h3 className="text-xs font-black tracking-wider text-[#7A1020] uppercase mb-3 pb-1 border-b border-[#FCE8EC]">
               📞 ติดต่อสอบถาม
             </h3>
-            <div className="space-y-3 text-xs text-gray-700">
+            <div className="space-y-3 text-xs text-body-dark font-medium">
               <div className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 shrink-0 text-[#B42336] mt-0.5" />
                 <span className="leading-relaxed">
@@ -99,7 +99,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Copyright Strip */}
-        <div className="mt-10 pt-6 border-t border-[#FCE8EC] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-gray-500 font-medium">
+        <div className="mt-10 pt-6 border-t border-[#FCE8EC] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-body-dark font-bold">
           <div>© 2026 Faculty of Medical Technology, Mahidol University (MUMT)</div>
           <div>เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9</div>
         </div>

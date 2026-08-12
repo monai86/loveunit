@@ -1,142 +1,140 @@
 @import "tailwindcss";
 
 :root {
-  --bloom-bg: #FFF8F9;
-  --bloom-ink: #1F1A1C;
+  --bloom-bg: #FFF5F7;
+  --bloom-ink: #1A080C;
+  --bloom-body: #331A20;
   --bloom-burgundy: #7A1020;
   --bloom-warm-red: #B42336;
   --bloom-soft-rose: #FCE8EC;
-  --bloom-rose-border: #F9D5DC;
-  --bloom-petal: #F4B8C3;
-
-  --background: #FFF8F9;
-  --foreground: #1F1A1C;
+  --bloom-border: #F0C4CC;
+  
+  --background: #FFF5F7;
+  --foreground: #1A080C;
 }
 
 body {
-  background-color: var(--bloom-bg);
-  color: var(--foreground);
+  background-color: #FFF5F7;
+  color: #1A080C;
   font-family: 'Prompt', 'Kanit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(252, 232, 236, 0.6) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(249, 213, 220, 0.4) 0px, transparent 50%);
-  background-attachment: fixed;
 }
 
 /* ===================================================
-   SPRING BLOOM DESIGN SYSTEM UTILITIES
+   SPRING BLOOM DEFINITIVE HIGH-CONTRAST DESIGN SYSTEM
    =================================================== */
+
+/* Explicit Text Color Utility Rules */
+.text-ink-dark {
+  color: #1A080C !important;
+}
+
+.text-body-dark {
+  color: #382025 !important;
+}
+
+.text-burgundy {
+  color: #7A1020 !important;
+}
+
+.text-warm-red {
+  color: #B42336 !important;
+}
 
 /* Bloom Card Surface */
 .bloom-card {
-  background-color: #FFFFFF;
-  border: 1px solid #F9D5DC;
-  border-radius: 1.5rem; /* 24px */
-  box-shadow: 0 10px 30px -5px rgba(122, 16, 32, 0.05), 0 4px 12px -2px rgba(0, 0, 0, 0.02);
-  transition: all 0.2s ease-in-out;
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #F0C4CC !important;
+  border-radius: 1.25rem !important; /* 20px */
+  box-shadow: 0 8px 24px -4px rgba(122, 16, 32, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
+  color: #1A080C !important;
 }
 
-.bloom-card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px -6px rgba(122, 16, 32, 0.1), 0 6px 16px -3px rgba(0, 0, 0, 0.03);
-  border-color: #F4B8C3;
+.bloom-card-hero {
+  background-color: #FFFFFF !important;
+  border: 2px solid #F0C4CC !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 12px 32px -8px rgba(122, 16, 32, 0.1) !important;
 }
 
 /* Primary Action Button (Deep Burgundy Gradient) */
 .bloom-btn-primary {
-  background: linear-gradient(135deg, #8F1327 0%, #7A1020 100%);
-  color: #FFFFFF;
-  font-weight: 700;
-  border-radius: 1rem; /* 16px */
-  padding: 0.75rem 1.5rem;
-  box-shadow: 0 8px 20px -4px rgba(122, 16, 32, 0.3);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, #8F1327 0%, #7A1020 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  border-radius: 0.875rem !important; /* 14px */
+  padding: 0.75rem 1.5rem !important;
+  box-shadow: 0 6px 18px -3px rgba(122, 16, 32, 0.35) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  transition: all 0.2s ease-in-out !important;
+  cursor: pointer !important;
+  border: none !important;
 }
 
 .bloom-btn-primary:hover {
-  background: linear-gradient(135deg, #A51730 0%, #8F1327 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 12px 24px -4px rgba(122, 16, 32, 0.4);
+  background: linear-gradient(135deg, #A51730 0%, #8F1327 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 22px -3px rgba(122, 16, 32, 0.45) !important;
 }
 
 .bloom-btn-primary:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 12px -2px rgba(122, 16, 32, 0.3);
+  transform: translateY(0) !important;
 }
 
-/* Secondary Button (Soft Rose Tint) */
+/* Secondary Button (Soft Rose Tint with Strong Text) */
 .bloom-btn-secondary {
-  background-color: #FCE8EC;
-  color: #7A1020;
-  font-weight: 700;
-  border-radius: 1rem;
-  padding: 0.75rem 1.25rem;
-  border: 1px solid #F9D5DC;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease-in-out;
-  cursor: pointer;
+  background-color: #FCE8EC !important;
+  color: #7A1020 !important;
+  font-weight: 700 !important;
+  border-radius: 0.875rem !important;
+  padding: 0.75rem 1.25rem !important;
+  border: 1.5px solid #F0C4CC !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  transition: all 0.2s ease-in-out !important;
+  cursor: pointer !important;
 }
 
 .bloom-btn-secondary:hover {
-  background-color: #F9D5DC;
-  color: #5C0C18;
-  border-color: #F4B8C3;
+  background-color: #F9D5DC !important;
+  color: #5C0C18 !important;
+  border-color: #E5B8C0 !important;
 }
 
 /* Bloom Form Inputs */
 .bloom-input, select.bloom-input {
-  width: 100%;
-  background-color: #FFFFFF;
-  border: 1.5px solid #E5D5D8;
-  border-radius: 0.875rem; /* 14px */
-  padding: 0.65rem 1rem;
-  font-size: 0.9375rem; /* 15px */
-  color: #1F1A1C;
-  outline: none;
-  transition: all 0.15s ease-in-out;
+  width: 100% !important;
+  background-color: #FFFFFF !important;
+  border: 1.5px solid #DDB0B8 !important;
+  border-radius: 0.75rem !important;
+  padding: 0.65rem 1rem !important;
+  font-size: 0.9375rem !important;
+  color: #1A080C !important;
+  outline: none !important;
 }
 
 .bloom-input:focus, select.bloom-input:focus {
-  border-color: #7A1020;
-  box-shadow: 0 0 0 4px rgba(122, 16, 32, 0.1);
-  background-color: #FFFFFF;
+  border-color: #7A1020 !important;
+  box-shadow: 0 0 0 3px rgba(122, 16, 32, 0.15) !important;
 }
 
 /* Bloom Badge Pill */
 .bloom-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  background-color: #FCE8EC;
-  color: #7A1020;
-  border: 1px solid #F9D5DC;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.bloom-badge-dark {
-  background: linear-gradient(135deg, #7A1020 0%, #B42336 100%);
-  color: #FFFFFF;
-  border: none;
-}
-
-/* Soft Bloom Hero Background */
-.bloom-hero-bg {
-  background: linear-gradient(135deg, rgba(255, 248, 249, 0.9) 0%, rgba(252, 232, 236, 0.7) 100%);
-  border: 1px solid #F9D5DC;
-  border-radius: 2rem;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  background-color: #FCE8EC !important;
+  color: #7A1020 !important;
+  border: 1px solid #F0C4CC !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 9999px !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
 }
