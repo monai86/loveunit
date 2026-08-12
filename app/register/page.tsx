@@ -182,6 +182,9 @@ export default function RegisterPage() {
       
       {/* Header */}
       <div className="text-center">
+        <div className="mb-3 flex justify-center">
+          <img src="/images/logo.png" alt="MUMT LOVE UNIT Logo" className="h-16 w-auto object-contain" />
+        </div>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#7A1020]/10 px-3 py-1 text-xs font-bold text-[#7A1020]">
           <Heart className="h-3.5 w-3.5 fill-[#7A1020]" />
           ระบบลงทะเบียนผู้บริจาคโลหิตออนไลน์

@@ -27,7 +27,7 @@ if (!connectionString) {
 
 async function runSeed() {
   console.log('⚡ Connecting to Neon PostgreSQL via HTTP Serverless API...');
-  const sql = neon(connectionString);
+  const sql = neon(connectionString!);
 
   try {
     // Seed Official MUMT 2026 Event Metadata & Time Slots

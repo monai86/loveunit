@@ -13,9 +13,7 @@ export function Navbar() {
         
         {/* Brand Logo & Title */}
         <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#7A1020] to-[#B42336] shadow-md shadow-[#7A1020]/20">
-            <Heart className="h-5 w-5 fill-white text-white" />
-          </div>
+          <img src="/images/logo.png" alt="MUMT LOVE UNIT Logo" className="h-11 w-auto object-contain" />
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-bold tracking-wider text-[#B42336] uppercase">MUMT Blood Donation 2026</span>

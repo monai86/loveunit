@@ -100,12 +100,15 @@ export default function RegistrationConfirmationPage({ params }: { params: Promi
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
       
-      {/* Header Banner */}
+      {/* Page Header */}
       <div className="text-center">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7A1020] to-[#B42336] text-white shadow-lg shadow-[#7A1020]/25">
-          <CheckCircle2 className="h-9 w-9" />
+        <div className="mb-3 flex justify-center">
+          <img src="/images/logo.png" alt="MUMT LOVE UNIT Logo" className="h-16 w-auto object-contain" />
         </div>
-
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+          <CheckCircle2 className="h-3.5 w-3.5" />
+          บัตรลงทะเบียนบริจาคโลหิตดิจิทัล
+        </span>
         <h1 className="mt-4 text-2xl font-black text-[#29272A] sm:text-3xl">
           ลงทะเบียนสำเร็จเรียบร้อยแล้ว!
         </h1>

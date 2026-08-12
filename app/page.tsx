@@ -55,9 +55,14 @@ export default async function HomePage() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-12">
           
           <div className="lg:col-span-7">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">
-              <Sparkles className="h-4 w-4 text-amber-300" />
-              <span className="text-xs font-bold tracking-wide text-amber-200 uppercase">โครงการบริจาคโลหิตครั้งใหญ่ มหิดล ศาลายา</span>
+            <div className="mb-4 flex flex-wrap items-center gap-3">
+              <div className="rounded-2xl bg-white p-2 shadow-xl shadow-black/20">
+                <img src="/images/logo.png" alt="MUMT LOVE UNIT Logo" className="h-14 w-auto object-contain" />
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">
+                <Sparkles className="h-4 w-4 text-amber-300" />
+                <span className="text-xs font-bold tracking-wide text-amber-200 uppercase">โครงการบริจาคโลหิตครั้งใหญ่ มหิดล ศาลายา</span>
+              </div>
             </div>
 
             <h1 className="mt-4 text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl">
