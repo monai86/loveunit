@@ -23,6 +23,7 @@ import {
 import { publicRegistrationSchema, PublicRegistrationInput } from '@/lib/validation/schemas';
 import { ParticipantType, DonationExperience, TimeSlot } from '@/lib/types/database';
 import { formatTimeRange, formatThaiDate } from '@/lib/utils/format';
+import { MAHIDOL_FACULTIES, ACADEMIC_YEARS } from '@/lib/constants/mahidol';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -393,35 +394,46 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Optional Student Fields */}
-              {formData.participantType === 'STUDENT' && (
+              {/* Student & Staff Faculty/Year Fields */}
+              {formData.participantType !== 'GENERAL_PUBLIC' && (
                 <div className="grid grid-cols-1 gap-4 rounded-2xl bg-[#FFF9F9] p-4 border border-[#FCE8EC] sm:grid-cols-2">
                   <div>
-                    <label className="block text-xs font-bold text-[#29272A] mb-1">คณะ / สถาบัน (ถ้ามี)</label>
-                    <input
-                      type="text"
-                      placeholder="เช่น คณะเทคนิคการแพทย์"
+                    <label className="block text-xs font-bold text-[#29272A] mb-1">
+                      คณะ / สถาบัน / วิทยาลัย
+                    </label>
+                    <select
                       value={formData.faculty}
                       onChange={(e) => handleChange('faculty', e.target.value)}
                       className="w-full rounded-xl border border-gray-300 px-3.5 py-2 text-sm text-[#29272A] focus:outline-none focus:ring-2 focus:ring-[#7A1020]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-[#29272A] mb-1">ชั้นปี (ถ้ามี)</label>
-                    <select
-                      value={formData.academicYear}
-                      onChange={(e) => handleChange('academicYear', e.target.value)}
-                      className="w-full rounded-xl border border-gray-300 px-3.5 py-2 text-sm text-[#29272A] focus:outline-none focus:ring-2 focus:ring-[#7A1020]"
                     >
-                      <option value="">-- เลือกชั้นปี --</option>
-                      <option value="ปี 1">ชั้นปีที่ 1</option>
-                      <option value="ปี 2">ชั้นปีที่ 2</option>
-                      <option value="ปี 3">ชั้นปีที่ 3</option>
-                      <option value="ปี 4">ชั้นปีที่ 4</option>
-                      <option value="บัณฑิตศึกษา">ระดับบัณฑิตศึกษา</option>
+                      <option value="">-- เลือกคณะ / สถาบัน --</option>
+                      {MAHIDOL_FACULTIES.map((fac) => (
+                        <option key={fac.code} value={fac.name}>
+                          {fac.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
+
+                  {formData.participantType === 'STUDENT' && (
+                    <div>
+                      <label className="block text-xs font-bold text-[#29272A] mb-1">
+                        ชั้นปี
+                      </label>
+                      <select
+                        value={formData.academicYear}
+                        onChange={(e) => handleChange('academicYear', e.target.value)}
+                        className="w-full rounded-xl border border-gray-300 px-3.5 py-2 text-sm text-[#29272A] focus:outline-none focus:ring-2 focus:ring-[#7A1020]"
+                      >
+                        <option value="">-- เลือกชั้นปี --</option>
+                        {ACADEMIC_YEARS.map((yr) => (
+                          <option key={yr.value} value={yr.value}>
+                            {yr.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               )}
 

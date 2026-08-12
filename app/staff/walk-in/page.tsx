@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { UserPlus, CheckCircle2, ArrowLeft, Phone, User, GraduationCap, Building2, Users, Loader2, Zap } from 'lucide-react';
 import { ParticipantType, DonationExperience } from '@/lib/types/database';
+import { MAHIDOL_FACULTIES } from '@/lib/constants/mahidol';
 
 export default function StaffWalkInPage() {
   const router = useRouter();
@@ -189,6 +190,26 @@ export default function StaffWalkInPage() {
               </button>
             </div>
           </div>
+
+          {formData.participantType !== 'GENERAL_PUBLIC' && (
+            <div>
+              <label className="block text-xs font-bold text-[#29272A] mb-1">
+                คณะ / สถาบัน / วิทยาลัย
+              </label>
+              <select
+                value={formData.faculty}
+                onChange={(e) => setFormData(prev => ({ ...prev, faculty: e.target.value }))}
+                className="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-[#29272A] focus:outline-none focus:ring-2 focus:ring-[#7A1020]"
+              >
+                <option value="">-- เลือกคณะ / สถาบัน --</option>
+                {MAHIDOL_FACULTIES.map((fac) => (
+                  <option key={fac.code} value={fac.name}>
+                    {fac.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div>
             <label className="block text-xs font-bold text-[#29272A] mb-2">
