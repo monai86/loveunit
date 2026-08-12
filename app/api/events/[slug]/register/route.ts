@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { publicRegistrationSchema } from '@/lib/validation/schemas';
-import { getEventBySlug, registerDonorAtomic } from '@/lib/db/store';
+import { getEventBySlug } from '@/services/event-service';
+import { registerDonorAtomic } from '@/services/registration-service';
 
 export async function POST(
   request: Request,
@@ -14,8 +15,8 @@ export async function POST(
     }
 
     const now = new Date();
-    const openAt = new Date(event.registration_open_at);
-    const closeAt = new Date(event.registration_close_at);
+    const openAt = new Date((event as any).registrationOpenAt || (event as any).registration_open_at);
+    const closeAt = new Date((event as any).registrationCloseAt || (event as any).registration_close_at);
     const isStatusOpen = ['REGISTRATION_OPEN', 'PUBLISHED'].includes(event.status);
     const isWithinWindow = now >= openAt && now <= closeAt;
 
@@ -45,10 +46,10 @@ export async function POST(
       lastName: input.lastName,
       phone: input.phone,
       email: input.email || undefined,
-      participantType: input.participantType,
+      participantType: input.participantType as any,
       faculty: input.faculty || undefined,
       academicYear: input.academicYear || undefined,
-      donationExperience: input.donationExperience,
+      donationExperience: input.donationExperience as any,
       slotId: input.slotId,
       source: 'ONLINE',
     });
@@ -58,7 +59,7 @@ export async function POST(
         success: false,
         errorCode: result.errorCode,
         message: result.message,
-        registrationCode: result.registration?.registration_code,
+        registrationCode: (result.registration as any)?.registrationCode || (result.registration as any)?.registration_code,
       }, { status: 400 });
     }
 

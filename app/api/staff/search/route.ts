@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { searchRegistrations } from '@/lib/db/store';
+import { searchRegistrations } from '@/services/checkin-service';
 import { requireStaff } from '@/lib/auth/server';
 
 export async function GET(request: Request) {
   try {
-    // Enforce Staff Role Server Authorization
     try {
       await requireStaff();
     } catch (err: any) {

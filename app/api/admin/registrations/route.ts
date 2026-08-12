@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getEventBySlug, getAllRegistrations } from '@/lib/db/store';
+import { getEventBySlug } from '@/services/event-service';
+import { getAllRegistrations } from '@/services/admin-service';
 import { requireAdmin } from '@/lib/auth/server';
 
 export async function GET() {
   try {
-    // Enforce Admin Server Authorization Guard
     try {
       await requireAdmin();
     } catch (err: any) {

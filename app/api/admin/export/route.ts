@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getEventBySlug, getAllRegistrations, recordAuditLog } from '@/lib/db/store';
+import { getEventBySlug } from '@/services/event-service';
+import { getAllRegistrations, recordAuditLog } from '@/services/admin-service';
 import { requireAdmin } from '@/lib/auth/server';
 
 export async function GET() {
   try {
-    // Enforce Admin Server Authorization Guard
     let currentUser;
     try {
       currentUser = await requireAdmin();
@@ -20,7 +20,6 @@ export async function GET() {
 
     const registrations = await getAllRegistrations(event.id);
 
-    // Audit Log the sensitive export action
     await recordAuditLog({
       actorId: currentUser.profile.user_id,
       action: 'EXPORT_REGISTRATIONS_DATA',
@@ -47,22 +46,22 @@ export async function GET() {
       'Checked In At'
     ].join(',');
 
-    const rows = registrations.map(r => [
-      `"${r.registration_code}"`,
-      `"${r.first_name}"`,
-      `"${r.last_name}"`,
+    const rows = registrations.map((r: any) => [
+      `"${r.registrationCode || r.registration_code}"`,
+      `"${r.firstName || r.first_name}"`,
+      `"${r.lastName || r.last_name}"`,
       `"${r.phone}"`,
       `"${r.email || ''}"`,
-      `"${r.participant_type}"`,
+      `"${r.participantType || r.participant_type}"`,
       `"${r.faculty || ''}"`,
-      `"${r.academic_year || ''}"`,
-      `"${r.donation_experience}"`,
-      `"${r.time_slot?.start_at || ''}"`,
-      `"${r.time_slot?.end_at || ''}"`,
+      `"${r.academicYear || r.academic_year || ''}"`,
+      `"${r.donationExperience || r.donation_experience}"`,
+      `"${(r.timeSlot || r.time_slot)?.startAt || (r.timeSlot || r.time_slot)?.start_at || ''}"`,
+      `"${(r.timeSlot || r.time_slot)?.endAt || (r.timeSlot || r.time_slot)?.end_at || ''}"`,
       `"${r.status}"`,
       `"${r.source}"`,
-      `"${r.registered_at}"`,
-      `"${r.checked_in_at || ''}"`
+      `"${r.registeredAt || r.registered_at}"`,
+      `"${r.checkedInAt || r.checked_in_at || ''}"`
     ].join(','));
 
     const csvContent = '\uFEFF' + [headers, ...rows].join('\n');

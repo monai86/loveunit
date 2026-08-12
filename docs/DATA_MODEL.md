@@ -1,50 +1,57 @@
-# Data Model — MUMT Blood Donation 2026
+# Data Model & Drizzle Schema — MUMT Blood Donation 2026
 
 ## Entity Relationship Summary
 
-```text
-events (1) ───< event_content_blocks (N)
-events (1) ───< time_slots (N) ───< registrations (N)
-events (1) ───< checkin_events (N)
-events (1) ───< feedback (N)
-auth.users (1) ─── staff_profiles (1)
-```
+The database uses PostgreSQL-native types managed by Drizzle ORM (`db/schema/*`).
 
-## Table Specifications
+### 1. Events (`events`)
+- `id` (UUID PK)
+- `slug` (Text Unique)
+- `name` (Text)
+- `short_name` (Text)
+- `description` (Text)
+- `start_at` (Timestamp with timezone)
+- `end_at` (Timestamp with timezone)
+- `venue_name` (Text)
+- `venue_detail` (Text)
+- `registration_open_at` (Timestamp with timezone)
+- `registration_close_at` (Timestamp with timezone)
+- `status` (Enum: `DRAFT`, `PUBLISHED`, `REGISTRATION_OPEN`, `REGISTRATION_CLOSED`, `COMPLETED`, `ARCHIVED`)
 
-### 1. `events`
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID (PK) | Unique event identifier |
-| `slug` | TEXT (UNIQUE) | Human-readable URL slug (`mumt-2026`) |
-| `name` | TEXT | Full event title |
-| `status` | ENUM | `DRAFT`, `PUBLISHED`, `REGISTRATION_OPEN`, `REGISTRATION_CLOSED`, `COMPLETED` |
+### 2. Time Slots (`time_slots`)
+- `id` (UUID PK)
+- `event_id` (UUID FK -> `events.id`)
+- `start_at` (Timestamp with timezone)
+- `end_at` (Timestamp with timezone)
+- `capacity` (Integer, default 35)
+- `booked_count` (Integer, default 0)
+- `is_active` (Boolean)
 
-### 2. `time_slots`
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID (PK) | Slot ID |
-| `event_id` | UUID (FK) | Reference to event |
-| `start_at` | TIMESTAMPTZ | Slot start time |
-| `end_at` | TIMESTAMPTZ | Slot end time |
-| `capacity` | INT | Max allowed registrations |
-| `booked_count` | INT | Current booked count |
+### 3. Registrations (`registrations`)
+- `id` (UUID PK)
+- `event_id` (UUID FK -> `events.id`)
+- `registration_code` (Text Unique)
+- `qr_token` (Text Unique)
+- `first_name` (Text)
+- `last_name` (Text)
+- `phone` (Text)
+- `phone_normalized` (Text)
+- `email` (Text Nullable)
+- `participant_type` (Enum: `STUDENT`, `STAFF`, `GENERAL_PUBLIC`)
+- `faculty` (Text Nullable)
+- `academic_year` (Text Nullable)
+- `donation_experience` (Enum: `FIRST_TIME`, `RETURNING`)
+- `slot_id` (UUID FK -> `time_slots.id` Nullable)
+- `status` (Enum: `REGISTERED`, `CHECKED_IN`, `IN_PROCESS`, `COMPLETED`, `CANCELLED`, `NO_SHOW`)
+- `source` (Enum: `ONLINE`, `WALK_IN`, `ADMIN`)
+- **Constraint:** Unique index `idx_registrations_event_phone` on `(event_id, phone_normalized)`
 
-### 3. `registrations`
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | UUID (PK) | Registration ID |
-| `registration_code` | TEXT (UNIQUE) | Format `MBD26-XXXXXX` |
-| `qr_token` | TEXT (UNIQUE) | Secure random opaque hash |
-| `phone_normalized` | TEXT | Cleaned 10-digit phone for duplicate check |
-| `participant_type` | ENUM | `STUDENT`, `STAFF`, `GENERAL_PUBLIC` |
-| `status` | ENUM | `REGISTERED`, `CHECKED_IN`, `IN_PROCESS`, `COMPLETED`, `CANCELLED`, `NO_SHOW` |
-| `source` | ENUM | `ONLINE`, `WALK_IN`, `ADMIN` |
+### 4. Staff Profiles (`staff_profiles`)
+- `user_id` (Text PK -> `user.id` Better Auth)
+- `display_name` (Text)
+- `role` (Enum: `STAFF`, `TEAM_LEAD`, `ADMIN`, `SUPER_ADMIN`)
+- `team` (Text Nullable)
+- `is_active` (Boolean)
 
-### 4. `event_content_blocks`
-| Field | Type | Description |
-|-------|------|-------------|
-| `content_key` | TEXT | E.g. `hero_poster`, `preparation_infographic`, `location_infographic` |
-| `title` | TEXT | Title |
-| `image_url` | TEXT (Nullable) | URL to image artwork |
-| `is_visible` | BOOLEAN | Visibility toggle |
+### 5. Better Auth Schema (`user`, `session`, `account`, `verification`)
+- Standard Better Auth PostgreSQL tables managed via Drizzle adapter.

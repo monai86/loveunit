@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getEventBySlug, getEventContentBlocks, updateEventContentBlock, recordAuditLog } from '@/lib/db/store';
+import { getEventBySlug } from '@/services/event-service';
+import { getAdminContentBlocks, updateEventContentBlock } from '@/services/content-service';
+import { recordAuditLog } from '@/services/admin-service';
 import { requireAdmin } from '@/lib/auth/server';
 
 export async function GET() {
@@ -16,7 +18,7 @@ export async function GET() {
       return NextResponse.json({ success: false, message: 'ไม่พบกิจกรรม' }, { status: 404 });
     }
 
-    const contentBlocks = await getEventContentBlocks(event.id);
+    const contentBlocks = await getAdminContentBlocks(event.id);
     return NextResponse.json({ success: true, contentBlocks });
   } catch (error) {
     console.error('Error fetching content blocks:', error);
@@ -44,10 +46,10 @@ export async function PUT(request: Request) {
     const res = await updateEventContentBlock(id, {
       title,
       description,
-      image_url: imageUrl,
-      alt_text: altText,
-      is_visible: isVisible,
-      display_order: displayOrder,
+      imageUrl,
+      altText,
+      isVisible,
+      displayOrder,
     });
 
     if (!res.success) {

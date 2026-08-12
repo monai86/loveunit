@@ -56,7 +56,7 @@ export const defaultEvent: Event = {
   updated_at: new Date().toISOString(),
 };
 
-const defaultContentBlocks: EventContentBlock[] = [
+export const defaultContentBlocks: EventContentBlock[] = [
   {
     id: 'cb-1',
     event_id: defaultEvent.id,
@@ -150,7 +150,7 @@ const defaultContentBlocks: EventContentBlock[] = [
   },
 ];
 
-const defaultSlots: TimeSlot[] = [
+export const defaultSlots: TimeSlot[] = [
   { id: 'ts-1', event_id: defaultEvent.id, start_at: '2026-09-16T08:00:00+07:00', end_at: '2026-09-16T09:00:00+07:00', capacity: 35, booked_count: 12, is_active: true, created_at: new Date().toISOString() },
   { id: 'ts-2', event_id: defaultEvent.id, start_at: '2026-09-16T09:00:00+07:00', end_at: '2026-09-16T10:00:00+07:00', capacity: 35, booked_count: 28, is_active: true, created_at: new Date().toISOString() },
   { id: 'ts-3', event_id: defaultEvent.id, start_at: '2026-09-16T10:00:00+07:00', end_at: '2026-09-16T11:00:00+07:00', capacity: 35, booked_count: 35, is_active: true, created_at: new Date().toISOString() },
@@ -160,7 +160,7 @@ const defaultSlots: TimeSlot[] = [
   { id: 'ts-7', event_id: defaultEvent.id, start_at: '2026-09-16T14:00:00+07:00', end_at: '2026-09-16T15:00:00+07:00', capacity: 25, booked_count: 8, is_active: true, created_at: new Date().toISOString() },
 ];
 
-let inMemoryRegistrations: Registration[] = [
+export let inMemoryRegistrations: Registration[] = [
   {
     id: 'reg-demo-1',
     event_id: defaultEvent.id,

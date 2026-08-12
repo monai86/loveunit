@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { checkInDonor, getRegistrationByQRToken, getRegistrationByCode } from '@/lib/db/store';
+import { checkInDonor } from '@/services/checkin-service';
+import { getRegistrationByQRToken, getRegistrationByCode } from '@/services/registration-service';
 import { requireStaff } from '@/lib/auth/server';
 
 export async function POST(request: Request) {
   try {
-    // Enforce Staff Role Server Authorization
     let currentUser;
     try {
       currentUser = await requireStaff();
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     const result = await checkInDonor(targetId, currentUser.profile.user_id);
 
     if (!result.success) {
-      return NextResponse.json({ success: false, message: result.message || 'ไม่สามารถเช็คอินได้' }, { status: 400 });
+      return NextResponse.json({ success: false, message: (result as any).message || 'ไม่สามารถเช็คอินได้' }, { status: 400 });
     }
 
     return NextResponse.json({

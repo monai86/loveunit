@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { walkInRegistrationSchema } from '@/lib/validation/schemas';
-import { getEventBySlug, getTimeSlots, registerDonorAtomic, checkInDonor } from '@/lib/db/store';
+import { getEventBySlug, getTimeSlots } from '@/services/event-service';
+import { registerDonorAtomic } from '@/services/registration-service';
+import { checkInDonor } from '@/services/checkin-service';
 import { requireStaff } from '@/lib/auth/server';
 
 export async function POST(request: Request) {
   try {
-    // Enforce Staff Role Server Authorization
     let currentUser;
     try {
       currentUser = await requireStaff();
@@ -32,21 +33,19 @@ export async function POST(request: Request) {
 
     const input = parseResult.data;
 
-    // P0 FIX: Get real active time slot UUID or pass null (no hardcoded ts-1 mock strings!)
     const activeSlots = await getTimeSlots(event.id);
-    const firstAvailableSlot = activeSlots.find(s => s.booked_count < s.capacity);
+    const firstAvailableSlot = activeSlots.find(s => ((s as any).bookedCount || (s as any).booked_count || 0) < s.capacity);
     const targetSlotId = firstAvailableSlot ? firstAvailableSlot.id : (activeSlots[0]?.id || '');
 
-    // Fast register as WALK_IN
     const regResult = await registerDonorAtomic({
       eventId: event.id,
       firstName: input.firstName,
       lastName: input.lastName,
       phone: input.phone,
-      participantType: input.participantType,
+      participantType: input.participantType as any,
       faculty: input.faculty || undefined,
       academicYear: input.academicYear || undefined,
-      donationExperience: input.donationExperience,
+      donationExperience: input.donationExperience as any,
       slotId: targetSlotId,
       source: 'WALK_IN',
     });
@@ -59,7 +58,6 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    // Immediately Check In
     const checkinRes = await checkInDonor(regResult.registration.id, currentUser.profile.user_id);
 
     return NextResponse.json({

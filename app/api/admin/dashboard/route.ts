@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getEventBySlug, getDashboardKPIs, getForecastByTimeSlot, getRegistrationsByParticipantType } from '@/lib/db/store';
+import { getEventBySlug } from '@/services/event-service';
+import { getDashboardKPIs } from '@/services/admin-service';
 import { requireTeamLead } from '@/lib/auth/server';
 
 export async function GET() {
   try {
-    // Enforce Team Lead / Admin Authorization Guard
     try {
       await requireTeamLead();
     } catch (err: any) {
@@ -18,15 +18,17 @@ export async function GET() {
     }
 
     const kpis = await getDashboardKPIs(event.id);
-    const forecast = await getForecastByTimeSlot(event.id);
-    const demographics = await getRegistrationsByParticipantType(event.id);
 
     return NextResponse.json({
       success: true,
       event,
       kpis,
-      forecast,
-      demographics,
+      forecast: kpis.slotBreakdown,
+      demographics: {
+        students: kpis.studentsCount,
+        staff: kpis.staffCount,
+        generalPublic: kpis.generalPublicCount,
+      },
     });
   } catch (error) {
     console.error('Error fetching admin dashboard KPIs:', error);

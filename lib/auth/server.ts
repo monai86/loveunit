@@ -1,6 +1,10 @@
 // Server-side Authorization & Role-Based Access Control (RBAC) Guards
 
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { headers } from 'next/headers';
+import { auth } from '@/lib/auth';
+import { db } from '@/db';
+import { staffProfiles } from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
 import { StaffProfile, StaffRole } from '@/lib/types/database';
 import { isMemoryBackendAllowed } from '@/lib/db/store';
 
@@ -10,7 +14,6 @@ export interface AuthenticatedUser {
   profile: StaffProfile;
 }
 
-// In-Memory Dev Staff Profiles for local testing without Supabase Auth
 const devProfiles: Record<string, StaffProfile> = {
   'staff@mahidol.ac.th': { user_id: 'u-staff', display_name: 'เจ้าหน้าที่จุดเช็คอิน', role: 'STAFF', team: 'Checkin Flow', is_active: true, created_at: '', updated_at: '' },
   'lead@mahidol.ac.th': { user_id: 'u-lead', display_name: 'หัวหน้าทีมปฏิบัติการ', role: 'TEAM_LEAD', team: 'Flow Team', is_active: true, created_at: '', updated_at: '' },
@@ -19,34 +22,45 @@ const devProfiles: Record<string, StaffProfile> = {
 };
 
 /**
- * Reads authenticated server session and loads staff profile from database.
+ * Reads Better Auth authenticated server session and loads staff profile from Drizzle DB.
  */
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
-  const supabase = await createServerSupabaseClient();
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
 
-  if (supabase) {
-    const { data: { user }, error: authErr } = await supabase.auth.getUser();
-    if (authErr || !user || !user.email) return null;
+    if (session && session.user && session.user.id) {
+      if (db) {
+        const [profile] = await db
+          .select()
+          .from(staffProfiles)
+          .where(and(eq(staffProfiles.userId, session.user.id), eq(staffProfiles.isActive, true)))
+          .limit(1);
 
-    const { data: profile } = await supabase
-      .from('staff_profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('is_active', true)
-      .maybeSingle();
-
-    if (!profile) return null;
-
-    return {
-      id: user.id,
-      email: user.email,
-      profile: profile as StaffProfile,
-    };
+        if (profile) {
+          return {
+            id: session.user.id,
+            email: session.user.email,
+            profile: {
+              user_id: profile.userId,
+              display_name: profile.displayName,
+              role: profile.role as StaffRole,
+              team: profile.team || null,
+              is_active: profile.isActive,
+              created_at: profile.createdAt.toISOString(),
+              updated_at: profile.updatedAt.toISOString(),
+            },
+          };
+        }
+      }
+    }
+  } catch (err) {
+    // Session read error
   }
 
-  // Fallback for local development/testing when allowed
+  // Fallback for local testing / memory backend when allowed
   if (isMemoryBackendAllowed()) {
-    // Return default admin profile for local dev testing
     const devProfile = devProfiles['admin@mahidol.ac.th'];
     return {
       id: devProfile.user_id,
@@ -58,9 +72,6 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
   return null;
 }
 
-/**
- * Authorization Guard: Requires active user with at least STAFF role.
- */
 export async function requireStaff(): Promise<AuthenticatedUser> {
   const user = await getAuthenticatedUser();
   if (!user) {
@@ -73,9 +84,6 @@ export async function requireStaff(): Promise<AuthenticatedUser> {
   return user;
 }
 
-/**
- * Authorization Guard: Requires active user with at least TEAM_LEAD role.
- */
 export async function requireTeamLead(): Promise<AuthenticatedUser> {
   const user = await getAuthenticatedUser();
   if (!user) {
@@ -88,9 +96,6 @@ export async function requireTeamLead(): Promise<AuthenticatedUser> {
   return user;
 }
 
-/**
- * Authorization Guard: Requires active user with ADMIN or SUPER_ADMIN role.
- */
 export async function requireAdmin(): Promise<AuthenticatedUser> {
   const user = await getAuthenticatedUser();
   if (!user) {
@@ -103,9 +108,6 @@ export async function requireAdmin(): Promise<AuthenticatedUser> {
   return user;
 }
 
-/**
- * Authorization Guard: Requires active user with SUPER_ADMIN role.
- */
 export async function requireSuperAdmin(): Promise<AuthenticatedUser> {
   const user = await getAuthenticatedUser();
   if (!user) {
