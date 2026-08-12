@@ -1,21 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --bloom-bg: #FFF5F7;
-  --bloom-ink: #1A080C;
-  --bloom-body: #331A20;
-  --bloom-burgundy: #7A1020;
-  --bloom-warm-red: #B42336;
-  --bloom-soft-rose: #FCE8EC;
-  --bloom-border: #F0C4CC;
+  --editorial-bg: #FFF9F9;
+  --editorial-surface: #FFFCFC;
+  --editorial-ink: #29272A;
+  --editorial-muted: #6B6366;
+  --editorial-burgundy: #7A1020;
+  --editorial-warm-red: #B42336;
+  --editorial-soft-rose: #FCE8EC;
+  --editorial-border: #F0C4CC;
   
-  --background: #FFF5F7;
-  --foreground: #1A080C;
+  --background: #FFF9F9;
+  --foreground: #29272A;
 }
 
 body {
-  background-color: #FFF5F7;
-  color: #1A080C;
+  background-color: #FFF9F9;
+  color: #29272A;
   font-family: 'Prompt', 'Kanit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
   margin: 0;
@@ -23,118 +24,143 @@ body {
 }
 
 /* ===================================================
-   SPRING BLOOM DEFINITIVE HIGH-CONTRAST DESIGN SYSTEM
+   WARM EDITORIAL BLOOD DRIVE DESIGN SYSTEM UTILITIES
    =================================================== */
 
-/* Explicit Text Color Utility Rules */
-.text-ink-dark {
-  color: #1A080C !important;
+/* High-Contrast Typography Helpers */
+.text-editorial-ink {
+  color: #29272A !important;
 }
 
-.text-body-dark {
-  color: #382025 !important;
+.text-editorial-muted {
+  color: #6B6366 !important;
 }
 
-.text-burgundy {
+.text-editorial-burgundy {
   color: #7A1020 !important;
 }
 
-.text-warm-red {
+.text-editorial-red {
   color: #B42336 !important;
 }
 
-/* Bloom Card Surface */
-.bloom-card {
-  background-color: #FFFFFF !important;
+/* Editorial Container Surface */
+.editorial-card {
+  background-color: #FFFCFC !important;
   border: 1.5px solid #F0C4CC !important;
-  border-radius: 1.25rem !important; /* 20px */
-  box-shadow: 0 8px 24px -4px rgba(122, 16, 32, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
-  color: #1A080C !important;
+  border-radius: 0.875rem !important; /* 14px */
+  box-shadow: 0 4px 16px -2px rgba(122, 16, 32, 0.05) !important;
+  color: #29272A !important;
 }
 
-.bloom-card-hero {
+.editorial-card-flat {
   background-color: #FFFFFF !important;
-  border: 2px solid #F0C4CC !important;
-  border-radius: 1.5rem !important;
-  box-shadow: 0 12px 32px -8px rgba(122, 16, 32, 0.1) !important;
+  border: 1px solid #F0C4CC !important;
+  border-radius: 0.75rem !important;
 }
 
-/* Primary Action Button (Deep Burgundy Gradient) */
-.bloom-btn-primary {
-  background: linear-gradient(135deg, #8F1327 0%, #7A1020 100%) !important;
+/* UNIT Section Tag Motif */
+.unit-tag {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  background-color: #7A1020 !important;
+  color: #FFFFFF !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 0.25rem !important; /* Sharp editorial tag */
+  font-size: 0.75rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  font-family: monospace, monospace !important;
+  text-transform: uppercase !important;
+}
+
+.unit-tag-outline {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  background-color: #FCE8EC !important;
+  color: #7A1020 !important;
+  border: 1.5px solid #7A1020 !important;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 0.25rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  font-family: monospace, monospace !important;
+  text-transform: uppercase !important;
+}
+
+/* Primary Action Button (Deep Burgundy Solid) */
+.editorial-btn-primary {
+  background-color: #7A1020 !important;
   color: #FFFFFF !important;
   font-weight: 700 !important;
-  border-radius: 0.875rem !important; /* 14px */
+  border-radius: 0.625rem !important; /* 10px */
   padding: 0.75rem 1.5rem !important;
-  box-shadow: 0 6px 18px -3px rgba(122, 16, 32, 0.35) !important;
+  box-shadow: 0 4px 12px -2px rgba(122, 16, 32, 0.25) !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 0.5rem !important;
-  transition: all 0.2s ease-in-out !important;
+  transition: all 0.15s ease-in-out !important;
   cursor: pointer !important;
   border: none !important;
 }
 
-.bloom-btn-primary:hover {
-  background: linear-gradient(135deg, #A51730 0%, #8F1327 100%) !important;
+.editorial-btn-primary:hover {
+  background-color: #8F1327 !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 10px 22px -3px rgba(122, 16, 32, 0.45) !important;
+  box-shadow: 0 6px 16px -2px rgba(122, 16, 32, 0.35) !important;
 }
 
-.bloom-btn-primary:active {
+.editorial-btn-primary:active {
   transform: translateY(0) !important;
 }
 
-/* Secondary Button (Soft Rose Tint with Strong Text) */
-.bloom-btn-secondary {
+/* Secondary Button (Soft Rose Bordered) */
+.editorial-btn-secondary {
   background-color: #FCE8EC !important;
   color: #7A1020 !important;
   font-weight: 700 !important;
-  border-radius: 0.875rem !important;
+  border-radius: 0.625rem !important;
   padding: 0.75rem 1.25rem !important;
   border: 1.5px solid #F0C4CC !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 0.5rem !important;
-  transition: all 0.2s ease-in-out !important;
+  transition: all 0.15s ease-in-out !important;
   cursor: pointer !important;
 }
 
-.bloom-btn-secondary:hover {
+.editorial-btn-secondary:hover {
   background-color: #F9D5DC !important;
   color: #5C0C18 !important;
-  border-color: #E5B8C0 !important;
+  border-color: #7A1020 !important;
 }
 
-/* Bloom Form Inputs */
-.bloom-input, select.bloom-input {
+/* Form Controls */
+.editorial-input, select.editorial-input {
   width: 100% !important;
   background-color: #FFFFFF !important;
   border: 1.5px solid #DDB0B8 !important;
-  border-radius: 0.75rem !important;
+  border-radius: 0.625rem !important;
   padding: 0.65rem 1rem !important;
   font-size: 0.9375rem !important;
-  color: #1A080C !important;
+  color: #29272A !important;
   outline: none !important;
 }
 
-.bloom-input:focus, select.bloom-input:focus {
+.editorial-input:focus, select.editorial-input:focus {
   border-color: #7A1020 !important;
   box-shadow: 0 0 0 3px rgba(122, 16, 32, 0.15) !important;
 }
 
-/* Bloom Badge Pill */
-.bloom-badge {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 0.375rem !important;
-  background-color: #FCE8EC !important;
-  color: #7A1020 !important;
-  border: 1px solid #F0C4CC !important;
-  padding: 0.25rem 0.75rem !important;
-  border-radius: 9999px !important;
-  font-size: 0.75rem !important;
-  font-weight: 700 !important;
+/* Editorial Ticket Container */
+.editorial-ticket {
+  background-color: #FFFFFF !important;
+  border: 2px dashed #7A1020 !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 10px 30px -5px rgba(122, 16, 32, 0.1) !important;
 }

@@ -2,76 +2,80 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Heart, MapPin, Phone, Mail, ShieldCheck, ExternalLink, Calendar, BookOpen } from 'lucide-react';
+import { Heart, MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-[#F0C4CC] bg-white text-ink-dark select-none">
+    <footer className="mt-20 border-t border-[#F0C4CC] bg-white text-editorial-ink select-none">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
           
-          {/* Brand Info Column */}
-          <div className="space-y-3">
+          {/* Brand Info (5 columns) */}
+          <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FFF5F7] p-1 border border-[#F0C4CC]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#FFF9F9] p-1 border border-[#F0C4CC]">
                 <img src="/images/logo.png" alt="MUMT Logo" className="h-full w-auto object-contain" />
               </div>
               <div>
-                <span className="text-xs font-black tracking-wider text-[#7A1020] uppercase block">MUMT Blood Donation 2026</span>
-                <span className="text-sm font-extrabold text-ink-dark">ครั้งที่ 9 “เติมรักให้เต็ม Unit”</span>
+                <span className="text-[10px] font-mono font-bold tracking-widest text-[#7A1020] uppercase block">MUMT / BLOOD DONATION / 2026</span>
+                <span className="text-sm font-black text-editorial-ink">ครั้งที่ 9 “เติมรักให้เต็ม Unit”</span>
               </div>
             </div>
-            <p className="text-xs leading-relaxed text-body-dark font-medium">
+            <p className="text-xs leading-relaxed text-editorial-muted font-medium max-w-md">
               โครงการบริจาคโลหิต จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ สภากาชาดไทย ณ อาคารสิริวิทยา มหาวิทยาลัยมหิดล ศาลายา
             </p>
-            <div className="pt-1">
-              <span className="bloom-badge text-[11px]">
-                <Heart className="h-3 w-3 fill-[#7A1020]" />
+            <div>
+              <span className="unit-tag-outline text-[10px]">
                 16 กันยายน 2569 (08:00 - 15:00 น.)
               </span>
             </div>
           </div>
 
-          {/* Quick Links Column */}
-          <div>
-            <h3 className="text-xs font-black tracking-wider text-[#7A1020] uppercase mb-3 pb-1 border-b border-[#FCE8EC]">
-              📌 ลิงก์เมนูด่วน
-            </h3>
-            <ul className="space-y-2 text-xs font-bold text-body-dark">
+          {/* Quick Links (3 columns) */}
+          <div className="md:col-span-3 space-y-3">
+            <span className="text-xs font-mono font-bold tracking-widest text-[#7A1020] uppercase block border-b border-[#FCE8EC] pb-1">
+              NAVIGATION
+            </span>
+            <ul className="space-y-2 text-xs font-bold text-editorial-ink">
               <li>
-                <Link href="/" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5">
-                  <span>• หน้าหลัก</span>
+                <Link href="/" className="hover:text-[#7A1020] hover:underline flex items-center justify-between">
+                  <span>หน้าแรก</span>
+                  <ArrowRight className="h-3 w-3 opacity-40" />
                 </Link>
               </li>
               <li>
-                <Link href="/register" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5 text-[#7A1020]">
-                  <span>• ลงทะเบียนบริจาคโลหิตออนไลน์</span>
+                <Link href="/register" className="hover:text-[#7A1020] hover:underline flex items-center justify-between text-[#7A1020]">
+                  <span>ลงทะเบียนออนไลน์</span>
+                  <ArrowRight className="h-3 w-3" />
                 </Link>
               </li>
               <li>
-                <Link href="/prepare" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5">
-                  <span>• ข้อปฏิบัติตัวก่อนบริจาค</span>
+                <Link href="/prepare" className="hover:text-[#7A1020] hover:underline flex items-center justify-between">
+                  <span>ข้อปฏิบัติตัวก่อนบริจาค</span>
+                  <ArrowRight className="h-3 w-3 opacity-40" />
                 </Link>
               </li>
               <li>
-                <Link href="/location" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5">
-                  <span>• แผนที่สถานที่และการเดินทาง</span>
+                <Link href="/location" className="hover:text-[#7A1020] hover:underline flex items-center justify-between">
+                  <span>สถานที่และการเดินทาง</span>
+                  <ArrowRight className="h-3 w-3 opacity-40" />
                 </Link>
               </li>
               <li>
-                <Link href="/staff/login" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5 text-gray-600">
-                  <span>• ระบบเจ้าหน้าที่ (Staff Portal)</span>
+                <Link href="/staff/login" className="hover:text-[#7A1020] hover:underline flex items-center justify-between text-gray-500">
+                  <span>ระบบเจ้าหน้าที่ (Staff)</span>
+                  <ArrowRight className="h-3 w-3 opacity-40" />
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Official Contact Details Column */}
-          <div>
-            <h3 className="text-xs font-black tracking-wider text-[#7A1020] uppercase mb-3 pb-1 border-b border-[#FCE8EC]">
-              📞 ติดต่อสอบถาม
-            </h3>
-            <div className="space-y-3 text-xs text-body-dark font-medium">
+          {/* Contact Details (4 columns) */}
+          <div className="md:col-span-4 space-y-3">
+            <span className="text-xs font-mono font-bold tracking-widest text-[#7A1020] uppercase block border-b border-[#FCE8EC] pb-1">
+              UNIT 05 / CONTACT
+            </span>
+            <div className="space-y-3 text-xs text-editorial-ink font-medium">
               <div className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 shrink-0 text-[#B42336] mt-0.5" />
                 <span className="leading-relaxed">
@@ -99,9 +103,9 @@ export function Footer() {
         </div>
 
         {/* Bottom Copyright Strip */}
-        <div className="mt-10 pt-6 border-t border-[#FCE8EC] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-body-dark font-bold">
+        <div className="mt-12 pt-6 border-t border-[#F0C4CC] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-editorial-muted font-bold">
           <div>© 2026 Faculty of Medical Technology, Mahidol University (MUMT)</div>
-          <div>เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9</div>
+          <div className="font-mono">เติมรักให้เต็ม Unit ครั้งที่ 9</div>
         </div>
       </div>
     </footer>

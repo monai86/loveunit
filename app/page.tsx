@@ -6,10 +6,10 @@ import {
   Clock, 
   MapPin, 
   CheckCircle2, 
-  Sparkles, 
   ArrowRight, 
   BookOpen, 
-  ShieldCheck
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import { InfographicSlot } from '@/components/infographic/InfographicSlot';
 import { getEventBySlug, getEventContentBlocks } from '@/services/event-service';
@@ -21,9 +21,9 @@ export default async function HomePage() {
   if (!event) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <div className="bloom-card p-8 text-center">
+        <div className="editorial-card p-8 text-center">
           <h2 className="text-lg font-bold text-red-700">ไม่พบข้อมูลกิจกรรมบริจาคโลหิต</h2>
-          <p className="mt-2 text-xs text-body-dark">กรุณาตรวจสอบ URL หรือติดต่อผู้ดูแลระบบ</p>
+          <p className="mt-2 text-xs text-editorial-muted">กรุณาตรวจสอบ URL หรือติดต่อผู้ดูแลระบบ</p>
         </div>
       </div>
     );
@@ -43,102 +43,93 @@ export default async function HomePage() {
   const eventDateFormatted = formatThaiDate(startAt);
   const eventTimeFormatted = formatTimeRange(startAt, endAt);
 
-  return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-10">
+  const donorSteps = [
+    { num: '01', title: 'REGISTER', desc: 'ลงทะเบียนออนไลน์ เลือกรอบเวลาเดินทาง' },
+    { num: '02', title: 'PREPARE', desc: 'นอนหลับ 6 ชม. ดื่มน้ำ 3-4 แก้ว ทานอาหาร' },
+    { num: '03', title: 'ARRIVE', desc: 'แสดง QR Pass ที่ห้อง 217-218 สิริวิทยา' },
+    { num: '04', title: 'DONATE', desc: 'ตรวจความพร้อมและบริจาคโลหิตกับสภากาชาด' },
+    { num: '05', title: 'REST', desc: 'พักผ่อน 15 นาที รับอาหารว่างและของที่ระลึก' },
+  ];
 
-      {/* SPRING BLOOM HIGH-CONTRAST HERO SECTION */}
-      <section className="bloom-card-hero p-6 sm:p-10 relative overflow-hidden bg-white">
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-16">
+
+      {/* UNIT 01: WARM EDITORIAL HERO CAMPAIGN */}
+      <section className="border-b border-[#F0C4CC] pb-12">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           
-          {/* Left Text & Actions */}
+          {/* Left Editorial Text & Actions (7 Cols) */}
           <div className="lg:col-span-7 space-y-6">
             
-            <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FFF5F7] p-1.5 border border-[#F0C4CC]">
-                  <img src="/images/logo.png" alt="MUMT Logo" className="h-full w-auto object-contain" />
-                </div>
-                <span className="bloom-badge py-1 px-3.5 text-xs">
-                  <Heart className="h-3.5 w-3.5 fill-[#7A1020] text-[#7A1020]" />
-                  โครงการบริจาคโลหิต ครั้งที่ 9
-                </span>
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="unit-tag">UNIT 01 / CAMPAIGN</span>
+                <span className="unit-tag-outline">คณะเทคนิคการแพทย์ มหิดล × สภากาชาดไทย</span>
               </div>
 
-              {/* High Contrast Title */}
-              <h1 className="text-2xl font-black text-ink-dark sm:text-4xl lg:text-5xl leading-tight tracking-tight">
-                {event.name}
+              {/* Display Typography Scale */}
+              <h1 className="text-3xl font-black text-editorial-ink sm:text-5xl lg:text-6xl leading-[1.1] tracking-tight">
+                เติมรักให้เต็ม <span className="text-[#7A1020]">UNIT</span> <br className="hidden sm:block" />
+                <span className="text-[#B42336]">ต่อชีวิตด้วยโลหิตคุณ</span>
               </h1>
 
-              {/* High Contrast Body Description */}
-              <p className="text-sm leading-relaxed text-body-dark sm:text-base font-medium">
+              <p className="text-sm leading-relaxed text-editorial-muted sm:text-base font-medium max-w-2xl">
                 {event.description}
               </p>
             </div>
 
-            {/* Event Key Badges Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Typography-First Event Facts (No Generic Cards) */}
+            <div className="grid grid-cols-3 gap-4 border-y border-[#F0C4CC] py-5 my-6">
               
-              <div className="bloom-card p-3.5 flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FCE8EC] text-[#7A1020]">
-                  <Calendar className="h-5 w-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-gray-500 block uppercase">วันที่จัดงาน</span>
-                  <span className="font-extrabold text-xs text-ink-dark">{eventDateFormatted}</span>
-                </div>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-gray-500 uppercase block tracking-wider">01. DATE</span>
+                <span className="text-lg sm:text-2xl font-black text-[#7A1020] block mt-0.5">16 SEP</span>
+                <span className="text-[11px] font-bold text-editorial-ink block">พุธ 16 กันยายน 2569</span>
               </div>
 
-              <div className="bloom-card p-3.5 flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FCE8EC] text-[#7A1020]">
-                  <Clock className="h-5 w-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-gray-500 block uppercase">เวลาบริการ</span>
-                  <span className="font-extrabold text-xs text-ink-dark">{eventTimeFormatted}</span>
-                </div>
+              <div className="border-l border-[#F0C4CC] pl-4">
+                <span className="text-[10px] font-mono font-bold text-gray-500 uppercase block tracking-wider">02. TIME</span>
+                <span className="text-lg sm:text-2xl font-black text-[#7A1020] block mt-0.5">08:00—15:00</span>
+                <span className="text-[11px] font-bold text-editorial-ink block">เปิดรับตลอดวัน</span>
               </div>
 
-              <div className="bloom-card p-3.5 flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#FCE8EC] text-[#7A1020]">
-                  <MapPin className="h-5 w-5" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-gray-500 block uppercase">สถานที่</span>
-                  <span className="font-extrabold text-xs text-ink-dark truncate block">{venueName}</span>
-                </div>
+              <div className="border-l border-[#F0C4CC] pl-4">
+                <span className="text-[10px] font-mono font-bold text-gray-500 uppercase block tracking-wider">03. VENUE</span>
+                <span className="text-lg sm:text-2xl font-black text-[#7A1020] block mt-0.5">LA 217–218</span>
+                <span className="text-[11px] font-bold text-editorial-ink block truncate">{venueName}</span>
               </div>
 
             </div>
 
-            {/* Action Buttons */}
+            {/* Editorial Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Link
                 href="/register"
-                className="bloom-btn-primary py-3.5 px-7 text-sm justify-center"
+                className="editorial-btn-primary py-3.5 px-8 text-sm justify-center"
               >
-                <Heart className="h-5 w-5 fill-white text-white" />
                 <span>ลงทะเบียนบริจาคโลหิตออนไลน์</span>
+                <ArrowRight className="h-4 w-4" />
               </Link>
 
               <Link
                 href="/prepare"
-                className="bloom-btn-secondary py-3.5 px-6 text-xs justify-center"
+                className="editorial-btn-secondary py-3.5 px-6 text-xs justify-center"
               >
-                <BookOpen className="h-4.5 w-4.5 text-[#7A1020]" />
-                <span>ดูข้อปฏิบัติตัวก่อนบริจาค</span>
+                <BookOpen className="h-4 w-4 text-[#7A1020]" />
+                <span>ข้อปฏิบัติตัวก่อนบริจาค</span>
               </Link>
             </div>
 
-            <p className="text-xs text-gray-600 font-bold">
-              * การเลือกรอบเวลาเป็นการเลือกช่วงเวลาแนะนำเดินทางมาถึง ไม่ใช่ระบบคิวถาวร
+            <p className="text-[11px] text-editorial-muted font-mono font-bold">
+              * การเลือกรอบเวลาเป็นการเลือกช่วงเวลาแนะนำเดินทางมาถึง เพื่อบริหารความหนาแน่น
             </p>
 
           </div>
 
-          {/* Right Hero Poster Box */}
+          {/* Right Poster Box (5 Cols) */}
           <div className="lg:col-span-5">
-            <div className="bloom-card p-3">
+            <div className="editorial-card p-3">
               <InfographicSlot
                 contentKey="hero_poster"
                 title={heroPoster?.title || 'โปสเตอร์ประชาสัมพันธ์โครงการ'}
@@ -154,15 +145,39 @@ export default async function HomePage() {
 
       </section>
 
-      {/* SECTION 01: PREPARATION GUIDE */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
+      {/* UNIT 02: DONOR JOURNEY (5 STEPS) */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between border-b border-[#F0C4CC] pb-3">
           <div>
-            <span className="bloom-badge mb-1">
-              <BookOpen className="h-3.5 w-3.5" />
-              Donor Guide
-            </span>
-            <h2 className="text-xl font-extrabold text-ink-dark sm:text-2xl">
+            <span className="unit-tag mb-1">UNIT 02 / DONOR JOURNEY</span>
+            <h2 className="text-xl font-black text-editorial-ink sm:text-2xl">
+              ขั้นตอนการเข้าร่วมบริจาคโลหิต
+            </h2>
+          </div>
+        </div>
+
+        {/* 5-Step Sequential Journey Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+          {donorSteps.map((step) => (
+            <div key={step.num} className="editorial-card p-4 flex flex-col justify-between space-y-3">
+              <div className="space-y-1">
+                <span className="text-xs font-mono font-black text-[#7A1020] block">{step.num}</span>
+                <h3 className="text-sm font-black text-editorial-ink">{step.title}</h3>
+              </div>
+              <p className="text-xs text-editorial-muted leading-relaxed font-medium">
+                {step.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* UNIT 03: PREPARATION GUIDE (ALTERNATING EDITORIAL LAYOUT) */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between border-b border-[#F0C4CC] pb-3">
+          <div>
+            <span className="unit-tag mb-1">UNIT 03 / PREPARATION</span>
+            <h2 className="text-xl font-black text-editorial-ink sm:text-2xl">
               การเตรียมตัวก่อนมาบริจาคโลหิต
             </h2>
           </div>
@@ -172,45 +187,43 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
           
-          <div className="md:col-span-5 bloom-card p-6 space-y-4 flex flex-col justify-between">
-            <div>
-              <h3 className="text-base font-extrabold text-[#7A1020] border-b border-[#FCE8EC] pb-2">
-                ข้อควรปฏิบัติสำคัญก่อนบริจาค
-              </h3>
-              <ul className="mt-3 space-y-2.5 text-xs font-bold text-body-dark">
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
-                  <span>พักผ่อนให้เพียงพอ นอนหลับไม่น้อยกว่า 6 ชั่วโมง</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
-                  <span>ดื่มน้ำเปล่า 3-4 แก้ว ก่อนบริจาคประมาณ 30 นาที</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
-                  <span>ทานอาหารมื้อหลัก หลีกเลี่ยงอาหารไขมันสูง</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
-                  <span>งดเครื่องดื่มแอลกอฮอล์อย่างน้อย 24 ชั่วโมง</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
-                  <span>นำบัตรประชาชนตัวจริงมาแสดงในวันงาน</span>
-                </li>
-              </ul>
-            </div>
+          <div className="md:col-span-5 editorial-card p-6 space-y-4">
+            <h3 className="text-base font-black text-[#7A1020] border-b border-[#FCE8EC] pb-2">
+              ข้อควรปฏิบัติสำคัญก่อนบริจาค
+            </h3>
+            <ul className="space-y-3 text-xs font-bold text-editorial-ink">
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
+                <span>พักผ่อนให้เพียงพอ นอนหลับไม่น้อยกว่า 6 ชั่วโมง</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
+                <span>ดื่มน้ำเปล่า 3-4 แก้ว ก่อนบริจาคประมาณ 30 นาที</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
+                <span>ทานอาหารมื้อหลัก หลีกเลี่ยงอาหารไขมันสูง</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
+                <span>งดเครื่องดื่มแอลกอฮอล์อย่างน้อย 24 ชั่วโมง</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
+                <span>นำบัตรประชาชนตัวจริงมาแสดงในวันงาน</span>
+              </li>
+            </ul>
 
             <div className="pt-2">
-              <Link href="/prepare" className="bloom-btn-secondary w-full py-2.5 text-xs justify-center">
-                <span>อ่านข้อปฏิบัติโดยละเอียด</span>
+              <Link href="/prepare" className="editorial-btn-secondary w-full py-2.5 text-xs justify-center">
+                <span>อ่านรายละเอียดเตรียมตัว</span>
               </Link>
             </div>
           </div>
 
-          <div className="md:col-span-7 bloom-card p-3">
+          <div className="md:col-span-7 editorial-card p-3">
             <InfographicSlot
               contentKey="preparation_infographic"
               title={prepInfographic?.title || 'การเตรียมตัวก่อนบริจาคโลหิต'}
@@ -224,15 +237,12 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* SECTION 02: LOCATION & MAP */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
+      {/* UNIT 04: VENUE & LOCATION (REVERSED LAYOUT) */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between border-b border-[#F0C4CC] pb-3">
           <div>
-            <span className="bloom-badge mb-1">
-              <MapPin className="h-3.5 w-3.5" />
-              Venue & Map
-            </span>
-            <h2 className="text-xl font-extrabold text-ink-dark sm:text-2xl">
+            <span className="unit-tag mb-1">UNIT 04 / LOCATION</span>
+            <h2 className="text-xl font-black text-editorial-ink sm:text-2xl">
               สถานที่จัดงานและการเดินทาง
             </h2>
           </div>
@@ -243,7 +253,7 @@ export default async function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bloom-card p-3">
+          <div className="editorial-card p-3">
             <InfographicSlot
               contentKey="location_infographic"
               title={locationInfographic?.title || 'แผนที่สถานที่จัดงาน (อาคารสิริวิทยา)'}
@@ -254,7 +264,7 @@ export default async function HomePage() {
             />
           </div>
 
-          <div className="bloom-card p-3">
+          <div className="editorial-card p-3">
             <InfographicSlot
               contentKey="transportation_infographic"
               title={transportInfographic?.title || 'การเดินทางและจุดจอดรถ'}

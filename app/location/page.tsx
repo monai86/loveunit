@@ -1,117 +1,105 @@
 import React from 'react';
 import Link from 'next/link';
-import { MapPin, Navigation, Bus, Car, Building, Phone, Clock, ExternalLink } from 'lucide-react';
+import { MapPin, Navigation, Bus, Car, ArrowRight } from 'lucide-react';
+import { getEventBySlug, getEventContentBlocks } from '@/services/event-service';
 import { InfographicSlot } from '@/components/infographic/InfographicSlot';
-import { getEventContentBlocks, getEventBySlug } from '@/lib/db/store';
-import { formatTimeRange } from '@/lib/utils/format';
 
 export default async function LocationPage() {
   const event = await getEventBySlug('mumt-2026');
-
-  if (!event) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <div className="bloom-card p-8 text-center">
-          <h2 className="text-lg font-bold text-red-700">ไม่พบข้อมูลกิจกรรม</h2>
-        </div>
-      </div>
-    );
-  }
-
-  const contentBlocks = await getEventContentBlocks(event.id);
-  const locationInfographic = contentBlocks.find(b => b.content_key === 'location_infographic');
-  const transportInfographic = contentBlocks.find(b => b.content_key === 'transportation_infographic');
+  const contentBlocks = event ? await getEventContentBlocks(event.id) : [];
+  const locationInfographic = contentBlocks.find(b => (b as any).contentKey === 'location_infographic' || (b as any).content_key === 'location_infographic');
+  const transportInfographic = contentBlocks.find(b => (b as any).contentKey === 'transportation_infographic' || (b as any).content_key === 'transportation_infographic');
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-10">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-12">
       
-      {/* Title Header */}
-      <div className="text-center space-y-2">
-        <span className="bloom-badge py-1 px-3.5 text-xs">
-          <MapPin className="h-3.5 w-3.5" />
-          Venue & Directions
-        </span>
-        <h1 className="text-2xl font-black text-[#1F1A1C] sm:text-4xl">
+      {/* Header */}
+      <div className="border-b border-[#F0C4CC] pb-4">
+        <div className="flex items-center gap-2">
+          <span className="unit-tag text-[10px]">UNIT 04 / LOCATION & MAP</span>
+          <span className="unit-tag-outline text-[10px]">แผนที่สถานที่และการเดินทาง</span>
+        </div>
+        <h1 className="mt-2 text-3xl font-black text-editorial-ink sm:text-4xl">
           สถานที่จัดงานและการเดินทาง
         </h1>
-        <p className="text-xs text-gray-600 sm:text-sm max-w-xl mx-auto">
-          {event.venue_name}
+        <p className="mt-1 text-xs text-editorial-muted font-medium max-w-2xl">
+          อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา
         </p>
       </div>
 
-      {/* Primary Location Card */}
-      <div className="bloom-card p-6 sm:p-8 bg-white">
-        <div className="space-y-4">
-          <div>
-            <span className="text-xs font-bold tracking-wider text-[#B42336] uppercase">Location Information</span>
-            <h2 className="mt-1 text-xl font-extrabold text-[#1F1A1C] sm:text-2xl">
-              {event.venue_detail}
-            </h2>
-          </div>
-
-          <div className="flex flex-col gap-3 text-xs font-medium text-gray-700 sm:flex-row sm:flex-wrap sm:gap-6 pt-2 border-t border-[#FCE8EC]">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-[#7A1020]" />
-              <span>เวลาเปิดบริการ: {formatTimeRange(event.start_at, event.end_at)}</span>
-            </div>
-            <div className="flex items-center gap-2 font-bold">
-              <Phone className="h-4 w-4 text-[#7A1020]" />
-              <span>ติดต่อสอบถาม: คุณเปา <a href="tel:0969866245" className="hover:underline text-[#7A1020]">09-6986-6245</a>, คุณแตงโม <a href="tel:0656274319" className="hover:underline text-[#7A1020]">06-5627-4319</a></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Infographic Maps Grid */}
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div className="bloom-card p-3 bg-white">
-          <InfographicSlot
-            contentKey="location_infographic"
-            title={locationInfographic?.title || 'แผนที่สถานที่จัดงาน (อาคารสิริวิทยา)'}
-            description={locationInfographic?.description}
-            imageUrl={locationInfographic?.image_url}
-            aspectRatio="banner"
-          />
-        </div>
-
-        <div className="bloom-card p-3 bg-white">
-          <InfographicSlot
-            contentKey="transportation_infographic"
-            title={transportInfographic?.title || 'แผนที่การเดินทางและจุดจอดรถ'}
-            description={transportInfographic?.description}
-            imageUrl={transportInfographic?.image_url}
-            aspectRatio="banner"
-          />
-        </div>
-      </div>
-
-      {/* Transportation Cards */}
-      <div className="bloom-card p-6 sm:p-8 bg-white space-y-6">
-        <h2 className="text-xl font-extrabold text-[#1F1A1C] border-b border-[#FCE8EC] pb-4">
-          คำแนะนำการเดินทาง
-        </h2>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {/* Main Location Details Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        
+        {/* Left Venue Details (5 Cols) */}
+        <div className="md:col-span-5 space-y-6">
           
-          <div className="bloom-card p-5 bg-[#FFF8F9] border-[#F9D5DC]">
-            <div className="flex items-center gap-2.5 text-xs font-extrabold text-[#7A1020] mb-2 border-b border-[#FCE8EC] pb-2">
-              <Car className="h-5 w-5" /> รถยนต์ส่วนตัว
+          <div className="editorial-card p-6 space-y-4">
+            <h2 className="text-base font-black text-[#7A1020] uppercase tracking-wider border-b border-[#FCE8EC] pb-2">
+              📍 จุดจัดงานหลัก
+            </h2>
+            <div className="space-y-2 text-xs font-bold text-editorial-ink">
+              <p className="text-sm font-black text-[#7A1020]">ห้องประชุม 217 และ 218</p>
+              <p className="leading-relaxed text-editorial-muted font-medium">
+                ชั้น 2 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา
+              </p>
+              <div className="pt-2">
+                <span className="unit-tag-outline text-[10px]">
+                  วันพุธที่ 16 กันยายน 2569 (08:00 - 15:00 น.)
+                </span>
+              </div>
             </div>
-            <p className="text-xs text-gray-700 leading-relaxed">
-              เดินทางมายัง มหาวิทยาลัยมหิดล ศาลายา สามารถจอดรถได้ที่ลานจอดรถอาคารสิริวิทยา หรืออาคารจอดรถกลางของมหาวิทยาลัย
-            </p>
           </div>
 
-          <div className="bloom-card p-5 bg-[#FFF8F9] border-[#F9D5DC]">
-            <div className="flex items-center gap-2.5 text-xs font-extrabold text-[#7A1020] mb-2 border-b border-[#FCE8EC] pb-2">
-              <Bus className="h-5 w-5" /> รถโดยสารประจำทาง / รถบัส
-            </div>
-            <p className="text-xs text-gray-700 leading-relaxed">
-              ใช้บริการรถโดยสารสาย 515, 84ก, 547 หรือรถรางสวัสดิการภายในมหาวิทยาลัยมหิดล มาลงที่หน้าอาคารสิริวิทยา (คณะศิลปศาสตร์)
-            </p>
+          <div className="editorial-card p-6 space-y-4">
+            <h2 className="text-base font-black text-[#7A1020] uppercase tracking-wider border-b border-[#FCE8EC] pb-2">
+              🚍 การเดินทางมายังวิทยาเขตศาลายา
+            </h2>
+            <ul className="space-y-3 text-xs font-bold text-editorial-ink">
+              <li className="flex items-start gap-2.5">
+                <Bus className="h-4.5 w-4.5 text-[#7A1020] shrink-0 mt-0.5" />
+                <span>รถ Tram สวัสดิการ ม.มหิดล: สาย 1, สาย 2 ลงหน้าอาคารสิริวิทยา</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <Car className="h-4.5 w-4.5 text-[#7A1020] shrink-0 mt-0.5" />
+                <span>รถยนต์ส่วนตัว: จอด ณ ลานจอดรถอาคารสิริวิทยา หรือลานจอดรถศูนย์เรียนรู้ (MLC)</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="pt-2">
+            <Link href="/register" className="editorial-btn-primary py-3.5 px-8 text-xs w-full justify-center">
+              <span>ลงทะเบียนบริจาคโลหิตออนไลน์</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
 
         </div>
+
+        {/* Right Infographic Maps (7 Cols) */}
+        <div className="md:col-span-7 space-y-6">
+          <div className="editorial-card p-3">
+            <InfographicSlot
+              contentKey="location_infographic"
+              title={locationInfographic?.title || 'แผนที่สถานที่จัดงาน (อาคารสิริวิทยา)'}
+              description={locationInfographic?.description || undefined}
+              imageUrl={(locationInfographic as any)?.imageUrl || (locationInfographic as any)?.image_url}
+              altText={(locationInfographic as any)?.altText || (locationInfographic as any)?.alt_text}
+              aspectRatio="banner"
+            />
+          </div>
+
+          <div className="editorial-card p-3">
+            <InfographicSlot
+              contentKey="transportation_infographic"
+              title={transportInfographic?.title || 'การเดินทางและจุดจอดรถ'}
+              description={transportInfographic?.description || undefined}
+              imageUrl={(transportInfographic as any)?.imageUrl || (transportInfographic as any)?.image_url}
+              altText={(transportInfographic as any)?.altText || (transportInfographic as any)?.alt_text}
+              aspectRatio="banner"
+            />
+          </div>
+        </div>
+
       </div>
 
     </div>
