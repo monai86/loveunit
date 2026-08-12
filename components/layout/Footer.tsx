@@ -2,84 +2,92 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Heart, MapPin, Phone, Mail, Monitor, ShieldCheck, HardDrive, Cpu } from 'lucide-react';
+import { Heart, MapPin, Phone, Mail, ShieldCheck, ExternalLink, Calendar, BookOpen } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="mt-12 win95-raised bg-[#C0C0C0] text-black border-t-2 border-white select-none">
-      
-      {/* Top Footer Status Strip */}
-      <div className="bg-[#000080] px-4 py-1.5 text-white flex items-center justify-between text-xs font-bold">
-        <div className="flex items-center gap-2">
-          <HardDrive className="h-4 w-4 text-amber-300" />
-          <span>MUMT Blood Donation 2026 System Core</span>
-        </div>
-        <div className="flex items-center gap-2 text-[11px] font-mono">
-          <Cpu className="h-3.5 w-3.5 text-green-400" />
-          <span className="hidden sm:inline">Status: ONLINE (Neon Postgres 18)</span>
-        </div>
-      </div>
-
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <footer className="mt-16 border-t border-[#F9D5DC] bg-white text-[#1F1A1C] select-none">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           
-          {/* Brand Info */}
-          <div className="win95-sunken p-4 bg-[#FFFFFF]">
-            <div className="flex items-center gap-2.5">
-              <div className="win95-sunken p-1 bg-white">
-                <img src="/images/logo.png" alt="MUMT Logo" className="h-7 w-auto object-contain" />
+          {/* Brand Info Column */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#FFF8F9] p-1 border border-[#F9D5DC]">
+                <img src="/images/logo.png" alt="MUMT Logo" className="h-full w-auto object-contain" />
               </div>
-              <span className="text-sm font-extrabold text-[#7A1020]">MUMT Blood Donation 2026</span>
+              <div>
+                <span className="text-xs font-black tracking-wider text-[#7A1020] uppercase block">MUMT Blood Donation 2026</span>
+                <span className="text-sm font-extrabold text-[#1F1A1C]">ครั้งที่ 9 “เติมรักให้เต็ม Unit”</span>
+              </div>
             </div>
-            <p className="mt-2.5 text-xs leading-relaxed text-gray-800">
-              โครงการ “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9” จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ สภากาชาดไทย
+            <p className="text-xs leading-relaxed text-gray-600">
+              โครงการบริจาคโลหิต จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ สภากาชาดไทย ณ อาคารสิริวิทยา มหาวิทยาลัยมหิดล ศาลายา
             </p>
+            <div className="pt-1">
+              <span className="bloom-badge text-[11px]">
+                <Heart className="h-3 w-3 fill-[#7A1020]" />
+                16 กันยายน 2569 (08:00 - 15:00 น.)
+              </span>
+            </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="win95-sunken p-4 bg-[#FFFFFF]">
-            <h3 className="text-xs font-black tracking-wider text-[#7A1020] uppercase mb-2 border-b-2 border-gray-200 pb-1">
+          {/* Quick Links Column */}
+          <div>
+            <h3 className="text-xs font-black tracking-wider text-[#7A1020] uppercase mb-3 pb-1 border-b border-[#FCE8EC]">
               📌 ลิงก์เมนูด่วน
             </h3>
-            <ul className="space-y-1.5 text-xs font-bold text-gray-800">
+            <ul className="space-y-2 text-xs font-bold text-gray-700">
               <li>
-                <Link href="/" className="hover:underline hover:text-[#7A1020]">▶ หน้าแรก (Desktop)</Link>
+                <Link href="/" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5">
+                  <span>• หน้าหลัก</span>
+                </Link>
               </li>
               <li>
-                <Link href="/register" className="hover:underline hover:text-[#7A1020]">▶ ลงทะเบียนบริจาคโลหิต</Link>
+                <Link href="/register" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5 text-[#7A1020]">
+                  <span>• ลงทะเบียนบริจาคโลหิตออนไลน์</span>
+                </Link>
               </li>
               <li>
-                <Link href="/prepare" className="hover:underline hover:text-[#7A1020]">▶ ข้อปฏิบัติตัวก่อนบริจาค</Link>
+                <Link href="/prepare" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5">
+                  <span>• ข้อปฏิบัติตัวก่อนบริจาค</span>
+                </Link>
               </li>
               <li>
-                <Link href="/location" className="hover:underline hover:text-[#7A1020]">▶ แผนที่และการเดินทาง</Link>
+                <Link href="/location" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5">
+                  <span>• แผนที่สถานที่และการเดินทาง</span>
+                </Link>
               </li>
               <li>
-                <Link href="/staff/login" className="hover:underline hover:text-[#7A1020]">▶ ระบบเจ้าหน้าที่ (Staff Portal)</Link>
+                <Link href="/staff/login" className="hover:text-[#7A1020] hover:underline flex items-center gap-1.5 text-gray-500">
+                  <span>• ระบบเจ้าหน้าที่ (Staff Portal)</span>
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact Details */}
-          <div className="win95-sunken p-4 bg-[#FFFFFF]">
-            <h3 className="text-xs font-black tracking-wider text-[#7A1020] uppercase mb-2 border-b-2 border-gray-200 pb-1">
+          {/* Official Contact Details Column */}
+          <div>
+            <h3 className="text-xs font-black tracking-wider text-[#7A1020] uppercase mb-3 pb-1 border-b border-[#FCE8EC]">
               📞 ติดต่อสอบถาม
             </h3>
-            <div className="space-y-2 text-xs text-gray-800">
-              <div className="flex items-start gap-2">
+            <div className="space-y-3 text-xs text-gray-700">
+              <div className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 shrink-0 text-[#B42336] mt-0.5" />
-                <span>ห้องประชุม 217 และ 218 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา</span>
+                <span className="leading-relaxed">
+                  ห้องประชุม 217 และ 218 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา
+                </span>
               </div>
               
-              <div className="flex items-start gap-2">
+              <div className="flex items-start gap-2.5">
                 <Phone className="h-4 w-4 shrink-0 text-[#B42336] mt-0.5" />
-                <div className="space-y-0.5 font-bold">
+                <div className="space-y-1 font-bold">
                   <p>คุณเปา: <a href="tel:0969866245" className="hover:underline text-[#7A1020]">09-6986-6245</a></p>
                   <p>คุณแตงโม: <a href="tel:0656274319" className="hover:underline text-[#7A1020]">06-5627-4319</a></p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <Mail className="h-4 w-4 shrink-0 text-[#B42336]" />
                 <a href="mailto:mumt68blooddonation@gmail.com" className="font-bold hover:underline text-[#7A1020]">
                   mumt68blooddonation@gmail.com
@@ -90,10 +98,10 @@ export function Footer() {
 
         </div>
 
-        {/* Bottom Win95 Status Bar */}
-        <div className="mt-6 win95-statusbar justify-between flex-wrap gap-2 text-gray-700">
+        {/* Bottom Copyright Strip */}
+        <div className="mt-10 pt-6 border-t border-[#FCE8EC] flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-gray-500 font-medium">
           <div>© 2026 Faculty of Medical Technology, Mahidol University (MUMT)</div>
-          <div className="font-mono font-bold text-black">Windows 95 Classic Edition</div>
+          <div>เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9</div>
         </div>
       </div>
     </footer>
