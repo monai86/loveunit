@@ -3,16 +3,20 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Heart, MapPin, BookOpen, UserCheck } from 'lucide-react';
+import { Home, Heart, MapPin, BookOpen } from 'lucide-react';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
 
+  // Do not render public mobile bottom nav on staff or admin pages
+  if (pathname.startsWith('/staff') || pathname.startsWith('/admin')) {
+    return null;
+  }
+
   const navItems = [
-    { href: '/', label: 'หน้าหลัก', icon: Home },
+    { href: '/', label: 'หน้าแรก', icon: Home },
     { href: '/prepare', label: 'ข้อปฏิบัติ', icon: BookOpen },
     { href: '/location', label: 'สถานที่', icon: MapPin },
-    { href: '/staff/login', label: 'เจ้าหน้าที่', icon: UserCheck },
   ];
 
   return (
@@ -25,7 +29,7 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+              className={`flex flex-col items-center gap-0.5 py-1 px-4 rounded-xl transition-all ${
                 isActive ? 'bg-white/20 font-black text-white' : 'text-white/70 hover:text-white'
               }`}
             >
