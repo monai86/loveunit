@@ -48,18 +48,21 @@ export function Footer() {
           {/* Venue & Contact */}
           <div>
             <h3 className="text-xs font-bold tracking-wider text-[#7A1020] uppercase">สถานที่จัดงาน & ติดต่อสอบถาม</h3>
-            <div className="mt-3 space-y-2 text-xs text-[#29272A]/80">
+            <div className="mt-3 space-y-2.5 text-xs text-[#29272A]/80">
               <div className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 shrink-0 text-[#B42336]" />
                 <span>ห้องประชุม 217 และ 218 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-[#B42336]" />
-                <span>02-441-4370 ต่อ 2101</span>
+              <div className="flex items-start gap-2">
+                <Phone className="h-4 w-4 shrink-0 text-[#B42336] mt-0.5" />
+                <div className="space-y-0.5">
+                  <p><strong className="text-[#29272A]">คุณเปา:</strong> <a href="tel:0969866245" className="hover:underline">09-6986-6245</a></p>
+                  <p><strong className="text-[#29272A]">คุณแตงโม:</strong> <a href="tel:0656274319" className="hover:underline">06-5627-4319</a></p>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-[#B42336]" />
-                <span>mumtblooddonation@mahidol.ac.th</span>
+                <a href="mailto:mumt68blooddonation@gmail.com" className="hover:underline hover:text-[#7A1020]">mumt68blooddonation@gmail.com</a>
               </div>
             </div>
           </div>

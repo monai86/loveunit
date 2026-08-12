@@ -47,14 +47,14 @@ export default async function LocationPage() {
               {event.venue_detail}
             </h2>
 
-            <div className="mt-4 flex flex-wrap gap-4 text-xs font-medium text-gray-700">
+            <div className="mt-4 flex flex-col gap-2.5 text-xs font-medium text-gray-700 sm:flex-row sm:flex-wrap sm:gap-6">
               <div className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4 text-[#7A1020]" />
                 <span>เวลาเปิดบริการ: {formatTimeRange(event.start_at, event.end_at)}</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Phone className="h-4 w-4 text-[#7A1020]" />
-                <span>สอบถามเพิ่มเติม: 02-441-4370</span>
+              <div className="flex items-start gap-1.5">
+                <Phone className="h-4 w-4 text-[#7A1020] shrink-0 mt-0.5" />
+                <span>ติดต่อสอบถาม: คุณเปา <a href="tel:0969866245" className="font-bold hover:underline">09-6986-6245</a>, คุณแตงโม <a href="tel:0656274319" className="font-bold hover:underline">06-5627-4319</a></span>
               </div>
             </div>
 
