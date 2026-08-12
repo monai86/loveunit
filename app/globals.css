@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FFF9F9;
+  --foreground: #29272A;
+  --primary: #7A1020;
+  --secondary: #B42336;
+  --soft-rose: #FCE8EC;
+}
+
+body {
+  background-color: #FFF9F9;
+  color: #29272A;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  min-height: 100vh;
+}
+
+/* Custom theme utility classes */
+.bg-blood-burgundy { background-color: #7A1020; }
+.text-blood-burgundy { color: #7A1020; }
+.border-blood-burgundy { border-color: #7A1020; }
+
+.bg-warm-red { background-color: #B42336; }
+.text-warm-red { color: #B42336; }
+
+.bg-soft-rose { background-color: #FCE8EC; }
+.text-soft-rose { color: #FCE8EC; }
+
+.bg-warm-white { background-color: #FFF9F9; }
+.text-charcoal { color: #29272A; }
