@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -17,7 +17,12 @@ import {
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const navLinks = [
     { href: '/', label: 'หน้าแรก', icon: Home },
@@ -27,7 +32,7 @@ export function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#F9D5DC] bg-white/95 backdrop-blur-md shadow-xs select-none">
+    <header className="sticky top-0 z-50 w-full border-b border-[#F9D5DC] bg-white/95 backdrop-blur-md shadow-xs select-none" suppressHydrationWarning>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         
         {/* Brand Logo & Event Title */}
@@ -54,7 +59,7 @@ export function Navbar() {
         <nav className="hidden items-center gap-1 lg:flex">
           {navLinks.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+            const isActive = mounted && (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
             return (
               <Link
                 key={item.href}
@@ -108,7 +113,7 @@ export function Navbar() {
           <div className="flex flex-col gap-1.5">
             {navLinks.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+              const isActive = mounted && (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
               return (
                 <Link
                   key={item.href}
