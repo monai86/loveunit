@@ -28,7 +28,7 @@ export async function updateEventContentBlock(id: string, updates: Partial<{
   displayOrder: number;
 }>) {
   if (db) {
-    const updateData: Record<string, any> = { updatedAt: new Date() };
+    const updateData: Record<string, unknown> = { updatedAt: new Date() };
     if (updates.title !== undefined) updateData.title = updates.title;
     if (updates.description !== undefined) updateData.description = updates.description;
     if (updates.imageUrl !== undefined) updateData.imageUrl = updates.imageUrl;

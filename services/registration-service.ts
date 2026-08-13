@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { registrations, timeSlots, events } from '@/db/schema';
-import { eq, and, ne, sql } from 'drizzle-orm';
+import { registrations, timeSlots } from '@/db/schema';
+import { eq, and, ne, sql, ilike } from 'drizzle-orm';
 import { normalizePhoneNumber, generateRegistrationCode, generateQRToken } from '@/lib/utils/format';
 import { isMemoryBackendAllowed, registerDonorAtomic as memoryRegisterAtomic, inMemoryRegistrations, defaultSlots, defaultEvent } from '@/lib/db/store';
 import { ParticipantType, DonationExperience, RegistrationSource } from '@/lib/types/database';
@@ -82,13 +82,13 @@ export async function registerDonorAtomic(input: {
           phone: input.phone,
           phoneNormalized: phoneNormalized,
           email: input.email || null,
-          participantType: input.participantType as any,
+          participantType: input.participantType as ParticipantType,
           faculty: input.faculty || null,
           academicYear: input.academicYear || null,
-          donationExperience: input.donationExperience as any,
+          donationExperience: input.donationExperience as DonationExperience,
           slotId: input.slotId || null,
           status: 'REGISTERED',
-          source: source as any,
+          source: source as RegistrationSource,
           privacyAccepted: true,
         })
         .returning();
@@ -144,6 +144,53 @@ export async function getRegistrationByQRToken(token: string) {
     const reg = inMemoryRegistrations.find(r => r.qr_token === tokenClean);
     if (!reg) return null;
     return { ...reg, time_slot: defaultSlots.find(s => s.id === reg.slot_id) || null };
+  }
+
+  throw new Error('DATABASE_URL is unconfigured in production environment.');
+}
+
+/**
+ * Looks up a donor's registration using phone + first/last name verification.
+ * Used by the public "ลืม QR Code" recovery page. Returns the full registration
+ * (with timeSlot/event relations) or null when nothing matches.
+ */
+export async function findRegistrationByPhoneAndName(input: {
+  eventId: string;
+  phone: string;
+  firstName: string;
+  lastName: string;
+}) {
+  const phoneNormalized = normalizePhoneNumber(input.phone);
+
+  if (db) {
+    const result = await db.query.registrations.findFirst({
+      where: and(
+        eq(registrations.eventId, input.eventId),
+        eq(registrations.phoneNormalized, phoneNormalized),
+        ne(registrations.status, 'CANCELLED'),
+        ilike(registrations.firstName, input.firstName.trim()),
+        ilike(registrations.lastName, input.lastName.trim()),
+      ),
+      with: {
+        timeSlot: true,
+        event: true,
+      },
+      orderBy: (regs, { desc }) => [desc(regs.registeredAt)],
+    });
+    return result || null;
+  }
+
+  if (isMemoryBackendAllowed()) {
+    const reg = inMemoryRegistrations.find(
+      r =>
+        r.event_id === input.eventId &&
+        r.phone_normalized === phoneNormalized &&
+        r.first_name === input.firstName.trim() &&
+        r.last_name === input.lastName.trim() &&
+        r.status !== 'CANCELLED'
+    );
+    if (!reg) return null;
+    return { ...reg, time_slot: defaultSlots.find(s => s.id === reg.slot_id) || null, event: defaultEvent };
   }
 
   throw new Error('DATABASE_URL is unconfigured in production environment.');

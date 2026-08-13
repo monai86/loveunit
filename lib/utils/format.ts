@@ -3,6 +3,24 @@
 import { ParticipantType, DonationExperience, RegistrationStatus, StaffRole } from '@/lib/types/database';
 
 /**
+ * Reads a field that may exist under a camelCase or snake_case key (dual-shape
+ * records from Drizzle vs. the in-memory store). Type-safe alternative to `as any`.
+ */
+export function pickField<T>(obj: unknown, camelKey: string, snakeKey: string): T | undefined {
+  if (!obj || typeof obj !== 'object') return undefined;
+  const record = obj as Record<string, unknown>;
+  const value = record[camelKey] ?? record[snakeKey];
+  return value as T | undefined;
+}
+
+/** Normalizes an unknown thrown value into a readable message. */
+export function getErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (typeof err === 'string') return err;
+  return String(err ?? '');
+}
+
+/**
  * Normalizes a Thai phone number for duplicate checking.
  * e.g., "081-234-5678" -> "0812345678"
  * e.g., "+66 81 234 5678" -> "0812345678"
@@ -125,6 +143,19 @@ export function getRegistrationStatusBadge(status: RegistrationStatus): { label:
     default:
       return { label: status, colorClass: 'bg-gray-100 text-gray-800' };
   }
+}
+
+/** Human-readable Thai labels for common audit/checkin actions. */
+export function formatActionLabel(action: string): string {
+  const labels: Record<string, string> = {
+    STATUS_CHANGE_CHECKED_IN: 'เช็คอิน (CHECKED IN)',
+    STATUS_CHANGE_IN_PROCESS: 'เริ่มกระบวนการบริจาค',
+    STATUS_CHANGE_COMPLETED: 'จบกระบวนการบริจาค',
+    STATUS_CHANGE_CANCELLED: 'ยกเลิก',
+    STATUS_CHANGE_NO_SHOW: 'ไม่มาตามนัด (NO SHOW)',
+    STATUS_CHANGE_REGISTERED: 'ลงทะเบียน',
+  };
+  return labels[action] || action;
 }
 
 export function getStaffRoleLabel(role: StaffRole): string {

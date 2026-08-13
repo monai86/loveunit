@@ -1,9 +1,29 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { QRCodeSVG } from 'qrcode.react';
 import { CheckCircle2, Calendar, Clock, MapPin, Download, ArrowRight, Printer, ShieldCheck } from 'lucide-react';
 import { getRegistrationByCode } from '@/services/registration-service';
-import { formatThaiDate } from '@/lib/utils/format';
+import { formatTimeRange } from '@/lib/utils/format';
+
+// Registration may arrive from either the Drizzle backend (camelCase) or the
+// legacy in-memory backend (snake_case); this view type covers both shapes.
+interface RegistrationView {
+  registrationCode?: string;
+  registration_code?: string;
+  firstName?: string;
+  first_name?: string;
+  lastName?: string;
+  last_name?: string;
+  phone?: string;
+  qrToken?: string;
+  qr_token?: string;
+  faculty?: string | null;
+  timeSlot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
+  time_slot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
+}
+
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ code: string }>;
@@ -17,14 +37,16 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const regCode = (registration as any).registrationCode || (registration as any).registration_code || code;
-  const firstName = (registration as any).firstName || (registration as any).first_name || '';
-  const lastName = (registration as any).lastName || (registration as any).last_name || '';
+  const reg = registration as RegistrationView;
+  const regCode = reg.registrationCode || reg.registration_code || code;
+  const firstName = reg.firstName || reg.first_name || '';
+  const lastName = reg.lastName || reg.last_name || '';
   const fullName = `${firstName} ${lastName}`;
-  const phone = (registration as any).phone || '';
-  const qrUrl = (registration as any).qrCodeDataUrl || (registration as any).qr_code_data_url;
-  const timeSlot = (registration as any).timeSlotText || (registration as any).time_slot_text || '08:00 - 15:00';
-  const facultyName = (registration as any).facultyName || (registration as any).faculty || 'มหาวิทยาลัยมหิดล';
+  const phone = reg.phone || '';
+  const qrToken = reg.qrToken || reg.qr_token || '';
+  const slot = reg.timeSlot || reg.time_slot;
+  const timeSlot = slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '08:00 - 15:00';
+  const facultyName = reg.faculty || 'มหาวิทยาลัยมหิดล';
 
   return (
     <div className="mx-auto max-w-xl px-4 py-8 sm:px-6">
@@ -44,25 +66,25 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
       <div className="editorial-ticket p-6 sm:p-8 space-y-6 relative overflow-hidden bg-white">
         
         {/* Ticket Header */}
-        <div className="border-b-2 border-dashed border-[#7A1020] pb-4 flex items-center justify-between">
+        <div className="border-b-2 border-dashed border-[var(--burgundy-700)] pb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-lg bg-[#FFF9F9] p-1 border border-[#F0C4CC] flex items-center justify-center">
+            <div className="h-9 w-9 rounded-lg bg-white p-1 border border-[var(--line)] flex items-center justify-center">
               <img src="/images/logo.png" alt="MUMT Logo" className="h-full w-auto object-contain" />
             </div>
             <div>
-              <span className="text-[9px] font-mono font-bold text-[#7A1020] uppercase block">MUMT BLOOD DONATION 2026</span>
-              <span className="text-xs font-black text-editorial-ink">REGISTRATION PASS</span>
+              <span className="text-[11px] font-bold text-[var(--burgundy-700)] uppercase block">MUMT Blood Donation 2026</span>
+              <span className="text-sm font-black text-[var(--ink)]">REGISTRATION PASS</span>
             </div>
           </div>
-          <span className="unit-tag text-[9px]">OFFICIAL PASS</span>
+          <span className="brand-chip--light text-[11px]">Official Pass</span>
         </div>
 
         {/* Ticket Registration Code */}
-        <div className="bg-[#FFF9F9] p-4 rounded-lg border border-[#F0C4CC] text-center space-y-1">
-          <span className="text-[10px] font-mono font-bold text-editorial-muted uppercase tracking-wider">
-            REGISTRATION CODE
+        <div className="bg-[var(--rose-100)]/60 p-4 rounded-lg border border-[var(--rose-200)] text-center space-y-1">
+          <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider">
+            Registration Code
           </span>
-          <div className="text-2xl font-mono font-black text-[#7A1020] tracking-wider">
+          <div className="text-2xl font-black text-[var(--burgundy-700)] tracking-wider">
             {regCode}
           </div>
         </div>
@@ -86,12 +108,12 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
 
           <div className="flex justify-between py-1.5 border-b border-gray-100">
             <span className="text-editorial-muted font-bold">วันที่จัดงาน:</span>
-            <span className="font-bold text-[#7A1020]">พุธ 16 กันยายน 2569</span>
+            <span className="font-bold text-[var(--burgundy-700)]">พุธ 16 กันยายน 2569</span>
           </div>
 
           <div className="flex justify-between py-1.5 border-b border-gray-100">
             <span className="text-editorial-muted font-bold">รอบเวลาเดินทางแนะนำ:</span>
-            <span className="font-mono font-black text-[#7A1020]">{timeSlot} น.</span>
+            <span className="font-black text-[var(--burgundy-700)]">{timeSlot}</span>
           </div>
 
           <div className="flex justify-between py-1.5">
@@ -101,14 +123,14 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
         </div>
 
         {/* QR Code Container */}
-        <div className="pt-4 border-t-2 border-dashed border-[#7A1020] text-center space-y-3">
-          <span className="text-[10px] font-mono font-bold text-[#7A1020] uppercase tracking-wider block">
-            QR CODE FOR EVENT SCAN
+        <div className="pt-4 border-t-2 border-dashed border-[var(--burgundy-700)] text-center space-y-3">
+          <span className="text-[11px] font-bold text-[var(--burgundy-700)] uppercase tracking-wider block">
+            QR Code for Event Scan
           </span>
 
-          {qrUrl ? (
-            <div className="mx-auto h-48 w-48 rounded-xl border-2 border-[#7A1020] p-2 bg-white flex items-center justify-center shadow-xs">
-              <img src={qrUrl} alt={`QR Pass for ${regCode}`} className="h-full w-full object-contain" />
+          {qrToken ? (
+            <div className="mx-auto h-48 w-48 rounded-xl border-2 border-[var(--burgundy-700)] p-2 bg-white flex items-center justify-center shadow-xs">
+              <QRCodeSVG value={qrToken} size={176} level="M" />
             </div>
           ) : (
             <div className="mx-auto h-48 w-48 rounded-xl border border-gray-300 bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-500">
@@ -116,7 +138,7 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
             </div>
           )}
 
-          <p className="text-[11px] text-editorial-muted font-medium">
+          <p className="text-[12px] text-editorial-muted font-medium">
             แสดง QR สแกน ณ จุดลงทะเบียน หน้าห้องประชุม 217-218
           </p>
         </div>

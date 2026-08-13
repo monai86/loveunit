@@ -4,14 +4,16 @@ import { getEventBySlug, getTimeSlots } from '@/services/event-service';
 import { registerDonorAtomic } from '@/services/registration-service';
 import { checkInDonor } from '@/services/checkin-service';
 import { requireStaff } from '@/lib/auth/server';
+import { getErrorMessage, pickField } from '@/lib/utils/format';
+import { ParticipantType, DonationExperience } from '@/lib/types/database';
 
 export async function POST(request: Request) {
   try {
     let currentUser;
     try {
       currentUser = await requireStaff();
-    } catch (err: any) {
-      const status = err.message === 'UNAUTHORIZED' ? 401 : 403;
+    } catch (err: unknown) {
+      const status = getErrorMessage(err) === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์ลงทะเบียน Walk-in' }, { status });
     }
 
@@ -34,7 +36,7 @@ export async function POST(request: Request) {
     const input = parseResult.data;
 
     const activeSlots = await getTimeSlots(event.id);
-    const firstAvailableSlot = activeSlots.find(s => ((s as any).bookedCount || (s as any).booked_count || 0) < s.capacity);
+    const firstAvailableSlot = activeSlots.find(s => (pickField<number>(s, 'bookedCount', 'booked_count') || 0) < s.capacity);
     const targetSlotId = firstAvailableSlot ? firstAvailableSlot.id : (activeSlots[0]?.id || '');
 
     const regResult = await registerDonorAtomic({
@@ -42,10 +44,10 @@ export async function POST(request: Request) {
       firstName: input.firstName,
       lastName: input.lastName,
       phone: input.phone,
-      participantType: input.participantType as any,
+      participantType: input.participantType as ParticipantType,
       faculty: input.faculty || undefined,
       academicYear: input.academicYear || undefined,
-      donationExperience: input.donationExperience as any,
+      donationExperience: input.donationExperience as DonationExperience,
       slotId: targetSlotId,
       source: 'WALK_IN',
     });

@@ -2,13 +2,14 @@ import { NextResponse } from 'next/server';
 import { getEventBySlug } from '@/services/event-service';
 import { getDashboardKPIs } from '@/services/admin-service';
 import { requireTeamLead } from '@/lib/auth/server';
+import { getErrorMessage } from '@/lib/utils/format';
 
 export async function GET() {
   try {
     try {
       await requireTeamLead();
-    } catch (err: any) {
-      const status = err.message === 'UNAUTHORIZED' ? 401 : 403;
+    } catch (err: unknown) {
+      const status = getErrorMessage(err) === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์เข้าถึง Dashboard' }, { status });
     }
 

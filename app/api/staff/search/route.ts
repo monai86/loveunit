@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import { searchRegistrations } from '@/services/checkin-service';
 import { requireStaff } from '@/lib/auth/server';
+import { getErrorMessage } from '@/lib/utils/format';
 
 export async function GET(request: Request) {
   try {
     try {
       await requireStaff();
-    } catch (err: any) {
-      const status = err.message === 'UNAUTHORIZED' ? 401 : 403;
+    } catch (err: unknown) {
+      const status = getErrorMessage(err) === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์ค้นหาข้อมูลผู้ลงทะเบียน' }, { status });
     }
 

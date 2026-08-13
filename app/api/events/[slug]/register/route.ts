@@ -2,12 +2,21 @@ import { NextResponse } from 'next/server';
 import { publicRegistrationSchema } from '@/lib/validation/schemas';
 import { getEventBySlug } from '@/services/event-service';
 import { registerDonorAtomic } from '@/services/registration-service';
+import { sendRegistrationConfirmation } from '@/services/email-service';
+import { pickField } from '@/lib/utils/format';
+import { ParticipantType, DonationExperience } from '@/lib/types/database';
+import { checkRateLimit, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    // Anti-abuse: public registration is the primary spam target.
+    if (!checkRateLimit(request, { limit: 20, windowMs: 60 * 1000 })) {
+      return rateLimitedResponse(60);
+    }
+
     const { slug } = await params;
     const event = await getEventBySlug(slug);
     if (!event) {
@@ -15,8 +24,8 @@ export async function POST(
     }
 
     const now = new Date();
-    const openAt = new Date((event as any).registrationOpenAt || (event as any).registration_open_at);
-    const closeAt = new Date((event as any).registrationCloseAt || (event as any).registration_close_at);
+    const openAt = new Date(pickField<string>(event, 'registrationOpenAt', 'registration_open_at') || '');
+    const closeAt = new Date(pickField<string>(event, 'registrationCloseAt', 'registration_close_at') || '');
     const isStatusOpen = ['REGISTRATION_OPEN', 'PUBLISHED'].includes(event.status);
     const isWithinWindow = now >= openAt && now <= closeAt;
 
@@ -45,11 +54,11 @@ export async function POST(
       firstName: input.firstName,
       lastName: input.lastName,
       phone: input.phone,
-      email: input.email || undefined,
-      participantType: input.participantType as any,
+      email: (input.email || '').trim() || undefined,
+      participantType: input.participantType as ParticipantType,
       faculty: input.faculty || undefined,
       academicYear: input.academicYear || undefined,
-      donationExperience: input.donationExperience as any,
+      donationExperience: input.donationExperience as DonationExperience,
       slotId: input.slotId,
       source: 'ONLINE',
     });
@@ -59,9 +68,22 @@ export async function POST(
         success: false,
         errorCode: result.errorCode,
         message: result.message,
-        registrationCode: (result.registration as any)?.registrationCode || (result.registration as any)?.registration_code,
+        registrationCode: pickField<string>(result.registration, 'registrationCode', 'registration_code'),
       }, { status: 400 });
     }
+
+    // Fire-and-forget confirmation email — never blocks or fails the registration.
+    const reg = result.registration;
+    const regSlot = pickField<{ startAt?: string; endAt?: string; start_at?: string; end_at?: string }>(reg, 'timeSlot', 'time_slot');
+    void sendRegistrationConfirmation({
+      to: (pickField<string>(reg, 'email', 'email') || '').trim(),
+      firstName: pickField<string>(reg, 'firstName', 'first_name') || '',
+      lastName: pickField<string>(reg, 'lastName', 'last_name') || '',
+      registrationCode: pickField<string>(reg, 'registrationCode', 'registration_code') || '',
+      slot: regSlot ? { startAt: regSlot.startAt, endAt: regSlot.endAt, start_at: regSlot.start_at, end_at: regSlot.end_at } : null,
+      venueName: pickField<string>(event, 'venueName', 'venue_name'),
+      eventDateLabel: 'พุธ 16 กันยายน 2569 (08:00 – 15:00 น.)',
+    });
 
     return NextResponse.json({
       success: true,

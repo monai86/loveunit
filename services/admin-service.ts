@@ -2,6 +2,7 @@ import { db } from '@/db';
 import { registrations, timeSlots, auditLogs } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import { isMemoryBackendAllowed, getDashboardKPIs as memoryGetKPIs, getAllRegistrations as memoryGetAllRegs, logAuditAction as memoryLogAudit } from '@/lib/db/store';
+import { resolveActorId } from '@/lib/auth/server';
 
 export async function getAllRegistrations(eventId: string) {
   if (db) {
@@ -94,7 +95,7 @@ export async function recordAuditLog(params: {
 }) {
   if (db) {
     await db.insert(auditLogs).values({
-      actorId: params.actorId || null,
+      actorId: resolveActorId(params.actorId),
       action: params.action,
       entityType: params.entityType,
       entityId: params.entityId,

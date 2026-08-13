@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getRegistrationByCode } from '@/services/registration-service';
+import { pickField } from '@/lib/utils/format';
 
 export async function GET(
   request: Request,
@@ -13,21 +14,22 @@ export async function GET(
       return NextResponse.json({ success: false, message: 'ไม่พบข้อมูลการลงทะเบียน' }, { status: 404 });
     }
 
-    const regObj = registration as any;
+    const regObj = registration;
 
+    const lastName = pickField<string>(regObj, 'lastName', 'last_name') || '';
     const safeRegistration = {
       id: regObj.id,
-      registration_code: regObj.registrationCode || regObj.registration_code,
-      qr_token: regObj.qrToken || regObj.qr_token,
-      first_name: regObj.firstName || regObj.first_name,
-      last_name_initial: (regObj.lastName || regObj.last_name) ? (regObj.lastName || regObj.last_name).slice(0, 1) + '.' : '',
-      participant_type: regObj.participantType || regObj.participant_type,
-      faculty: regObj.faculty,
-      donation_experience: regObj.donationExperience || regObj.donation_experience,
+      registration_code: pickField<string>(regObj, 'registrationCode', 'registration_code'),
+      qr_token: pickField<string>(regObj, 'qrToken', 'qr_token'),
+      first_name: pickField<string>(regObj, 'firstName', 'first_name'),
+      last_name_initial: lastName ? lastName.slice(0, 1) + '.' : '',
+      participant_type: pickField<string>(regObj, 'participantType', 'participant_type'),
+      faculty: pickField<string>(regObj, 'faculty', 'faculty'),
+      donation_experience: pickField<string>(regObj, 'donationExperience', 'donation_experience'),
       status: regObj.status,
-      time_slot: regObj.timeSlot || regObj.time_slot,
-      event: regObj.event,
-      registered_at: regObj.registeredAt || regObj.registered_at,
+      time_slot: pickField(regObj, 'timeSlot', 'time_slot'),
+      event: pickField(regObj, 'event', 'event'),
+      registered_at: pickField<string>(regObj, 'registeredAt', 'registered_at'),
     };
 
     return NextResponse.json({ success: true, registration: safeRegistration });

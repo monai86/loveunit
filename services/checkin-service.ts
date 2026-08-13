@@ -1,9 +1,10 @@
 import { db } from '@/db';
-import { registrations, checkinEvents, timeSlots } from '@/db/schema';
-import { eq, or, ilike, sql } from 'drizzle-orm';
+import { registrations, checkinEvents } from '@/db/schema';
+import { eq, or, ilike } from 'drizzle-orm';
 import { normalizePhoneNumber } from '@/lib/utils/format';
 import { isTransitionAllowed } from '@/lib/db/store';
 import { isMemoryBackendAllowed, searchRegistrations as memorySearch, updateRegistrationStatus as memoryUpdateStatus } from '@/lib/db/store';
+import { resolveActorId } from '@/lib/auth/server';
 import { RegistrationStatus } from '@/lib/types/database';
 
 export async function searchRegistrations(query: string) {
@@ -58,24 +59,30 @@ export async function updateRegistrationStatus(
     }
 
     const now = new Date();
-    const updateData: Record<string, any> = {
+    const updateData: Record<string, unknown> = {
       status: targetStatus,
       updatedAt: now,
     };
     if (targetStatus === 'CHECKED_IN') updateData.checkedInAt = now;
     if (targetStatus === 'COMPLETED') updateData.completedAt = now;
 
-    const [updated] = await db
-      .update(registrations)
-      .set(updateData)
-      .where(eq(registrations.id, registrationId))
-      .returning();
+    // Status change + audit log must commit atomically: never leave a status
+    // updated without a corresponding audit trail.
+    const updated = await db.transaction(async (tx) => {
+      const [row] = await tx
+        .update(registrations)
+        .set(updateData)
+        .where(eq(registrations.id, registrationId))
+        .returning();
 
-    await db.insert(checkinEvents).values({
-      eventId: current.eventId,
-      registrationId: registrationId,
-      action: `STATUS_CHANGE_${targetStatus}`,
-      performedBy: performedBy || null,
+      await tx.insert(checkinEvents).values({
+        eventId: current.eventId,
+        registrationId: registrationId,
+        action: `STATUS_CHANGE_${targetStatus}`,
+        performedBy: resolveActorId(performedBy),
+      });
+
+      return row;
     });
 
     return { success: true, registration: updated };
