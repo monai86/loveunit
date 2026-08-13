@@ -17,8 +17,18 @@
 /.next/
 /out/
 
+# E2E build dir (production build for Playwright, see scripts/start-e2e-server.mjs)
+/.next-e2e/
+
+# playwright
+/test-results/
+/playwright-report/
+
 # production
 /build
+
+# Freebuff desktop app workspace data (thread DB, logs, e2e launcher)
+/.freebuff/
 
 # misc
 .DS_Store

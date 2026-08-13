@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // E2E production build lives in a separate dist dir (scripts/start-e2e-server.mjs).
+    ".next-e2e/**",
   ]),
 ]);
 

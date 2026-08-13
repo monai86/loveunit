@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Unit tests (registration + hardening + auth)
+        run: npm test
+
+      - name: Auth integration tests (Better Auth memory adapter)
+        run: npx tsx tests/auth.test.ts
+
+      - name: Production build
+        run: npm run build
+
+  # Playwright E2E against a production (standalone) server on a real Neon DB.
+  # Only runs when the DATABASE_URL secret is configured (see H-103 in docs);
+  # PRs without secrets skip this job cleanly.
+  e2e:
+    runs-on: ubuntu-latest
+    if: ${{ secrets.DATABASE_URL != '' }}
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+      BETTER_AUTH_URL: http://localhost:3003
+      NEXT_PUBLIC_APP_URL: http://localhost:3003
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Apply migrations
+        run: npx tsx scripts/apply-migration.ts
+
+      - name: Seed staff accounts
+        run: npx tsx scripts/seed-staff.ts
+
+      - name: Seed E2E data (event + slots + content)
+        run: npx tsx scripts/seed-e2e.ts
+
+      - name: Build (separate dist dir)
+        run: NEXT_DIST_DIR=.next-e2e npm run build
+
+      - name: Start E2E server
+        run: |
+          node scripts/start-e2e-server.mjs > e2e-server.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:3003/ > /dev/null 2>&1; then
+              echo 'E2E server is up'; exit 0
+            fi
+            sleep 1
+          done
+          echo 'E2E server failed to start'; tail -50 e2e-server.log; exit 1
+
+      - name: Run Playwright E2E
+        run: E2E_BASE_URL=http://localhost:3003 npx playwright test --reporter=github
+
+      - name: Stop E2E server
+        if: always()
+        run: |
+          pkill -f 'node scripts/start-e2e-server.mjs' 2>/dev/null || true
+          pkill -f 'standalone.*server.js' 2>/dev/null || true
+          pkill -f 'next-e2e.*server\.js' 2>/dev/null || true
