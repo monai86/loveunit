@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -13,14 +13,12 @@ import {
   ArrowRight
 } from 'lucide-react';
 
+const emptySubscribe = () => () => {};
+
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const pathname = usePathname();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // PUBLIC DONOR NAVIGATION LINKS ONLY
   const navLinks = [
@@ -35,12 +33,12 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#D5C7B8] bg-[#F7F3EE]/95 backdrop-blur-md select-none" suppressHydrationWarning>
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[var(--bg)]/95 backdrop-blur-md select-none" suppressHydrationWarning>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         
         {/* Public Brand Logo & Title */}
         <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1 border border-[#D5C7B8] shadow-xs">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1 border border-[var(--line)] shadow-sm">
             <img 
               src="/images/logo.png" 
               alt="MUMT LOVE UNIT Logo" 
@@ -48,13 +46,10 @@ export function Navbar() {
             />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-black tracking-widest text-[#8E0015] uppercase">MUMT BLOOD DONATION 2026</span>
-              <span className="px-1.5 py-0.5 rounded bg-[#E9E1D9] text-[#7A1020] text-[9px] font-mono font-bold">ครั้งที่ 9</span>
-            </div>
-            <h1 className="text-xs font-black text-[#282828] sm:text-sm">
-              เติมรักให้เต็ม Unit <span className="text-[#C13A2B]">ต่อชีวิตด้วยโลหิตคุณ</span>
+            <h1 className="text-sm font-black text-[var(--ink)] sm:text-base">
+              MUMT Blood Donation 2026 <span className="text-[var(--burgundy-400)]">ครั้งที่ 9</span>
             </h1>
+            <p className="text-xs font-semibold text-[var(--muted)]">เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ</p>
           </div>
         </Link>
 
@@ -67,22 +62,22 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
                   isActive
-                    ? 'bg-[#E9E1D9] text-[#7A1020]'
-                    : 'text-[#282828] hover:bg-[#E9E1D9]/50 hover:text-[#7A1020]'
+                    ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)]'
+                    : 'text-[var(--ink)] hover:bg-[var(--rose-100)]/60 hover:text-[var(--burgundy-700)]'
                 }`}
               >
-                <Icon className={`h-4 w-4 ${isActive ? 'text-[#7A1020]' : 'text-gray-500'}`} />
+                <Icon className={`h-4 w-4 ${isActive ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`} />
                 <span>{item.label}</span>
               </Link>
             );
           })}
 
-          <div className="ml-3 border-l border-[#D5C7B8] pl-3">
+          <div className="ml-3 border-l border-[var(--line)] pl-3">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 bg-[#8E0015] hover:bg-[#7A1020] text-white font-extrabold px-5 py-2.5 rounded-xl text-xs shadow-md transition-all active:scale-95"
+              className="inline-flex items-center gap-2 bg-[var(--burgundy-600)] hover:bg-[var(--burgundy-700)] text-white font-extrabold px-5 py-2.5 rounded-xl text-sm shadow-md transition-all active:scale-95"
             >
               <Heart className="h-4 w-4 fill-white" />
               <span>ลงทะเบียนบริจาคโลหิต</span>
@@ -95,7 +90,7 @@ export function Navbar() {
         <div className="flex items-center gap-2 lg:hidden">
           <Link
             href="/register"
-            className="inline-flex items-center gap-1 bg-[#8E0015] text-white font-extrabold px-3 py-2 rounded-xl text-xs shadow-xs"
+            className="inline-flex items-center gap-1 bg-[var(--burgundy-700)] text-white font-extrabold px-3.5 py-2.5 rounded-xl text-xs shadow-xs"
           >
             <Heart className="h-3.5 w-3.5 fill-white" />
             <span>ลงทะเบียน</span>
@@ -103,7 +98,7 @@ export function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#D5C7B8] bg-white text-[#7A1020]"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)]"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -113,7 +108,7 @@ export function Navbar() {
 
       {/* Mobile Public Drawer */}
       {mobileMenuOpen && (
-        <div className="border-t border-[#D5C7B8] bg-[#F7F3EE] px-4 py-4 shadow-xl lg:hidden animate-in slide-in-from-top-2 duration-150">
+        <div className="border-t border-[var(--line)] bg-[var(--bg)] px-4 py-4 shadow-xl lg:hidden animate-in slide-in-from-top-2 duration-150">
           <div className="flex flex-col gap-2">
             {navLinks.map((item) => {
               const Icon = item.icon;
@@ -123,14 +118,14 @@ export function Navbar() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-xs font-bold transition-all ${
+                  className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all ${
                     isActive
-                      ? 'bg-[#E9E1D9] text-[#7A1020]'
-                      : 'text-[#282828] hover:bg-white'
+                      ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)]'
+                      : 'text-[var(--ink)] hover:bg-white'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className="h-4 w-4 text-[#7A1020]" />
+                    <Icon className="h-4 w-4 text-[var(--burgundy-700)]" />
                     <span>{item.label}</span>
                   </div>
                   <ArrowRight className="h-3.5 w-3.5 opacity-40" />
@@ -138,11 +133,11 @@ export function Navbar() {
               );
             })}
 
-            <div className="mt-2 pt-2 border-t border-[#D5C7B8]">
+            <div className="mt-2 pt-2 border-t border-[var(--line)]">
               <Link
                 href="/register"
                 onClick={() => setMobileMenuOpen(false)}
-                className="inline-flex items-center justify-center gap-2 bg-[#8E0015] text-white font-extrabold w-full py-3 text-xs rounded-xl shadow-md"
+                className="inline-flex items-center justify-center gap-2 bg-[var(--burgundy-600)] text-white font-extrabold w-full py-3 text-sm rounded-xl shadow-md"
               >
                 <Heart className="h-4 w-4 fill-white" />
                 <span>ลงทะเบียนบริจาคโลหิตออนไลน์</span>

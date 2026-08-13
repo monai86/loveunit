@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Heart, QrCode } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 interface TicketStubProps {
   registrationCode?: string;
@@ -22,74 +22,73 @@ export function TicketStub({
   venue = 'LA 217-218 อาคารสิริวิทยา',
   qrUrl,
   unitNumber = '09',
-  variant = 'desktop',
 }: TicketStubProps) {
   return (
-    <div className="relative inline-block w-full max-w-xl select-none font-sans">
+    <div className="relative inline-block w-full max-w-xl select-none">
       
-      {/* TICKET CONTAINER WITH PARCHMENT TEXTURE AND STAMPED EDGES */}
-      <div className="relative flex overflow-hidden rounded-2xl border-2 border-[#7A1020] bg-[#F7F3EE] shadow-2xl">
+      {/* TICKET — solid white card, sharp bottom edge */}
+      <div className="relative flex overflow-hidden rounded-xl bg-white shadow-[0_20px_50px_-20px_rgba(56,6,15,0.45)] border border-[var(--line)]">
         
         {/* MAIN TICKET BODY */}
         <div className="flex-1 p-5 sm:p-6 space-y-4 relative">
           
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-[#D5C7B8] pb-3">
+          <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1 border border-[#D5C7B8] shadow-xs">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1 border border-[var(--line)]">
                 <img src="/images/logo.png" alt="MUMT Logo" className="h-full w-auto object-contain" />
               </div>
               <div>
-                <h3 className="text-xs font-black tracking-wider text-[#7A1020] uppercase font-mono">MUMT</h3>
-                <p className="text-[10px] font-bold text-[#666666] tracking-tight">BLOOD DONATION 2026</p>
+                <p className="text-xs font-black tracking-wide text-[var(--burgundy-700)] uppercase">MUMT</p>
+                <p className="text-[11px] font-semibold text-[var(--muted)] tracking-tight">BLOOD DONATION 2026</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 rounded-full bg-[#E9E1D9] px-2.5 py-0.5 border border-[#D5C7B8]">
-              <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
-              <span className="text-[10px] font-extrabold text-[#7A1020]">ยืนยันการลงทะเบียน</span>
+            <div className="flex items-center gap-1.5 rounded-full bg-[var(--ok-bg)] px-2.5 py-1 border border-[var(--ok)]/20">
+              <span className="h-2 w-2 rounded-full bg-[var(--ok)] animate-pulse"></span>
+              <span className="text-[11px] font-bold text-[var(--ok)]">ยืนยันการลงทะเบียน</span>
             </div>
           </div>
 
-          {/* Center Content: Blood Drop Graphic & Donor Details */}
+          {/* Center Content */}
           <div className="grid grid-cols-12 gap-3 items-center">
             
-            {/* Left Info (7 Cols) */}
-            <div className="col-span-7 space-y-2">
+            {/* Left Info */}
+            <div className="col-span-7 space-y-2.5">
               <div>
-                <span className="text-[9px] font-mono font-bold text-[#666666] uppercase block">ชื่อ-นามสกุล</span>
-                <span className="text-sm sm:text-base font-black text-[#282828] block truncate">{name}</span>
+                <span className="text-[11px] font-bold text-[var(--muted)] uppercase block">ชื่อ-นามสกุล</span>
+                <span className="text-sm sm:text-base font-black text-[var(--ink)] block truncate">{name}</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <span className="text-[9px] font-mono font-bold text-[#666666] uppercase block">วันจัดงาน</span>
-                  <span className="font-extrabold text-[#7A1020] block">{date}</span>
-                  <span className="text-[10px] font-bold text-[#282828] block">{timeSlot}</span>
+                  <span className="text-[11px] font-bold text-[var(--muted)] uppercase block">วันจัดงาน</span>
+                  <span className="font-extrabold text-[var(--burgundy-700)] block">{date}</span>
+                  <span className="text-[11px] font-semibold text-[var(--ink)] block">{timeSlot}</span>
                 </div>
 
                 <div>
-                  <span className="text-[9px] font-mono font-bold text-[#666666] uppercase block">สถานที่</span>
-                  <span className="font-bold text-[#282828] block truncate">{venue}</span>
+                  <span className="text-[11px] font-bold text-[var(--muted)] uppercase block">สถานที่</span>
+                  <span className="text-xs font-bold text-[var(--ink)] block truncate">{venue}</span>
                 </div>
               </div>
             </div>
 
-            {/* Right Graphic: Blood Drop & Stamp (5 Cols) */}
+            {/* Right Graphic */}
             <div className="col-span-5 relative flex flex-col items-center justify-center">
               
               {/* Circular Stamp Motif */}
-              <div className="absolute -top-1 -right-1 h-16 w-16 rounded-full border-2 border-dashed border-[#7A1020]/40 flex items-center justify-center rotate-[-12deg] pointer-events-none">
-                <span className="text-[9px] font-mono font-black text-[#7A1020]/60 tracking-widest uppercase">DONOR</span>
+              <div className="absolute -top-1 -right-1 h-14 w-14 rounded-full border-2 border-dashed border-[var(--burgundy-700)]/35 flex items-center justify-center rotate-[-12deg] pointer-events-none">
+                <span className="text-[11px] font-bold text-[var(--burgundy-700)]/55 tracking-widest uppercase">DONOR</span>
               </div>
 
-              {/* Watermark Blood Drop Illustration */}
+              {/* Blood Drop */}
               <div className="relative h-20 w-16 flex items-center justify-center">
                 <svg viewBox="0 0 100 130" className="h-full w-full drop-shadow-md">
                   <defs>
                     <linearGradient id="bloodDropGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#C13A2B" />
-                      <stop offset="100%" stopColor="#7A1020" />
+                      <stop offset="100%" stopColor="#6E101E" />
                     </linearGradient>
                   </defs>
                   <path 
@@ -100,8 +99,8 @@ export function TicketStub({
               </div>
 
               <div className="mt-1 text-center">
-                <span className="text-[9px] font-mono font-bold text-[#666666]">UNIT</span>
-                <span className="text-base font-mono font-black text-[#7A1020] block leading-none">{unitNumber}</span>
+                <span className="text-[11px] font-bold text-[var(--muted)]">UNIT</span>
+                <span className="text-base font-black text-[var(--burgundy-700)] block leading-none">{unitNumber}</span>
               </div>
 
             </div>
@@ -109,19 +108,18 @@ export function TicketStub({
           </div>
 
           {/* Barcode & Code Strip */}
-          <div className="pt-2 border-t border-[#D5C7B8] flex items-center justify-between">
+          <div className="pt-3 border-t border-[var(--line)] flex items-center justify-between">
             <div className="flex flex-col">
-              {/* Simulated Barcode */}
-              <div className="h-7 flex items-center gap-0.5 overflow-hidden">
+              <div className="h-6 flex items-center gap-0.5 overflow-hidden">
                 {[2,1,3,1,4,1,2,3,1,2,1,4,2,1,3,1,2,4,1,2,3,1,2,1,4].map((w, i) => (
-                  <div key={i} className="bg-[#282828] h-full" style={{ width: `${w * 1.5}px` }} />
+                  <div key={i} className="bg-[var(--ink)] h-full" style={{ width: `${w * 1.5}px` }} />
                 ))}
               </div>
-              <span className="text-[10px] font-mono font-bold tracking-widest text-[#282828] mt-0.5">{registrationCode}</span>
+              <span className="text-[11px] font-bold tracking-widest text-[var(--ink)] mt-0.5">{registrationCode}</span>
             </div>
 
             {qrUrl && (
-              <div className="h-12 w-12 rounded-lg border border-[#7A1020] p-0.5 bg-white shrink-0">
+              <div className="h-12 w-12 rounded-lg border border-[var(--burgundy-700)] p-0.5 bg-white shrink-0">
                 <img src={qrUrl} alt="QR Code" className="h-full w-full object-contain" />
               </div>
             )}
@@ -129,13 +127,13 @@ export function TicketStub({
 
         </div>
 
-        {/* RIGHT DEEP RED STUB FLAP */}
-        <div className="w-16 bg-[#7A1020] border-l-2 border-dashed border-white/40 flex flex-col items-center justify-between py-4 text-white select-none">
-          <span className="text-[10px] font-mono font-extrabold tracking-widest uppercase rotate-90 whitespace-nowrap mt-4">
+        {/* RIGHT RED STUB FLAP */}
+        <div className="w-14 bg-[var(--burgundy-800)] flex flex-col items-center justify-between py-4 text-white select-none">
+          <span className="text-[11px] font-bold tracking-widest uppercase rotate-90 whitespace-nowrap mt-3">
             DONOR PASS
           </span>
           <Heart className="h-5 w-5 fill-white text-white my-auto" />
-          <span className="text-xs font-mono font-black tracking-widest rotate-90 mb-4">
+          <span className="text-xs font-black tracking-widest rotate-90 mb-3">
             UNIT {unitNumber}
           </span>
         </div>
