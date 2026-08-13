@@ -34,12 +34,31 @@ jobs:
       - name: Production build
         run: npm run build
 
+  # The `secrets` context is not available in job-level `if` conditions (the
+  # workflow is rejected at validation time), so surface the DATABASE_URL secret
+  # as a job output here and gate the E2E job on it via `needs`.
+  check-e2e-config:
+    runs-on: ubuntu-latest
+    outputs:
+      has_db: ${{ steps.check.outputs.has_db }}
+    steps:
+      - id: check
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -n "$DATABASE_URL" ]; then
+            echo "has_db=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_db=false" >> "$GITHUB_OUTPUT"
+          fi
+
   # Playwright E2E against a production (standalone) server on a real Neon DB.
   # Only runs when the DATABASE_URL secret is configured (see H-103 in docs);
   # PRs without secrets skip this job cleanly.
   e2e:
     runs-on: ubuntu-latest
-    if: ${{ secrets.DATABASE_URL != '' }}
+    needs: check-e2e-config
+    if: ${{ needs.check-e2e-config.outputs.has_db == 'true' }}
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
