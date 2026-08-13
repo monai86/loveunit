@@ -1,6 +1,6 @@
-// Data Access Layer with Hardened Security, State Machine, and Fail-Closed Production Storage
+// In-Memory Data Access Layer with State Machine and Fail-Closed Production Storage
+// Used ONLY for local development and automated tests when a real database is not configured.
 
-import { createClient } from '@supabase/supabase-js';
 import { 
   Event, 
   EventContentBlock, 
@@ -15,22 +15,12 @@ import {
 } from '@/lib/types/database';
 import { normalizePhoneNumber, generateRegistrationCode, generateQRToken } from '@/lib/utils/format';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-export const supabase = (SUPABASE_URL && SUPABASE_ANON_KEY)
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
-
 /**
- * P0 SECURITY & RELIABILITY — Production Fail-Closed Check
  * Memory backend is ONLY allowed when DATA_BACKEND=memory is explicitly set
- * or in non-production environments. In production without Supabase, it FAILS CLOSED.
+ * or in non-production environments. In production it FAILS CLOSED.
  */
 export function isMemoryBackendAllowed(): boolean {
   if (process.env.DATA_BACKEND === 'memory') return true;
-  if (process.env.DATA_BACKEND === 'supabase') return false;
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return true;
   if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') return true;
   return false;
 }
@@ -160,7 +150,7 @@ export const defaultSlots: TimeSlot[] = [
   { id: 'ts-7', event_id: defaultEvent.id, start_at: '2026-09-16T14:00:00+07:00', end_at: '2026-09-16T15:00:00+07:00', capacity: 25, booked_count: 8, is_active: true, created_at: new Date().toISOString() },
 ];
 
-export let inMemoryRegistrations: Registration[] = [
+export const inMemoryRegistrations: Registration[] = [
   {
     id: 'reg-demo-1',
     event_id: defaultEvent.id,
@@ -211,8 +201,17 @@ export let inMemoryRegistrations: Registration[] = [
   }
 ];
 
-let inMemoryAuditLogs: AuditLog[] = [];
-let inMemoryCheckinEvents: CheckinEvent[] = [];
+const inMemoryAuditLogs: AuditLog[] = [];
+const inMemoryCheckinEvents: CheckinEvent[] = [];
+
+/** Read-only accessors for the audit-log viewer (memory backend). */
+export function getInMemoryCheckinEvents(): readonly CheckinEvent[] {
+  return inMemoryCheckinEvents;
+}
+
+export function getInMemoryAuditLogs(): readonly AuditLog[] {
+  return inMemoryAuditLogs;
+}
 
 // ==========================================
 // REGISTRATION STATE MACHINE CONTROLS
@@ -233,7 +232,7 @@ export function isTransitionAllowed(currentStatus: RegistrationStatus, targetSta
 }
 
 // ==========================================
-// HARDENED STORE FUNCTIONS
+// MEMORY STORE FUNCTIONS
 // ==========================================
 
 /**
@@ -243,16 +242,6 @@ export function isTransitionAllowed(currentStatus: RegistrationStatus, targetSta
 export async function getEventBySlug(slug: string): Promise<Event | null> {
   const cleanSlug = slug.trim().toLowerCase();
 
-  if (supabase) {
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .eq('slug', cleanSlug)
-      .maybeSingle();
-    if (!error && data) return data as Event;
-    return null;
-  }
-
   if (isMemoryBackendAllowed()) {
     return cleanSlug === defaultEvent.slug ? defaultEvent : null;
   }
@@ -260,17 +249,7 @@ export async function getEventBySlug(slug: string): Promise<Event | null> {
   throw new Error('Database connection unconfigured in production environment.');
 }
 
-export async function getEventContentBlocks(eventId: string): Promise<EventContentBlock[]> {
-  if (supabase) {
-    const { data, error } = await supabase
-      .from('event_content_blocks')
-      .select('*')
-      .eq('event_id', eventId)
-      .eq('is_visible', true)
-      .order('display_order', { ascending: true });
-    if (!error && data) return data as EventContentBlock[];
-  }
-
+export async function getEventContentBlocks(_eventId: string): Promise<EventContentBlock[]> {
   if (isMemoryBackendAllowed()) {
     return defaultContentBlocks.filter(b => b.is_visible).sort((a, b) => a.display_order - b.display_order);
   }
@@ -279,18 +258,6 @@ export async function getEventContentBlocks(eventId: string): Promise<EventConte
 }
 
 export async function updateEventContentBlock(id: string, updates: Partial<EventContentBlock>): Promise<{ success: boolean; block?: EventContentBlock }> {
-  if (supabase) {
-    const { data, error } = await supabase
-      .from('event_content_blocks')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-    if (!error && data) {
-      return { success: true, block: data as EventContentBlock };
-    }
-  }
-
   if (isMemoryBackendAllowed()) {
     const block = defaultContentBlocks.find(b => b.id === id || b.content_key === id);
     if (block) {
@@ -302,17 +269,7 @@ export async function updateEventContentBlock(id: string, updates: Partial<Event
   return { success: false };
 }
 
-export async function getTimeSlots(eventId: string): Promise<TimeSlot[]> {
-  if (supabase) {
-    const { data, error } = await supabase
-      .from('time_slots')
-      .select('*')
-      .eq('event_id', eventId)
-      .eq('is_active', true)
-      .order('start_at', { ascending: true });
-    if (!error && data) return data as TimeSlot[];
-  }
-
+export async function getTimeSlots(_eventId: string): Promise<TimeSlot[]> {
   if (isMemoryBackendAllowed()) {
     return defaultSlots.filter(s => s.is_active).sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
   }
@@ -335,57 +292,6 @@ export async function registerDonorAtomic(input: {
 }): Promise<{ success: boolean; registration?: Registration; errorCode?: string; message?: string }> {
   const phoneNormalized = normalizePhoneNumber(input.phone);
   const source = input.source || 'ONLINE';
-
-  if (supabase) {
-    const { data: existing } = await supabase
-      .from('registrations')
-      .select('id, registration_code')
-      .eq('event_id', input.eventId)
-      .eq('phone_normalized', phoneNormalized)
-      .neq('status', 'CANCELLED')
-      .maybeSingle();
-
-    if (existing) {
-      return {
-        success: false,
-        errorCode: 'DUPLICATE_REGISTRATION',
-        message: 'พบการลงทะเบียนสำหรับหมายเลขโทรศัพท์นี้แล้ว',
-        registration: { registration_code: existing.registration_code } as Registration,
-      };
-    }
-
-    const code = generateRegistrationCode();
-    const token = generateQRToken(code);
-
-    const { data: rpcRes, error: rpcErr } = await supabase.rpc('register_donor_atomic', {
-      p_event_id: input.eventId,
-      p_registration_code: code,
-      p_qr_token: token,
-      p_first_name: input.firstName,
-      p_last_name: input.lastName,
-      p_phone: input.phone,
-      p_phone_normalized: phoneNormalized,
-      p_email: input.email || null,
-      p_participant_type: input.participantType,
-      p_faculty: input.faculty || null,
-      p_academic_year: input.academicYear || null,
-      p_donation_experience: input.donationExperience,
-      p_slot_id: input.slotId,
-      p_source: source,
-    });
-
-    if (!rpcErr && rpcRes && rpcRes.success) {
-      const { data: createdReg } = await supabase
-        .from('registrations')
-        .select('*, time_slot:time_slots(*)')
-        .eq('id', rpcRes.registration_id)
-        .single();
-
-      return { success: true, registration: createdReg as Registration };
-    } else if (rpcRes && !rpcRes.success) {
-      return { success: false, errorCode: rpcRes.error_code, message: rpcRes.message };
-    }
-  }
 
   if (isMemoryBackendAllowed()) {
     const duplicate = inMemoryRegistrations.find(
@@ -449,15 +355,6 @@ export async function registerDonorAtomic(input: {
 
 export async function getRegistrationByCode(code: string): Promise<Registration | null> {
   const codeClean = code.trim().toUpperCase();
-  if (supabase) {
-    const { data, error } = await supabase
-      .from('registrations')
-      .select('*, time_slot:time_slots(*), event:events(*)')
-      .eq('registration_code', codeClean)
-      .maybeSingle();
-    if (!error && data) return data as Registration;
-  }
-
   if (isMemoryBackendAllowed()) {
     const reg = inMemoryRegistrations.find(r => r.registration_code.toUpperCase() === codeClean);
     if (!reg) return null;
@@ -470,15 +367,6 @@ export async function getRegistrationByCode(code: string): Promise<Registration 
 
 export async function getRegistrationByQRToken(token: string): Promise<Registration | null> {
   const tokenClean = token.trim();
-  if (supabase) {
-    const { data, error } = await supabase
-      .from('registrations')
-      .select('*, time_slot:time_slots(*)')
-      .eq('qr_token', tokenClean)
-      .maybeSingle();
-    if (!error && data) return data as Registration;
-  }
-
   if (isMemoryBackendAllowed()) {
     const reg = inMemoryRegistrations.find(r => r.qr_token === tokenClean);
     if (!reg) return null;
@@ -492,15 +380,6 @@ export async function getRegistrationByQRToken(token: string): Promise<Registrat
 export async function searchRegistrations(query: string): Promise<Registration[]> {
   const q = query.trim().toLowerCase();
   if (!q) return [];
-
-  if (supabase) {
-    const { data } = await supabase
-      .from('registrations')
-      .select('*, time_slot:time_slots(*)')
-      .or(`registration_code.ilike.%${q}%,first_name.ilike.%${q}%,last_name.ilike.%${q}%,phone.ilike.%${q}%`)
-      .limit(50);
-    if (data) return data as Registration[];
-  }
 
   if (isMemoryBackendAllowed()) {
     const normPhone = normalizePhoneNumber(q);
@@ -523,92 +402,54 @@ export async function updateRegistrationStatus(
   performedBy?: string
 ): Promise<{ success: boolean; registration?: Registration; message?: string }> {
   
-  let currentStatus: RegistrationStatus = 'REGISTERED';
   let targetReg: Registration | null = null;
 
-  if (supabase) {
-    const { data: current } = await supabase
-      .from('registrations')
-      .select('status')
-      .eq('id', registrationId)
-      .single();
-    if (current) currentStatus = current.status;
-  } else if (isMemoryBackendAllowed()) {
+  if (isMemoryBackendAllowed()) {
     targetReg = inMemoryRegistrations.find(r => r.id === registrationId) || null;
-    if (targetReg) currentStatus = targetReg.status;
+  } else {
+    throw new Error('Database connection unconfigured in production environment.');
+  }
+
+  if (!targetReg) {
+    return { success: false, message: 'ไม่พบข้อมูลการลงทะเบียน' };
   }
 
   // Enforce Registration State Machine Transition
-  if (!isTransitionAllowed(currentStatus, targetStatus)) {
+  if (!isTransitionAllowed(targetReg.status, targetStatus)) {
     return {
       success: false,
-      message: `ไม่สามารถเปลี่ยนสถานะจาก "${currentStatus}" เป็น "${targetStatus}" ได้`,
+      message: `ไม่สามารถเปลี่ยนสถานะจาก "${targetReg.status}" เป็น "${targetStatus}" ได้`,
     };
   }
 
   const now = new Date().toISOString();
-  const updatePayload: Record<string, any> = {
-    status: targetStatus,
-    updated_at: now,
-  };
-  if (targetStatus === 'CHECKED_IN') updatePayload.checked_in_at = now;
-  if (targetStatus === 'COMPLETED') updatePayload.completed_at = now;
+  targetReg.status = targetStatus;
+  targetReg.updated_at = now;
+  if (targetStatus === 'CHECKED_IN') targetReg.checked_in_at = now;
+  if (targetStatus === 'COMPLETED') targetReg.completed_at = now;
 
-  if (supabase) {
-    const { data, error } = await supabase
-      .from('registrations')
-      .update(updatePayload)
-      .eq('id', registrationId)
-      .select('*, time_slot:time_slots(*)')
-      .single();
+  inMemoryCheckinEvents.push({
+    id: `chk-${Date.now()}`,
+    event_id: targetReg.event_id,
+    registration_id: targetReg.id,
+    action: `STATUS_CHANGE_${targetStatus}`,
+    performed_by: performedBy || null,
+    metadata: null,
+    created_at: now,
+  });
 
-    if (!error && data) {
-      await supabase.from('checkin_events').insert({
-        event_id: data.event_id,
-        registration_id: data.id,
-        action: `STATUS_CHANGE_${targetStatus}`,
-        performed_by: performedBy || null,
-      });
-      return { success: true, registration: data as Registration };
-    }
-  }
-
-  if (isMemoryBackendAllowed() && targetReg) {
-    targetReg.status = targetStatus;
-    if (targetStatus === 'CHECKED_IN') targetReg.checked_in_at = now;
-    if (targetStatus === 'COMPLETED') targetReg.completed_at = now;
-    targetReg.updated_at = now;
-
-    inMemoryCheckinEvents.push({
-      id: `chk-${Date.now()}`,
-      event_id: targetReg.event_id,
-      registration_id: targetReg.id,
-      action: `STATUS_CHANGE_${targetStatus}`,
-      performed_by: performedBy || null,
-      metadata: null,
-      created_at: now,
-    });
-
-    return { success: true, registration: { ...targetReg, time_slot: defaultSlots.find(s => s.id === targetReg?.slot_id) || null } };
-  }
-
-  return { success: false, message: 'ไม่พบข้อมูลการลงทะเบียน' };
+  return { success: true, registration: { ...targetReg, time_slot: defaultSlots.find(s => s.id === targetReg?.slot_id) || null } };
 }
 
 export async function checkInDonor(registrationId: string, performedBy?: string) {
   return updateRegistrationStatus(registrationId, 'CHECKED_IN', performedBy);
 }
 
-export async function getDashboardKPIs(eventId: string): Promise<DashboardKPIs> {
-  let regs = inMemoryRegistrations;
-  let slots = defaultSlots;
+export async function getDashboardKPIs(_eventId: string): Promise<DashboardKPIs> {
+  const regs = inMemoryRegistrations;
+  const slots = defaultSlots;
 
-  if (supabase) {
-    const { data: dbRegs } = await supabase.from('registrations').select('*').eq('event_id', eventId);
-    const { data: dbSlots } = await supabase.from('time_slots').select('*').eq('event_id', eventId);
-    if (dbRegs) regs = dbRegs as Registration[];
-    if (dbSlots) slots = dbSlots as TimeSlot[];
-  } else if (!isMemoryBackendAllowed()) {
+  if (!isMemoryBackendAllowed()) {
     throw new Error('Database connection unconfigured in production environment.');
   }
 
@@ -667,15 +508,7 @@ export async function getDashboardKPIs(eventId: string): Promise<DashboardKPIs> 
 }
 
 export async function logAuditAction(action: string, entityType: string, entityId: string, actorId?: string, metadata?: Record<string, unknown>) {
-  if (supabase) {
-    await supabase.from('audit_logs').insert({
-      actor_id: actorId || null,
-      action,
-      entity_type: entityType,
-      entity_id: entityId,
-      metadata: metadata || null,
-    });
-  } else if (isMemoryBackendAllowed()) {
+  if (isMemoryBackendAllowed()) {
     inMemoryAuditLogs.push({
       id: `audit-${Date.now()}`,
       actor_id: actorId || null,
@@ -689,14 +522,6 @@ export async function logAuditAction(action: string, entityType: string, entityI
 }
 
 export async function getAllRegistrations(eventId: string): Promise<Registration[]> {
-  if (supabase) {
-    const { data } = await supabase
-      .from('registrations')
-      .select('*, time_slot:time_slots(*)')
-      .eq('event_id', eventId)
-      .order('registered_at', { ascending: false });
-    if (data) return data as Registration[];
-  }
   if (isMemoryBackendAllowed()) {
     return inMemoryRegistrations
       .filter(r => r.event_id === eventId)

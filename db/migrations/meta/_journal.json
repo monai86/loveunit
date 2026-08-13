@@ -8,6 +8,20 @@
       "when": 1786540211417,
       "tag": "0000_spicy_mimic",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786555943357,
+      "tag": "0001_watery_lady_deathstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786562243543,
+      "tag": "0002_add_must_change_password",
+      "breakpoints": true
     }
   ]
 }

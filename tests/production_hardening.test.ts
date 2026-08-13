@@ -1,9 +1,11 @@
+// These tests exercise the in-memory backend on purpose; enable it explicitly.
+process.env.DATA_BACKEND = 'memory';
+
 import assert from 'node:assert';
-import { generateQRToken, normalizePhoneNumber, generateRegistrationCode } from '../lib/utils/format';
+import { generateQRToken, generateRegistrationCode } from '../lib/utils/format';
 import { 
   getEventBySlug, 
   isTransitionAllowed, 
-  updateRegistrationStatus, 
   isMemoryBackendAllowed,
   registerDonorAtomic,
   updateEventContentBlock

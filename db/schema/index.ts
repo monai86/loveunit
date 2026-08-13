@@ -3,8 +3,9 @@ import { events, timeSlots } from './events';
 import { registrations } from './registrations';
 import { staffProfiles } from './staff';
 import { eventContentBlocks } from './content';
-import { checkinEvents, auditLogs, feedback } from './audit';
-import { user, session, account, verification } from './auth';
+import { checkinEvents } from './audit';
+import { user, session, account } from './auth';
+import { waitlist } from './waitlist';
 
 export * from './events';
 export * from './registrations';
@@ -12,6 +13,7 @@ export * from './staff';
 export * from './content';
 export * from './audit';
 export * from './auth';
+export * from './waitlist';
 
 // Relations
 export const eventsRelations = relations(events, ({ many }) => ({
@@ -54,4 +56,15 @@ export const userRelations = relations(user, ({ one, many }) => ({
   }),
   sessions: many(session),
   accounts: many(account),
+}));
+
+export const waitlistRelations = relations(waitlist, ({ one }) => ({
+  event: one(events, {
+    fields: [waitlist.eventId],
+    references: [events.id],
+  }),
+  timeSlot: one(timeSlots, {
+    fields: [waitlist.slotId],
+    references: [timeSlots.id],
+  }),
 }));
