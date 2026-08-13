@@ -27,6 +27,7 @@ A production-ready, mobile-first web application designed for university blood d
 - **ORM & Migrations:** Drizzle ORM + drizzle-kit (`drizzle.config.ts`, `db/schema/*`)
 - **Authentication:** Better Auth (`better-auth`) with Drizzle adapter
 - **Validation:** Zod schemas
+- **Email:** Nodemailer (SMTP) — transactional confirmation emails
 
 ---
 
@@ -48,3 +49,72 @@ npm test
 # Run Next.js production SSG build verification
 npx next build
 ```
+
+---
+
+## 🔐 Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in:
+
+| Variable | Purpose | Required |
+|---|---|---|
+| `DATABASE_URL` | Neon PostgreSQL connection string | ✅ |
+| `BETTER_AUTH_SECRET` | Better Auth signing secret (≥32 chars) | ✅ |
+| `BETTER_AUTH_URL` | Public URL of the app (e.g. `https://your-domain.com`) | ✅ |
+| `NEXT_PUBLIC_APP_URL` | Public base URL (used for links in emails) | ✅ |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | SMTP server for confirmation emails | only for email |
+| `SMTP_FROM` | Sender address for confirmation emails | only for email |
+
+Email is a **silent no-op** when SMTP is not configured — registrations never fail because of email.
+
+---
+
+## 📬 Registration Confirmation Email
+
+On successful online registration, a confirmation email is sent (when SMTP is configured) containing:
+the registration code, arrival time slot, venue, pre-donation checklist, and a link to the QR pass page.
+
+---
+
+## 🐳 Deployment
+
+### Docker
+
+The repo ships a multi-stage `Dockerfile` using Next.js **standalone output**
+(`output: "standalone"` in `next.config.ts`) — no build-time database access required.
+
+```bash
+# Build the image
+docker build -t loveunit .
+
+# Run it (pass secrets at runtime)
+docker run -p 3000:3000 --env-file .env.local loveunit
+```
+
+### CI
+
+`.github/workflows/ci.yml` runs on every push/PR to `main`: **lint → typecheck → unit tests → production build**.
+
+### Deploying to a host
+
+1. Provision a PostgreSQL (Neon) database and run migrations: `npm run db:push`.
+2. Set the environment variables from the table above on the host.
+3. Examples:
+   - **Railway / Fly.io:** deploy the Dockerfile directly and attach the env vars.
+   - **Vercel:** import the repo and set the env vars; the default build command works out of the box.
+
+### Data & migrations
+
+- Schema lives in `db/schema/*`; generate a migration with `npm run db:generate`, then apply with `npm run db:push`.
+- `db/seed.ts` seeds the official event metadata and time slots (idempotent).
+
+---
+
+## 🧭 Public pages
+- `/` — homepage (hero, donor journey, preparation checklist)
+- `/register` — 3-step online registration wizard
+- `/lookup` — recover a forgotten QR code (phone + name verification)
+- `/registration/[code]` — registration pass with QR code
+- `/prepare`, `/location` — donor guides
+- `/staff/*` — staff check-in, walk-in registration (auth required)
+- `/admin/*` — admin dashboard, registrations, content management (auth required)
