@@ -12,6 +12,19 @@ export interface AuthenticatedUser {
   id: string;
   email: string;
   profile: StaffProfile;
+  mustChangePassword: boolean;
+}
+
+/**
+ * Dev-fallback staff profiles use synthetic user ids (e.g. 'u-admin') that do
+ * not exist in the `user` table. Persisting them as FK values would violate
+ * the foreign key constraint, so they are resolved to null (no actor recorded).
+ * Real authenticated sessions carry real user ids and are kept as-is.
+ */
+export function resolveActorId(actorId?: string | null): string | null {
+  if (!actorId) return null;
+  if (actorId.startsWith('u-')) return null;
+  return actorId;
 }
 
 const devProfiles: Record<string, StaffProfile> = {
@@ -51,70 +64,63 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
               created_at: profile.createdAt.toISOString(),
               updated_at: profile.updatedAt.toISOString(),
             },
+            mustChangePassword: session.user.mustChangePassword === true,
           };
         }
       }
     }
-  } catch (err) {
+  } catch (_err) {
     // Session read error
   }
 
-  // Fallback for local testing / memory backend when allowed
-  if (isMemoryBackendAllowed()) {
-    const devProfile = devProfiles['admin@mahidol.ac.th'];
-    return {
-      id: devProfile.user_id,
-      email: 'admin@mahidol.ac.th',
-      profile: devProfile,
-    };
+  // Dev fallback for local testing / memory backend: only when there is no real
+  // database configured (or memory backend is explicitly requested). If a real DB
+  // exists (even in development) we require a real session — no synthetic admin.
+  if (!db || process.env.DATA_BACKEND === 'memory' || process.env.NODE_ENV === 'test') {
+    if (isMemoryBackendAllowed()) {
+      const devProfile = devProfiles['admin@mahidol.ac.th'];
+      return {
+        id: devProfile.user_id,
+        email: 'admin@mahidol.ac.th',
+        profile: devProfile,
+        mustChangePassword: false,
+      };
+    }
   }
 
   return null;
 }
 
-export async function requireStaff(): Promise<AuthenticatedUser> {
-  const user = await getAuthenticatedUser();
+/**
+ * Role check shared by all guards. `userOverride` lets tests inject a synthetic
+ * user instead of hitting the session/DB layer.
+ */
+function assertRole(user: AuthenticatedUser | null, allowedRoles: StaffRole[], label: string): AuthenticatedUser {
   if (!user) {
     throw new Error('UNAUTHORIZED');
   }
-  const allowedRoles: StaffRole[] = ['STAFF', 'TEAM_LEAD', 'ADMIN', 'SUPER_ADMIN'];
   if (!allowedRoles.includes(user.profile.role)) {
     throw new Error('FORBIDDEN');
   }
   return user;
 }
 
-export async function requireTeamLead(): Promise<AuthenticatedUser> {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    throw new Error('UNAUTHORIZED');
-  }
-  const allowedRoles: StaffRole[] = ['TEAM_LEAD', 'ADMIN', 'SUPER_ADMIN'];
-  if (!allowedRoles.includes(user.profile.role)) {
-    throw new Error('FORBIDDEN');
-  }
-  return user;
+export async function requireStaff(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
+  const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
+  return assertRole(user, ['STAFF', 'TEAM_LEAD', 'ADMIN', 'SUPER_ADMIN'], 'STAFF');
 }
 
-export async function requireAdmin(): Promise<AuthenticatedUser> {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    throw new Error('UNAUTHORIZED');
-  }
-  const allowedRoles: StaffRole[] = ['ADMIN', 'SUPER_ADMIN'];
-  if (!allowedRoles.includes(user.profile.role)) {
-    throw new Error('FORBIDDEN');
-  }
-  return user;
+export async function requireTeamLead(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
+  const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
+  return assertRole(user, ['TEAM_LEAD', 'ADMIN', 'SUPER_ADMIN'], 'TEAM_LEAD');
 }
 
-export async function requireSuperAdmin(): Promise<AuthenticatedUser> {
-  const user = await getAuthenticatedUser();
-  if (!user) {
-    throw new Error('UNAUTHORIZED');
-  }
-  if (user.profile.role !== 'SUPER_ADMIN') {
-    throw new Error('FORBIDDEN');
-  }
-  return user;
+export async function requireAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
+  const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
+  return assertRole(user, ['ADMIN', 'SUPER_ADMIN'], 'ADMIN');
+}
+
+export async function requireSuperAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
+  const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
+  return assertRole(user, ['SUPER_ADMIN'], 'SUPER_ADMIN');
 }

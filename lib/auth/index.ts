@@ -11,6 +11,33 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  user: {
+    additionalFields: {
+      mustChangePassword: {
+        type: 'boolean',
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+    },
+  },
   secret: process.env.BETTER_AUTH_SECRET || 'dev-better-auth-secret-change-in-prod-123456789',
   baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
+  // In development, accept any localhost origin (dev servers may run on any port).
+  // In production only the configured base URL is trusted.
+  trustedOrigins:
+    process.env.NODE_ENV === 'production'
+      ? undefined
+      : (request?: Request) => {
+          try {
+            if (!request) return [];
+            const url = new URL(request.url);
+            if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+              return [url.origin];
+            }
+            return [];
+          } catch {
+            return [];
+          }
+        },
 });
