@@ -1,10 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
-import { CheckCircle2, Calendar, Clock, MapPin, Download, ArrowRight, Printer, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { getRegistrationByCode } from '@/services/registration-service';
 import { formatTimeRange } from '@/lib/utils/format';
+import { RegistrationPoster } from '@/components/registration/RegistrationPoster';
 
 // Registration may arrive from either the Drizzle backend (camelCase) or the
 // legacy in-memory backend (snake_case); this view type covers both shapes.
@@ -45,7 +47,7 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
   const phone = reg.phone || '';
   const qrToken = reg.qrToken || reg.qr_token || '';
   const slot = reg.timeSlot || reg.time_slot;
-  const timeSlot = slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '08:00 - 15:00';
+  const timeSlot = slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 - 14:00';
   const facultyName = reg.faculty || 'มหาวิทยาลัยมหิดล';
 
   return (
@@ -69,7 +71,7 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
         <div className="border-b-2 border-dashed border-[var(--burgundy-700)] pb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="h-9 w-9 rounded-lg bg-white p-1 border border-[var(--line)] flex items-center justify-center">
-              <img src="/images/logo.png" alt="MUMT Logo" className="h-full w-auto object-contain" />
+              <Image src="/images/logo.png" alt="MUMT Logo" width={32} height={32} className="h-full w-auto object-contain" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[var(--burgundy-700)] uppercase block">MUMT Blood Donation 2026</span>
@@ -118,7 +120,7 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
 
           <div className="flex justify-between py-1.5">
             <span className="text-editorial-muted font-bold">สถานที่:</span>
-            <span className="font-bold text-editorial-ink">ห้อง 217-218 สิริวิทยา ศาลายา</span>
+            <span className="font-bold text-editorial-ink">ห้อง 217 สิริวิทยา ศาลายา</span>
           </div>
         </div>
 
@@ -139,7 +141,7 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
           )}
 
           <p className="text-[12px] text-editorial-muted font-medium">
-            แสดง QR สแกน ณ จุดลงทะเบียน หน้าห้องประชุม 217-218
+            แสดง QR สแกน ณ จุดลงทะเบียน หน้าห้องประชุม 217
           </p>
         </div>
 
@@ -162,6 +164,9 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
+
+      {/* Event poster matching the visitor's saved language (TH/EN toggle) */}
+      <RegistrationPoster />
 
     </div>
   );

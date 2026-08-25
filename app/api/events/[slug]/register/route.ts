@@ -82,7 +82,7 @@ export async function POST(
       registrationCode: pickField<string>(reg, 'registrationCode', 'registration_code') || '',
       slot: regSlot ? { startAt: regSlot.startAt, endAt: regSlot.endAt, start_at: regSlot.start_at, end_at: regSlot.end_at } : null,
       venueName: pickField<string>(event, 'venueName', 'venue_name'),
-      eventDateLabel: 'พุธ 16 กันยายน 2569 (08:00 – 15:00 น.)',
+      eventDateLabel: 'พุธ 16 กันยายน 2569 (09:00 – 14:00 น.)',
     });
 
     return NextResponse.json({

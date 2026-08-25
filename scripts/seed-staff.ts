@@ -9,6 +9,13 @@ loadEnvLocal();
 
 const ACCOUNTS: Array<{ email: string; password: string; displayName: string; role: 'STAFF' | 'TEAM_LEAD' | 'ADMIN' | 'SUPER_ADMIN'; team: string }> = [
   {
+    email: 'superadmin@mahidol.ac.th',
+    password: 'SuperAdmin@MUMT2026',
+    displayName: 'ผู้ดูแลระบบสูงสุด (Super Admin)',
+    role: 'SUPER_ADMIN',
+    team: 'Executive Board',
+  },
+  {
     email: 'admin@mahidol.ac.th',
     password: 'Admin@MUMT2026',
     displayName: 'ผู้ดูแลระบบ MUMT',
@@ -66,10 +73,10 @@ async function main() {
       console.log(`✅ created user ${acc.email} (${userId})`);
     }
 
-    // Newly seeded accounts must change their password on first login.
+    // Seeded accounts are ready for direct login without forced password change
     await db
       .update(user)
-      .set({ mustChangePassword: true })
+      .set({ mustChangePassword: false })
       .where(eq(user.id, userId));
 
     const [profile] = await db

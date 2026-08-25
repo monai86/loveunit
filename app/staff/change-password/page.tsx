@@ -3,7 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ShieldCheck, Lock, AlertCircle, Loader2, KeyRound } from 'lucide-react';
+import Image from 'next/image';
+import { 
+  ShieldCheck, 
+  Lock, 
+  AlertCircle, 
+  Loader2, 
+  KeyRound, 
+  Eye, 
+  EyeOff, 
+  ArrowLeft,
+  CheckCircle2
+} from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 
 export default function ChangePasswordPage() {
@@ -11,6 +22,11 @@ export default function ChangePasswordPage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +56,7 @@ export default function ChangePasswordPage() {
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError('รหัสผ่านใหม่กับยืนยันรหัสผ่านไม่ตรงกัน');
+      setError('รหัสผ่านใหม่และยืนยันรหัสผ่านไม่ตรงกัน');
       return;
     }
 
@@ -54,130 +70,189 @@ export default function ChangePasswordPage() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok || !data?.success) {
-        setError(data?.message || 'เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่');
+        setError(data?.message || 'เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาตรวจสอบรหัสผ่านเดิม');
         return;
       }
 
       router.replace(data.redirect || '/staff/checkin');
     } catch (err) {
       console.error(err);
-      setError('เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่');
+      setError('เปลี่ยนรหัสผ่านไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto max-w-md px-4 py-16 sm:px-6">
+    <div className="min-h-[85vh] flex flex-col justify-center items-center px-4 py-12 sm:px-6">
       
-      <div className="text-center space-y-2">
-        <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--ink)] text-white shadow-xl">
-          <KeyRound className="h-8 w-8 text-[var(--danger)]" />
-        </div>
-        <div className="inline-block px-2.5 py-0.5 rounded bg-[var(--burgundy-600)] text-white text-[11px] font-mono font-bold uppercase">
-          FIRST LOGIN • SECURITY
-        </div>
-        <h1 className="text-2xl font-black text-[var(--ink)]">ตั้งรหัสผ่านใหม่</h1>
-        <p className="text-xs text-[var(--muted)] font-medium">
-          ครั้งแรกที่เข้าสู่ระบบ กรุณาเปลี่ยนรหัสผ่านที่ระบบตั้งไว้ให้ เป็นรหัสผ่านเฉพาะของคุณ
-        </p>
-      </div>
-
-      <div className="mt-6 rounded-2xl border border-[var(--line)] bg-white p-6 shadow-sm sm:p-8 space-y-6">
+      <div className="w-full max-w-md space-y-6">
         
-        {error && (
-          <div className="flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-bold text-red-800">
-            <AlertCircle className="h-4 w-4 shrink-0 text-red-600" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="cp-current" className="block text-xs font-bold text-[var(--ink)] mb-1">
-              รหัสผ่านปัจจุบัน
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
-              <input
-                id="cp-current"
-                type="password"
-                required
-                placeholder="รหัสที่ระบบแจกให้ครั้งแรก"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                className="editorial-input pl-10"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="cp-new" className="block text-xs font-bold text-[var(--ink)] mb-1">
-              รหัสผ่านใหม่
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
-              <input
-                id="cp-new"
-                type="password"
-                required
-                minLength={8}
-                placeholder="อย่างน้อย 8 ตัวอักษร"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="editorial-input pl-10"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="cp-confirm" className="block text-xs font-bold text-[var(--ink)] mb-1">
-              ยืนยันรหัสผ่านใหม่
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
-              <input
-                id="cp-confirm"
-                type="password"
-                required
-                minLength={8}
-                placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="editorial-input pl-10"
-              />
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="editorial-btn-primary w-full py-3.5 text-xs justify-center font-black"
+        {/* Return to Login link */}
+        <div className="text-left">
+          <Link
+            href="/staff/login"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--muted)] hover:text-[var(--burgundy-700)] transition-colors"
           >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                กำลังบันทึก...
-              </span>
-            ) : (
-              <span>บันทึกรหัสผ่านใหม่</span>
-            )}
-          </button>
-        </form>
-
-        <p className="text-center text-[11px] text-gray-400 font-medium">
-          <Link href="/staff/login" className="underline">
-            กลับไปหน้าล็อกอิน
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>กลับไปหน้าเข้าสู่ระบบ</span>
           </Link>
-        </p>
+        </div>
 
-      </div>
+        {/* Main Card */}
+        <div className="bg-white rounded-3xl border border-[var(--line)] p-7 sm:p-9 shadow-xl space-y-6">
+          
+          {/* Header */}
+          <div className="text-center space-y-3">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--rose-100)] p-2 border border-[var(--line)] shadow-xs">
+              <KeyRound className="h-7 w-7 text-[var(--burgundy-700)]" />
+            </div>
 
-      <div className="mt-4 flex items-start gap-2 p-3 rounded-xl bg-[var(--ink)]/[0.03] border border-[var(--line)] text-[11px] text-[var(--muted)]">
-        <ShieldCheck className="h-4 w-4 shrink-0 mt-0.5 text-[var(--burgundy-600)]" />
-        <span>
-          การเปลี่ยนรหัสผ่านจะยกเลิกเซสชันอื่น ๆ ที่ล็อกอินอยู่ทั้งหมด เพื่อความปลอดภัยของบัญชี
-        </span>
+            <div className="space-y-1">
+              <div className="flex items-center justify-center gap-1.5">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-black uppercase tracking-wider border border-amber-300/60">
+                  FIRST LOGIN • SECURITY SETUP
+                </span>
+              </div>
+              <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] tracking-tight">
+                ตั้งรหัสผ่านเฉพาะของคุณ
+              </h1>
+              <p className="text-xs text-[var(--muted)] font-medium">
+                สำหรับการเข้าใช้งานครั้งแรก กรุณาเปลี่ยนรหัสผ่านเริ่มต้นเพื่อความปลอดภัย
+              </p>
+            </div>
+          </div>
+
+          {/* Error Notice */}
+          {error && (
+            <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-bold text-red-800">
+              <AlertCircle className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            
+            {/* Current Password */}
+            <div className="space-y-1">
+              <label htmlFor="cp-current" className="block text-xs font-black text-[var(--ink)]">
+                รหัสผ่านปัจจุบัน (รหัสที่ระบบแจกให้) *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                  <Lock className="h-4 w-4" />
+                </div>
+                <input
+                  id="cp-current"
+                  type={showCurrent ? 'text' : 'password'}
+                  required
+                  placeholder="เช่น SuperAdmin@MUMT2026"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-[var(--line)] bg-gray-50/50 focus:bg-white text-xs font-bold text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)] transition-all font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowCurrent(!showCurrent)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-700 transition-colors focus:outline-none"
+                  aria-label={showCurrent ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+                >
+                  {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* New Password */}
+            <div className="space-y-1">
+              <label htmlFor="cp-new" className="block text-xs font-black text-[var(--ink)]">
+                รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร) *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                  <Lock className="h-4 w-4" />
+                </div>
+                <input
+                  id="cp-new"
+                  type={showNew ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  placeholder="กำหนดรหัสผ่านใหม่"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-[var(--line)] bg-gray-50/50 focus:bg-white text-xs font-bold text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)] transition-all font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNew(!showNew)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-700 transition-colors focus:outline-none"
+                  aria-label={showNew ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+                >
+                  {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm New Password */}
+            <div className="space-y-1">
+              <label htmlFor="cp-confirm" className="block text-xs font-black text-[var(--ink)]">
+                ยืนยันรหัสผ่านใหม่อีกครั้ง *
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                  <Lock className="h-4 w-4" />
+                </div>
+                <input
+                  id="cp-confirm"
+                  type={showConfirm ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  placeholder="พิมพ์รหัสผ่านใหม่อีกครั้ง"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-[var(--line)] bg-gray-50/50 focus:bg-white text-xs font-bold text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)] transition-all font-mono"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-700 transition-colors focus:outline-none"
+                  aria-label={showConfirm ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+                >
+                  {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 px-4 rounded-xl bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-70"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>กำลังบันทึกรหัสผ่านใหม่...</span>
+                  </span>
+                ) : (
+                  <span>บันทึกและเข้าสู่ระบบ</span>
+                )}
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+
+        {/* Security hint */}
+        <div className="text-center space-y-1 text-[11px] text-[var(--muted)]">
+          <p className="flex items-center justify-center gap-1.5 font-medium">
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+            <span>การเปลี่ยนรหัสผ่านจะช่วยปกป้องความปลอดภัยของระบบและข้อมูลผู้บริจาค</span>
+          </p>
+        </div>
+
       </div>
 
     </div>

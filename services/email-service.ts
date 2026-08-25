@@ -23,7 +23,7 @@ function isSmtpConfigured(): boolean {
 function buildHtml(input: ConfirmationInput): string {
   const timeSlot = input.slot
     ? formatTimeRange(input.slot.startAt || input.slot.start_at || '', input.slot.endAt || input.slot.end_at || '')
-    : '08:00 – 15:00 น.';
+    : '09:00 – 14:00 น.';
 
   const checklist = [
     'นอนหลับพักผ่อนให้เพียงพออย่างน้อย 6 ชั่วโมง',
@@ -49,7 +49,7 @@ function buildHtml(input: ConfirmationInput): string {
       <table style="width:100%;font-size:13px;color:#29272A;">
         <tr><td style="padding:6px 0;color:#6B6366;">วันจัดงาน</td><td style="text-align:right;font-weight:700;">${input.eventDateLabel || 'พุธ 16 กันยายน 2569'}</td></tr>
         <tr><td style="padding:6px 0;color:#6B6366;">รอบเวลาเดินทางแนะนำ</td><td style="text-align:right;font-weight:700;color:#7A1020;">${timeSlot}</td></tr>
-        <tr><td style="padding:6px 0;color:#6B6366;">สถานที่</td><td style="text-align:right;font-weight:700;">${input.venueName || 'ห้องประชุม 217-218 อาคารสิริวิทยา ศาลายา'}</td></tr>
+        <tr><td style="padding:6px 0;color:#6B6366;">สถานที่</td><td style="text-align:right;font-weight:700;">${input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา ศาลายา'}</td></tr>
       </table>
       <div style="margin:18px 0;border-top:2px dashed #7A1020;"></div>
       <div style="font-size:11px;letter-spacing:2px;color:#7A1020;font-weight:700;">ข้อปฏิบัติก่อนบริจาค</div>

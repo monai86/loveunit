@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Image as ImageIcon, Save, CheckCircle2, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowLeft, Image as ImageIcon, Save, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { EventContentBlock } from '@/lib/types/database';
 
 export default function AdminContentPage() {
@@ -188,9 +189,9 @@ export default function AdminContentPage() {
 
                 <div className="md:col-span-4">
                   <span className="block text-[11px] font-bold text-gray-700 mb-1">ตัวอย่างภาพพรีวิว (Preview)</span>
-                  <div className="rounded-2xl border border-gray-200 bg-slate-50 p-4 aspect-video flex flex-col items-center justify-center text-center overflow-hidden">
+                  <div className="rounded-2xl border border-gray-200 bg-slate-50 p-4 aspect-video flex flex-col items-center justify-center text-center overflow-hidden relative">
                     {block.image_url ? (
-                      <img src={block.image_url} alt={block.alt_text || block.title} className="max-h-full max-w-full object-contain rounded-lg" />
+                      <Image src={block.image_url} alt={block.alt_text || block.title} width={300} height={200} unoptimized className="max-h-full max-w-full object-contain rounded-lg" />
                     ) : (
                       <>
                         <ImageIcon className="h-8 w-8 text-gray-400 mb-1" />

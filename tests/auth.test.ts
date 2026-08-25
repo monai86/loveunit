@@ -152,7 +152,37 @@ async function runAuthTests() {
   await assert.rejects(() => requireSuperAdmin(null), /UNAUTHORIZED/);
   console.log('✓ requireSuperAdmin: only SUPER_ADMIN passes\n');
 
-  console.log('🎉 ALL AUTH TESTS PASSED SUCCESSFULLY!');
+  // ---- Staff and Role Management CRUD ----
+  console.log('Test 9: Staff & RBAC Role Management in Admin Service');
+  const { getAllStaffMembers, updateStaffRoleAndTeam } = await import('../services/admin-service');
+  const initialStaff = await getAllStaffMembers();
+  assert.ok(initialStaff.length >= 4, 'Must have at least 4 seeded in-memory staff');
+  const targetStaff = initialStaff.find((s) => s.role === 'STAFF');
+  assert.ok(targetStaff, 'Must have a staff member with STAFF role');
+
+  const updateResult = await updateStaffRoleAndTeam({
+    userId: targetStaff.userId,
+    role: 'TEAM_LEAD',
+    team: 'Emergency Response Lead',
+    actorId: 'u-admin',
+  });
+  assert.strictEqual(updateResult.success, true);
+  const updatedStaff = await getAllStaffMembers();
+  const modifiedUser = updatedStaff.find((s) => s.userId === targetStaff.userId);
+  assert.strictEqual(modifiedUser?.role, 'TEAM_LEAD');
+  assert.strictEqual(modifiedUser?.team, 'Emergency Response Lead');
+  console.log('✓ Staff role update & station assignment verified\n');
+
+  // ---- Public Footer Link Verification ----
+  console.log('Test 10: Public Website Does Not Expose Staff Login Button');
+  const fs = await import('node:fs');
+  const path = await import('node:path');
+  const footerContent = fs.readFileSync(path.join(process.cwd(), 'components/layout/Footer.tsx'), 'utf-8');
+  assert.ok(!footerContent.includes('เข้าสู่ระบบเจ้าหน้าที่ (Staff Login)'), 'Footer must not contain public staff login button');
+  assert.ok(!footerContent.includes('href="/staff/login"'), 'Footer must not link to /staff/login publicly');
+  console.log('✓ Public footer verified: staff login button removed from general public view\n');
+
+  console.log('🎉 ALL AUTH & RBAC TESTS PASSED SUCCESSFULLY!');
 }
 
 runAuthTests().catch((err) => {

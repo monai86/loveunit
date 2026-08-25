@@ -6,10 +6,10 @@
 
 | Layer | Tool | Files | Runs in CI? |
 | --- | --- | --- | --- |
-| Unit / logic | `tsx` + `node:assert` (no framework) | `tests/registration.test.ts`, `tests/production_hardening.test.ts` | ✅ `npm test` |
+| Unit / logic | `tsx` + `node:assert` (no framework) | `tests/registration.test.ts`, `tests/production_hardening.test.ts`, `tests/cancel.test.ts` | ✅ `npm test` |
 | Auth integration | `tsx` + Better Auth **memory adapter** (full HTTP via `auth.handler()`) | `tests/auth.test.ts` | ✅ `npm test` + dedicated step |
 | RBAC guards | same suite, injected users | `tests/auth.test.ts` (tests 5–8) | ✅ |
-| DB integration (real Neon) | none automated | — | ❌ (manual during dev) |
+| DB integration (real Neon) | `tsx` against a **disposable scratch database** on the same Neon project (real Drizzle migrations + real service layer) | `tests/db.integration.test.ts` | ✅ gated on `secrets.DATABASE_URL` (skips cleanly when absent) |
 | E2E (browser) | `@playwright/test` (Chromium) against a **production standalone server** (`next build` into `.next-e2e` + `server.js`) | `tests/e2e/smoke.spec.ts`, `tests/e2e/donor-register.spec.ts`, `tests/e2e/staff-checkin.spec.ts` | ✅ gated on `secrets.DATABASE_URL` |
 
 **Runner choice:** `tsx` (no Vitest/Jest installed — verified in lockfile). The suites are lightweight and fast; introducing Vitest is **optional** and only for nicer DX (watch/coverage), not required for correctness.
@@ -79,16 +79,17 @@
 - Local run: `E2E_BASE_URL=http://localhost:3003 npx playwright test`.
 - Chromium note (macOS dev): the headless-shell variant fails to download on some machines; `playwright.config.ts` resolves the full “Google Chrome for Testing” executable automatically, and falls back to Playwright's default on Linux CI.
 
-### 4.2 Neon integration tests (HIGH value, needs secret)
-- New `tests/db.integration.test.ts`, **skipped** when `DATABASE_URL` is absent (so CI without secrets still passes).
-- CI secret: `DATABASE_URL` (HUMAN ACTION H-103).
-- Cases:
+### 4.2 Neon integration tests (HIGH) — ✅ IMPLEMENTED
+- `tests/db.integration.test.ts`, run via `npm run test:db`. **Skips** (exit 0) when `DATABASE_URL` is absent, so CI without secrets still passes.
+- **Isolation:** creates a disposable **scratch database** on the same Neon project (`loveunit_itest_*`; needs the `CREATEDB` privilege — Neon's default roles have it), applies the real Drizzle migrations, exercises the real service layer, then terminates connections and drops the DB. Nothing touches the shared schema.
+- Cases (all green locally against real Neon):
   1. duplicate normalized phone → second insert rejected
-  2. slot capacity race → only `capacity` registrations succeed
-  3. transaction rollback on failed check-in transition
-  4. waitlist promote → registration created, waitlist entry NOTIFIED
-  5. forced password change flag round-trip (auth, real adapter)
-- Isolation: dedicated test schema or transactional rollback; teardown after run.
+  2. slot capacity race → only `capacity` registrations succeed (`SELECT … FOR UPDATE`)
+  3. transaction rollback on failed check-in transition / FK failure
+  4. waitlist promote → registration created, waitlist entry NOTIFIED (FIFO)
+  5. forced password change flag round-trip (auth, real DB adapter)
+- CI secret: `DATABASE_URL` (HUMAN ACTION H-103) — the `neon-integration` job runs only when the secret is present.
+- The waitlist test drives the **real cancel flow** (`POST /api/staff/cancel` → `cancelRegistration`): cancelling a REGISTERED donor atomically sets status → `CANCELLED` + audit + `booked_count − 1`, then promotes the next WAITING donor (FIFO) into the freed seat. Unit coverage in `tests/cancel.test.ts` (memory backend).
 
 ### 4.3 Request-level auth route tests (MED)
 - Spin the Next dev server (or use route handler unit invocation) to assert:
@@ -121,13 +122,14 @@ Lint → Typecheck → npm test → auth integration (tsx) → build
 
 Implemented:
 ```yaml
-- ci job:    lint → typecheck → npm test → auth integration (tsx) → build
-- e2e job:   (only if secrets.DATABASE_URL set) npm ci → playwright install --with-deps chromium
-             → apply-migration.ts → seed-staff.ts → seed-e2e.ts
-             → NEXT_DIST_DIR=.next-e2e build → start standalone server → playwright test
+- ci job:              lint → typecheck → npm test → auth integration (tsx) → build
+- neon-integration job: (only if secrets.DATABASE_URL set) npm ci → npm run test:db
+- e2e job:             (only if secrets.DATABASE_URL set) npm ci → playwright install --with-deps chromium
+                       → apply-migration.ts → seed-staff.ts → seed-e2e.ts
+                       → NEXT_DIST_DIR=.next-e2e build → start standalone server → playwright test
 ```
 
-Still future: Neon integration test suite (only if secrets.DATABASE_URL present, else skip) — see 4.2.
+Both DB-dependent jobs gate on the `DATABASE_URL` secret via the shared `check-db-config` job output.
 
 ---
 
@@ -135,5 +137,5 @@ Still future: Neon integration test suite (only if secrets.DATABASE_URL present,
 
 - `npm test` → all suites green (today: ✅).
 - `npx playwright test` → smoke + journeys A + B green (currently 3/3 ✅).
-- Neon integration suite: green locally with real `DATABASE_URL`, skipped cleanly in CI without it.
+- Neon integration suite: green locally with real `DATABASE_URL` (✅ verified), skipped cleanly in CI without it.
 - No flaky timers; E2E uses explicit waits on UI states, not sleeps.

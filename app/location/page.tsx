@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { MapPin, Navigation, Bus, Car, ArrowRight } from 'lucide-react';
+import { Bus, Car, ArrowRight } from 'lucide-react';
 import { getEventBySlug, getEventContentBlocks } from '@/services/event-service';
 import { InfographicSlot } from '@/components/infographic/InfographicSlot';
 import { pickField } from '@/lib/utils/format';
@@ -37,13 +37,18 @@ export default async function LocationPage() {
               จุดจัดงานหลัก
             </h2>
             <div className="space-y-2 text-xs font-bold text-editorial-ink">
-              <p className="text-sm font-black text-[var(--burgundy-700)]">ห้องประชุม 217 และ 218</p>
+              <p className="text-sm font-black text-[var(--burgundy-700)]">ห้องประชุม 217</p>
               <p className="leading-relaxed text-editorial-muted font-medium">
                 ชั้น 2 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา
               </p>
               <p className="pt-2 text-sm font-bold text-[var(--burgundy-700)]">
-                วันพุธที่ 16 กันยายน 2569 (08:00 - 15:00 น.)
+                วันพุธที่ 16 กันยายน 2569 (09:00 - 14:00 น.)
               </p>
+              <div className="pt-2 border-t border-[var(--rose-100)] text-[11px] font-bold text-[var(--muted)] space-y-1">
+                <p>📞 ติดต่อสอบถามเส้นทางในวันงาน:</p>
+                <p>• คุณเปา: <a href="tel:0969866245" className="text-[var(--burgundy-700)] underline">09-6986-6245</a></p>
+                <p>• คุณแตงโม: <a href="tel:0656274319" className="text-[var(--burgundy-700)] underline">06-5627-4319</a></p>
+              </div>
             </div>
           </div>
 

@@ -49,7 +49,7 @@ export default function LookupPage() {
         setResult(null);
         setErrorMessage(data.message || 'ไม่พบข้อมูลการลงทะเบียน');
       }
-    } catch (_err) {
+    } catch {
       setResult(null);
       setErrorMessage('เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย กรุณาลองใหม่อีกครั้ง');
     } finally {

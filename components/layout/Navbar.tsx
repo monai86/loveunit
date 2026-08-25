@@ -2,6 +2,7 @@
 
 import React, { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { 
   Heart, 
@@ -9,8 +10,11 @@ import {
   X, 
   BookOpen, 
   MapPin, 
-  Home,
-  ArrowRight
+  Home, 
+  ArrowRight,
+  Image as ImageIcon,
+  CheckSquare,
+  Microscope
 } from 'lucide-react';
 
 const emptySubscribe = () => () => {};
@@ -23,7 +27,10 @@ export function Navbar() {
   // PUBLIC DONOR NAVIGATION LINKS ONLY
   const navLinks = [
     { href: '/', label: 'หน้าแรก', icon: Home },
-    { href: '/prepare', label: 'ข้อปฏิบัติตัวก่อนบริจาค', icon: BookOpen },
+    { href: '/screening', label: 'ประเมินตนเอง', icon: CheckSquare },
+    { href: '/knowledge', label: 'ความรู้ & แล็บตรวจ', icon: Microscope },
+    { href: '/prepare', label: 'การเตรียมตัว', icon: BookOpen },
+    { href: '/poster', label: 'โปสเตอร์', icon: ImageIcon },
     { href: '/location', label: 'สถานที่ & การเดินทาง', icon: MapPin },
   ];
 
@@ -39,10 +46,13 @@ export function Navbar() {
         {/* Public Brand Logo & Title */}
         <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1 border border-[var(--line)] shadow-sm">
-            <img 
+            <Image 
               src="/images/logo.png" 
               alt="MUMT LOVE UNIT Logo" 
+              width={40}
+              height={40}
               className="h-full w-auto object-contain"
+              priority
             />
           </div>
           <div>

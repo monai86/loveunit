@@ -69,7 +69,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
         }
       }
     }
-  } catch (_err) {
+  } catch {
     // Session read error
   }
 
@@ -95,7 +95,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
  * Role check shared by all guards. `userOverride` lets tests inject a synthetic
  * user instead of hitting the session/DB layer.
  */
-function assertRole(user: AuthenticatedUser | null, allowedRoles: StaffRole[], label: string): AuthenticatedUser {
+function assertRole(user: AuthenticatedUser | null, allowedRoles: StaffRole[], _label?: string): AuthenticatedUser {
   if (!user) {
     throw new Error('UNAUTHORIZED');
   }

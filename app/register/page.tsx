@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Heart, User, Phone, School, GraduationCap, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle } from 'lucide-react';
+import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle } from 'lucide-react';
 import { MAHIDOL_FACULTIES, ACADEMIC_YEARS } from '@/lib/constants/mahidol';
 import { formatTimeRange } from '@/lib/utils/format';
 
@@ -100,7 +100,7 @@ export default function RegisterPage() {
         } else {
           setErrorMessage('ไม่สามารถโหลดข้อมูลช่วงเวลาได้ กรุณาลองใหม่อีกครั้ง');
         }
-      } catch (err) {
+      } catch {
         setErrorMessage('เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย');
       } finally {
         setSlotsLoading(false);
@@ -181,7 +181,7 @@ export default function RegisterPage() {
         // generic fallback so donors see the real reason (duplicate phone, etc.).
         setErrorMessage(data.message || data.error || 'เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง');
       }
-    } catch (err) {
+    } catch {
       setErrorMessage('เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย');
     } finally {
       setLoading(false);
@@ -211,7 +211,7 @@ export default function RegisterPage() {
       } else {
         setWaitlistMessage({ type: 'error', text: data.message || 'ไม่สามารถเข้ารายการรอได้' });
       }
-    } catch (_err) {
+    } catch {
       setWaitlistMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย' });
     } finally {
       setWaitlistLoading(false);
@@ -477,47 +477,28 @@ export default function RegisterPage() {
                   <div className="space-y-2">
                     {timeSlots.map((slot) => {
                       const isSelected = formData.timeSlotId === slot.id;
-                      const isFull = slot.status === 'FULL' || slot.remainingCapacity <= 0;
-
                       return (
                         <button
                           key={slot.id}
                           type="button"
                           onClick={() => {
-                            if (isFull) {
-                              setWaitlistMessage(null);
-                              setWaitlistSlot(slot);
-                            } else {
-                              setFormData({ ...formData, timeSlotId: slot.id });
-                            }
+                            setFormData({ ...formData, timeSlotId: slot.id });
                           }}
-                          className={`w-full p-3.5 rounded-lg border text-left text-xs font-bold transition-all flex items-center justify-between ${
+                          className={`w-full p-3.5 rounded-xl border text-left text-xs font-bold transition-all flex items-center justify-between ${
                             isSelected
                               ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1 ring-[var(--burgundy-700)]'
-                              : isFull
-                              ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-60'
                               : 'border-gray-200 bg-white hover:border-[var(--burgundy-700)] text-editorial-ink'
                           }`}
                         >
                           <div className="flex items-center gap-3">
                             <Clock className={`h-4 w-4 ${isSelected ? 'text-[var(--burgundy-700)]' : 'text-gray-400'}`} />
-                            <span className="text-sm font-black">{slot.timeSlot}</span>
+                            <span className="text-sm font-black">{slot.timeSlot} น.</span>
                           </div>
 
                           <div className="flex items-center gap-3">
-                            {isFull ? (
-                              <span className="text-[11px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded">
-                                เต็มแล้ว · คลิกเข้ารายการรอ
-                              </span>
-                            ) : slot.remainingCapacity <= 15 ? (
-                              <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
-                                เหลือ {slot.remainingCapacity} ที่
-                              </span>
-                            ) : (
-                              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                                ว่าง ({slot.remainingCapacity} ที่)
-                              </span>
-                            )}
+                            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
+                              เปิดรับลงทะเบียน
+                            </span>
 
                             {isSelected && (
                               <div className="h-5 w-5 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center">

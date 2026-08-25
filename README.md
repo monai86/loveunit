@@ -8,15 +8,16 @@
 ![Drizzle ORM](https://img.shields.io/badge/Drizzle_ORM-0.45-C5F74F?logo=drizzle)
 ![Better Auth](https://img.shields.io/badge/Better_Auth-1.6-black)
 
-A production-ready, mobile-first web application designed for university blood donation events. Built for **Faculty of Medical Technology, Mahidol University (MUMT)** in collaboration with the **Thai Red Cross Society**.
+A production-ready, mobile-first web application designed for university blood donation events. Built for **Faculty of Medical Technology, Mahidol University (MUMT)** in collaboration with the **Regional Blood Centre 4, Ratchaburi (Thai Red Cross)**.
 
 ---
 
 ## 📅 Official Event Metadata (Source of Truth)
 - **Event Name:** MUMT Blood Donation 2026 “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9”
-- **Date:** วันพุธที่ 16 กันยายน 2569 (16 September 2026)
-- **Time:** 08:00 – 15:00 น.
-- **Venue:** ห้องประชุม 217 และ 218 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา
+- **Organizer:** คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี (Faculty of Medical Technology, Mahidol University & Regional Blood Centre 4, Ratchaburi)
+- **Date:** วันพุธที่ 16 กันยายน 2569 (Wednesday, 16 September 2026)
+- **Time:** 09:00 – 14:00 น. (9:00 AM – 2:00 PM)
+- **Venue:** ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา (Meeting Room 217, Sirividhaya Building, Faculty of Liberal Arts, Mahidol University, Salaya Campus)
 
 ---
 

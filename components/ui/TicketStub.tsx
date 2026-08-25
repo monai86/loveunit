@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Heart } from 'lucide-react';
 
 interface TicketStubProps {
@@ -18,8 +19,8 @@ export function TicketStub({
   registrationCode = 'MUMT2026-00012345',
   name = 'นายธนภัทร ใจดี',
   date = '16 SEP 2026',
-  timeSlot = '08:00 - 15:00 น.',
-  venue = 'LA 217-218 อาคารสิริวิทยา',
+  timeSlot = '09:00 - 14:00 น.',
+  venue = 'LA 217 อาคารสิริวิทยา',
   qrUrl,
   unitNumber = '09',
 }: TicketStubProps) {
@@ -33,19 +34,19 @@ export function TicketStub({
         <div className="flex-1 p-5 sm:p-6 space-y-4 relative">
           
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1 border border-[var(--line)]">
-                <img src="/images/logo.png" alt="MUMT Logo" className="h-full w-auto object-contain" />
+          <div className="flex items-center justify-between gap-2 border-b border-[var(--line)] pb-3">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white p-1 border border-[var(--line)]">
+                <Image src="/images/logo.png" alt="MUMT Logo" width={32} height={32} className="h-full w-auto object-contain" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-xs font-black tracking-wide text-[var(--burgundy-700)] uppercase">MUMT</p>
-                <p className="text-[11px] font-semibold text-[var(--muted)] tracking-tight">BLOOD DONATION 2026</p>
+                <p className="truncate text-[11px] font-semibold text-[var(--muted)] tracking-tight">BLOOD DONATION 2026</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 rounded-full bg-[var(--ok-bg)] px-2.5 py-1 border border-[var(--ok)]/20">
-              <span className="h-2 w-2 rounded-full bg-[var(--ok)] animate-pulse"></span>
+            <div className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-[var(--ok-bg)] px-2.5 py-1 border border-[var(--ok)]/20">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--ok)] animate-pulse"></span>
               <span className="text-[11px] font-bold text-[var(--ok)]">ยืนยันการลงทะเบียน</span>
             </div>
           </div>
@@ -119,8 +120,8 @@ export function TicketStub({
             </div>
 
             {qrUrl && (
-              <div className="h-12 w-12 rounded-lg border border-[var(--burgundy-700)] p-0.5 bg-white shrink-0">
-                <img src={qrUrl} alt="QR Code" className="h-full w-full object-contain" />
+              <div className="h-12 w-12 rounded-lg border border-[var(--burgundy-700)] p-0.5 bg-white shrink-0 relative">
+                <Image src={qrUrl} alt="QR Code" width={48} height={48} unoptimized className="h-full w-full object-contain" />
               </div>
             )}
           </div>

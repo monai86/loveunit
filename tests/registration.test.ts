@@ -21,10 +21,10 @@ async function runHardeningTests() {
   console.log('Test 1: P0 Event Metadata Source of Truth');
   const event = await getEventBySlug('mumt-2026');
   assert.ok(event, 'Event mumt-2026 should be found');
-  assert.strictEqual(event.start_at, '2026-09-16T08:00:00+07:00', 'Event date must be 16 September 2026 08:00');
-  assert.strictEqual(event.end_at, '2026-09-16T15:00:00+07:00', 'Event end time must be 15:00');
+  assert.strictEqual(event.start_at, '2026-09-16T09:00:00+07:00', 'Event date must be 16 September 2026 09:00');
+  assert.strictEqual(event.end_at, '2026-09-16T14:00:00+07:00', 'Event end time must be 14:00');
   assert.ok(event.venue_name.includes('อาคารสิริวิทยา'), 'Venue must be Sirividhya Building');
-  console.log('✓ Official Event date (16 Sep 2026), time (08:00-15:00), and venue verified\n');
+  console.log('✓ Official Event date (16 Sep 2026), time (09:00-14:00), and venue verified\n');
 
   // Test 2: Event Slug 404 Bug Fix
   console.log('Test 2: P0 Event Slug 404 Handling');

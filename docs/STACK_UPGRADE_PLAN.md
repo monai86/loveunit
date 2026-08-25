@@ -98,10 +98,11 @@ See `docs/TESTING_GAP_ANALYSIS.md` for full detail. Short version:
    - Runs against a **production standalone server** (`NEXT_DIST_DIR=.next-e2e` build + `scripts/start-e2e-server.mjs`), seeded via `scripts/seed-staff.ts` + `scripts/seed-e2e.ts`.
    - CI: separate `e2e` job in `.github/workflows/ci.yml`, gated on `secrets.DATABASE_URL` (skipped cleanly when absent).
    - E2E caught a real production bug: `participantType: 'GENERAL'` vs `GENERAL_PUBLIC` — fixed in `app/register/page.tsx`.
-3. **Neon integration tests (optional, high value) — still open:**
-   - Real-DB suite behind CI secret `DATABASE_URL` (skipped when absent):
-     - duplicate phone prevention, slot capacity race, transaction rollback, waitlist promote.
-   - Pattern: dedicated test schema + `scripts/apply-migration.ts` + teardown.
+3. **Neon integration tests ✅ implemented** (`tests/db.integration.test.ts`, `npm run test:db`):
+   - Real-DB suite behind CI secret `DATABASE_URL` (skipped when absent); CI job `neon-integration`, gated the same way as `e2e`.
+   - Isolation: disposable scratch database on the same Neon project (`CREATEDB`) + real migrations via `scripts/lib/apply-migrations.ts`; dropped in teardown.
+   - Cases: duplicate phone prevention, slot capacity race (`FOR UPDATE`), transaction rollback, waitlist promote, forced-password-change round-trip.
+   - Verified green locally against real Neon (2026-08-16).
 
 ---
 
@@ -148,7 +149,7 @@ No phase deletes a working path before its replacement is proven.
 | --- | --- | --- |
 | H-101 | SMTP credentials (or Resend key + domain) | live confirmation email |
 | H-102 | Cloudflare Turnstile site keys (if adopted) | anti-bot beyond rate limiting |
-| H-103 | CI `DATABASE_URL` secret | Neon integration tests in CI |
+| H-103 | CI `DATABASE_URL` secret | Neon integration tests + E2E in CI (DONE — secret configured) |
 | H-104 | Production secrets in deploy env (DATABASE_URL, BETTER_AUTH_SECRET, SMTP_*) | production launch |
 | H-105 | (pre-existing, from `docs/HUMAN_ACTIONS.md`) privacy text approval, official artwork, final staff accounts | public launch |
 

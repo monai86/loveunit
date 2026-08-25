@@ -11,9 +11,21 @@ import {
   DashboardKPIs,
   ParticipantType,
   DonationExperience,
-  RegistrationStatus
+  RegistrationStatus,
+  StaffProfile,
+  StaffRole
 } from '@/lib/types/database';
 import { normalizePhoneNumber, generateRegistrationCode, generateQRToken } from '@/lib/utils/format';
+
+// Collision-safe id generator for in-memory records. Date.now() alone collides
+// when several records are created within the same millisecond (fast machines
+// create the donor, waitlist entries, cancel + promotion all in one ms), which
+// made id-based lookups return the wrong row.
+let memoryIdSeq = 0;
+function nextMemoryId(prefix: string): string {
+  memoryIdSeq += 1;
+  return `${prefix}-${Date.now()}-${memoryIdSeq}`;
+}
 
 /**
  * Memory backend is ONLY allowed when DATA_BACKEND=memory is explicitly set
@@ -34,11 +46,11 @@ export const defaultEvent: Event = {
   slug: 'mumt-2026',
   name: 'MUMT Blood Donation 2026 “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9”',
   short_name: 'MUMT Blood Donation 2026 (ครั้งที่ 9)',
-  description: 'ขอเชิญชวนผู้มีจิตศรัทธาร่วมบริจาคโลหิตในโครงการเติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9 จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ สภากาชาดไทย',
-  start_at: '2026-09-16T08:00:00+07:00',
-  end_at: '2026-09-16T15:00:00+07:00',
-  venue_name: 'ห้องประชุม 217 และ 218 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา',
-  venue_detail: 'ห้องประชุม 217 และ 218 ชั้น 2 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา',
+  description: 'ขอเชิญชวนทุกคนมาร่วมเป็นส่วนหนึ่งในการส่งต่อโอกาสและช่วยเหลือผู้ป่วยที่ต้องการโลหิตในกิจกรรม “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ” ครั้งที่ 9 โดยคณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี เพียงการบริจาคโลหิตของคุณ 1 ครั้ง อาจช่วยต่อชีวิตใครอีกหลายคน ✨',
+  start_at: '2026-09-16T09:00:00+07:00',
+  end_at: '2026-09-16T14:00:00+07:00',
+  venue_name: 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา',
+  venue_detail: 'ห้องประชุม 217 ชั้น 2 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา',
   registration_open_at: '2026-08-01T00:00:00+07:00',
   registration_close_at: '2026-09-16T14:00:00+07:00',
   status: 'REGISTRATION_OPEN',
@@ -65,7 +77,7 @@ export const defaultContentBlocks: EventContentBlock[] = [
     event_id: defaultEvent.id,
     content_key: 'location_infographic',
     title: 'แผนที่สถานที่จัดงาน อาคารสิริวิทยา คณะศิลปศาสตร์',
-    description: 'ผังห้องประชุม 217 และ 218 ชั้น 2 อาคารสิริวิทยา',
+    description: 'ผังห้องประชุม 217 ชั้น 2 อาคารสิริวิทยา',
     image_url: null,
     alt_text: 'แผนที่สถานที่จัดงาน อาคารสิริวิทยา',
     display_order: 2,
@@ -104,7 +116,7 @@ export const defaultContentBlocks: EventContentBlock[] = [
     event_id: defaultEvent.id,
     content_key: 'what_to_bring',
     title: 'สิ่งที่ต้องเตรียมมาในวันงาน',
-    description: 'บัตรประชาชน หรือบัตรผู้บริจาคโลหิตสภากาชาดไทย',
+    description: 'บัตรประจำตัวประชาชน หรือบัตรผู้บริจาคโลหิตสภากาชาดไทย',
     image_url: null,
     alt_text: 'สิ่งที่ต้องเตรียมมาในวันงาน',
     display_order: 5,
@@ -141,13 +153,12 @@ export const defaultContentBlocks: EventContentBlock[] = [
 ];
 
 export const defaultSlots: TimeSlot[] = [
-  { id: 'ts-1', event_id: defaultEvent.id, start_at: '2026-09-16T08:00:00+07:00', end_at: '2026-09-16T09:00:00+07:00', capacity: 35, booked_count: 12, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-2', event_id: defaultEvent.id, start_at: '2026-09-16T09:00:00+07:00', end_at: '2026-09-16T10:00:00+07:00', capacity: 35, booked_count: 28, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-3', event_id: defaultEvent.id, start_at: '2026-09-16T10:00:00+07:00', end_at: '2026-09-16T11:00:00+07:00', capacity: 35, booked_count: 35, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-4', event_id: defaultEvent.id, start_at: '2026-09-16T11:00:00+07:00', end_at: '2026-09-16T12:00:00+07:00', capacity: 35, booked_count: 18, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-5', event_id: defaultEvent.id, start_at: '2026-09-16T12:00:00+07:00', end_at: '2026-09-16T13:00:00+07:00', capacity: 35, booked_count: 15, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-6', event_id: defaultEvent.id, start_at: '2026-09-16T13:00:00+07:00', end_at: '2026-09-16T14:00:00+07:00', capacity: 35, booked_count: 22, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-7', event_id: defaultEvent.id, start_at: '2026-09-16T14:00:00+07:00', end_at: '2026-09-16T15:00:00+07:00', capacity: 25, booked_count: 8, is_active: true, created_at: new Date().toISOString() },
+  // Official event window 09:00–14:00 น.: five 1-hour slots (Unlimited capacity).
+  { id: 'ts-1', event_id: defaultEvent.id, start_at: '2026-09-16T09:00:00+07:00', end_at: '2026-09-16T10:00:00+07:00', capacity: 9999, booked_count: 12, is_active: true, created_at: new Date().toISOString() },
+  { id: 'ts-2', event_id: defaultEvent.id, start_at: '2026-09-16T10:00:00+07:00', end_at: '2026-09-16T11:00:00+07:00', capacity: 9999, booked_count: 28, is_active: true, created_at: new Date().toISOString() },
+  { id: 'ts-3', event_id: defaultEvent.id, start_at: '2026-09-16T11:00:00+07:00', end_at: '2026-09-16T12:00:00+07:00', capacity: 9999, booked_count: 35, is_active: true, created_at: new Date().toISOString() },
+  { id: 'ts-4', event_id: defaultEvent.id, start_at: '2026-09-16T12:00:00+07:00', end_at: '2026-09-16T13:00:00+07:00', capacity: 9999, booked_count: 18, is_active: true, created_at: new Date().toISOString() },
+  { id: 'ts-5', event_id: defaultEvent.id, start_at: '2026-09-16T13:00:00+07:00', end_at: '2026-09-16T14:00:00+07:00', capacity: 9999, booked_count: 15, is_active: true, created_at: new Date().toISOString() },
 ];
 
 export const inMemoryRegistrations: Registration[] = [
@@ -203,6 +214,93 @@ export const inMemoryRegistrations: Registration[] = [
 
 const inMemoryAuditLogs: AuditLog[] = [];
 const inMemoryCheckinEvents: CheckinEvent[] = [];
+
+export interface InMemoryStaffUser extends StaffProfile {
+  email: string;
+}
+
+export const inMemoryStaffProfiles: InMemoryStaffUser[] = [
+  {
+    user_id: 'u-superadmin',
+    email: 'superadmin@mahidol.ac.th',
+    display_name: 'ผู้ดูแลระบบสูงสุด (Super Admin)',
+    role: 'SUPER_ADMIN',
+    team: 'Executive Board',
+    is_active: true,
+    created_at: new Date(Date.now() - 86400000 * 30).toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    user_id: 'u-admin',
+    email: 'admin@mahidol.ac.th',
+    display_name: 'ผู้ดูแลระบบกลาง MUMT',
+    role: 'ADMIN',
+    team: 'Management & Ops',
+    is_active: true,
+    created_at: new Date(Date.now() - 86400000 * 20).toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    user_id: 'u-lead',
+    email: 'lead@mahidol.ac.th',
+    display_name: 'หัวหน้าทีมปฏิบัติการหน้างาน',
+    role: 'TEAM_LEAD',
+    team: 'จุดคัดกรอง & เจาะเก็บโลหิต',
+    is_active: true,
+    created_at: new Date(Date.now() - 86400000 * 10).toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    user_id: 'u-staff',
+    email: 'staff@mahidol.ac.th',
+    display_name: 'เจ้าหน้าที่จุดลงทะเบียนและเช็คอิน',
+    role: 'STAFF',
+    team: 'จุดเช็คอิน QR Code (ห้อง 217)',
+    is_active: true,
+    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
+
+export async function getInMemoryStaffProfiles(): Promise<InMemoryStaffUser[]> {
+  return inMemoryStaffProfiles;
+}
+
+export async function upsertInMemoryStaff(params: {
+  userId?: string;
+  email: string;
+  displayName: string;
+  role: StaffRole;
+  team?: string | null;
+  isActive?: boolean;
+}): Promise<InMemoryStaffUser> {
+  const existing = inMemoryStaffProfiles.find(
+    (s) => (params.userId && s.user_id === params.userId) || s.email.toLowerCase() === params.email.toLowerCase()
+  );
+
+  if (existing) {
+    existing.display_name = params.displayName;
+    existing.role = params.role;
+    existing.team = params.team ?? existing.team;
+    if (params.isActive !== undefined) existing.is_active = params.isActive;
+    existing.updated_at = new Date().toISOString();
+    return existing;
+  }
+
+  const newStaff: InMemoryStaffUser = {
+    user_id: params.userId || nextMemoryId('u-staff'),
+    email: params.email,
+    display_name: params.displayName,
+    role: params.role,
+    team: params.team || null,
+    is_active: params.isActive !== undefined ? params.isActive : true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  inMemoryStaffProfiles.push(newStaff);
+  return newStaff;
+}
 
 /** Read-only accessors for the audit-log viewer (memory backend). */
 export function getInMemoryCheckinEvents(): readonly CheckinEvent[] {
@@ -321,7 +419,7 @@ export async function registerDonorAtomic(input: {
     const code = generateRegistrationCode();
     const token = generateQRToken(code);
     const newReg: Registration = {
-      id: `reg-${Date.now()}`,
+      id: nextMemoryId('reg'),
       event_id: input.eventId,
       registration_code: code,
       qr_token: token,
@@ -429,7 +527,7 @@ export async function updateRegistrationStatus(
   if (targetStatus === 'COMPLETED') targetReg.completed_at = now;
 
   inMemoryCheckinEvents.push({
-    id: `chk-${Date.now()}`,
+    id: nextMemoryId('chk'),
     event_id: targetReg.event_id,
     registration_id: targetReg.id,
     action: `STATUS_CHANGE_${targetStatus}`,
@@ -443,6 +541,59 @@ export async function updateRegistrationStatus(
 
 export async function checkInDonor(registrationId: string, performedBy?: string) {
   return updateRegistrationStatus(registrationId, 'CHECKED_IN', performedBy);
+}
+
+/**
+ * Memory-backend cancel: status → CANCELLED, frees the slot's booked_count,
+ * and records an audit event. Waitlist promotion is handled by the service
+ * layer (checkin-service.cancelRegistration), mirroring the DB flow.
+ */
+export async function cancelRegistration(
+  registrationId: string,
+  performedBy?: string,
+  reason?: string
+): Promise<{ success: boolean; registration?: Registration; message?: string; eventId?: string; slotId?: string | null }> {
+  if (!isMemoryBackendAllowed()) {
+    throw new Error('Database connection unconfigured in production environment.');
+  }
+
+  const targetReg = inMemoryRegistrations.find(r => r.id === registrationId) || null;
+  if (!targetReg) {
+    return { success: false, message: 'ไม่พบข้อมูลการลงทะเบียน' };
+  }
+
+  if (!isTransitionAllowed(targetReg.status, 'CANCELLED')) {
+    return {
+      success: false,
+      message: `ไม่สามารถยกเลิกรายการที่มีสถานะ "${targetReg.status}" ได้`,
+    };
+  }
+
+  const now = new Date().toISOString();
+  targetReg.status = 'CANCELLED';
+  targetReg.updated_at = now;
+
+  if (targetReg.slot_id) {
+    const slot = defaultSlots.find(s => s.id === targetReg.slot_id);
+    if (slot) slot.booked_count = Math.max(0, slot.booked_count - 1);
+  }
+
+  inMemoryCheckinEvents.push({
+    id: nextMemoryId('chk'),
+    event_id: targetReg.event_id,
+    registration_id: targetReg.id,
+    action: 'STATUS_CHANGE_CANCELLED',
+    performed_by: performedBy || null,
+    metadata: reason ? { reason } : null,
+    created_at: now,
+  });
+
+  return {
+    success: true,
+    registration: { ...targetReg, time_slot: defaultSlots.find(s => s.id === targetReg?.slot_id) || null },
+    eventId: targetReg.event_id,
+    slotId: targetReg.slot_id,
+  };
 }
 
 export async function getDashboardKPIs(_eventId: string): Promise<DashboardKPIs> {
@@ -510,7 +661,7 @@ export async function getDashboardKPIs(_eventId: string): Promise<DashboardKPIs>
 export async function logAuditAction(action: string, entityType: string, entityId: string, actorId?: string, metadata?: Record<string, unknown>) {
   if (isMemoryBackendAllowed()) {
     inMemoryAuditLogs.push({
-      id: `audit-${Date.now()}`,
+      id: nextMemoryId('audit'),
       actor_id: actorId || null,
       action,
       entity_type: entityType,

@@ -45,19 +45,15 @@ export async function registerDonorAtomic(input: {
         };
       }
 
-      // 2. Lock & Check Slot Capacity
+      // 2. Increment Slot Booked Count (Unlimited Capacity)
       if (input.slotId) {
         const slotResult = await tx.execute(
-          sql`SELECT capacity, booked_count FROM time_slots WHERE id = ${input.slotId} AND event_id = ${input.eventId} AND is_active = TRUE FOR UPDATE`
+          sql`SELECT id, capacity, booked_count FROM time_slots WHERE id = ${input.slotId} AND event_id = ${input.eventId} AND is_active = TRUE FOR UPDATE`
         );
-        const slotRow = slotResult.rows[0] as { capacity: number; booked_count: number } | undefined;
+        const slotRow = slotResult.rows[0] as { id: string; capacity: number; booked_count: number } | undefined;
 
         if (!slotRow) {
           return { success: false, errorCode: 'SLOT_NOT_FOUND', message: 'ไม่พบช่วงเวลาที่เลือก' };
-        }
-
-        if (slotRow.booked_count >= slotRow.capacity) {
-          return { success: false, errorCode: 'SLOT_FULL', message: 'ช่วงเวลานี้เพิ่งเต็ม กรุณาเลือกช่วงเวลาอื่น' };
         }
 
         // Increment booked_count

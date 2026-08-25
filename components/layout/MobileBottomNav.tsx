@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Heart, MapPin, BookOpen } from 'lucide-react';
+import { Home, Heart, MapPin, BookOpen, CheckSquare } from 'lucide-react';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
@@ -15,7 +15,8 @@ export function MobileBottomNav() {
 
   const navItems = [
     { href: '/', label: 'หน้าแรก', icon: Home },
-    { href: '/prepare', label: 'ข้อปฏิบัติ', icon: BookOpen },
+    { href: '/screening', label: 'คัดกรอง', icon: CheckSquare },
+    { href: '/prepare', label: 'เตรียมตัว', icon: BookOpen },
     { href: '/location', label: 'สถานที่', icon: MapPin },
   ];
 

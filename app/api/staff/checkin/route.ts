@@ -18,7 +18,10 @@ export async function POST(request: Request) {
     const { registrationId, qrToken, registrationCode, status } = body;
 
     // Target status to transition to. Defaults to CHECKED_IN when not specified.
-    const VALID_TARGETS: RegistrationStatus[] = ['CHECKED_IN', 'IN_PROCESS', 'COMPLETED', 'CANCELLED', 'NO_SHOW'];
+    // NOTE: CANCELLED is intentionally NOT here — cancellations must go through
+    // POST /api/staff/cancel, which frees the slot seat and promotes the
+    // waitlist (a raw status flip here would leak capacity).
+    const VALID_TARGETS: RegistrationStatus[] = ['CHECKED_IN', 'IN_PROCESS', 'COMPLETED', 'NO_SHOW'];
     let targetStatus: RegistrationStatus = 'CHECKED_IN';
     if (status) {
       if (!VALID_TARGETS.includes(status)) {

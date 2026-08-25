@@ -24,7 +24,7 @@ const notoSansThai = Noto_Sans_Thai({
 
 export const metadata: Metadata = {
   title: "MUMT Blood Donation 2026 — เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9",
-  description: "ระบบลงทะเบียนออนไลน์กิจกรรมบริจาคโลหิต MUMT Blood Donation 2026 จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ สภากาชาดไทย",
+  description: "ระบบลงทะเบียนออนไลน์กิจกรรมบริจาคโลหิต MUMT Blood Donation 2026 จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี",
   keywords: ["MUMT", "บริจาคโลหิต", "มหิดล", "เทคนิคการแพทย์", "Blood Donation 2026", "สภากาชาดไทย"],
 };
 

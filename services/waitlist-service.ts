@@ -8,6 +8,10 @@ import { normalizePhoneNumber } from '@/lib/utils/format';
 import { isMemoryBackendAllowed, defaultSlots } from '@/lib/db/store';
 import { registerDonorAtomic } from '@/services/registration-service';
 
+// Collision-safe id for in-memory waitlist entries (Date.now() alone collides
+// when several joins land in the same millisecond on fast machines).
+let waitlistIdSeq = 0;
+
 export async function joinWaitlist(input: {
   eventId: string;
   slotId: string;
@@ -66,7 +70,7 @@ export async function joinWaitlist(input: {
     if (existing) return { success: false, message: 'เบอร์โทรนี้อยู่ในรายการรอของช่วงเวลานี้แล้ว' };
 
     const entry = {
-      id: `wl-${Date.now()}`,
+      id: `wl-${Date.now()}-${++waitlistIdSeq}`,
       event_id: input.eventId,
       slot_id: input.slotId,
       first_name: input.firstName.trim(),

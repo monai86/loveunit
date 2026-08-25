@@ -35,11 +35,11 @@ async function main() {
       slug: 'mumt-2026',
       name: 'MUMT Blood Donation 2026 “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9”',
       shortName: 'MUMT Blood Donation 2026 (ครั้งที่ 9)',
-      description: 'ขอเชิญชวนผู้มีจิตศรัทธาร่วมบริจาคโลหิตในโครงการเติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9 จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ สภากาชาดไทย',
+      description: 'ขอเชิญชวนทุกคนมาร่วมเป็นส่วนหนึ่งในการส่งต่อโอกาสและช่วยเหลือผู้ป่วยที่ต้องการโลหิตในกิจกรรม “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ” ครั้งที่ 9 โดยคณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี เพียงการบริจาคโลหิตของคุณ 1 ครั้ง อาจช่วยต่อชีวิตใครอีกหลายคน ✨',
       startAt: eventDay,
-      endAt: new Date(eventDay.getTime() + 7 * 3600 * 1000),
-      venueName: 'ห้องประชุม 217 และ 218 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา',
-      venueDetail: 'ห้องประชุม 217 และ 218 ชั้น 2 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา',
+      endAt: new Date(eventDay.getTime() + 5.5 * 3600 * 1000),
+      venueName: 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา',
+      venueDetail: 'ห้องประชุม 217 ชั้น 2 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา',
       registrationOpenAt: openAt,
       registrationCloseAt: closeAt,
       status: 'REGISTRATION_OPEN',
@@ -60,10 +60,10 @@ async function main() {
   // 2) Content blocks — upsert by (eventId, contentKey) unique index.
   const blocks = [
     { contentKey: 'hero_poster', title: 'โปสเตอร์ประชาสัมพันธ์โครงการ', description: 'โปสเตอร์หลัก MUMT Blood Donation 2026 ครั้งที่ 9', altText: 'โปสเตอร์หลัก MUMT Blood Donation 2026', displayOrder: 1 },
-    { contentKey: 'location_infographic', title: 'แผนที่สถานที่จัดงาน อาคารสิริวิทยา คณะศิลปศาสตร์', description: 'ผังห้องประชุม 217 และ 218 ชั้น 2 อาคารสิริวิทยา', altText: 'แผนที่สถานที่จัดงาน อาคารสิริวิทยา', displayOrder: 2 },
+    { contentKey: 'location_infographic', title: 'แผนที่สถานที่จัดงาน อาคารสิริวิทยา คณะศิลปศาสตร์', description: 'ผังห้องประชุม 217 ชั้น 2 อาคารสิริวิทยา', altText: 'แผนที่สถานที่จัดงาน อาคารสิริวิทยา', displayOrder: 2 },
     { contentKey: 'transportation_infographic', title: 'การเดินทางและจุดจอดรถ', description: 'ข้อมูลการเดินทางด้วยรถสาธารณะ รถรางมหิดล และจุดจอดรถยนต์', altText: 'ข้อมูลการเดินทาง', displayOrder: 3 },
     { contentKey: 'preparation_infographic', title: 'การเตรียมตัวก่อนบริจาคโลหิต', description: 'ข้อปฏิบัติ พักผ่อน 6-8 ชม. ดื่มน้ำ 3-4 แก้ว และงดอาหารไขมันสูง', altText: 'การเตรียมตัวก่อนบริจาคโลหิต', displayOrder: 4 },
-    { contentKey: 'what_to_bring', title: 'สิ่งที่ต้องเตรียมมาในวันงาน', description: 'บัตรประชาชน หรือบัตรผู้บริจาคโลหิตสภากาชาดไทย', altText: 'สิ่งที่ต้องเตรียมมาในวันงาน', displayOrder: 5 },
+    { contentKey: 'what_to_bring', title: 'สิ่งที่ต้องเตรียมมาในวันงาน', description: 'บัตรประจำตัวประชาชน หรือบัตรผู้บริจาคโลหิตสภากาชาดไทย', altText: 'สิ่งที่ต้องเตรียมมาในวันงาน', displayOrder: 5 },
     { contentKey: 'booth_infographic', title: 'นิทรรศการบูธกิจกรรมให้ความรู้', description: 'กิจกรรมความรู้หมู่เลือด นิทรรศการเทคนิคการแพทย์', altText: 'บูธกิจกรรมให้ความรู้', displayOrder: 6 },
     { contentKey: 'sponsor_banner', title: 'ผู้สนับสนุนโครงการ', description: 'ขอขอบคุณผู้สนับสนุนกิจกรรมบริจาคโลหิต MUMT ครั้งที่ 9', altText: 'ผู้สนับสนุนโครงการ', displayOrder: 7 },
   ];
@@ -85,15 +85,15 @@ async function main() {
     .where(eq(timeSlots.eventId, EVENT_ID));
 
   if (!existing || Number(existing.count) === 0) {
-    const hour = 8;
-    const slots = Array.from({ length: 7 }, (_, i) => ({
-      eventId: EVENT_ID,
-      startAt: new Date(eventDay.getTime() + (hour + i) * 3600 * 1000),
-      endAt: new Date(eventDay.getTime() + (hour + i + 1) * 3600 * 1000),
-      capacity: 35,
-      bookedCount: 0,
-      isActive: true,
-    }));
+    // Official event window 09:00–14:00: five 1-hour slots.
+    const base = eventDay.getTime();
+    const slots = [
+      { eventId: EVENT_ID, startAt: new Date(base + 9 * 3600 * 1000), endAt: new Date(base + 10 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
+      { eventId: EVENT_ID, startAt: new Date(base + 10 * 3600 * 1000), endAt: new Date(base + 11 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
+      { eventId: EVENT_ID, startAt: new Date(base + 11 * 3600 * 1000), endAt: new Date(base + 12 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
+      { eventId: EVENT_ID, startAt: new Date(base + 12 * 3600 * 1000), endAt: new Date(base + 13 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
+      { eventId: EVENT_ID, startAt: new Date(base + 13 * 3600 * 1000), endAt: new Date(base + 14 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
+    ];
     await db.insert(timeSlots).values(slots);
     console.log(`✅ ${slots.length} time slots ready`);
   } else {

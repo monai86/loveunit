@@ -3,21 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  Users, 
   Search, 
-  Filter, 
-  Download, 
   FileSpreadsheet, 
-  CheckCircle2, 
-  Clock, 
-  Phone, 
   ArrowLeft,
   Loader2,
-  XCircle,
   Eye
 } from 'lucide-react';
 import { Registration, TimeSlot } from '@/lib/types/database';
-import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge, getDonationExperienceLabel, formatThaiDate } from '@/lib/utils/format';
+import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
 
 interface ApiRegistration {
   id: string;

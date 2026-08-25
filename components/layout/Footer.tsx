@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { MapPin, Phone, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 
@@ -22,7 +23,7 @@ export function Footer() {
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--bg)] p-1 border border-[var(--line)]">
-                <img src="/images/logo.png" alt="MUMT Logo" className="h-full w-auto object-contain" />
+                <Image src="/images/logo.png" alt="MUMT Logo" width={40} height={40} className="h-full w-auto object-contain" />
               </div>
               <div>
                 <span className="text-xs font-black text-[var(--ink)] block">MUMT Blood Donation 2026</span>
@@ -30,12 +31,17 @@ export function Footer() {
               </div>
             </div>
             <p className="text-sm leading-relaxed text-[var(--muted)] font-medium max-w-md">
-              โครงการบริจาคโลหิต จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ สภากาชาดไทย ณ อาคารสิริวิทยา มหาวิทยาลัยมหิดล ศาลายา
+              โครงการบริจาคโลหิต จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี ณ อาคารสิริวิทยา มหาวิทยาลัยมหิดล ศาลายา
             </p>
             <div>
               <span className="px-3 py-1 rounded bg-[var(--rose-100)] text-[var(--burgundy-700)] text-xs font-bold border border-[var(--line)]">
-                16 กันยายน 2569 (08:00 - 15:00 น.)
+                16 กันยายน 2569 (09:00 - 14:00 น.)
               </span>
+            </div>
+            {/* Social handles from official posters */}
+            <div className="pt-2 flex flex-wrap gap-2 text-xs font-bold text-[var(--muted)]">
+              <span className="bg-gray-100 px-2.5 py-1 rounded-full text-gray-700">IG & TikTok: @mumt_loveunit</span>
+              <span className="bg-gray-100 px-2.5 py-1 rounded-full text-gray-700">FB: เติมรักให้เต็มยูนิตต่อชีวิตด้วยโลหิตคุณ</span>
             </div>
           </div>
 
@@ -58,8 +64,26 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/screening" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5 text-amber-800">
+                  <span>แบบคัดกรองตนเอง (Self-Screen)</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-amber-700" />
+                </Link>
+              </li>
+              <li>
+                <Link href="/knowledge" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5">
+                  <span>ความรู้ & การตรวจแล็บ</span>
+                  <ArrowRight className="h-3.5 w-3.5 opacity-40" />
+                </Link>
+              </li>
+              <li>
                 <Link href="/prepare" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5">
                   <span>ข้อปฏิบัติตัวก่อนบริจาค</span>
+                  <ArrowRight className="h-3.5 w-3.5 opacity-40" />
+                </Link>
+              </li>
+              <li>
+                <Link href="/poster" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5">
+                  <span>โปสเตอร์ประชาสัมพันธ์</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-40" />
                 </Link>
               </li>
@@ -87,7 +111,7 @@ export function Footer() {
               <div className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 shrink-0 text-[var(--burgundy-500)] mt-0.5" />
                 <span className="leading-relaxed">
-                  ห้องประชุม 217 และ 218 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา
+                  ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา
                 </span>
               </div>
               
@@ -104,16 +128,6 @@ export function Footer() {
                 <a href="mailto:mumt68blooddonation@gmail.com" className="font-bold hover:underline text-[var(--burgundy-600)] break-all min-w-0 inline-block py-1.5">
                   mumt68blooddonation@gmail.com
                 </a>
-              </div>
-
-              <div className="pt-2">
-                <Link
-                  href="/staff/login"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-3.5 rounded-lg bg-[var(--rose-100)] hover:bg-[var(--rose-200)] text-[var(--burgundy-700)] font-bold text-xs border border-[var(--line)]"
-                >
-                  <ShieldCheck className="h-3.5 w-3.5 text-gray-600" />
-                  <span>เข้าสู่ระบบเจ้าหน้าที่ (Staff Login)</span>
-                </Link>
               </div>
             </div>
           </div>
