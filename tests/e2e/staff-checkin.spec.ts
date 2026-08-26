@@ -117,6 +117,10 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
   // 4) Check the donor in.
   await page.getByRole('button', { name: /เช็คอิน/ }).first().click();
   await expect(page.getByText(/CHECKED IN|เช็คอินแล้ว/).first()).toBeVisible({ timeout: 15_000 });
+
+  // 5) Confirm donation completed & souvenir given.
+  await page.getByRole('button', { name: /บริจาคสำเร็จ/ }).first().click();
+  await expect(page.getByText(/บริจาคสำเร็จ|COMPLETED/).first()).toBeVisible({ timeout: 15_000 });
 });
 
 test.afterAll(async ({ request }) => {

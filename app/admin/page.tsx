@@ -67,23 +67,23 @@ export default async function AdminDashboardPage() {
       title: 'เช็คอินเข้างานแล้ว', 
       value: kpis.checkedInCount.toLocaleString('th-TH'), 
       unit: 'คน', 
-      detail: `อัตราการมาถึง ${kpis.attendanceRatePercent}%`, 
+      detail: `คิดเป็น ${kpis.attendanceRatePercent}% ของผู้ลงทะเบียน`, 
       icon: UserCheck,
+      color: 'bg-sky-50 text-sky-900 border-sky-200' 
+    },
+    { 
+      title: 'บริจาคสำเร็จ & รับของที่ระลึก', 
+      value: kpis.completedCount.toLocaleString('th-TH'), 
+      unit: 'คน / ยูนิต', 
+      detail: `มอบของที่ระลึกสำเร็จ ${kpis.completedCount} ชิ้น`, 
+      icon: Heart,
       color: 'bg-emerald-50 text-emerald-900 border-emerald-200' 
     },
     { 
-      title: 'กำลังบริจาค / เสร็จสิ้น', 
-      value: `${kpis.inProcessCount} / ${kpis.completedCount}`, 
+      title: 'กลุ่มผู้บริจาค', 
+      value: `${kpis.studentsCount + kpis.staffCount} / ${kpis.generalPublicCount}`, 
       unit: 'คน', 
-      detail: `สำเร็จแล้ว ${kpis.completedCount} ยูนิต`, 
-      icon: Heart,
-      color: 'bg-rose-50 text-rose-900 border-rose-200' 
-    },
-    { 
-      title: 'ครั้งแรก / เคยบริจาค', 
-      value: `${kpis.firstTimeDonors} / ${kpis.returningDonors}`, 
-      unit: 'คน', 
-      detail: `${kpis.studentsCount} นศ. · ${kpis.staffCount} บุคลากร · ${kpis.generalPublicCount} ทั่วไป`, 
+      detail: `${kpis.studentsCount} นศ. · ${kpis.staffCount} บุคลากร · ${kpis.generalPublicCount} บุคคลทั่วไป`, 
       icon: Calendar,
       color: 'bg-amber-50 text-amber-900 border-amber-200' 
     },

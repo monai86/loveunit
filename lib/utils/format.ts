@@ -140,19 +140,19 @@ export function getDonationExperienceLabel(exp: DonationExperience): string {
 export function getRegistrationStatusBadge(status: RegistrationStatus): { label: string; colorClass: string } {
   switch (status) {
     case 'REGISTERED':
-      return { label: 'ลงทะเบียนแล้ว', colorClass: 'bg-blue-100 text-blue-800 border-blue-200' };
+      return { label: 'ลงทะเบียนแล้ว', colorClass: 'bg-amber-50 text-amber-800 border-amber-200' };
     case 'CHECKED_IN':
-      return { label: 'เช็คอินแล้ว', colorClass: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+      return { label: 'เช็คอินแล้ว', colorClass: 'bg-blue-50 text-blue-800 border-blue-200' };
     case 'IN_PROCESS':
-      return { label: 'กำลังบริจาค', colorClass: 'bg-purple-100 text-purple-800 border-purple-200' };
+      return { label: 'กำลังบริจาค', colorClass: 'bg-purple-50 text-purple-800 border-purple-200' };
     case 'COMPLETED':
-      return { label: 'เสร็จสิ้น', colorClass: 'bg-green-100 text-green-800 border-green-200' };
+      return { label: 'บริจาคสำเร็จ · รับของที่ระลึกแล้ว', colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200' };
     case 'CANCELLED':
-      return { label: 'ยกเลิกแล้ว', colorClass: 'bg-gray-100 text-gray-800 border-gray-200' };
+      return { label: 'ยกเลิกแล้ว', colorClass: 'bg-gray-100 text-gray-700 border-gray-200' };
     case 'NO_SHOW':
-      return { label: 'ไม่ได้เข้าร่วม', colorClass: 'bg-red-100 text-red-800 border-red-200' };
+      return { label: 'ไม่ได้เข้าร่วม', colorClass: 'bg-rose-50 text-rose-800 border-rose-200' };
     default:
-      return { label: status, colorClass: 'bg-gray-100 text-gray-800' };
+      return { label: status, colorClass: 'bg-gray-100 text-gray-800 border-gray-200' };
   }
 }
 

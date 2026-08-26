@@ -286,7 +286,7 @@ export function getInMemoryAuditLogs(): readonly AuditLog[] {
 // ==========================================
 const ALLOWED_TRANSITIONS: Record<RegistrationStatus, RegistrationStatus[]> = {
   REGISTERED: ['CHECKED_IN', 'CANCELLED'],
-  CHECKED_IN: ['IN_PROCESS', 'CANCELLED'],
+  CHECKED_IN: ['COMPLETED', 'IN_PROCESS', 'CANCELLED'],
   IN_PROCESS: ['COMPLETED', 'CANCELLED'],
   COMPLETED: [],
   CANCELLED: [],

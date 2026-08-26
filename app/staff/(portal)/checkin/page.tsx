@@ -8,12 +8,19 @@ import {
   Search, 
   CheckCircle2, 
   UserCheck, 
-  Play, 
+  Gift, 
   XCircle, 
   UserPlus,
   Camera,
-  Heart,
-  Ban
+  Ban,
+  Sparkles,
+  RotateCcw,
+  Clock,
+  Phone,
+  User,
+  ShieldCheck,
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
 import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
@@ -34,6 +41,8 @@ interface ApiRegistration {
   status?: RegistrationStatus;
   checkedInAt?: string;
   checked_in_at?: string;
+  completedAt?: string;
+  completed_at?: string;
   timeSlot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
   time_slot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
 }
@@ -49,12 +58,12 @@ interface RegistrationDetail {
   timeSlotText: string;
   status: RegistrationStatus;
   checkedInAt?: string;
+  completedAt?: string;
 }
 
 interface StaffStats {
   totalToday: number;
   checkedIn: number;
-  inProcess: number;
   completed: number;
   cancelled: number;
 }
@@ -72,6 +81,7 @@ function mapRegistration(r: ApiRegistration): RegistrationDetail {
     timeSlotText: slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 – 14:00 น.',
     status: r.status || 'REGISTERED',
     checkedInAt: r.checkedInAt || r.checked_in_at || undefined,
+    completedAt: r.completedAt || r.completed_at || undefined,
   };
 }
 
@@ -81,11 +91,12 @@ export default function StaffCheckinPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [registration, setRegistration] = useState<RegistrationDetail | null>(null);
 
-  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning'; text: string } | null>(null);
-  const [stats, setStats] = useState<StaffStats>({ totalToday: 0, checkedIn: 0, inProcess: 0, completed: 0, cancelled: 0 });
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; text: string } | null>(null);
+  const [stats, setStats] = useState<StaffStats>({ totalToday: 0, checkedIn: 0, completed: 0, cancelled: 0 });
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const busyRef = useRef(false);
 
   const stopScanner = useCallback(async () => {
@@ -113,7 +124,6 @@ export default function StaffCheckinPage() {
         setStats({
           totalToday: data.kpis.totalRegistrations ?? 0,
           checkedIn: data.kpis.checkedInCount ?? 0,
-          inProcess: data.kpis.inProcessCount ?? 0,
           completed: data.kpis.completedCount ?? 0,
           cancelled: data.kpis.cancelledCount ?? 0,
         });
@@ -147,7 +157,7 @@ export default function StaffCheckinPage() {
       if (res.ok && data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
         setRegistration(mapRegistration(data.registrations[0]));
         if (data.registrations.length > 1) {
-          setMessage({ type: 'warning', text: `พบข้อมูล ${data.registrations.length} รายการ แสดงรายการแรกที่ตรงที่สุด` });
+          setMessage({ type: 'info', text: `พบข้อมูล ${data.registrations.length} รายการ แสดงรายการแรกที่ตรงที่สุด` });
         }
       } else {
         setMessage({ type: 'error', text: data.message || data.error || 'ไม่พบข้อมูลผู้บริจาคที่ค้นหา' });
@@ -159,7 +169,7 @@ export default function StaffCheckinPage() {
     }
   };
 
-  const handleStatusChange = async (targetStatus: 'CHECKED_IN' | 'IN_PROCESS' | 'COMPLETED' | 'CANCELLED') => {
+  const handleStatusChange = async (targetStatus: 'CHECKED_IN' | 'COMPLETED' | 'CANCELLED') => {
     if (!registration) return;
 
     setActionLoading(true);
@@ -179,13 +189,23 @@ export default function StaffCheckinPage() {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        setRegistration({ ...registration, status: targetStatus, checkedInAt: new Date().toISOString() });
+        const nowIso = new Date().toISOString();
+        const updatedReg = {
+          ...registration,
+          status: targetStatus,
+          checkedInAt: targetStatus === 'CHECKED_IN' ? nowIso : registration.checkedInAt,
+          completedAt: targetStatus === 'COMPLETED' ? nowIso : registration.completedAt,
+        };
+        setRegistration(updatedReg);
         loadStats();
 
         let successText = 'ดำเนินการสำเร็จ!';
-        if (targetStatus === 'CHECKED_IN') successText = `เช็คอินสำเร็จ! คุณ${registration.firstName} ${registration.lastName}`;
-        if (targetStatus === 'IN_PROCESS') successText = `เริ่มขั้นตอนบริจาคโลหิตสำหรับ คุณ${registration.firstName}`;
-        if (targetStatus === 'COMPLETED') successText = `การบริจาคเสร็จสมบูรณ์! ขอขอบคุณ คุณ${registration.firstName}`;
+        if (targetStatus === 'CHECKED_IN') {
+          successText = `🎟️ ยืนยันเช็คอินเข้างานสำเร็จ! คุณ${registration.firstName} ${registration.lastName}`;
+        }
+        if (targetStatus === 'COMPLETED') {
+          successText = `🎁 บันทึกการบริจาคโลหิตสำเร็จ และมอบของที่ระลึกให้ คุณ${registration.firstName} เรียบร้อยแล้ว ✨`;
+        }
         if (targetStatus === 'CANCELLED') {
           successText = data.promoted
             ? `ยกเลิกรายการ คุณ${registration.firstName} และเลื่อนผู้รอรายถัดไปเข้าคิวแล้ว`
@@ -203,7 +223,13 @@ export default function StaffCheckinPage() {
         body: payload,
         label: `${registration.firstName} ${registration.lastName} → ${targetStatus}`,
       });
-      setRegistration({ ...registration, status: targetStatus, checkedInAt: new Date().toISOString() });
+      const nowIso = new Date().toISOString();
+      setRegistration({
+        ...registration,
+        status: targetStatus,
+        checkedInAt: targetStatus === 'CHECKED_IN' ? nowIso : registration.checkedInAt,
+        completedAt: targetStatus === 'COMPLETED' ? nowIso : registration.completedAt,
+      });
       setMessage({
         type: 'warning',
         text: 'ออฟไลน์ — บันทึกการกระทำไว้ในเครื่องแล้ว จะซิงค์อัตโนมัติเมื่อกลับมาออนไลน์',
@@ -213,42 +239,52 @@ export default function StaffCheckinPage() {
     }
   };
 
-  const handleCheckinByToken = useCallback(async (qrToken: string) => {
+  const handleLookupByToken = useCallback(async (tokenOrCode: string) => {
     if (busyRef.current) return;
     busyRef.current = true;
     setMessage(null);
+
+    // Haptic feedback if available on mobile
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try { navigator.vibrate(80); } catch { /* ignore */ }
+    }
+
     try {
-      await stopScanner();
-      const res = await fetch('/api/staff/checkin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ qrToken, status: 'CHECKED_IN' }),
-      });
+      const res = await fetch(`/api/staff/search?q=${encodeURIComponent(tokenOrCode.trim())}`);
       const data = await res.json();
-      if (res.ok && data.success && data.registration) {
-        setRegistration(mapRegistration(data.registration));
+
+      if (res.ok && data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
+        const found = mapRegistration(data.registrations[0]);
+        setRegistration(found);
         loadStats();
-        setMessage({ type: 'success', text: `เช็คอินสำเร็จ! คุณ${data.registration.firstName || ''} ${data.registration.lastName || ''}`.trim() });
+
+        if (found.status === 'REGISTERED') {
+          setMessage({
+            type: 'info',
+            text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (สถานะ: รอเช็คอิน) — กรุณากดยืนยันเช็คอินเข้างานด้านล่าง`,
+          });
+        } else if (found.status === 'CHECKED_IN') {
+          setMessage({
+            type: 'info',
+            text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (เช็คอินแล้ว) — เมื่อบริจาคโลหิตเสร็จสิ้น สามารถกดยืนยันรับของที่ระลึกได้`,
+          });
+        } else if (found.status === 'COMPLETED') {
+          setMessage({
+            type: 'success',
+            text: `คุณ${found.firstName} ${found.lastName} ได้บริจาคโลหิตและรับของที่ระลึกเรียบร้อยแล้ว ✨`,
+          });
+        }
       } else {
         setMessage({ type: 'error', text: data.message || data.error || 'ไม่พบข้อมูลการลงทะเบียนจาก QR Code นี้' });
       }
     } catch {
-      enqueueOfflineAction({
-        endpoint: '/api/staff/checkin',
-        method: 'POST',
-        body: { qrToken, status: 'CHECKED_IN' },
-        label: `QR สแกน → CHECKED_IN`,
-      });
-      setMessage({
-        type: 'warning',
-        text: 'ออฟไลน์ — บันทึกการเช็คอินไว้ในเครื่องแล้ว จะซิงค์อัตโนมัติเมื่อกลับมาออนไลน์',
-      });
+      setMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการค้นหาข้อมูลจาก QR Code' });
     } finally {
       busyRef.current = false;
     }
-  }, [loadStats, stopScanner]);
+  }, [loadStats]);
 
-  const startScanner = async () => {
+  const startScanner = async (targetFacing: 'environment' | 'user' = facingMode) => {
     setMessage(null);
     try {
       if (scannerRef.current) {
@@ -266,7 +302,6 @@ export default function StaffCheckinPage() {
       }
 
       setScanning(true);
-      // Wait for next tick so DOM is definitely ready
       await new Promise((r) => setTimeout(r, 100));
 
       const element = document.getElementById('qr-reader-region');
@@ -284,25 +319,27 @@ export default function StaffCheckinPage() {
       };
 
       const qrCodeSuccessCallback = (decodedText: string) => {
-        handleCheckinByToken(decodedText.trim());
+        handleLookupByToken(decodedText.trim());
       };
 
-      // Try environment (back) camera first; if not available (e.g. desktop/laptop), fallback to user (front)
       try {
         await scanner.start(
-          { facingMode: 'environment' },
+          { facingMode: targetFacing },
           qrConfig,
           qrCodeSuccessCallback,
           () => {}
         );
+        setFacingMode(targetFacing);
       } catch (envErr) {
-        console.warn('Environment camera failed, trying front/user camera:', envErr);
+        console.warn(`${targetFacing} camera failed, trying fallback camera:`, envErr);
+        const fallbackMode = targetFacing === 'environment' ? 'user' : 'environment';
         await scanner.start(
-          { facingMode: 'user' },
+          { facingMode: fallbackMode },
           qrConfig,
           qrCodeSuccessCallback,
           () => {}
         );
+        setFacingMode(fallbackMode);
       }
     } catch (err: unknown) {
       console.error('Camera start error:', err);
@@ -332,16 +369,21 @@ export default function StaffCheckinPage() {
     }
   };
 
+  const toggleCameraFacing = async () => {
+    const nextFacing = facingMode === 'environment' ? 'user' : 'environment';
+    await startScanner(nextFacing);
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-8">
       
-      {/* Top Header */}
+      {/* Top Header & Live KPI Stat Strip */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--line)] pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-mono font-black text-[var(--burgundy-700)] uppercase tracking-wider">
-              STAFF CHECK-IN STATION
+              STAFF CHECK-IN & SOUVENIR STATION
             </span>
             <span className="px-2 py-0.5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] text-[10px] font-black border border-[var(--line)]">
               ห้องประชุม 217
@@ -350,70 +392,113 @@ export default function StaffCheckinPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-[var(--ink)]">
             ระบบเช็คอินและคัดกรองผู้บริจาคหน้างาน
           </h1>
-          <p className="text-xs text-[var(--muted)] font-medium">
-            สแกนบัตร QR Code หรือค้นหาด้วยชื่อ/เบอร์โทร เพื่อยืนยันการเข้าร่วมกิจกรรม
+          <p className="text-xs text-[var(--muted)]">
+            สแกน QR Code เพื่อเช็คอินเข้างาน ตรวจสอบผู้มาจริง และบันทึกการรับของที่ระลึกสุดพิเศษเมื่อบริจาคสำเร็จ
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={loadStats}
+            title="รีเฟรชข้อมูลสถิติ"
+            className="p-2.5 rounded-xl border border-[var(--line)] bg-white hover:bg-gray-50 text-[var(--ink)] text-xs font-bold transition-all shadow-xs cursor-pointer"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </button>
           <Link
             href="/staff/walk-in"
-            className="editorial-btn-primary py-2.5 px-4 text-xs flex items-center gap-1.5 shadow-sm"
+            className="editorial-btn-secondary text-xs flex items-center gap-2"
           >
             <UserPlus className="h-4 w-4" />
-            <span>ลงทะเบียน Walk-in</span>
-          </Link>
-
-          <Link
-            href="/staff/queue"
-            className="editorial-btn-secondary py-2.5 px-4 text-xs flex items-center gap-1.5"
-          >
-            <span>ดูลำดับคิวหน้างาน</span>
+            <span>Walk-in หน้างาน</span>
           </Link>
         </div>
       </div>
 
-      {/* Live Operational Stats Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <div className="p-4 rounded-2xl bg-white border border-[var(--line)] shadow-xs text-center space-y-1">
-          <span className="text-[11px] font-bold text-[var(--muted)] block">ลงทะเบียนทั้งหมด</span>
-          <span className="text-2xl font-mono font-black text-[var(--ink)]">{stats.totalToday} <span className="text-xs font-sans font-bold">คน</span></span>
+      {/* 3 Core KPIs Strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white border border-[var(--line)] rounded-2xl p-5 shadow-xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
+              1. ผู้ลงทะเบียนทั้งหมด
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl sm:text-3xl font-black text-[var(--ink)]">
+                {stats.totalToday}
+              </span>
+              <span className="text-xs text-gray-400 font-bold">คน</span>
+            </div>
+            <span className="text-[11px] text-gray-500 block">ปริมาณผู้ที่สนใจล่วงหน้า</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100">
+            <User className="h-6 w-6" />
+          </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-1">
-          <span className="text-[11px] font-bold text-emerald-800 block">เช็คอินเข้างานแล้ว</span>
-          <span className="text-2xl font-mono font-black text-emerald-900">{stats.checkedIn} <span className="text-xs font-sans font-bold">คน</span></span>
+        <div className="bg-white border border-[var(--line)] rounded-2xl p-5 shadow-xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">
+              2. มาเช็คอินเข้างานแล้ว
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl sm:text-3xl font-black text-blue-900">
+                {stats.checkedIn}
+              </span>
+              <span className="text-xs text-blue-600 font-bold">คน</span>
+              {stats.totalToday > 0 && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold">
+                  {Math.round((stats.checkedIn / stats.totalToday) * 100)}%
+                </span>
+              )}
+            </div>
+            <span className="text-[11px] text-blue-600/80 block">จำนวนผู้ที่มาถึงงานจริง</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100">
+            <UserCheck className="h-6 w-6" />
+          </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-center space-y-1">
-          <span className="text-[11px] font-bold text-blue-800 block">กำลังบริจาคบนเตียง</span>
-          <span className="text-2xl font-mono font-black text-blue-900">{stats.inProcess} <span className="text-xs font-sans font-bold">คน</span></span>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-center space-y-1">
-          <span className="text-[11px] font-bold text-rose-800 block">เสร็จสิ้นการบริจาค</span>
-          <span className="text-2xl font-mono font-black text-rose-900">{stats.completed} <span className="text-xs font-sans font-bold">คน</span></span>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-gray-100 border border-gray-200 text-center space-y-1 col-span-2 sm:col-span-1">
-          <span className="text-[11px] font-bold text-gray-600 block">ยกเลิก / ไม่มา</span>
-          <span className="text-2xl font-mono font-black text-gray-800">{stats.cancelled} <span className="text-xs font-sans font-bold">คน</span></span>
+        <div className="bg-white border border-[var(--line)] rounded-2xl p-5 shadow-xs flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
+              3. บริจาคสำเร็จ & รับของที่ระลึก
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl sm:text-3xl font-black text-emerald-900">
+                {stats.completed}
+              </span>
+              <span className="text-xs text-emerald-600 font-bold">คน / ยูนิต</span>
+            </div>
+            <span className="text-[11px] text-emerald-600/80 block">มอบของที่ระลึกเรียบร้อย</span>
+          </div>
+          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100">
+            <Gift className="h-6 w-6" />
+          </div>
         </div>
       </div>
 
-      {/* Toast Notification Alert */}
+      {/* Status / Alert Banner */}
       {message && (
-        <div className={`p-4 rounded-2xl text-xs font-bold border flex items-center justify-between shadow-xs ${
-          message.type === 'success' ? 'bg-emerald-50 border-emerald-300 text-emerald-900' :
-          message.type === 'warning' ? 'bg-amber-50 border-amber-300 text-amber-900' :
-          'bg-red-50 border-red-300 text-red-900'
+        <div className={`p-4 rounded-2xl border text-xs font-bold flex items-center justify-between gap-3 shadow-xs animate-in fade-in slide-in-from-top-2 ${
+          message.type === 'success' ? 'bg-emerald-50 text-emerald-900 border-emerald-200' :
+          message.type === 'warning' ? 'bg-amber-50 text-amber-900 border-amber-200' :
+          message.type === 'info' ? 'bg-blue-50 text-blue-900 border-blue-200' :
+          'bg-rose-50 text-rose-900 border-rose-200'
         }`}>
           <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-            <span>{message.text}</span>
+            {message.type === 'success' && <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />}
+            {message.type === 'warning' && <AlertCircle className="h-5 w-5 text-amber-600 shrink-0" />}
+            {message.type === 'info' && <Sparkles className="h-5 w-5 text-blue-600 shrink-0" />}
+            {message.type === 'error' && <XCircle className="h-5 w-5 text-rose-600 shrink-0" />}
+            <span className="text-sm font-black">{message.text}</span>
           </div>
-          <button onClick={() => setMessage(null)} className="text-xs font-black underline hover:opacity-80">
-            ปิด
+          <button
+            type="button"
+            onClick={() => setMessage(null)}
+            className="text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
+          >
+            <XCircle className="h-4 w-4" />
           </button>
         </div>
       )}
@@ -421,54 +506,69 @@ export default function StaffCheckinPage() {
       {/* Main Two-Pane Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* Left Pane: QR Scanner & Search (5 cols) */}
+        {/* Left Pane: High-End QR Scanner & Search (5 cols) */}
         <div className="lg:col-span-5 bg-white border border-[var(--line)] rounded-3xl p-6 space-y-6 shadow-sm">
           
           <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
             <div className="flex items-center gap-2">
               <QrCode className="h-4 w-4 text-[var(--burgundy-700)]" />
               <h2 className="text-xs font-black text-[var(--ink)] uppercase tracking-wider">
-                สแกนบัตร QR Code
+                สแกน QR Code บัตรผู้บริจาค
               </h2>
             </div>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-black uppercase ${
-              scanning ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'
-            }`}>
-              {scanning ? 'CAMERA ACTIVE' : 'STANDBY'}
-            </span>
+            <div className="flex items-center gap-2">
+              {scanning && (
+                <button
+                  type="button"
+                  onClick={toggleCameraFacing}
+                  title="สลับกล้องหน้า/หลัง"
+                  className="p-1 px-2 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>{facingMode === 'environment' ? 'กล้องหลัง' : 'กล้องหน้า'}</span>
+                </button>
+              )}
+              <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-black uppercase ${
+                scanning ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'
+              }`}>
+                {scanning ? 'LIVE CAMERA' : 'STANDBY'}
+              </span>
+            </div>
           </div>
 
-          {/* Camera Region */}
-          <div className="relative w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 aspect-square flex items-center justify-center">
+          {/* Camera Region Container */}
+          <div className="relative w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 aspect-square flex items-center justify-center shadow-inner">
+            
             {/* Always in DOM for Html5Qrcode attach */}
             <div
               id="qr-reader-region"
               className={`w-full h-full ${scanning ? 'block' : 'hidden'}`}
             />
 
+            {/* Standby Viewfinder Placeholder */}
             {!scanning && (
               <div className="relative aspect-square w-full flex flex-col items-center justify-center text-white p-6 text-center space-y-3">
-                {/* Target Guides */}
-                <div className="absolute inset-10 border-2 border-dashed border-rose-400/50 rounded-2xl pointer-events-none flex items-center justify-center">
+                {/* Modern Reticle / Guides */}
+                <div className="absolute inset-12 border-2 border-dashed border-rose-400/40 rounded-2xl pointer-events-none flex items-center justify-center">
                   <div className="h-5 w-5 border-t-2 border-l-2 border-rose-500 absolute -top-1 -left-1 rounded-tl" />
                   <div className="h-5 w-5 border-t-2 border-r-2 border-rose-500 absolute -top-1 -right-1 rounded-tr" />
                   <div className="h-5 w-5 border-b-2 border-l-2 border-rose-500 absolute -bottom-1 -left-1 rounded-bl" />
                   <div className="h-5 w-5 border-b-2 border-r-2 border-rose-500 absolute -bottom-1 -right-1 rounded-br" />
                 </div>
 
-                <div className="p-3 rounded-2xl bg-white/10 backdrop-blur-sm shadow-inner">
+                <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md shadow-inner">
                   <QrCode className="h-10 w-10 text-rose-300" />
                 </div>
 
-                <div className="space-y-1">
-                  <p className="text-xs font-black text-white">สแกน QR Code บัตรผู้บริจาค</p>
-                  <p className="text-[11px] text-slate-400">หันกล้องไปยัง QR Code เพื่อเช็คอินทันที</p>
+                <div className="space-y-1 z-10">
+                  <p className="text-sm font-black text-white">สแกนบัตรลงทะเบียน</p>
+                  <p className="text-[11px] text-slate-400">หันกล้องไปที่ QR Code ของผู้บริจาค</p>
                 </div>
 
                 <button
                   type="button"
-                  onClick={startScanner}
-                  className="editorial-btn-primary py-2.5 px-5 text-xs flex items-center gap-2 shadow-lg cursor-pointer"
+                  onClick={() => startScanner()}
+                  className="editorial-btn-primary py-2.5 px-6 text-xs flex items-center gap-2 shadow-lg cursor-pointer z-10"
                 >
                   <Camera className="h-4 w-4" />
                   <span>เปิดกล้องสแกน</span>
@@ -476,24 +576,38 @@ export default function StaffCheckinPage() {
               </div>
             )}
 
+            {/* Active Laser Scanning Overlay */}
             {scanning && (
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
-                <button
-                  type="button"
-                  onClick={stopScanner}
-                  className="px-3.5 py-1.5 rounded-xl bg-black/70 backdrop-blur-md hover:bg-black/90 text-white text-xs font-bold flex items-center gap-1.5 border border-white/20 shadow-lg cursor-pointer transition-colors"
-                >
-                  <XCircle className="h-3.5 w-3.5" />
-                  <span>ปิดกล้อง</span>
-                </button>
-              </div>
+              <>
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                  <div className="w-56 h-56 border-2 border-rose-500/70 rounded-2xl relative">
+                    <div className="h-6 w-6 border-t-4 border-l-4 border-rose-500 absolute -top-1.5 -left-1.5 rounded-tl" />
+                    <div className="h-6 w-6 border-t-4 border-r-4 border-rose-500 absolute -top-1.5 -right-1.5 rounded-tr" />
+                    <div className="h-6 w-6 border-b-4 border-l-4 border-rose-500 absolute -bottom-1.5 -left-1.5 rounded-bl" />
+                    <div className="h-6 w-6 border-b-4 border-r-4 border-rose-500 absolute -bottom-1.5 -right-1.5 rounded-br" />
+                    {/* Animated Laser Line */}
+                    <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-rose-500 to-transparent absolute top-1/2 -translate-y-1/2 animate-pulse shadow-[0_0_12px_rgba(244,63,94,0.9)]" />
+                  </div>
+                </div>
+
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                  <button
+                    type="button"
+                    onClick={stopScanner}
+                    className="px-4 py-1.5 rounded-xl bg-black/80 backdrop-blur-md hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 border border-white/20 shadow-lg cursor-pointer transition-colors"
+                  >
+                    <XCircle className="h-3.5 w-3.5" />
+                    <span>ปิดกล้อง</span>
+                  </button>
+                </div>
+              </>
             )}
           </div>
 
-          {/* Fallback Search */}
+          {/* Quick Manual Search */}
           <div className="space-y-2 pt-2 border-t border-gray-100">
             <label htmlFor="ck-search" className="block text-xs font-black text-[var(--ink)]">
-              หรือค้นหาด้วยชื่อ / เบอร์โทร / รหัสบัตร
+              หรือค้นหาด่วน (ชื่อ / เบอร์โทร / รหัสยืนยัน)
             </label>
             <form onSubmit={handleSearch} className="flex gap-2">
               <div className="relative flex-1">
@@ -519,16 +633,16 @@ export default function StaffCheckinPage() {
 
         </div>
 
-        {/* Right Pane: Donor Verification & Action Card (7 cols) */}
+        {/* Right Pane: Donor Confirmation & Souvenir Card (7 cols) */}
         <div className="lg:col-span-7">
           {registration ? (
-            <div className="bg-white border border-[var(--line)] rounded-3xl p-7 space-y-6 shadow-sm">
+            <div className="bg-white border border-[var(--line)] rounded-3xl p-7 space-y-6 shadow-sm animate-in fade-in duration-200">
               
-              {/* Header */}
+              {/* Card Header: Code & Status */}
               <div className="flex items-center justify-between border-b border-[var(--line)] pb-4">
                 <div>
-                  <span className="text-[11px] font-mono font-bold text-[var(--muted)] uppercase block">
-                    REGISTRATION CODE
+                  <span className="text-[10px] font-mono font-bold text-[var(--muted)] uppercase tracking-wider block">
+                    REGISTRATION PASS
                   </span>
                   <span className="text-2xl sm:text-3xl font-mono font-black text-[var(--burgundy-700)]">
                     {registration.registrationCode}
@@ -555,16 +669,20 @@ export default function StaffCheckinPage() {
 
               {/* Donor Data Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
-                  <span className="text-[11px] font-bold text-gray-500 block">ชื่อ - นามสกุล</span>
-                  <p className="text-base font-black text-[var(--ink)]">
+                <div className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
+                  <span className="text-[11px] font-bold text-gray-500 block flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5 text-gray-400" /> ชื่อ - นามสกุล
+                  </span>
+                  <p className="text-lg font-black text-[var(--ink)]">
                     คุณ{registration.firstName} {registration.lastName}
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
-                  <span className="text-[11px] font-bold text-gray-500 block">เบอร์โทรศัพท์</span>
-                  <p className="text-base font-mono font-black text-[var(--ink)]">
+                <div className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
+                  <span className="text-[11px] font-bold text-gray-500 block flex items-center gap-1.5">
+                    <Phone className="h-3.5 w-3.5 text-gray-400" /> เบอร์โทรศัพท์
+                  </span>
+                  <p className="text-lg font-mono font-black text-[var(--ink)]">
                     {registration.phone}
                   </p>
                 </div>
@@ -572,89 +690,138 @@ export default function StaffCheckinPage() {
                 <div className="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
                   <span className="text-[11px] font-bold text-gray-500 block">ประเภทผู้บริจาค</span>
                   <p className="font-bold text-[var(--ink)]">
-                    {getParticipantTypeLabel(registration.participantType)} ({registration.facultyName})
+                    {getParticipantTypeLabel(registration.participantType)}
                   </p>
+                  <span className="text-[10px] text-gray-500 block">{registration.facultyName}</span>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
-                  <span className="text-[11px] font-bold text-gray-500 block">รอบเวลาที่ลงทะเบียน</span>
-                  <p className="font-mono font-bold text-[var(--burgundy-700)]">
+                  <span className="text-[11px] font-bold text-gray-500 block flex items-center gap-1">
+                    <Clock className="h-3.5 w-3.5 text-[var(--burgundy-700)]" /> รอบเวลาที่ลงทะเบียน
+                  </span>
+                  <p className="font-mono font-bold text-[var(--burgundy-700)] text-sm">
                     {registration.timeSlotText}
                   </p>
                 </div>
               </div>
 
-              {/* Action Pipeline Buttons */}
-              <div className="space-y-3 pt-2 border-t border-[var(--line)]">
-                <span className="text-xs font-black text-[var(--ink)] block">
-                  ขั้นตอนการดำเนินการ (Action Pipeline):
-                </span>
+              {/* Status Context & Next Action Guidance */}
+              <div className="rounded-2xl p-4 border space-y-2 bg-[var(--rose-50)]/50 border-[var(--rose-100)]">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-[var(--burgundy-800)] flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-[var(--burgundy-700)]" />
+                    สถานะการเข้าร่วมงาน & ของที่ระลึก:
+                  </span>
+                  {registration.checkedInAt && (
+                    <span className="text-[11px] font-mono text-gray-600">
+                      เช็คอินเมื่อ: {new Date(registration.checkedInAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
+                    </span>
+                  )}
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {registration.status === 'REGISTERED' && (
+                  <p className="text-xs text-gray-600">
+                    ผู้บริจาคลงทะเบียนแล้ว กรุณาตรวจสอบข้อมูลและกดปุ่ม <span className="font-bold text-blue-700">&ldquo;ยืนยันเช็คอินเข้างาน&rdquo;</span> ด้านล่าง
+                  </p>
+                )}
+
+                {registration.status === 'CHECKED_IN' && (
+                  <p className="text-xs text-emerald-800 font-bold">
+                    ✓ เช็คอินเข้างานแล้ว — เมื่อผู้บริจาคบริจาคโลหิตเสร็จสิ้น กดปุ่ม <span className="font-black text-emerald-900">&ldquo;บริจาคสำเร็จ &amp; มอบของที่ระลึก&rdquo;</span>
+                  </p>
+                )}
+
+                {registration.status === 'COMPLETED' && (
+                  <div className="flex items-center gap-2 text-emerald-900 text-xs font-black">
+                    <Gift className="h-5 w-5 text-emerald-600" />
+                    <span>🎉 บริจาคโลหิตสำเร็จ และรับของที่ระลึกสุดพิเศษเรียบร้อยแล้ว ✨</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3 pt-2 border-t border-[var(--line)]">
+                <div className="flex flex-col sm:flex-row gap-3">
                   
+                  {/* Step 1: Check In */}
                   {registration.status === 'REGISTERED' && (
                     <button
                       type="button"
                       disabled={actionLoading}
                       onClick={() => handleStatusChange('CHECKED_IN')}
-                      className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
+                      className="flex-1 py-4 px-5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-sm shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
                     >
-                      <UserCheck className="h-4 w-4" />
-                      <span>1. ยืนยันการเช็คอิน (CHECK-IN)</span>
+                      <UserCheck className="h-5 w-5" />
+                      <span>1. ยืนยันการเช็คอินเข้างาน (CHECK-IN)</span>
                     </button>
                   )}
 
-                  {(registration.status === 'REGISTERED' || registration.status === 'CHECKED_IN') && (
-                    <button
-                      type="button"
-                      disabled={actionLoading}
-                      onClick={() => handleStatusChange('IN_PROCESS')}
-                      className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99]"
-                    >
-                      <Play className="h-4 w-4" />
-                      <span>2. เริ่มบริจาคบนเตียง (IN PROCESS)</span>
-                    </button>
-                  )}
-
-                  {registration.status === 'IN_PROCESS' && (
+                  {/* Step 2: Complete Donation & Give Souvenir */}
+                  {registration.status === 'CHECKED_IN' && (
                     <button
                       type="button"
                       disabled={actionLoading}
                       onClick={() => handleStatusChange('COMPLETED')}
-                      className="w-full py-3.5 px-4 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-black text-xs shadow-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99] sm:col-span-2"
+                      className="flex-1 py-4 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
                     >
-                      <Heart className="h-4 w-4 fill-white" />
-                      <span>3. บริจาคเสร็จสิ้น (COMPLETED)</span>
+                      <Gift className="h-5 w-5" />
+                      <span>2. ยืนยันบริจาคสำเร็จ & มอบของที่ระลึก (COMPLETED)</span>
                     </button>
                   )}
 
+                  {/* If Already Completed */}
+                  {registration.status === 'COMPLETED' && (
+                    <div className="flex-1 py-3 px-4 rounded-2xl bg-emerald-100 text-emerald-900 font-black text-xs flex items-center justify-center gap-2 border border-emerald-200">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                      <span>เสร็จสิ้นกระบวนการทั้งหมดแล้ว</span>
+                    </div>
+                  )}
+
+                  {/* Cancel / Ineligible Button */}
                   {registration.status !== 'CANCELLED' && registration.status !== 'COMPLETED' && (
                     <button
                       type="button"
                       disabled={actionLoading}
                       onClick={() => handleStatusChange('CANCELLED')}
-                      className="py-3 px-4 rounded-xl bg-gray-100 hover:bg-red-50 text-gray-700 hover:text-red-700 font-bold text-xs border border-gray-200 transition-all flex items-center justify-center gap-1.5"
+                      className="py-3 px-4 rounded-2xl bg-gray-100 hover:bg-rose-50 text-gray-700 hover:text-rose-700 font-bold text-xs border border-gray-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
                     >
-                      <Ban className="h-3.5 w-3.5" />
+                      <Ban className="h-4 w-4" />
                       <span>ยกเลิก / ไม่ผ่านคัดกรอง</span>
                     </button>
                   )}
 
                 </div>
+
+                {/* Reset / Next Scan Action */}
+                <div className="flex justify-end pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setRegistration(null);
+                      setMessage(null);
+                      setSearchQuery('');
+                    }}
+                    className="text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center gap-1 p-1 cursor-pointer"
+                  >
+                    <span>สแกนหรือค้นหารายการถัดไป ➔</span>
+                  </button>
+                </div>
               </div>
 
             </div>
           ) : (
-            <div className="bg-white border border-[var(--line)] rounded-3xl p-12 text-center space-y-3 shadow-xs">
-              <div className="h-16 w-16 mx-auto rounded-2xl bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center">
-                <Search className="h-8 w-8" />
+            <div className="bg-white border border-[var(--line)] rounded-3xl p-12 text-center space-y-4 shadow-xs">
+              <div className="h-20 w-20 mx-auto rounded-3xl bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center shadow-inner">
+                <QrCode className="h-10 w-10" />
               </div>
-              <h3 className="text-base font-black text-[var(--ink)]">
-                รอการสแกนหรือค้นหาผู้บริจาค
-              </h3>
-              <p className="text-xs text-[var(--muted)] max-w-sm mx-auto">
-                สแกน QR Code จากบัตรอิเล็กทรอนิกส์ของผู้บริจาค หรือพิมพ์ค้นหาด้วยชื่อ/เบอร์โทรศัพท์ เพื่อเริ่มขั้นตอนเช็คอิน
-              </p>
+              <div className="space-y-1">
+                <h3 className="text-lg font-black text-[var(--ink)]">
+                  พร้อมสำหรับการสแกนหรือค้นหาผู้บริจาค
+                </h3>
+                <p className="text-xs text-[var(--muted)] max-w-md mx-auto leading-relaxed">
+                  สแกน QR Code จากบัตรผู้บริจาค หรือพิมพ์ค้นหาด้วยชื่อ เบอร์โทรศัพท์ หรือรหัสบัตร เพื่อตรวจสอบและยืนยันการเช็คอินและมอบของที่ระลึก
+                </p>
+              </div>
             </div>
           )}
         </div>

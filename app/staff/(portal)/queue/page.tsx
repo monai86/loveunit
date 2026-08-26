@@ -24,6 +24,8 @@ const STATUS_LABEL: Record<string, string> = {
   REGISTERED: 'รอเช็คอิน',
   CHECKED_IN: 'เช็คอินแล้ว',
   IN_PROCESS: 'กำลังบริจาค',
+  COMPLETED: 'บริจาคสำเร็จ · รับของที่ระลึก 🎁',
+  CANCELLED: 'ยกเลิก',
 };
 
 export default function StaffQueuePage() {
@@ -90,20 +92,20 @@ export default function StaffQueuePage() {
       <div className="mb-6 flex items-center justify-between border-b border-[var(--rose-100)] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="unit-tag">STAFF / QUEUE</span>
+            <span className="unit-tag">STAFF / ATTENDANCE</span>
             <span className="unit-tag-outline">LIVE</span>
           </div>
           <h1 className="mt-2 text-2xl font-black text-[var(--ink)]">
-            คิวผู้บริจาครายรอบเวลา
+            รายชื่อผู้บริจาครายรอบเวลา & ของที่ระลึก
           </h1>
           <p className="mt-1 text-xs text-gray-600">
-            ดูคิวผู้บริจาคที่ลงทะเบียนไว้ของแต่ละรอบ และกดเรียกคนถัดไปเมื่อพร้อม
+            ดูรายชื่อผู้บริจาคที่ลงทะเบียนไว้ของแต่ละรอบเวลา ติดตามการมาถึง และบันทึกของที่ระลึก
           </p>
         </div>
         <button
           type="button"
           onClick={load}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--burgundy-700)]/30 bg-white px-3 py-3.5 text-xs font-bold text-[var(--burgundy-700)] hover:bg-[var(--rose-100)]"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--burgundy-700)]/30 bg-white px-3 py-3.5 text-xs font-bold text-[var(--burgundy-700)] hover:bg-[var(--rose-100)] cursor-pointer"
         >
           <RefreshCw className="h-3.5 w-3.5" />
           รีเฟรช
@@ -113,7 +115,7 @@ export default function StaffQueuePage() {
       {/* Summary strip */}
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-2xl border border-[var(--rose-100)] bg-white p-4">
-          <div className="text-[11px] font-mono font-bold text-[var(--burgundy-700)] uppercase">รอบเวลา</div>
+          <div className="text-[11px] font-mono font-bold text-[var(--burgundy-700)] uppercase">รอบเวลาทั้งหมด</div>
           <div className="mt-1 text-2xl font-black text-[var(--ink)]">{queue.length}</div>
         </div>
         <div className="rounded-2xl border border-[var(--rose-100)] bg-white p-4">
@@ -121,15 +123,15 @@ export default function StaffQueuePage() {
           <div className="mt-1 text-2xl font-black text-[var(--burgundy-600)]">{totalWaiting}</div>
         </div>
         <div className="rounded-2xl border border-[var(--rose-100)] bg-white p-4">
-          <div className="text-[11px] font-mono font-bold text-[var(--burgundy-700)] uppercase">เช็คอินแล้ว</div>
-          <div className="mt-1 text-2xl font-black text-[var(--ink)]">
+          <div className="text-[11px] font-mono font-bold text-blue-700 uppercase">เช็คอินเข้างานแล้ว</div>
+          <div className="mt-1 text-2xl font-black text-blue-900">
             {queue.reduce((s, x) => s + x.donors.filter((d) => d.status === 'CHECKED_IN').length, 0)}
           </div>
         </div>
         <div className="rounded-2xl border border-[var(--rose-100)] bg-white p-4">
-          <div className="text-[11px] font-mono font-bold text-[var(--burgundy-700)] uppercase">กำลังบริจาค</div>
-          <div className="mt-1 text-2xl font-black text-[var(--ink)]">
-            {queue.reduce((s, x) => s + x.donors.filter((d) => d.status === 'IN_PROCESS').length, 0)}
+          <div className="text-[11px] font-mono font-bold text-emerald-700 uppercase">บริจาคสำเร็จ & รับของที่ระลึก</div>
+          <div className="mt-1 text-2xl font-black text-emerald-900">
+            {queue.reduce((s, x) => s + x.donors.filter((d) => d.status === 'COMPLETED').length, 0)}
           </div>
         </div>
       </div>

@@ -16,6 +16,7 @@ export async function searchRegistrations(query: string) {
     const normPhone = normalizePhoneNumber(q);
     return await db.query.registrations.findMany({
       where: or(
+        eq(registrations.qrToken, q),
         ilike(registrations.registrationCode, `%${q}%`),
         ilike(registrations.firstName, `%${q}%`),
         ilike(registrations.lastName, `%${q}%`),
