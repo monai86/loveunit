@@ -1,14 +1,12 @@
 import { db } from '@/db';
 import { registrations, timeSlots, auditLogs, staffProfiles, user } from '@/db/schema';
-import { eq, desc, and } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { 
   isMemoryBackendAllowed, 
   getDashboardKPIs as memoryGetKPIs, 
   getAllRegistrations as memoryGetAllRegs, 
   logAuditAction as memoryLogAudit,
-  getInMemoryStaffProfiles,
-  upsertInMemoryStaff,
-  InMemoryStaffUser
+  getInMemoryStaffProfiles
 } from '@/lib/db/store';
 import { resolveActorId } from '@/lib/auth/server';
 import { StaffRole } from '@/lib/types/database';

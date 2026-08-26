@@ -15,14 +15,15 @@ export async function GET() {
     await requireAdmin();
     const staffList = await getAllStaffMembers();
     return NextResponse.json({ success: true, staff: staffList });
-  } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') {
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    if (err?.message === 'UNAUTHORIZED') {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-    if (error?.message === 'FORBIDDEN') {
+    if (err?.message === 'FORBIDDEN') {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
-    return NextResponse.json({ success: false, error: error?.message || 'Server error' }, { status: 500 });
+    return NextResponse.json({ success: false, error: err?.message || 'Server error' }, { status: 500 });
   }
 }
 
@@ -164,14 +165,15 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: false, message: 'Database unconfigured' }, { status: 500 });
-  } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') {
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    if (err?.message === 'UNAUTHORIZED') {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-    if (error?.message === 'FORBIDDEN') {
+    if (err?.message === 'FORBIDDEN') {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
-    return NextResponse.json({ success: false, error: error?.message || 'Server error' }, { status: 500 });
+    return NextResponse.json({ success: false, error: err?.message || 'Server error' }, { status: 500 });
   }
 }
 
@@ -234,7 +236,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     if (isMemoryBackendAllowed()) {
-      const res = await updateStaffRoleAndTeam({
+      await updateStaffRoleAndTeam({
         userId,
         role: 'ADMIN',
         team,
@@ -245,13 +247,14 @@ export async function PATCH(req: NextRequest) {
     }
 
     return NextResponse.json({ success: false, message: 'Database unconfigured' }, { status: 500 });
-  } catch (error: any) {
-    if (error?.message === 'UNAUTHORIZED') {
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    if (err?.message === 'UNAUTHORIZED') {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-    if (error?.message === 'FORBIDDEN') {
+    if (err?.message === 'FORBIDDEN') {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
-    return NextResponse.json({ success: false, error: error?.message || 'Server error' }, { status: 500 });
+    return NextResponse.json({ success: false, error: err?.message || 'Server error' }, { status: 500 });
   }
 }

@@ -56,6 +56,14 @@ export async function registerDonorAtomic(input: {
           return { success: false, errorCode: 'SLOT_NOT_FOUND', message: 'ไม่พบช่วงเวลาที่เลือก' };
         }
 
+        if (slotRow.booked_count >= slotRow.capacity) {
+          return {
+            success: false,
+            errorCode: 'SLOT_FULL',
+            message: 'ช่วงเวลานี้เพิ่งเต็ม กรุณาเลือกช่วงเวลาอื่น',
+          };
+        }
+
         // Increment booked_count
         await tx
           .update(timeSlots)

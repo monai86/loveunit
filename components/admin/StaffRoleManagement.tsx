@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   ShieldCheck, 
   UserPlus, 
@@ -9,7 +9,6 @@ import {
   X, 
   Edit2, 
   Search, 
-  KeyRound, 
   AlertCircle,
   RefreshCw,
   Eye,
@@ -26,7 +25,7 @@ interface Props {
 
 export function StaffRoleManagement({ initialStaffList = [] }: Props) {
   const [staffList, setStaffList] = useState<StaffListItem[]>(initialStaffList);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(initialStaffList.length === 0);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffListItem | null>(null);
@@ -42,7 +41,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
   const [formSuccess, setFormSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchStaff = async () => {
+  const fetchStaff = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/admin/staff');
@@ -55,13 +54,27 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    let ignore = false;
     if (initialStaffList.length === 0) {
-      fetchStaff();
+      fetch('/api/admin/staff')
+        .then((res) => res.json())
+        .then((data) => {
+          if (!ignore && data.success && data.staff) {
+            setStaffList(data.staff);
+          }
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (!ignore) setLoading(false);
+        });
     }
-  }, []);
+    return () => {
+      ignore = true;
+    };
+  }, [initialStaffList.length]);
 
   const handleOpenCreate = () => {
     setEditingStaff(null);
@@ -133,8 +146,8 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
       setTimeout(() => {
         setModalOpen(false);
       }, 1000);
-    } catch (err: any) {
-      setFormError(err.message || 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
     } finally {
       setSubmitting(false);
     }

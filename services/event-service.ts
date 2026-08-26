@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { events, timeSlots, eventContentBlocks } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
-import { isMemoryBackendAllowed, defaultEvent, defaultSlots, defaultContentBlocks } from '@/lib/db/store';
+import { defaultEvent, defaultSlots, defaultContentBlocks } from '@/lib/db/store';
 
 export async function getEventBySlug(slug: string) {
   if (db) {

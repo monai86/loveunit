@@ -1,6 +1,4 @@
-// Utility and Formatting Functions
-
-import { ParticipantType, DonationExperience, RegistrationStatus, StaffRole } from '@/lib/types/database';
+import { ParticipantType, DonationExperience, RegistrationStatus } from '@/lib/types/database';
 
 /**
  * Reads a field that may exist under a camelCase or snake_case key (dual-shape
@@ -158,6 +156,6 @@ export function formatActionLabel(action: string): string {
   return labels[action] || action;
 }
 
-export function getStaffRoleLabel(role?: string): string {
+export function getStaffRoleLabel(_role?: string): string {
   return 'ผู้ดูแลระบบ (Admin)';
 }

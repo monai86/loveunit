@@ -33,6 +33,7 @@ import { getAuthenticatedUser } from '@/lib/auth/server';
 import { WaitlistPanel } from '@/components/admin/WaitlistPanel';
 import { StaffRoleManagement } from '@/components/admin/StaffRoleManagement';
 import { getParticipantTypeLabel, getRegistrationStatusBadge, formatTimeRange } from '@/lib/utils/format';
+import { RegistrationStatus, ParticipantType } from '@/lib/types/database';
 
 export const dynamic = 'force-dynamic';
 
@@ -383,18 +384,33 @@ export default async function AdminDashboardPage() {
                   </td>
                 </tr>
               ) : (
-                recentRegistrations.map((reg: any) => {
-                  const badge = getRegistrationStatusBadge(reg.status);
-                  const slot = reg.timeSlot || reg.time_slot;
+                recentRegistrations.map((reg) => {
+                  const regObj = reg as {
+                    id: string;
+                    status: RegistrationStatus;
+                    timeSlot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
+                    time_slot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
+                    registration_code?: string;
+                    registrationCode?: string;
+                    first_name?: string;
+                    firstName?: string;
+                    last_name?: string;
+                    lastName?: string;
+                    participant_type?: ParticipantType;
+                    participantType?: ParticipantType;
+                    phone?: string;
+                  };
+                  const badge = getRegistrationStatusBadge(regObj.status);
+                  const slot = regObj.timeSlot || regObj.time_slot;
                   const timeLabel = slot
                     ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '')
                     : '09:00 – 14:00 น.';
-                  const regCode = reg.registration_code || reg.registrationCode || '';
-                  const fullName = `${reg.first_name || reg.firstName || ''} ${reg.last_name || reg.lastName || ''}`.trim();
-                  const pType = reg.participant_type || reg.participantType || 'STUDENT';
+                  const regCode = regObj.registration_code || regObj.registrationCode || '';
+                  const fullName = `${regObj.first_name || regObj.firstName || ''} ${regObj.last_name || regObj.lastName || ''}`.trim();
+                  const pType = regObj.participant_type || regObj.participantType || 'STUDENT';
 
                   return (
-                    <tr key={reg.id} className="hover:bg-gray-50/80 transition-colors">
+                    <tr key={regObj.id} className="hover:bg-gray-50/80 transition-colors">
                       <td className="p-3.5 font-mono font-bold text-[var(--burgundy-700)]">
                         {regCode}
                       </td>

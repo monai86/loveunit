@@ -9,18 +9,10 @@ import {
   CheckCircle2, 
   UserCheck, 
   Play, 
-  CheckSquare, 
   XCircle, 
   UserPlus,
   Camera,
-  RefreshCw,
-  Phone,
-  Clock,
-  Sparkles,
-  AlertTriangle,
   Heart,
-  ChevronRight,
-  ShieldCheck,
   Ban
 } from 'lucide-react';
 import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';

@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { MapPin, Phone, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import { MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 
 export function Footer() {
   const pathname = usePathname();

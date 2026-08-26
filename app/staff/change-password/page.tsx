@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   ShieldCheck, 
   Lock, 
@@ -12,8 +11,7 @@ import {
   KeyRound, 
   Eye, 
   EyeOff, 
-  ArrowLeft,
-  CheckCircle2
+  ArrowLeft
 } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 

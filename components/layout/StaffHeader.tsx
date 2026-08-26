@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { QrCode, UserPlus, BarChart3, LogOut, ShieldCheck, ListOrdered, Loader2, ArrowLeft } from 'lucide-react';
+import { QrCode, UserPlus, BarChart3, LogOut, ListOrdered, Loader2, ArrowLeft } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 
 export function StaffHeader() {

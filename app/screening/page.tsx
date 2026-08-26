@@ -6,15 +6,11 @@ import {
   CheckCircle2, 
   AlertTriangle, 
   XCircle, 
-  HelpCircle, 
   ArrowRight, 
   RotateCcw, 
   ShieldCheck, 
   Heart, 
   Info, 
-  Activity, 
-  Stethoscope, 
-  Pill, 
   Sparkles,
   ChevronRight
 } from 'lucide-react';
