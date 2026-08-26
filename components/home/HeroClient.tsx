@@ -122,7 +122,7 @@ export function HeroClient({
     <>
       {/* ============ HERO — full-bleed red field ============ */}
       <section className="hero-field relative overflow-hidden">
-        <div className="mx-auto max-w-7xl px-4 pt-6 pb-12 sm:px-6 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-16">
+        <div className="mx-auto max-w-6xl px-4 pt-6 pb-12 sm:px-6 sm:pt-10 sm:pb-16 lg:px-8 lg:pt-12 lg:pb-16">
           
           {/* Top Bar: Badges on left, Language Switcher on right (Balanced & Symmetric) */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
@@ -138,7 +138,7 @@ export function HeroClient({
             <div className="self-end sm:self-auto shrink-0">{toggle}</div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center">
 
             {/* Left Column: Headline, Description, Event Facts & CTAs (7 cols) */}
             <div className="lg:col-span-7 space-y-6">
@@ -174,32 +174,32 @@ export function HeroClient({
               </div>
 
               {/* CTAs Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div className="flex flex-wrap items-center gap-2.5 pt-2">
                 <Link 
                   href="/register" 
-                  className="btn-cream shadow-lg hover:shadow-xl font-display font-extrabold text-xs sm:text-sm px-5 sm:px-6 py-3.5 rounded-xl flex items-center gap-2 active:scale-95 transition-transform"
+                  className="btn-cream shadow-lg hover:shadow-xl font-display font-extrabold text-xs sm:text-sm px-4 sm:px-5 py-3 rounded-xl flex items-center gap-2 active:scale-95 transition-transform"
                 >
                   <span>{copy.ctaRegister}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link 
                   href="/screening" 
-                  className="btn-outline-cream border-amber-300/50 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20 font-bold text-xs sm:text-sm px-4 sm:px-5 py-3.5 rounded-xl flex items-center gap-1.5 transition-colors"
+                  className="btn-outline-cream border-amber-300/50 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20 font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-3 rounded-xl flex items-center gap-1.5 transition-colors"
                 >
                   <span>{isEn ? 'Self-Screening Quiz' : 'ประเมินความพร้อมตนเอง'}</span>
                 </Link>
                 <Link 
                   href="/knowledge" 
-                  className="btn-outline-cream border-white/20 bg-white/5 hover:bg-white/15 font-bold text-xs sm:text-sm px-4 sm:px-5 py-3.5 rounded-xl flex items-center gap-1.5 transition-colors"
+                  className="btn-outline-cream border-white/20 bg-white/5 hover:bg-white/15 font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-3 rounded-xl flex items-center gap-1.5 transition-colors"
                 >
                   <span>{isEn ? 'Knowledge & Labs' : 'ความรู้ & แล็บตรวจ'}</span>
                 </Link>
               </div>
             </div>
 
-            {/* Right Column: Official Event Poster (5 cols) */}
-            <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <div className="rise-in w-full max-w-xs sm:max-w-sm lg:max-w-xs xl:max-w-sm relative group">
+            {/* Right Column: Official Event Poster (5 cols) - Centered & Inward */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-center items-center">
+              <div className="rise-in w-full max-w-xs sm:max-w-sm lg:max-w-[320px] xl:max-w-[350px] relative group">
                 <Link 
                   href="/poster" 
                   className="block relative aspect-[1/1.414] rounded-2xl overflow-hidden shadow-2xl border-2 border-white/25 hover:border-white/60 transition-all duration-300 transform group-hover:scale-[1.01] group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
