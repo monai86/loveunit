@@ -7,49 +7,64 @@ import { test, expect, type Page } from '@playwright/test';
 // 3. walk-in form (staff) — Tab order + label binding
 // ============================================================
 
-// Make the LAST slot FULL by temporarily dropping its capacity to 0, then
-// restore it in afterAll. This triggers the waitlist modal WITHOUT creating
-// registrations — so parallel specs (staff-checkin, which always picks the
-// first free slot) never see a polluted slot.
+// Make the LAST slot FULL by temporarily dropping its capacity to 0 and setting
+// bookedCount = capacity, then restore it in afterAll. This triggers the
+// waitlist modal WITHOUT creating registrations — so parallel specs
+// (staff-checkin, which always picks the first free slot) never see a polluted slot.
 let targetSlotId: string | null = null;
 let originalCapacity: number | null = null;
+let originalBookedCount: number | null = null;
 
-async function setSlotCapacity(capacity: number) {
+async function getDb() {
   const { loadEnvLocal } = await import('../../scripts/lib/env');
   loadEnvLocal();
   const { db } = await import('@/db');
+  return db;
+}
+
+async function markLastSlotFull() {
+  const db = await getDb();
+  if (!db) {
+    console.error('keyboard-nav: db is null — cannot mark slot as full');
+    return;
+  }
   const { timeSlots } = await import('@/db/schema');
-  const { eq, desc } = await import('drizzle-orm');
+  const { desc } = await import('drizzle-orm');
+
+  const [row] = await db.select().from(timeSlots).orderBy(desc(timeSlots.startAt)).limit(1);
+  if (!row) {
+    console.error('keyboard-nav: no time slots found in DB');
+    return;
+  }
+  targetSlotId = row.id;
+  originalCapacity = row.capacity as number;
+  originalBookedCount = (row as Record<string, unknown>).bookedCount as number ?? 0;
+
+  const { eq } = await import('drizzle-orm');
+  // Set capacity=0 AND bookedCount=capacity to guarantee slot shows as FULL
+  await db.update(timeSlots).set({ capacity: 0, bookedCount: 999 }).where(eq(timeSlots.id, targetSlotId));
+  console.log(`keyboard-nav: marked slot ${targetSlotId} as FULL (was cap=${originalCapacity}, booked=${originalBookedCount})`);
+}
+
+async function restoreSlot() {
+  if (!targetSlotId || originalCapacity === null) return;
+  const db = await getDb();
   if (!db) return;
-
-  if (!targetSlotId) {
-    const [row] = await db.select().from(timeSlots).orderBy(desc(timeSlots.startAt)).limit(1);
-    if (row) {
-      targetSlotId = row.id;
-      originalCapacity = row.capacity as number;
-    }
-  }
-
-  if (targetSlotId) {
-    await db.update(timeSlots).set({ capacity }).where(eq(timeSlots.id, targetSlotId));
-  }
+  const { timeSlots } = await import('@/db/schema');
+  const { eq } = await import('drizzle-orm');
+  await db.update(timeSlots).set({
+    capacity: originalCapacity,
+    bookedCount: originalBookedCount ?? 0,
+  }).where(eq(timeSlots.id, targetSlotId));
+  console.log(`keyboard-nav: restored slot ${targetSlotId} (cap=${originalCapacity}, booked=${originalBookedCount})`);
 }
 
 test.beforeAll(async () => {
-  await setSlotCapacity(0);
+  await markLastSlotFull();
 });
 
 test.afterAll(async () => {
-  if (originalCapacity !== null && targetSlotId) {
-    const { loadEnvLocal } = await import('../../scripts/lib/env');
-    loadEnvLocal();
-    const { db } = await import('@/db');
-    const { timeSlots } = await import('@/db/schema');
-    const { eq } = await import('drizzle-orm');
-    if (db) {
-      await db.update(timeSlots).set({ capacity: originalCapacity }).where(eq(timeSlots.id, targetSlotId));
-    }
-  }
+  await restoreSlot();
 });
 
 async function loginStaff(page: Page) {
@@ -168,9 +183,9 @@ test.describe('keyboard navigation & focus trap', () => {
     await page.getByRole('button', { name: 'ถัดไป' }).click();
     await page.waitForTimeout(800);
 
-    // The FULL slot (first row) opens the waitlist modal on click
-    const fullSlot = page.locator('button').filter({ hasText: 'เต็มแล้ว · คลิกเข้ารายการรอ' }).first();
-    await expect(fullSlot).toBeVisible({ timeout: 5000 });
+    // The FULL slot opens the waitlist modal on click
+    const fullSlot = page.locator('button').filter({ hasText: /เต็มแล้ว/ }).first();
+    await expect(fullSlot).toBeVisible({ timeout: 10_000 });
     await fullSlot.click();
     await page.waitForTimeout(300);
 

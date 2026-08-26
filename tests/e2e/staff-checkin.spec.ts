@@ -112,11 +112,11 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
 
   // The result panel shows the registration code and the REGISTERED badge.
   await expect(page.getByText(donorCode, { exact: true })).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByText(/REGISTERED|ลงทะเบียนแล้ว/)).toBeVisible();
+  await expect(page.getByText(/REGISTERED|ลงทะเบียนแล้ว/).first()).toBeVisible();
 
   // 4) Check the donor in.
   await page.getByRole('button', { name: /เช็คอิน/ }).first().click();
-  await expect(page.getByText(/CHECKED IN|เช็คอินแล้ว/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText(/CHECKED IN|เช็คอินแล้ว/).first()).toBeVisible({ timeout: 15_000 });
 });
 
 test.afterAll(async ({ request }) => {
