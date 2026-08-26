@@ -40,4 +40,12 @@ test('donor can register online and reach the QR pass', async ({ page }) => {
   await expect(page.locator('svg[role="img"]')).toBeVisible();
   await expect(page.getByText(firstName)).toBeVisible();
   await expect(page.getByText(lastName)).toBeVisible();
+
+  // Clean up created donor so test data does not linger in DB
+  const match = page.url().match(/\/registration\/(MBD26-[A-Z0-9]+)/);
+  if (match && match[1]) {
+    await page.request.post('/api/events/mumt-2026/cancel', {
+      data: { registrationCode: match[1], reason: 'E2E test teardown cleanup' },
+    });
+  }
 });

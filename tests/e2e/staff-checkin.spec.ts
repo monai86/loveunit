@@ -124,6 +124,11 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
 });
 
 test.afterAll(async ({ request }) => {
+  if (donorCode) {
+    await request.post('/api/events/mumt-2026/cancel', {
+      data: { registrationCode: donorCode, reason: 'E2E teardown cleanup' },
+    }).catch(() => {});
+  }
   // Restore the staff password so the next run can sign in again.
   // If the account was forced to NEW_PASS this run, rotate back to STAFF_PASS.
   const cookie = await signIn(request, STAFF_EMAIL, NEW_PASS);

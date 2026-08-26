@@ -13,12 +13,26 @@ loadEnvLocal();
 
 async function main() {
   const { db } = await import('@/db');
-  const { events, timeSlots, eventContentBlocks } = await import('@/db/schema');
-  const { eq, sql } = await import('drizzle-orm');
+  const { events, timeSlots, eventContentBlocks, registrations } = await import('@/db/schema');
+  const { eq, sql, or, ilike } = await import('drizzle-orm');
 
   if (!db) {
     console.error('❌ DATABASE_URL not set — cannot seed.');
     process.exit(1);
+  }
+
+  // 0) Clean up automated test mock records so real database stats stay clean
+  try {
+    await db.delete(registrations).where(or(
+      ilike(registrations.firstName, 'อีทูอี%'),
+      ilike(registrations.firstName, 'เอ็มที%'),
+      ilike(registrations.firstName, 'วอล์กอิน%'),
+      ilike(registrations.firstName, 'กากาาก%'),
+      ilike(registrations.firstName, 'สมชาย%'),
+      ilike(registrations.firstName, 'สมหญิง%')
+    ));
+  } catch {
+    // ignore
   }
 
   const EVENT_ID = 'e1111111-1111-1111-1111-111111111111';
