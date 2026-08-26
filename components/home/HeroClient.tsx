@@ -2,8 +2,8 @@
 
 import React, { useSyncExternalStore } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Heart, Calendar, Clock, MapPin, ArrowRight } from 'lucide-react';
-import { TicketStub } from '@/components/ui/TicketStub';
 import { formatThaiDate, formatTimeRange } from '@/lib/utils/format';
 
 type Lang = 'th' | 'en';
@@ -186,33 +186,43 @@ export function HeroClient({
               </div>
             </div>
 
-            {/* Right: ticket breaks out of the hero bottom edge */}
+            {/* Right: Official Event Poster breaks out of the hero */}
             <div className="lg:col-span-5 hidden lg:flex justify-end">
-              <div className="rise-in w-full max-w-md rotate-2 origin-top-right relative z-10 lg:translate-y-24">
-                <TicketStub
-                  registrationCode="MBD26-DONORPASS"
-                  name={copy.stubName}
-                  date="16 SEP 2026"
-                  timeSlot={copy.stubTime}
-                  venue={copy.stubVenue}
-                  unitNumber="09"
-                />
+              <div className="rise-in w-full max-w-sm relative z-10 lg:translate-y-16 group">
+                <Link href="/poster" className="block relative aspect-[1/1.414] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 hover:border-white/50 transition-all duration-300 transform group-hover:-translate-y-2 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                  <Image
+                    src={isEn ? '/images/poster-en.jpg' : '/images/poster-th.jpg'}
+                    alt="MUMT Blood Donation 2026 Official Poster"
+                    fill
+                    sizes="(min-width: 1024px) 400px, 90vw"
+                    className="object-cover"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-4">
+                    <span className="text-xs font-black text-white bg-[var(--burgundy-600)] px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5">
+                      <span>คลิกเพื่อดูโปสเตอร์เต็ม</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </span>
+                  </div>
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Mobile ticket — hangs off the hero bottom */}
-      <div className="lg:hidden mx-auto -mt-24 max-w-md px-4 sm:px-6 relative z-10">
-        <TicketStub
-          registrationCode="MBD26-DONORPASS"
-          name={copy.stubName}
-          date="16 SEP 2026"
-          timeSlot={copy.stubTime}
-          venue={copy.stubVenue}
-          unitNumber="09"
-        />
+      {/* Mobile Poster — hangs off the hero bottom */}
+      <div className="lg:hidden mx-auto -mt-16 max-w-xs px-4 relative z-10">
+        <Link href="/poster" className="block relative aspect-[1/1.414] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/30">
+          <Image
+            src={isEn ? '/images/poster-en.jpg' : '/images/poster-th.jpg'}
+            alt="MUMT Blood Donation 2026 Official Poster"
+            fill
+            sizes="300px"
+            className="object-cover"
+            priority
+          />
+        </Link>
       </div>
     </>
   );

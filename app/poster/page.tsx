@@ -395,15 +395,38 @@ export default function PosterPage() {
             </h3>
             <div className="p-4 rounded-xl bg-[var(--rose-100)]/50 border border-[var(--line)] space-y-2 text-xs font-bold text-[var(--ink)]">
               <div className="flex items-center justify-between">
-                <span>คุณเปา</span>
+                <span>เปา</span>
                 <a href="tel:0969866245" className="font-mono text-sm text-[var(--burgundy-700)] hover:underline">09-6986-6245</a>
               </div>
               <div className="flex items-center justify-between border-t border-[var(--line)] pt-2">
-                <span>คุณแตงโม</span>
+                <span>แตงโม</span>
                 <a href="tel:0656274319" className="font-mono text-sm text-[var(--burgundy-700)] hover:underline">06-5627-4319</a>
               </div>
-              <div className="border-t border-[var(--line)] pt-2 text-[11px] text-[var(--muted)]">
-                ติดตามข่าวสาร: <strong>@mumt_loveunit</strong> (IG / TikTok) และ Facebook <strong>เติมรักให้เต็มยูนิต ต่อชีวิตด้วยโลหิตคุณ</strong>
+              <div className="border-t border-[var(--line)] pt-2.5 flex flex-wrap gap-2 text-[11px]">
+                <a
+                  href="https://www.instagram.com/mumt_loveunit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-md bg-white border border-pink-200 text-pink-700 font-bold hover:underline"
+                >
+                  IG: @mumt_loveunit
+                </a>
+                <a
+                  href="https://www.tiktok.com/@mumt_loveunit"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-md bg-gray-900 text-white font-bold hover:underline"
+                >
+                  TikTok: @mumt_loveunit
+                </a>
+                <a
+                  href="https://www.facebook.com/profile.php?id=100064643707063&utm_source=ig&utm_medium=social&utm_content=link_in_bio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 rounded-md bg-blue-50 border border-blue-200 text-blue-700 font-bold hover:underline"
+                >
+                  Facebook Page
+                </a>
               </div>
             </div>
           </div>

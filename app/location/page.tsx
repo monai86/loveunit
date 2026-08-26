@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Bus, Car, ArrowRight } from 'lucide-react';
+import { Bus, Car, ArrowRight, MapPin } from 'lucide-react';
 import { getEventBySlug, getEventContentBlocks } from '@/services/event-service';
 import { InfographicSlot } from '@/components/infographic/InfographicSlot';
 import { pickField } from '@/lib/utils/format';
@@ -44,10 +44,22 @@ export default async function LocationPage() {
               <p className="pt-2 text-sm font-bold text-[var(--burgundy-700)]">
                 วันพุธที่ 16 กันยายน 2569 (09:00 - 14:00 น.)
               </p>
+              <div className="pt-2">
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=อาคารสิริวิทยา+คณะศิลปศาสตร์+มหาวิทยาลัยมหิดล+ศาลายา"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 text-xs font-black flex items-center justify-center gap-2 transition-all shadow-xs"
+                >
+                  <MapPin className="h-4 w-4 text-blue-600 shrink-0" />
+                  <span>🗺️ เปิดนำทางใน Google Maps</span>
+                </a>
+              </div>
+
               <div className="pt-2 border-t border-[var(--rose-100)] text-[11px] font-bold text-[var(--muted)] space-y-1">
                 <p>📞 ติดต่อสอบถามเส้นทางในวันงาน:</p>
-                <p>• คุณเปา: <a href="tel:0969866245" className="text-[var(--burgundy-700)] underline">09-6986-6245</a></p>
-                <p>• คุณแตงโม: <a href="tel:0656274319" className="text-[var(--burgundy-700)] underline">06-5627-4319</a></p>
+                <p>• เปา: <a href="tel:0969866245" className="text-[var(--burgundy-700)] underline">09-6986-6245</a></p>
+                <p>• แตงโม: <a href="tel:0656274319" className="text-[var(--burgundy-700)] underline">06-5627-4319</a></p>
               </div>
             </div>
           </div>

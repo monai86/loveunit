@@ -64,7 +64,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Public Navigation */}
-        <nav className="hidden items-center gap-1 xl:gap-2 lg:flex">
+        <nav className="hidden items-center gap-1 xl:gap-2 lg:flex shrink-0">
           {navLinks.map((item) => {
             const Icon = item.icon;
             const isActive = mounted && (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
@@ -72,7 +72,7 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-1.5 xl:gap-2 rounded-xl px-3 xl:px-4 py-2 text-sm font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-1.5 xl:gap-2 rounded-xl px-2.5 xl:px-3.5 py-2 text-xs xl:text-sm font-black whitespace-nowrap shrink-0 transition-all ${
                   isActive
                     ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)]'
                     : 'text-[var(--ink)] hover:bg-[var(--rose-100)]/60 hover:text-[var(--burgundy-700)]'
@@ -84,14 +84,14 @@ export function Navbar() {
             );
           })}
 
-          <div className="ml-3 border-l border-[var(--line)] pl-3">
+          <div className="ml-2 xl:ml-3 border-l border-[var(--line)] pl-2 xl:pl-3 shrink-0">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 bg-[var(--burgundy-600)] hover:bg-[var(--burgundy-700)] text-white font-extrabold px-5 py-2.5 rounded-xl text-sm shadow-md transition-all active:scale-95"
+              className="inline-flex items-center gap-2 bg-[var(--burgundy-600)] hover:bg-[var(--burgundy-700)] text-white font-extrabold px-3.5 xl:px-5 py-2.5 rounded-xl text-xs xl:text-sm shadow-md transition-all active:scale-95 whitespace-nowrap shrink-0"
             >
-              <Heart className="h-4 w-4 fill-white" />
+              <Heart className="h-4 w-4 fill-white shrink-0" />
               <span>ลงทะเบียนบริจาคโลหิต</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-3.5 w-3.5 shrink-0" />
             </Link>
           </div>
         </nav>

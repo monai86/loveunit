@@ -345,8 +345,8 @@ export default async function HomePage() {
               ติดต่อทีมงานผู้ประสานงาน หรือติดตามข้อมูลอัปเดตผ่านช่องทางโซเชียลมีเดีย
             </p>
             <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-1 text-xs font-bold text-[var(--burgundy-700)]">
-              <span>📞 คุณเปา: <a href="tel:0969866245" className="underline">09-6986-6245</a></span>
-              <span>📞 คุณแตงโม: <a href="tel:0656274319" className="underline">06-5627-4319</a></span>
+              <span>📞 เปา: <a href="tel:0969866245" className="underline">09-6986-6245</a></span>
+              <span>📞 แตงโม: <a href="tel:0656274319" className="underline">06-5627-4319</a></span>
             </div>
           </div>
 

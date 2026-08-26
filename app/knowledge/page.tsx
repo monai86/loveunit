@@ -6,20 +6,16 @@ import Image from 'next/image';
 import { 
   Microscope, 
   ShieldCheck, 
-  Dna, 
   Activity, 
-  Heart, 
+  Heart,
   Layers, 
   Sparkles, 
   ChevronRight, 
-  ArrowRight, 
   CheckCircle2, 
-  Info,
   Droplets,
   Share2,
   Check,
-  AlertTriangle,
-  FileText
+  AlertTriangle
 } from 'lucide-react';
 
 type TabType = 'LAB_TESTING' | 'COMPONENTS' | 'ABO_RH_SYSTEM' | 'BENEFITS';
@@ -27,7 +23,6 @@ type TabType = 'LAB_TESTING' | 'COMPONENTS' | 'ABO_RH_SYSTEM' | 'BENEFITS';
 export default function KnowledgePage() {
   const [activeTab, setActiveTab] = useState<TabType>('LAB_TESTING');
   const [selectedBloodGroup, setSelectedBloodGroup] = useState<'O' | 'A' | 'B' | 'AB'>('O');
-  const [selectedRh, setSelectedRh] = useState<'POS' | 'NEG'>('POS');
   const [copied, setCopied] = useState(false);
 
   const bloodGroupStats = [
@@ -394,122 +389,66 @@ export default function KnowledgePage() {
       {activeTab === 'ABO_RH_SYSTEM' && (
         <section className="space-y-8 animate-in fade-in duration-200">
           
-          {/* SECTION A: RH POSITIVE VS RH NEGATIVE COMPARISON */}
-          <div className="editorial-card p-6 sm:p-8 space-y-6">
-            <div className="space-y-2 border-b border-[var(--line)] pb-4">
-              <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 text-blue-900 px-3 py-0.5 text-xs font-black">
-                <span>ความรู้เรื่องกรุ๊ปเลือด ตอนที่ 2</span>
-              </div>
-              <h2 className="text-2xl font-black text-[var(--ink)]">
-                Rh+ vs Rh- : ทำความเข้าใจหมู่เลือดและหมู่เลือดหายาก (Rare Blood)
-              </h2>
-              <p className="text-xs text-[var(--muted)]">
-                อ้างอิง: ศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย และ <em>บทที่ 4 การทดสอบโลหิตบริจาค</em>
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              
-              {/* Infographic Post 2 Image Display */}
-              <div className="lg:col-span-5 space-y-2">
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-[var(--line)] bg-white shadow-md">
-                  <Image
-                    src="/images/education/blood-groups-part2.png"
-                    alt="Rh+ vs Rh- ความรู้เรื่องกรุ๊ปเลือด 2"
-                    fill
-                    sizes="(min-width: 1024px) 40vw, 90vw"
-                    className="object-contain"
-                  />
-                </div>
-                <p className="text-[11px] text-center font-bold text-[var(--muted)]">
-                  ภาพ: อินโฟกราฟิกความรู้เรื่องกรุ๊ปเลือด ตอนที่ 2 (Rh+ vs Rh-)
-                </p>
-              </div>
-
-              {/* Detailed Breakdown Table & Facts */}
-              <div className="lg:col-span-7 space-y-4">
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  
-                  {/* Rh Positive Card */}
-                  <div className="p-4 rounded-2xl bg-red-50/70 border border-red-200 space-y-2 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-1 rounded-full bg-red-600 text-white font-black font-mono text-xs">
-                        Rh Positive (Rh+)
-                      </span>
-                      <span className="font-bold text-red-900">99.7% ในคนไทย</span>
-                    </div>
-                    <div className="space-y-1.5 pt-1 text-[var(--ink)] font-medium">
-                      <p>• <strong>แอนติเจน:</strong> มีแอนติเจน D บนผิวเม็ดเลือดแดง</p>
-                      <p>• <strong>การรับเลือด:</strong> รับเลือดได้ทั้ง Rh+ และ Rh-</p>
-                      <p>• <strong>การให้เลือด:</strong> ให้เลือดแก่ผู้ป่วย <strong>Rh+ เท่านั้น!</strong></p>
-                      <p className="text-[11px] text-red-800 pt-1">
-                        เป็นหมู่เลือดหลักของคนไทย จึงมีความต้องการใช้ในโรงพยาบาลปริมาณมากอย่างต่อเนื่อง
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Rh Negative Card */}
-                  <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-1 rounded-full bg-blue-600 text-white font-black font-mono text-xs">
-                        Rh Negative (Rh-)
-                      </span>
-                      <span className="font-bold text-blue-900">0.3% ในคนไทย</span>
-                    </div>
-                    <div className="space-y-1.5 pt-1 text-[var(--ink)] font-medium">
-                      <p>• <strong>แอนติเจน:</strong> <strong>ไม่มีแอนติเจน D</strong> บนผิวเม็ดเลือดแดง</p>
-                      <p>• <strong>การรับเลือด:</strong> <strong className="text-red-700 underline">รับเลือดจาก Rh- เท่านั้น!</strong></p>
-                      <p>• <strong>การให้เลือด:</strong> ให้เลือดแก่ผู้ป่วยได้ทั้ง Rh+ และ Rh-</p>
-                      <p className="text-[11px] text-blue-800 pt-1">
-                        พบเพียง 3 ใน 1,000 คน เรียกว่า <strong>“หมู่เลือดหายาก (Rare Blood)”</strong> เสี่ยงขาดแคลนเมื่อฉุกเฉิน
-                      </p>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Important Clinical Insights Alert */}
-                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1.5">
-                  <div className="flex items-center gap-2 font-black text-amber-900">
-                    <AlertTriangle className="h-4 w-4 text-amber-700 shrink-0" />
-                    <span>ความสำคัญทางการแพทย์: ทำไม Rh- ต้องรับเฉพาะ Rh- เท่านั้น?</span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed text-amber-900 font-medium">
-                    หากผู้ป่วยที่มีหมู่เลือด Rh-Negative ได้รับเม็ดเลือดแดง Rh-Positive ร่างกายจะถูกกระตุ้นให้สร้างภูมิคุ้มกัน <strong>Anti-D</strong> ซึ่งจะทำให้เกิดปฏิกิริยาเม็ดเลือดแดงแตกอย่างรุนแรง (Hemolytic Transfusion Reaction) ในการรับเลือดครั้งต่อไป หรือก่อให้เกิดภาวะทารกบวมน้ำและเม็ดเลือดแดงแตกในครรภ์ (Hemolytic Disease of the Fetus and Newborn: HDFN) ในหญิงตั้งครรภ์
-                  </p>
-                </div>
-
-                {/* Weak D Note */}
-                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-700 space-y-1">
-                  <span className="font-bold text-[var(--ink)] block text-[11px]">🔬 การตรวจ Weak D ในห้องปฏิบัติการ:</span>
-                  <p className="text-[11px] text-[var(--muted)] leading-relaxed">
-                    ผู้บริจาคที่มีแอนติเจน D อ่อนแรง (Weak D) ทางห้องปฏิบัติการจะจัดให้เป็น <strong>Rh-Positive</strong> เสมอ เพื่อความปลอดภัยของผู้รับโลหิต Rh-Negative ที่อาจถูกกระตุ้นให้สร้าง Anti-D ได้
-                  </p>
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-
-          {/* SECTION B: ABO BLOOD COMPATIBILITY (FEATURING POST 1) */}
+          {/* SECTION 1: ABO BLOOD COMPATIBILITY (FEATURING POST 1) */}
           <div className="editorial-card p-6 sm:p-8 space-y-6">
             <div className="space-y-2 border-b border-[var(--line)] pb-4">
               <div className="inline-flex items-center gap-2 rounded-full bg-red-100 text-[var(--burgundy-700)] px-3 py-0.5 text-xs font-black">
                 <span>ความรู้เรื่องกรุ๊ปเลือด ตอนที่ 1</span>
               </div>
               <h2 className="text-2xl font-black text-[var(--ink)]">
-                เลือดกรุ๊ปไหน ให้ใครได้บ้าง? (Interactive ABO Matrix)
+                ระบบหมู่เลือด ABO : เลือดกรุ๊ปไหน ให้ใครได้บ้าง? (Interactive Matrix)
               </h2>
               <p className="text-xs text-[var(--muted)]">
-                ตารางความเข้ากันได้ของเม็ดเลือดแดงและพลาสมา พร้อมสถิติในประชากรไทย
+                ตารางความเข้ากันได้ของเม็ดเลือดแดงและพลาสมา พร้อมสถิติในประชากรไทย อ้างอิงศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย
               </p>
             </div>
 
+            {/* Infographic Post 1 Image Display & Quick Summary */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-5 space-y-2">
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-[var(--line)] bg-white shadow-md">
+                  <Image
+                    src="/images/education/blood-groups-part1.png"
+                    alt="ความรู้เรื่องกรุ๊ปเลือด ตอนที่ 1 ABO"
+                    fill
+                    sizes="(min-width: 1024px) 40vw, 90vw"
+                    className="object-contain"
+                  />
+                </div>
+                <p className="text-[11px] text-center font-bold text-[var(--muted)]">
+                  ภาพ: อินโฟกราฟิกความรู้เรื่องกรุ๊ปเลือด ตอนที่ 1 (ระบบหมู่เลือด ABO)
+                </p>
+              </div>
+
+              {/* Thai Blood Group Distribution Stats */}
+              <div className="lg:col-span-7 space-y-4">
+                <h3 className="text-sm font-black text-[var(--ink)]">
+                  สัดส่วนหมู่เลือดในประชากรไทย (Thai Population Distribution)
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {bloodGroupStats.map((item) => (
+                    <div key={item.group} className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xl font-black font-mono text-[var(--burgundy-700)]">
+                          กรุ๊ป {item.group}
+                        </span>
+                        <span className="text-base font-black font-mono text-gray-900">
+                          {item.percent}%
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
+                        <div className="h-full bg-[var(--burgundy-600)]" style={{ width: `${item.percent * 2.5}%` }} />
+                      </div>
+                      <p className="text-[10px] text-[var(--muted)] leading-tight">{item.role}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* Blood Group Selectors */}
-            <div className="space-y-3">
-              <span className="text-xs font-black text-[var(--ink)] block">เลือกหมู่เลือดที่ต้องการตรวจสอบ:</span>
+            <div className="space-y-3 pt-4 border-t border-[var(--line)]">
+              <span className="text-xs font-black text-[var(--ink)] block">เลือกหมู่เลือดเพื่อดูผลจำลองการให้-รับเลือด:</span>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {(['O', 'A', 'B', 'AB'] as const).map((grp) => {
                   const isSelected = selectedBloodGroup === grp;
@@ -519,7 +458,7 @@ export default function KnowledgePage() {
                       key={grp}
                       type="button"
                       onClick={() => setSelectedBloodGroup(grp)}
-                      className={`p-4 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
+                      className={`p-4 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
                         isSelected
                           ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-md ring-2 ring-[var(--burgundy-700)] scale-105'
                           : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
@@ -617,33 +556,105 @@ export default function KnowledgePage() {
 
               </div>
             </div>
+          </div>
 
-            {/* Thai Blood Group Distribution Stats */}
-            <div className="space-y-4 pt-4 border-t border-[var(--line)]">
-              <h3 className="text-base font-black text-[var(--ink)]">
-                สัดส่วนหมู่เลือดในประชากรไทย (Thai Population Distribution)
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {bloodGroupStats.map((item) => (
-                  <div key={item.group} className="p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-black font-mono text-[var(--burgundy-700)]">
-                        กรุ๊ป {item.group}
-                      </span>
-                      <span className="text-lg font-black font-mono text-gray-900">
-                        {item.percent}%
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
-                      <div className="h-full bg-[var(--burgundy-600)]" style={{ width: `${item.percent * 2.5}%` }} />
-                    </div>
-                    <p className="text-[11px] text-[var(--muted)] leading-tight">{item.role}</p>
-                  </div>
-                ))}
+          {/* SECTION 2: RH POSITIVE VS RH NEGATIVE COMPARISON (FEATURING POST 2) */}
+          <div className="editorial-card p-6 sm:p-8 space-y-6">
+            <div className="space-y-2 border-b border-[var(--line)] pb-4">
+              <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 text-blue-900 px-3 py-0.5 text-xs font-black">
+                <span>ความรู้เรื่องกรุ๊ปเลือด ตอนที่ 2</span>
               </div>
+              <h2 className="text-2xl font-black text-[var(--ink)]">
+                Rh+ vs Rh- : ทำความเข้าใจหมู่เลือดและหมู่เลือดหายาก (Rare Blood)
+              </h2>
+              <p className="text-xs text-[var(--muted)]">
+                อ้างอิง: ศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย และ <em>บทที่ 4 การทดสอบโลหิตบริจาค</em>
+              </p>
             </div>
 
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              
+              {/* Infographic Post 2 Image Display */}
+              <div className="lg:col-span-5 space-y-2">
+                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-[var(--line)] bg-white shadow-md">
+                  <Image
+                    src="/images/education/blood-groups-part2.png"
+                    alt="Rh+ vs Rh- ความรู้เรื่องกรุ๊ปเลือด 2"
+                    fill
+                    sizes="(min-width: 1024px) 40vw, 90vw"
+                    className="object-contain"
+                  />
+                </div>
+                <p className="text-[11px] text-center font-bold text-[var(--muted)]">
+                  ภาพ: อินโฟกราฟิกความรู้เรื่องกรุ๊ปเลือด ตอนที่ 2 (Rh+ vs Rh-)
+                </p>
+              </div>
+
+              {/* Detailed Breakdown Table & Facts */}
+              <div className="lg:col-span-7 space-y-4">
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  
+                  {/* Rh Positive Card */}
+                  <div className="p-4 rounded-2xl bg-red-50/70 border border-red-200 space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-1 rounded-full bg-red-600 text-white font-black font-mono text-xs">
+                        Rh Positive (Rh+)
+                      </span>
+                      <span className="font-bold text-red-900">99.7% ในคนไทย</span>
+                    </div>
+                    <div className="space-y-1.5 pt-1 text-[var(--ink)] font-medium">
+                      <p>• <strong>แอนติเจน:</strong> มีแอนติเจน D บนผิวเม็ดเลือดแดง</p>
+                      <p>• <strong>การรับเลือด:</strong> รับเลือดได้ทั้ง Rh+ และ Rh-</p>
+                      <p>• <strong>การให้เลือด:</strong> ให้เลือดแก่ผู้ป่วย <strong>Rh+ เท่านั้น!</strong></p>
+                      <p className="text-[11px] text-red-800 pt-1">
+                        เป็นหมู่เลือดหลักของคนไทย จึงมีความต้องการใช้ในโรงพยาบาลปริมาณมากอย่างต่อเนื่อง
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Rh Negative Card */}
+                  <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="px-2.5 py-1 rounded-full bg-blue-600 text-white font-black font-mono text-xs">
+                        Rh Negative (Rh-)
+                      </span>
+                      <span className="font-bold text-blue-900">0.3% ในคนไทย</span>
+                    </div>
+                    <div className="space-y-1.5 pt-1 text-[var(--ink)] font-medium">
+                      <p>• <strong>แอนติเจน:</strong> <strong>ไม่มีแอนติเจน D</strong> บนผิวเม็ดเลือดแดง</p>
+                      <p>• <strong>การรับเลือด:</strong> <strong className="text-red-700 underline">รับเลือดจาก Rh- เท่านั้น!</strong></p>
+                      <p>• <strong>การให้เลือด:</strong> ให้เลือดแก่ผู้ป่วยได้ทั้ง Rh+ และ Rh-</p>
+                      <p className="text-[11px] text-blue-800 pt-1">
+                        พบเพียง 3 ใน 1,000 คน เรียกว่า <strong>“หมู่เลือดหายาก (Rare Blood)”</strong> เสี่ยงขาดแคลนเมื่อฉุกเฉิน
+                      </p>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Important Clinical Insights Alert */}
+                <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1.5">
+                  <div className="flex items-center gap-2 font-black text-amber-900">
+                    <AlertTriangle className="h-4 w-4 text-amber-700 shrink-0" />
+                    <span>ความสำคัญทางการแพทย์: ทำไม Rh- ต้องรับเฉพาะ Rh- เท่านั้น?</span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-amber-900 font-medium">
+                    หากผู้ป่วยที่มีหมู่เลือด Rh-Negative ได้รับเม็ดเลือดแดง Rh-Positive ร่างกายจะถูกกระตุ้นให้สร้างภูมิคุ้มกัน <strong>Anti-D</strong> ซึ่งจะทำให้เกิดปฏิกิริยาเม็ดเลือดแดงแตกอย่างรุนแรง (Hemolytic Transfusion Reaction) ในการรับเลือดครั้งต่อไป หรือก่อให้เกิดภาวะทารกบวมน้ำและเม็ดเลือดแดงแตกในครรภ์ (Hemolytic Disease of the Fetus and Newborn: HDFN) ในหญิงตั้งครรภ์
+                  </p>
+                </div>
+
+                {/* Weak D Note */}
+                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-700 space-y-1">
+                  <span className="font-bold text-[var(--ink)] block text-[11px]">🔬 การตรวจ Weak D ในห้องปฏิบัติการ:</span>
+                  <p className="text-[11px] text-[var(--muted)] leading-relaxed">
+                    ผู้บริจาคที่มีแอนติเจน D อ่อนแรง (Weak D) ทางห้องปฏิบัติการจะจัดให้เป็น <strong>Rh-Positive</strong> เสมอ เพื่อความปลอดภัยของผู้รับโลหิต Rh-Negative ที่อาจถูกกระตุ้นให้สร้าง Anti-D ได้
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
           </div>
 
         </section>

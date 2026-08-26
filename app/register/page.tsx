@@ -125,7 +125,12 @@ export default function RegisterPage() {
 
   const validateStep2 = () => {
     if (!formData.participantType) return 'กรุณาเลือกประเภทผู้เข้าร่วม';
-    if (formData.participantType === 'STUDENT' && !formData.faculty) return 'กรุณาเลือกคณะ / หน่วยงาน';
+    if (formData.participantType !== 'GENERAL_PUBLIC' && (!formData.faculty || formData.faculty === '')) {
+      return 'กรุณาเลือกคณะ / หน่วยงาน';
+    }
+    if (formData.participantType === 'STUDENT' && !formData.academicYear) {
+      return 'กรุณาเลือกระดับชั้นปีการศึกษา';
+    }
     if (!formData.donationExperience) return 'กรุณาเลือกประสบการณ์การบริจาค';
     return null;
   };
@@ -380,10 +385,18 @@ export default function RegisterPage() {
                       <button
                         key={type.id}
                         type="button"
-                        onClick={() => setFormData({ ...formData, participantType: type.id })}
-                        className={`p-3 rounded-lg border text-left text-xs font-bold transition-all ${
+                        onClick={() => {
+                          const isGeneral = type.id === 'GENERAL_PUBLIC';
+                          setFormData({ 
+                            ...formData, 
+                            participantType: type.id,
+                            faculty: isGeneral ? 'บุคคลทั่วไป' : (formData.faculty === 'บุคคลทั่วไป' ? '' : formData.faculty),
+                            academicYear: isGeneral ? '' : formData.academicYear
+                          });
+                        }}
+                        className={`p-3 rounded-lg border text-left text-xs font-bold transition-all cursor-pointer ${
                           formData.participantType === type.id
-                            ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]'
+                            ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1 ring-[var(--burgundy-700)]'
                             : 'border-gray-200 hover:border-gray-300 text-editorial-ink'
                         }`}
                       >
@@ -393,23 +406,27 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label htmlFor="reg-faculty" className="block text-xs font-bold text-editorial-ink mb-1.5">
-                    คณะ / หน่วยงาน <span className="text-red-600">*</span>
-                  </label>
-                  <select
-                    id="reg-faculty"
-                    value={formData.faculty}
-                    onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
-                    className="editorial-input"
-                  >
-                    {MAHIDOL_FACULTIES.map((fac) => (
-                      <option key={fac.code} value={fac.name}>
-                        {fac.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                {/* Faculty selector — only for Students and University Staff */}
+                {formData.participantType !== 'GENERAL_PUBLIC' && (
+                  <div>
+                    <label htmlFor="reg-faculty" className="block text-xs font-bold text-editorial-ink mb-1.5">
+                      คณะ / หน่วยงาน <span className="text-red-600">*</span>
+                    </label>
+                    <select
+                      id="reg-faculty"
+                      value={formData.faculty}
+                      onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
+                      className="editorial-input"
+                    >
+                      <option value="">-- กรุณาเลือกคณะ / หน่วยงาน --</option>
+                      {MAHIDOL_FACULTIES.map((fac) => (
+                        <option key={fac.code} value={fac.name}>
+                          {fac.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 {formData.participantType === 'STUDENT' && (
                   <div>
@@ -422,6 +439,7 @@ export default function RegisterPage() {
                       onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
                       className="editorial-input"
                     >
+                      <option value="">-- กรุณาเลือกระดับชั้นปี --</option>
                       {ACADEMIC_YEARS.map((yr) => (
                         <option key={yr.value} value={yr.value}>
                           {yr.label}
@@ -446,9 +464,9 @@ export default function RegisterPage() {
                           key={exp.id}
                           type="button"
                           onClick={() => setFormData({ ...formData, donationExperience: exp.id })}
-                          className={`p-3 rounded-lg border text-center text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                          className={`p-3 rounded-lg border text-center text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                             formData.donationExperience === exp.id
-                              ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]'
+                              ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1 ring-[var(--burgundy-700)]'
                               : 'border-gray-200 hover:border-gray-300 text-[var(--ink)]'
                           }`}
                         >
@@ -465,58 +483,62 @@ export default function RegisterPage() {
             {/* STEP 3: TIME SLOT SELECTION (TIMETABLE LIST) */}
             {step === 3 && (
               <div className="space-y-5">
-                <h3 className="text-sm font-black text-[var(--burgundy-700)] uppercase tracking-wider border-b border-[var(--rose-100)] pb-2">
-                  03. เลือกรอบเวลาแนะนำเดินทางมาถึง (16 ก.ย. 2569)
-                </h3>
+                <div className="space-y-2 border-b border-[var(--rose-100)] pb-2">
+                  <h3 className="text-sm font-black text-[var(--burgundy-700)] uppercase tracking-wider">
+                    03. เลือกรอบเวลาแนะนำเดินทางมาถึง (16 ก.ย. 2569)
+                  </h3>
+                  <p className="text-xs text-[var(--muted)]">
+                    เลือกช่วงเวลาที่ท่านสะดวก เพื่อให้เจ้าหน้าที่จัดเตรียมและดูแลท่านได้อย่างรวดเร็ว
+                  </p>
+                </div>
+
+                {/* 100 Exclusive Gifts Notice */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-200/80 space-y-1.5 shadow-xs">
+                  <div className="flex items-center gap-2 font-black text-amber-950 text-xs">
+                    <Sparkles className="h-4 w-4 text-amber-600 shrink-0" />
+                    <span>🎁 สิทธิพิเศษ: 100 ท่านแรกที่ลงทะเบียน เดินทางมางาน และบริจาคโลหิตสำเร็จ จะได้รับของที่ระลึกสุดพิเศษ!</span>
+                  </div>
+                  <p className="text-[11px] text-amber-900 leading-relaxed font-medium">
+                    รอบเวลาด้านล่างเป็นการประมาณการช่วงเวลาเดินทางมาถึง เพื่อให้การหมุนเวียนคิวสะดวกรวดเร็วที่สุด
+                  </p>
+                </div>
 
                 {slotsLoading ? (
                   <div className="py-8 text-center text-xs font-bold text-editorial-muted">
                     กำลังโหลดข้อมูลช่วงเวลา...
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {timeSlots.map((slot) => {
                       const isSelected = formData.timeSlotId === slot.id;
-                      const isFull = slot.status === 'FULL' || slot.remainingCapacity <= 0;
                       return (
                         <button
                           key={slot.id}
                           type="button"
                           onClick={() => {
-                            if (isFull) {
-                              setWaitlistSlot(slot);
-                            } else {
-                              setFormData({ ...formData, timeSlotId: slot.id });
-                            }
+                            setFormData({ ...formData, timeSlotId: slot.id });
                           }}
-                          className={`w-full p-3.5 rounded-xl border text-left text-xs font-bold transition-all flex items-center justify-between ${
+                          className={`w-full p-4 rounded-xl border text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
                             isSelected
-                              ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1 ring-[var(--burgundy-700)]'
-                              : isFull
-                              ? 'border-gray-200 bg-gray-50/70 hover:border-amber-400 text-gray-600'
+                              ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-2 ring-[var(--burgundy-700)] shadow-sm'
                               : 'border-gray-200 bg-white hover:border-[var(--burgundy-700)] text-editorial-ink'
                           }`}
                         >
                           <div className="flex items-center gap-3">
-                            <Clock className={`h-4 w-4 ${isSelected ? 'text-[var(--burgundy-700)]' : 'text-gray-400'}`} />
-                            <span className="text-sm font-black">{slot.timeSlot}</span>
+                            <Clock className={`h-4.5 w-4.5 ${isSelected ? 'text-[var(--burgundy-700)]' : 'text-gray-400'}`} />
+                            <div>
+                              <span className="text-sm font-black block font-mono">{slot.timeSlot}</span>
+                              <span className="text-[11px] font-normal text-gray-500">รอบเวลาแนะนำเดินทางมาถึง</span>
+                            </div>
                           </div>
 
-                          <div className="flex items-center gap-3">
-                            {isFull ? (
-                              <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">
-                                เต็มแล้ว · คลิกเข้ารายการรอ
-                              </span>
-                            ) : (
-                              <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
-                                ว่าง ({slot.remainingCapacity} ที่)
-                              </span>
-                            )}
-
-                            {isSelected && (
-                              <div className="h-5 w-5 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center">
-                                <Check className="h-3 w-3" />
+                          <div className="flex items-center gap-2">
+                            {isSelected ? (
+                              <div className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs">
+                                <Check className="h-3.5 w-3.5" />
                               </div>
+                            ) : (
+                              <span className="text-[11px] font-bold text-gray-400">เลือกช่วงเวลานี้</span>
                             )}
                           </div>
                         </button>
