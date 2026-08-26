@@ -78,26 +78,41 @@ async function main() {
   }
   console.log(`✅ ${blocks.length} content blocks ready`);
 
-  // 3) Time slots — only when the event has none (never disturb real bookings).
+  // 3) Time slots — five 1-hour slots for 09:00–14:00.
+  // Slots 1-4 are AVAILABLE for donor registration & check-in tests.
+  // Slot 5 is FULL (capacity: 0) for waitlist modal & keyboard nav tests.
   const [existing] = await db
     .select({ count: sql<number>`count(*)` })
     .from(timeSlots)
     .where(eq(timeSlots.eventId, EVENT_ID));
 
+  const base = eventDay.getTime();
   if (!existing || Number(existing.count) === 0) {
-    // Official event window 09:00–14:00: five 1-hour slots.
-    const base = eventDay.getTime();
     const slots = [
       { eventId: EVENT_ID, startAt: new Date(base + 9 * 3600 * 1000), endAt: new Date(base + 10 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
       { eventId: EVENT_ID, startAt: new Date(base + 10 * 3600 * 1000), endAt: new Date(base + 11 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
       { eventId: EVENT_ID, startAt: new Date(base + 11 * 3600 * 1000), endAt: new Date(base + 12 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
       { eventId: EVENT_ID, startAt: new Date(base + 12 * 3600 * 1000), endAt: new Date(base + 13 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
-      { eventId: EVENT_ID, startAt: new Date(base + 13 * 3600 * 1000), endAt: new Date(base + 14 * 3600 * 1000), capacity: 40, bookedCount: 0, isActive: true },
+      { eventId: EVENT_ID, startAt: new Date(base + 13 * 3600 * 1000), endAt: new Date(base + 14 * 3600 * 1000), capacity: 0, bookedCount: 0, isActive: true },
     ];
     await db.insert(timeSlots).values(slots);
-    console.log(`✅ ${slots.length} time slots ready`);
+    console.log(`✅ ${slots.length} time slots ready (last slot set to capacity 0 for waitlist tests)`);
   } else {
-    console.log(`ℹ️  ${existing.count} time slots already exist — skipping`);
+    // If slots exist, ensure the last slot is FULL (capacity 0) and at least the first 2 are AVAILABLE (capacity 40)
+    const allSlots = await db
+      .select()
+      .from(timeSlots)
+      .where(eq(timeSlots.eventId, EVENT_ID))
+      .orderBy(timeSlots.startAt);
+
+    if (allSlots.length > 0) {
+      const lastSlot = allSlots[allSlots.length - 1];
+      await db.update(timeSlots).set({ capacity: 0 }).where(eq(timeSlots.id, lastSlot.id));
+      if (allSlots.length > 1) {
+        await db.update(timeSlots).set({ capacity: 40 }).where(eq(timeSlots.id, allSlots[0].id));
+      }
+      console.log(`✅ Ensured last slot (${lastSlot.id}) is FULL (capacity: 0) for waitlist testing`);
+    }
   }
 
   console.log('\n🎉 E2E seed complete.');
