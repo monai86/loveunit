@@ -8,9 +8,20 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   const diagnostics: Record<string, any> = {};
 
+  const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL || '';
+  let dbHost = 'unknown';
+  let dbName = 'unknown';
+  try {
+    const parsed = new URL(dbUrl);
+    dbHost = parsed.host;
+    dbName = parsed.pathname;
+  } catch {}
+
   diagnostics.env = {
     hasDatabaseUrl: !!process.env.DATABASE_URL,
     hasPostgresUrl: !!process.env.POSTGRES_URL,
+    dbHost,
+    dbName,
     hasBetterAuthSecret: !!process.env.BETTER_AUTH_SECRET,
     betterAuthSecretLen: process.env.BETTER_AUTH_SECRET?.length,
     betterAuthUrl: process.env.BETTER_AUTH_URL,
@@ -40,6 +51,12 @@ export async function GET(req: NextRequest) {
   } catch (err: any) {
     diagnostics.dbError = {
       message: err?.message,
+      cause: err?.cause ? {
+        message: err.cause?.message,
+        code: err.cause?.code,
+        detail: err.cause?.detail,
+        hint: err.cause?.hint,
+      } : null,
       stack: err?.stack,
     };
   }
@@ -60,8 +77,12 @@ export async function GET(req: NextRequest) {
     diagnostics.signInTest = {
       success: false,
       error: err?.message || String(err),
+      cause: err?.cause ? {
+        message: err.cause?.message,
+        code: err.cause?.code,
+        detail: err.cause?.detail,
+      } : null,
       status: err?.status,
-      stack: err?.stack,
     };
   }
 
