@@ -97,7 +97,7 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
     await page.goto('/staff/checkin');
   }
 
-  await expect(page.getByRole('heading', { name: /ระบบเช็คอินและคัดกรอง/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /ระบบเช็คอิน/ })).toBeVisible();
 
   // 3) Search for the donor by code.
   await page.getByPlaceholder('ค้นหาชื่อ / เบอร์โทร / รหัสยืนยัน...').fill(donorCode);

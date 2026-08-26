@@ -278,7 +278,7 @@ export default function StaffCheckinPage() {
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-[var(--ink)]">
-            ระบบเช็คอินและตรวจคัดกรองผู้บริจาคหน้างาน
+            ระบบเช็คอินและคัดกรองผู้บริจาคหน้างาน
           </h1>
           <p className="text-xs text-[var(--muted)] font-medium">
             สแกนบัตร QR Code หรือค้นหาด้วยชื่อ/เบอร์โทร เพื่อยืนยันการเข้าร่วมกิจกรรม

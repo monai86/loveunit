@@ -505,7 +505,7 @@ export default function RegisterPage() {
                           <div className="flex items-center gap-3">
                             {isFull ? (
                               <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">
-                                เต็มแล้ว (ลงชื่อรอคิว)
+                                เต็มแล้ว · คลิกเข้ารายการรอ
                               </span>
                             ) : (
                               <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
