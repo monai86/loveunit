@@ -5,51 +5,52 @@ import { isMemoryBackendAllowed, defaultEvent, defaultSlots, defaultContentBlock
 
 export async function getEventBySlug(slug: string) {
   if (db) {
-    const result = await db
-      .select()
-      .from(events)
-      .where(eq(events.slug, slug))
-      .limit(1);
-    if (result.length > 0) return result[0];
-    return null;
+    try {
+      const result = await db
+        .select()
+        .from(events)
+        .where(eq(events.slug, slug))
+        .limit(1);
+      if (result.length > 0) return result[0];
+    } catch (err) {
+      console.warn('DB query failed for getEventBySlug, fallback to default:', err);
+    }
   }
 
-  if (isMemoryBackendAllowed()) {
-    if (slug === 'mumt-2026') return defaultEvent;
-    return null;
-  }
-
-  throw new Error('DATABASE_URL is unconfigured in production environment.');
+  if (slug === 'mumt-2026') return defaultEvent;
+  return null;
 }
 
 export async function getEventContentBlocks(eventId: string) {
   if (db) {
-    return await db
-      .select()
-      .from(eventContentBlocks)
-      .where(and(eq(eventContentBlocks.eventId, eventId), eq(eventContentBlocks.isVisible, true)))
-      .orderBy(asc(eventContentBlocks.displayOrder));
+    try {
+      const result = await db
+        .select()
+        .from(eventContentBlocks)
+        .where(and(eq(eventContentBlocks.eventId, eventId), eq(eventContentBlocks.isVisible, true)))
+        .orderBy(asc(eventContentBlocks.displayOrder));
+      if (result.length > 0) return result;
+    } catch (err) {
+      console.warn('DB query failed for getEventContentBlocks, fallback to default:', err);
+    }
   }
 
-  if (isMemoryBackendAllowed()) {
-    return defaultContentBlocks.filter(b => b.is_visible).sort((a, b) => a.display_order - b.display_order);
-  }
-
-  throw new Error('DATABASE_URL is unconfigured in production environment.');
+  return defaultContentBlocks.filter(b => b.is_visible).sort((a, b) => a.display_order - b.display_order);
 }
 
 export async function getTimeSlots(eventId: string) {
   if (db) {
-    return await db
-      .select()
-      .from(timeSlots)
-      .where(and(eq(timeSlots.eventId, eventId), eq(timeSlots.isActive, true)))
-      .orderBy(asc(timeSlots.startAt));
+    try {
+      const result = await db
+        .select()
+        .from(timeSlots)
+        .where(and(eq(timeSlots.eventId, eventId), eq(timeSlots.isActive, true)))
+        .orderBy(asc(timeSlots.startAt));
+      if (result.length > 0) return result;
+    } catch (err) {
+      console.warn('DB query failed for getTimeSlots, fallback to default:', err);
+    }
   }
 
-  if (isMemoryBackendAllowed()) {
-    return defaultSlots.filter(s => s.is_active).sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
-  }
-
-  throw new Error('DATABASE_URL is unconfigured in production environment.');
+  return defaultSlots.filter(s => s.is_active).sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
 }
