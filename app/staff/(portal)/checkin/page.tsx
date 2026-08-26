@@ -428,7 +428,7 @@ export default function StaffCheckinPage() {
                 <input
                   id="ck-search"
                   type="text"
-                  placeholder="เช่น สมชาย หรือ 0812345678"
+                  placeholder="ค้นหาชื่อ / เบอร์โทร / รหัสยืนยัน..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-[var(--line)] bg-gray-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[var(--burgundy-600)]"
@@ -462,13 +462,19 @@ export default function StaffCheckinPage() {
                   </span>
                 </div>
 
-                <div>
+                <div className="text-right">
                   {(() => {
                     const badge = getRegistrationStatusBadge(registration.status);
+                    const engStatus = registration.status === 'CHECKED_IN' ? 'CHECKED IN' : registration.status;
                     return (
-                      <span className={`px-3 py-1 rounded-full text-xs font-black border ${badge.colorClass}`}>
-                        {badge.label}
-                      </span>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className={`px-3 py-1 rounded-full text-xs font-black border ${badge.colorClass}`}>
+                          {badge.label}
+                        </span>
+                        <span className="text-[10px] font-mono font-bold text-[var(--muted)]">
+                          {engStatus}
+                        </span>
+                      </div>
                     );
                   })()}
                 </div>

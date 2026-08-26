@@ -8,19 +8,9 @@ import {
   Plus, 
   Eye, 
   Heart,
-  Search,
-  ShieldCheck,
-  Crown,
-  Shield,
-  Smartphone,
-  CheckCircle2,
-  AlertTriangle,
   Layers,
   ArrowRight,
-  Sparkles,
-  RefreshCw,
   QrCode,
-  SlidersHorizontal,
   Download
 } from 'lucide-react';
 import { getDashboardKPIs, getAllRegistrations, getAllStaffMembers } from '@/services/admin-service';
@@ -62,7 +52,7 @@ export default async function AdminDashboardPage() {
 
   const totalCapacity = kpis.slotBreakdown.reduce((acc, s) => acc + s.capacity, 0);
   const totalBooked = kpis.slotBreakdown.reduce((acc, s) => acc + s.bookedCount, 0);
-  const overallOccupancyPercent = totalCapacity > 0 ? Math.round((totalBooked / totalCapacity) * 100) : 0;
+  const _overallOccupancyPercent = totalCapacity > 0 ? Math.round((totalBooked / totalCapacity) * 100) : 0;
 
   const kpiBlocks = [
     { 

@@ -11,7 +11,7 @@ import { test, expect, type Page } from '@playwright/test';
 // restore it in afterAll. This triggers the waitlist modal WITHOUT creating
 // registrations — so parallel specs (staff-checkin, which always picks the
 // first free slot) never see a polluted slot.
-const MODAL_SLOT_ID = '11111111-1111-1111-1111-111111111107'; // last slot (07:00)
+let targetSlotId: string | null = null;
 let originalCapacity: number | null = null;
 
 async function setSlotCapacity(capacity: number) {
@@ -19,29 +19,37 @@ async function setSlotCapacity(capacity: number) {
   loadEnvLocal();
   const { db } = await import('@/db');
   const { timeSlots } = await import('@/db/schema');
-  const { eq } = await import('drizzle-orm');
+  const { eq, desc } = await import('drizzle-orm');
   if (!db) return;
-  await db.update(timeSlots).set({ capacity }).where(eq(timeSlots.id, MODAL_SLOT_ID));
-}
 
-async function readSlotCapacity(): Promise<number | null> {
-  const { loadEnvLocal } = await import('../../scripts/lib/env');
-  loadEnvLocal();
-  const { db } = await import('@/db');
-  const { timeSlots } = await import('@/db/schema');
-  const { eq } = await import('drizzle-orm');
-  if (!db) return null;
-  const [row] = await db.select().from(timeSlots).where(eq(timeSlots.id, MODAL_SLOT_ID)).limit(1);
-  return row ? (row.capacity as number) : null;
+  if (!targetSlotId) {
+    const [row] = await db.select().from(timeSlots).orderBy(desc(timeSlots.startAt)).limit(1);
+    if (row) {
+      targetSlotId = row.id;
+      originalCapacity = row.capacity as number;
+    }
+  }
+
+  if (targetSlotId) {
+    await db.update(timeSlots).set({ capacity }).where(eq(timeSlots.id, targetSlotId));
+  }
 }
 
 test.beforeAll(async () => {
-  originalCapacity = await readSlotCapacity();
-  if (originalCapacity !== null) await setSlotCapacity(0);
+  await setSlotCapacity(0);
 });
 
 test.afterAll(async () => {
-  if (originalCapacity !== null) await setSlotCapacity(originalCapacity);
+  if (originalCapacity !== null && targetSlotId) {
+    const { loadEnvLocal } = await import('../../scripts/lib/env');
+    loadEnvLocal();
+    const { db } = await import('@/db');
+    const { timeSlots } = await import('@/db/schema');
+    const { eq } = await import('drizzle-orm');
+    if (db) {
+      await db.update(timeSlots).set({ capacity: originalCapacity }).where(eq(timeSlots.id, targetSlotId));
+    }
+  }
 });
 
 async function loginStaff(page: Page) {

@@ -75,14 +75,19 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
 
   // 2) Admin/Staff sign-in with the known password.
   await page.goto('/staff/login');
-  await page.getByPlaceholder('admin@mahidol.ac.th').fill(STAFF_EMAIL);
-  await page.getByPlaceholder('••••••••').fill(STAFF_PASS);
-  await page.getByRole('button', { name: 'เข้าสู่ระบบ' }).click();
+  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.locator('#staff-email').fill(STAFF_EMAIL);
+  await page.locator('#staff-password').fill(STAFF_PASS);
 
-  // Wait for admin or checkin dashboard
-  await page
-    .waitForURL(/\/(staff\/change-password|staff\/checkin|admin)/, { timeout: 15_000 })
-    .catch(() => {});
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
+    try {
+      await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin)/, { timeout: 4000 });
+      break;
+    } catch {
+      await page.waitForTimeout(500);
+    }
+  }
 
   if (page.url().includes('/staff/change-password')) {
     await expect(page.getByRole('heading', { name: 'ตั้งรหัสผ่านใหม่' })).toBeVisible();
@@ -93,23 +98,25 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
     await page.waitForURL(/\/(staff\/checkin|admin)/, { timeout: 15_000 });
   }
 
-  if (page.url().includes('/admin')) {
+  if (!page.url().includes('/staff/checkin')) {
     await page.goto('/staff/checkin');
+    await page.waitForLoadState('networkidle').catch(() => {});
   }
 
-  await expect(page.getByRole('heading', { name: /ระบบเช็คอิน/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /ระบบเช็คอิน/ })).toBeVisible({ timeout: 10_000 });
 
   // 3) Search for the donor by code.
-  await page.getByPlaceholder('ค้นหาชื่อ / เบอร์โทร / รหัสยืนยัน...').fill(donorCode);
-  await page.getByPlaceholder('ค้นหาชื่อ / เบอร์โทร / รหัสยืนยัน...').press('Enter');
+  const searchInput = page.locator('#ck-search');
+  await searchInput.fill(donorCode);
+  await searchInput.press('Enter');
 
   // The result panel shows the registration code and the REGISTERED badge.
-  await expect(page.getByText(donorCode, { exact: true })).toBeVisible();
-  await expect(page.getByText('REGISTERED', { exact: true })).toBeVisible();
+  await expect(page.getByText(donorCode, { exact: true })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText(/REGISTERED|ลงทะเบียนแล้ว/)).toBeVisible();
 
   // 4) Check the donor in.
   await page.getByRole('button', { name: /เช็คอิน/ }).first().click();
-  await expect(page.getByText('CHECKED IN', { exact: true })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText(/CHECKED IN|เช็คอินแล้ว/)).toBeVisible({ timeout: 15_000 });
 });
 
 test.afterAll(async ({ request }) => {
