@@ -32,24 +32,28 @@ export function normalizePhoneNumber(phone: string): string {
 }
 
 /**
- * Generates a unique user-friendly registration code.
- * Format: MBD26-XXXXXX (6 alphanumeric chars)
+ * Generates a sequential running registration code.
+ * Format: LVU26-XXX (e.g. LVU26-001, LVU26-002, LVU26-100)
  */
-export function generateRegistrationCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-    const bytes = new Uint8Array(6);
-    crypto.getRandomValues(bytes);
-    for (let i = 0; i < 6; i++) {
-      code += chars.charAt(bytes[i] % chars.length);
-    }
-  } else {
-    for (let i = 0; i < 6; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+export function generateRegistrationCode(seq?: number): string {
+  if (typeof seq === 'number' && seq > 0) {
+    const padded = String(seq).padStart(3, '0');
+    return `LVU26-${padded}`;
   }
-  return `MBD26-${code}`;
+  // Fallback if no seq provided: generate random 3-digit number
+  const randomNum = Math.floor(1 + Math.random() * 999);
+  return `LVU26-${String(randomNum).padStart(3, '0')}`;
+}
+
+/**
+ * Extracts numeric queue number from a registration code (e.g. "LVU26-042" -> 42).
+ */
+export function extractQueueNumber(code: string): number | null {
+  const match = code.match(/LVU26-(\d+)/i) || code.match(/MBD26-(\d+)/i);
+  if (match && match[1]) {
+    return parseInt(match[1], 10);
+  }
+  return null;
 }
 
 /**
@@ -58,7 +62,7 @@ export function generateRegistrationCode(): string {
  */
 export function generateQRToken(registrationCode: string): string {
   const uuid = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36);
-  return `MBD26_QR_${registrationCode}_${uuid.replace(/-/g, '')}`;
+  return `LVU26_QR_${registrationCode}_${uuid.replace(/-/g, '')}`;
 }
 
 /**

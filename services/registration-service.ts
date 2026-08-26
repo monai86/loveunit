@@ -71,8 +71,12 @@ export async function registerDonorAtomic(input: {
           .where(eq(timeSlots.id, input.slotId));
       }
 
-      // 3. Create Registration Record
-      const code = generateRegistrationCode();
+      // 3. Create Registration Record with sequential running number
+      const countResult = await tx.execute(
+        sql`SELECT COUNT(*)::int as count FROM registrations WHERE event_id = ${input.eventId}`
+      );
+      const nextSeq = (Number(countResult.rows[0]?.count) || 0) + 1;
+      const code = generateRegistrationCode(nextSeq);
       const token = generateQRToken(code);
 
       const [newReg] = await tx

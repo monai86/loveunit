@@ -386,7 +386,8 @@ export async function registerDonorAtomic(input: {
       slot.booked_count += 1;
     }
 
-    const code = generateRegistrationCode();
+    const nextSeq = inMemoryRegistrations.filter((r: Registration) => r.event_id === input.eventId).length + 1;
+    const code = generateRegistrationCode(nextSeq);
     const token = generateQRToken(code);
     const newReg: Registration = {
       id: nextMemoryId('reg'),

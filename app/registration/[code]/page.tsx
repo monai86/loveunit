@@ -5,8 +5,9 @@ import { notFound } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { getRegistrationByCode } from '@/services/registration-service';
-import { formatTimeRange } from '@/lib/utils/format';
+import { formatTimeRange, extractQueueNumber } from '@/lib/utils/format';
 import { RegistrationPoster } from '@/components/registration/RegistrationPoster';
+import { Sparkles } from 'lucide-react';
 
 // Registration may arrive from either the Drizzle backend (camelCase) or the
 // legacy in-memory backend (snake_case); this view type covers both shapes.
@@ -81,18 +82,48 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
           <span className="brand-chip--light text-[11px]">Official Pass</span>
         </div>
 
-        {/* Ticket Registration Code */}
-        <div className="bg-[var(--rose-100)]/60 p-4 rounded-lg border border-[var(--rose-200)] text-center space-y-1">
-          <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider">
-            Registration Code
-          </span>
-          <div className="text-2xl font-black text-[var(--burgundy-700)] tracking-wider">
+        {/* Ticket Registration Code & Queue Number */}
+        <div className="bg-gradient-to-br from-[var(--rose-100)]/80 to-amber-50 p-4 rounded-xl border border-[var(--rose-200)] text-center space-y-2">
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-[11px] font-black text-[var(--burgundy-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 rounded-full border border-[var(--rose-200)] shadow-2xs">
+              {(() => {
+                const q = extractQueueNumber(regCode);
+                return q ? `ลำดับผู้ลงทะเบียนที่ #${String(q).padStart(3, '0')}` : 'DONOR PASS';
+              })()}
+            </span>
+          </div>
+
+          <div className="text-3xl font-black text-[var(--burgundy-700)] font-mono tracking-wider">
             {regCode}
           </div>
+
+          {/* 100 Early-Bird Gift Badge */}
+          {(() => {
+            const q = extractQueueNumber(regCode);
+            if (q && q <= 100) {
+              return (
+                <div className="pt-1 flex items-center justify-center gap-1.5 text-[11px] font-black text-amber-900 bg-amber-100/80 py-1 px-3 rounded-lg border border-amber-300 shadow-2xs">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+                  <span>อยู่ในลำดับ 100 ท่านแรก! (รับของที่ระลึกพิเศษเมื่อบริจาคสำเร็จ 🎁)</span>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
 
         {/* Donor Information */}
         <div className="space-y-3 text-xs">
+          <div className="flex justify-between py-1.5 border-b border-gray-100">
+            <span className="text-editorial-muted font-bold">ลำดับคิวลงทะเบียน (Queue No.):</span>
+            <span className="font-mono font-black text-[var(--burgundy-700)] text-sm">
+              {(() => {
+                const q = extractQueueNumber(regCode);
+                return q ? `#${String(q).padStart(3, '0')}` : '-';
+              })()}
+            </span>
+          </div>
+
           <div className="flex justify-between py-1.5 border-b border-gray-100">
             <span className="text-editorial-muted font-bold">ชื่อ-นามสกุล:</span>
             <span className="font-black text-editorial-ink">{fullName}</span>

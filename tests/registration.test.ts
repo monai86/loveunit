@@ -36,8 +36,8 @@ async function runHardeningTests() {
   console.log('Test 3: Phone Normalization, Code Format & Time Formatting');
   assert.strictEqual(normalizePhoneNumber('081-234-5678'), '0812345678');
   assert.strictEqual(normalizePhoneNumber('+66 81 234 5678'), '0812345678');
-  const code = generateRegistrationCode();
-  assert.match(code, /^MBD26-[A-Z0-9]{6}$/);
+  const code = generateRegistrationCode(42);
+  assert.strictEqual(code, 'LVU26-042');
   const timeFormatted = formatTimeRange('2026-09-16T09:00:00+07:00', '2026-09-16T10:00:00+07:00');
   assert.strictEqual(timeFormatted, '09:00–10:00 น.');
   assert.strictEqual(timeFormatted.endsWith('น. น.'), false, 'Must not have duplicate น.');
