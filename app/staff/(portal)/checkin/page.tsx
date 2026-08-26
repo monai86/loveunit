@@ -89,12 +89,19 @@ export default function StaffCheckinPage() {
   const busyRef = useRef(false);
 
   const stopScanner = useCallback(async () => {
-    try {
-      await scannerRef.current?.stop();
-    } catch {
-      // ignore
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop();
+      } catch {
+        // ignore
+      }
+      try {
+        scannerRef.current.clear();
+      } catch {
+        // ignore
+      }
+      scannerRef.current = null;
     }
-    scannerRef.current = null;
     setScanning(false);
   }, []);
 
@@ -244,21 +251,84 @@ export default function StaffCheckinPage() {
   const startScanner = async () => {
     setMessage(null);
     try {
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+        } catch {
+          // ignore
+        }
+        try {
+          scannerRef.current.clear();
+        } catch {
+          // ignore
+        }
+        scannerRef.current = null;
+      }
+
+      setScanning(true);
+      // Wait for next tick so DOM is definitely ready
+      await new Promise((r) => setTimeout(r, 100));
+
+      const element = document.getElementById('qr-reader-region');
+      if (!element) {
+        throw new Error('Scanner container element not found');
+      }
+
       const scanner = new Html5Qrcode('qr-reader-region');
       scannerRef.current = scanner;
-      setScanning(true);
-      await scanner.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
-        (decodedText) => {
-          handleCheckinByToken(decodedText.trim());
-        },
-        () => {}
-      );
-    } catch {
+
+      const qrConfig = {
+        fps: 10,
+        qrbox: { width: 240, height: 240 },
+        aspectRatio: 1.0,
+      };
+
+      const qrCodeSuccessCallback = (decodedText: string) => {
+        handleCheckinByToken(decodedText.trim());
+      };
+
+      // Try environment (back) camera first; if not available (e.g. desktop/laptop), fallback to user (front)
+      try {
+        await scanner.start(
+          { facingMode: 'environment' },
+          qrConfig,
+          qrCodeSuccessCallback,
+          () => {}
+        );
+      } catch (envErr) {
+        console.warn('Environment camera failed, trying front/user camera:', envErr);
+        await scanner.start(
+          { facingMode: 'user' },
+          qrConfig,
+          qrCodeSuccessCallback,
+          () => {}
+        );
+      }
+    } catch (err: unknown) {
+      console.error('Camera start error:', err);
       setScanning(false);
-      scannerRef.current = null;
-      setMessage({ type: 'error', text: 'ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตการเข้าถึงกล้อง หรือใช้ช่องค้นหาแทน' });
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+        } catch {
+          // ignore
+        }
+        try {
+          scannerRef.current.clear();
+        } catch {
+          // ignore
+        }
+        scannerRef.current = null;
+      }
+
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (errMsg.includes('NotAllowedError') || errMsg.includes('Permission') || errMsg.includes('Permission denied')) {
+        setMessage({ type: 'error', text: 'เบราว์เซอร์ไม่อนุญาตให้เข้าถึงกล้อง กรุณากดอนุญาตสิทธิ์การใช้กล้อง (Camera Permission) ในแถบเบราว์เซอร์' });
+      } else if (errMsg.includes('NotFoundError') || errMsg.includes('no camera')) {
+        setMessage({ type: 'error', text: 'ไม่พบอุปกรณ์กล้องบนเครื่องนี้ กรุณาใช้ช่องค้นหาด้านล่างแทน' });
+      } else {
+        setMessage({ type: 'error', text: 'ไม่สามารถเปิดกล้องได้ กรุณาตรวจสอบการอนุญาตสิทธิ์กล้อง หรือใช้ช่องค้นหาแทน' });
+      }
     }
   };
 
@@ -369,12 +439,15 @@ export default function StaffCheckinPage() {
           </div>
 
           {/* Camera Region */}
-          <div className="relative w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800">
-            {scanning ? (
-              <div id="qr-reader-region" className="w-full aspect-square" />
-            ) : (
+          <div className="relative w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 aspect-square flex items-center justify-center">
+            {/* Always in DOM for Html5Qrcode attach */}
+            <div
+              id="qr-reader-region"
+              className={`w-full h-full ${scanning ? 'block' : 'hidden'}`}
+            />
+
+            {!scanning && (
               <div className="relative aspect-square w-full flex flex-col items-center justify-center text-white p-6 text-center space-y-3">
-                
                 {/* Target Guides */}
                 <div className="absolute inset-10 border-2 border-dashed border-rose-400/50 rounded-2xl pointer-events-none flex items-center justify-center">
                   <div className="h-5 w-5 border-t-2 border-l-2 border-rose-500 absolute -top-1 -left-1 rounded-tl" />
@@ -395,7 +468,7 @@ export default function StaffCheckinPage() {
                 <button
                   type="button"
                   onClick={startScanner}
-                  className="editorial-btn-primary py-2.5 px-5 text-xs flex items-center gap-2 shadow-lg"
+                  className="editorial-btn-primary py-2.5 px-5 text-xs flex items-center gap-2 shadow-lg cursor-pointer"
                 >
                   <Camera className="h-4 w-4" />
                   <span>เปิดกล้องสแกน</span>
@@ -404,11 +477,11 @@ export default function StaffCheckinPage() {
             )}
 
             {scanning && (
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2">
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
                 <button
                   type="button"
                   onClick={stopScanner}
-                  className="px-3.5 py-1.5 rounded-xl bg-black/60 backdrop-blur-md hover:bg-black/80 text-white text-xs font-bold flex items-center gap-1.5 border border-white/20"
+                  className="px-3.5 py-1.5 rounded-xl bg-black/70 backdrop-blur-md hover:bg-black/90 text-white text-xs font-bold flex items-center gap-1.5 border border-white/20 shadow-lg cursor-pointer transition-colors"
                 >
                   <XCircle className="h-3.5 w-3.5" />
                   <span>ปิดกล้อง</span>
