@@ -20,7 +20,14 @@ import {
   User,
   ShieldCheck,
   AlertCircle,
-  RefreshCw
+  Volume2,
+  VolumeX,
+  Zap,
+  UploadCloud,
+  History,
+  Flashlight,
+  SlidersHorizontal,
+  ChevronRight
 } from 'lucide-react';
 import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
@@ -61,6 +68,14 @@ interface RegistrationDetail {
   completedAt?: string;
 }
 
+interface RecentScanItem {
+  id: string;
+  code: string;
+  name: string;
+  status: RegistrationStatus;
+  time: string;
+}
+
 interface StaffStats {
   totalToday: number;
   checkedIn: number;
@@ -85,6 +100,60 @@ function mapRegistration(r: ApiRegistration): RegistrationDetail {
   };
 }
 
+// Synthesized Web Audio API sound generator (Zero external audio file dependency)
+function playAudioChime(type: 'success' | 'souvenir' | 'error' | 'click') {
+  try {
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+
+    if (type === 'success') {
+      // High-pitched pleasant double chime (880Hz -> 1320Hz)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(1320, now + 0.1);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } else if (type === 'souvenir') {
+      // Triumphant chord (587Hz -> 880Hz -> 1174Hz)
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(587.33, now);
+      osc.frequency.setValueAtTime(880, now + 0.08);
+      osc.frequency.setValueAtTime(1174.66, now + 0.16);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else if (type === 'error') {
+      // Low saw buzz (220Hz)
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    } else {
+      // Subtle click
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(600, now);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    }
+  } catch {
+    // AudioContext blocked or not supported
+  }
+}
+
 export default function StaffCheckinPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -94,27 +163,21 @@ export default function StaffCheckinPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; text: string } | null>(null);
   const [stats, setStats] = useState<StaffStats>({ totalToday: 0, checkedIn: 0, completed: 0, cancelled: 0 });
 
+  // Practical Features State
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [scanning, setScanning] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
-  const busyRef = useRef(false);
+  const [cameras, setCameras] = useState<Array<{ id: string; label: string }>>([]);
+  const [selectedCameraId, setSelectedCameraId] = useState<string>('');
+  const [torchOn, setTorchOn] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [fastTrackMode, setFastTrackMode] = useState(false);
+  const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
-  const stopScanner = useCallback(async () => {
-    if (scannerRef.current) {
-      try {
-        await scannerRef.current.stop();
-      } catch {
-        // ignore
-      }
-      try {
-        scannerRef.current.clear();
-      } catch {
-        // ignore
-      }
-      scannerRef.current = null;
-    }
-    setScanning(false);
-  }, []);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const busyRef = useRef(false);
+  const lastScannedCodeRef = useRef<{ code: string; time: number }>({ code: '', time: 0 });
 
   const loadStats = useCallback(async () => {
     try {
@@ -132,6 +195,175 @@ export default function StaffCheckinPage() {
       // Ignore
     }
   }, []);
+
+  const addRecentScan = useCallback((reg: RegistrationDetail, targetStatus: RegistrationStatus) => {
+    setRecentScans((prev) => {
+      const item: RecentScanItem = {
+        id: reg.id,
+        code: reg.registrationCode,
+        name: `${reg.firstName} ${reg.lastName}`,
+        status: targetStatus,
+        time: new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      };
+      const filtered = prev.filter((p) => p.id !== reg.id);
+      return [item, ...filtered].slice(0, 5);
+    });
+  }, []);
+
+  const handleLookupByToken = useCallback(async (tokenOrCode: string) => {
+    const cleanToken = tokenOrCode.trim();
+    if (!cleanToken) return;
+
+    // Debounce duplicate scans of the exact same code within 2 seconds
+    const now = Date.now();
+    if (lastScannedCodeRef.current.code === cleanToken && now - lastScannedCodeRef.current.time < 2000) {
+      return;
+    }
+    lastScannedCodeRef.current = { code: cleanToken, time: now };
+
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setMessage(null);
+
+    // Haptic feedback if available on mobile
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try { navigator.vibrate(100); } catch { /* ignore */ }
+    }
+
+    try {
+      const res = await fetch(`/api/staff/search?q=${encodeURIComponent(cleanToken)}`);
+      const data = await res.json();
+
+      if (res.ok && data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
+        const found = mapRegistration(data.registrations[0]);
+        setRegistration(found);
+        loadStats();
+
+        // FAST-TRACK AUTO CHECK-IN: If donor is in REGISTERED state and fast-track mode is ON
+        if (fastTrackMode && found.status === 'REGISTERED') {
+          if (soundEnabled) playAudioChime('success');
+          try {
+            const checkinRes = await fetch('/api/staff/checkin', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ registrationId: found.id, status: 'CHECKED_IN' }),
+            });
+            const checkinData = await checkinRes.json();
+            if (checkinRes.ok && checkinData.success) {
+              const nowIso = new Date().toISOString();
+              const autoUpdated = { ...found, status: 'CHECKED_IN' as RegistrationStatus, checkedInAt: nowIso };
+              setRegistration(autoUpdated);
+              addRecentScan(found, 'CHECKED_IN');
+              loadStats();
+              setMessage({
+                type: 'success',
+                text: `⚡ [Fast Check-in] เช็คอินสำเร็จทันที: คุณ${found.firstName} ${found.lastName} (${found.registrationCode})`,
+              });
+              return;
+            }
+          } catch {
+            // fallback to manual review
+          }
+        }
+
+        // Standard Review Mode
+        if (found.status === 'REGISTERED') {
+          if (soundEnabled) playAudioChime('success');
+          setMessage({
+            type: 'info',
+            text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (รอเช็คอิน) — กรุณากดยืนยันเช็คอินเข้างานด้านล่าง`,
+          });
+        } else if (found.status === 'CHECKED_IN') {
+          if (soundEnabled) playAudioChime('click');
+          setMessage({
+            type: 'info',
+            text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (เช็คอินแล้ว) — เมื่อบริจาคโลหิตเสร็จสิ้น กดปุ่มรับของที่ระลึกได้`,
+          });
+        } else if (found.status === 'COMPLETED') {
+          if (soundEnabled) playAudioChime('souvenir');
+          setMessage({
+            type: 'success',
+            text: `คุณ${found.firstName} ${found.lastName} ได้บริจาคโลหิตและรับของที่ระลึกเรียบร้อยแล้ว ✨`,
+          });
+        }
+      } else {
+        if (soundEnabled) playAudioChime('error');
+        setMessage({ type: 'error', text: data.message || data.error || 'ไม่พบข้อมูลการลงทะเบียนจาก QR Code นี้' });
+      }
+    } catch {
+      if (soundEnabled) playAudioChime('error');
+      setMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการค้นหาข้อมูลจาก QR Code' });
+    } finally {
+      busyRef.current = false;
+    }
+  }, [loadStats, soundEnabled, fastTrackMode, addRecentScan]);
+
+  const stopScanner = useCallback(async () => {
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.stop();
+      } catch {
+        // ignore
+      }
+      try {
+        scannerRef.current.clear();
+      } catch {
+        // ignore
+      }
+      scannerRef.current = null;
+    }
+    setScanning(false);
+    setTorchOn(false);
+  }, []);
+
+  // Fetch available cameras on mount
+  useEffect(() => {
+    Html5Qrcode.getCameras()
+      .then((devices) => {
+        if (devices && devices.length > 0) {
+          setCameras(devices.map((d) => ({ id: d.id, label: d.label || `Camera ${d.id.slice(0, 4)}` })));
+          const rear = devices.find((d) => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear') || d.label.toLowerCase().includes('environment'));
+          if (rear) setSelectedCameraId(rear.id);
+          else setSelectedCameraId(devices[0].id);
+        }
+      })
+      .catch(() => {
+        // Ignored if camera permission not granted yet
+      });
+  }, []);
+
+  // Keyboard wedge listener for USB/Bluetooth physical barcode scanners
+  useEffect(() => {
+    let barcodeBuffer = '';
+    let lastKeyTime = Date.now();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
+        return;
+      }
+
+      const now = Date.now();
+      if (now - lastKeyTime > 100) {
+        barcodeBuffer = '';
+      }
+      lastKeyTime = now;
+
+      if (e.key === 'Enter') {
+        if (barcodeBuffer.length >= 6) {
+          const code = barcodeBuffer.trim();
+          barcodeBuffer = '';
+          e.preventDefault();
+          void handleLookupByToken(code);
+        }
+      } else if (e.key.length === 1) {
+        barcodeBuffer += e.key;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleLookupByToken]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -155,14 +387,18 @@ export default function StaffCheckinPage() {
       const data = await res.json();
 
       if (res.ok && data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
-        setRegistration(mapRegistration(data.registrations[0]));
+        const found = mapRegistration(data.registrations[0]);
+        setRegistration(found);
+        if (soundEnabled) playAudioChime('success');
         if (data.registrations.length > 1) {
           setMessage({ type: 'info', text: `พบข้อมูล ${data.registrations.length} รายการ แสดงรายการแรกที่ตรงที่สุด` });
         }
       } else {
+        if (soundEnabled) playAudioChime('error');
         setMessage({ type: 'error', text: data.message || data.error || 'ไม่พบข้อมูลผู้บริจาคที่ค้นหา' });
       }
     } catch {
+      if (soundEnabled) playAudioChime('error');
       setMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย' });
     } finally {
       setLoading(false);
@@ -197,16 +433,20 @@ export default function StaffCheckinPage() {
           completedAt: targetStatus === 'COMPLETED' ? nowIso : registration.completedAt,
         };
         setRegistration(updatedReg);
+        addRecentScan(registration, targetStatus);
         loadStats();
 
         let successText = 'ดำเนินการสำเร็จ!';
         if (targetStatus === 'CHECKED_IN') {
+          if (soundEnabled) playAudioChime('success');
           successText = `🎟️ ยืนยันเช็คอินเข้างานสำเร็จ! คุณ${registration.firstName} ${registration.lastName}`;
         }
         if (targetStatus === 'COMPLETED') {
+          if (soundEnabled) playAudioChime('souvenir');
           successText = `🎁 บันทึกการบริจาคโลหิตสำเร็จ และมอบของที่ระลึกให้ คุณ${registration.firstName} เรียบร้อยแล้ว ✨`;
         }
         if (targetStatus === 'CANCELLED') {
+          if (soundEnabled) playAudioChime('error');
           successText = data.promoted
             ? `ยกเลิกรายการ คุณ${registration.firstName} และเลื่อนผู้รอรายถัดไปเข้าคิวแล้ว`
             : `ยกเลิกรายการสำหรับ คุณ${registration.firstName}`;
@@ -214,6 +454,7 @@ export default function StaffCheckinPage() {
 
         setMessage({ type: 'success', text: successText });
       } else {
+        if (soundEnabled) playAudioChime('error');
         setMessage({ type: 'error', text: data.message || data.error || 'ไม่สามารถดำเนินการได้' });
       }
     } catch {
@@ -230,6 +471,8 @@ export default function StaffCheckinPage() {
         checkedInAt: targetStatus === 'CHECKED_IN' ? nowIso : registration.checkedInAt,
         completedAt: targetStatus === 'COMPLETED' ? nowIso : registration.completedAt,
       });
+      addRecentScan(registration, targetStatus);
+      if (soundEnabled) playAudioChime('success');
       setMessage({
         type: 'warning',
         text: 'ออฟไลน์ — บันทึกการกระทำไว้ในเครื่องแล้ว จะซิงค์อัตโนมัติเมื่อกลับมาออนไลน์',
@@ -239,52 +482,7 @@ export default function StaffCheckinPage() {
     }
   };
 
-  const handleLookupByToken = useCallback(async (tokenOrCode: string) => {
-    if (busyRef.current) return;
-    busyRef.current = true;
-    setMessage(null);
-
-    // Haptic feedback if available on mobile
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-      try { navigator.vibrate(80); } catch { /* ignore */ }
-    }
-
-    try {
-      const res = await fetch(`/api/staff/search?q=${encodeURIComponent(tokenOrCode.trim())}`);
-      const data = await res.json();
-
-      if (res.ok && data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
-        const found = mapRegistration(data.registrations[0]);
-        setRegistration(found);
-        loadStats();
-
-        if (found.status === 'REGISTERED') {
-          setMessage({
-            type: 'info',
-            text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (สถานะ: รอเช็คอิน) — กรุณากดยืนยันเช็คอินเข้างานด้านล่าง`,
-          });
-        } else if (found.status === 'CHECKED_IN') {
-          setMessage({
-            type: 'info',
-            text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (เช็คอินแล้ว) — เมื่อบริจาคโลหิตเสร็จสิ้น สามารถกดยืนยันรับของที่ระลึกได้`,
-          });
-        } else if (found.status === 'COMPLETED') {
-          setMessage({
-            type: 'success',
-            text: `คุณ${found.firstName} ${found.lastName} ได้บริจาคโลหิตและรับของที่ระลึกเรียบร้อยแล้ว ✨`,
-          });
-        }
-      } else {
-        setMessage({ type: 'error', text: data.message || data.error || 'ไม่พบข้อมูลการลงทะเบียนจาก QR Code นี้' });
-      }
-    } catch {
-      setMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการค้นหาข้อมูลจาก QR Code' });
-    } finally {
-      busyRef.current = false;
-    }
-  }, [loadStats]);
-
-  const startScanner = async (targetFacing: 'environment' | 'user' = facingMode) => {
+  const startScanner = async (targetFacing: 'environment' | 'user' = facingMode, customCameraId?: string) => {
     setMessage(null);
     try {
       if (scannerRef.current) {
@@ -313,8 +511,8 @@ export default function StaffCheckinPage() {
       scannerRef.current = scanner;
 
       const qrConfig = {
-        fps: 10,
-        qrbox: { width: 240, height: 240 },
+        fps: 15,
+        qrbox: { width: 250, height: 250 },
         aspectRatio: 1.0,
       };
 
@@ -322,9 +520,13 @@ export default function StaffCheckinPage() {
         handleLookupByToken(decodedText.trim());
       };
 
+      const cameraSelection = customCameraId 
+        ? { deviceId: { exact: customCameraId } }
+        : { facingMode: targetFacing };
+
       try {
         await scanner.start(
-          { facingMode: targetFacing },
+          cameraSelection,
           qrConfig,
           qrCodeSuccessCallback,
           () => {}
@@ -374,38 +576,107 @@ export default function StaffCheckinPage() {
     await startScanner(nextFacing);
   };
 
+  const handleCameraChange = async (deviceId: string) => {
+    setSelectedCameraId(deviceId);
+    if (scanning) {
+      await startScanner(facingMode, deviceId);
+    }
+  };
+
+  const toggleTorch = async () => {
+    if (!scannerRef.current || !scanning) return;
+    try {
+      const nextTorch = !torchOn;
+      await scannerRef.current.applyVideoConstraints({
+        advanced: [{ torch: nextTorch } as MediaTrackConstraintSet],
+      });
+      setTorchOn(nextTorch);
+    } catch {
+      setMessage({ type: 'warning', text: 'อุปกรณ์หรือกล้องนี้ไม่รองรับการเปิดไฟฉาย' });
+    }
+  };
+
+  // Image Upload / Screenshot Scanner
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    setMessage(null);
+
+    try {
+      const tempScanner = scannerRef.current || new Html5Qrcode('qr-reader-region');
+      const decodedText = await tempScanner.scanFile(file, true);
+      if (decodedText) {
+        await handleLookupByToken(decodedText.trim());
+      } else {
+        if (soundEnabled) playAudioChime('error');
+        setMessage({ type: 'error', text: 'ไม่พบ QR Code ในรูปภาพที่เลือก กรุณาลองใหม่อีกครั้ง' });
+      }
+    } catch {
+      if (soundEnabled) playAudioChime('error');
+      setMessage({ type: 'error', text: 'ไม่สามารถอ่าน QR Code จากรูปภาพนี้ได้ กรุณาตรวจสอบความคมชัด' });
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-8">
       
-      {/* Top Header & Live KPI Stat Strip */}
+      {/* Top Header & Quick Mode Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--line)] pb-5">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-mono font-black text-[var(--burgundy-700)] uppercase tracking-wider">
-              STAFF CHECK-IN & SOUVENIR STATION
+              PRACTICAL STAFF SCANNER & SOUVENIR
             </span>
             <span className="px-2 py-0.5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] text-[10px] font-black border border-[var(--line)]">
               ห้องประชุม 217
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-[var(--ink)]">
-            ระบบเช็คอินและคัดกรองผู้บริจาคหน้างาน
+            ระบบเช็คอินและมอบของที่ระลึก
           </h1>
           <p className="text-xs text-[var(--muted)]">
-            สแกน QR Code เพื่อเช็คอินเข้างาน ตรวจสอบผู้มาจริง และบันทึกการรับของที่ระลึกสุดพิเศษเมื่อบริจาคสำเร็จ
+            สแกน QR Code ตรวจสอบผู้มาจริง และบันทึกของที่ระลึกสุดพิเศษเมื่อบริจาคโลหิตสำเร็จ
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Action Badges & Walk-in */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Sound Toggle */}
           <button
             type="button"
-            onClick={loadStats}
-            title="รีเฟรชข้อมูลสถิติ"
-            className="p-2.5 rounded-xl border border-[var(--line)] bg-white hover:bg-gray-50 text-[var(--ink)] text-xs font-bold transition-all shadow-xs cursor-pointer"
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            title={soundEnabled ? 'ปิดเสียง Beep' : 'เปิดเสียง Beep'}
+            className={`p-2.5 rounded-xl border transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer ${
+              soundEnabled 
+                ? 'bg-blue-50 border-blue-200 text-blue-800' 
+                : 'bg-gray-100 border-gray-200 text-gray-400'
+            }`}
           >
-            <RefreshCw className="h-4 w-4" />
+            {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            <span className="hidden sm:inline">{soundEnabled ? 'เสียงเปิด' : 'เสียงปิด'}</span>
           </button>
+
+          {/* Fast-Track Auto Check-in Toggle */}
+          <button
+            type="button"
+            onClick={() => setFastTrackMode(!fastTrackMode)}
+            title="สลับโหมดเช็คอินด่วนอัตโนมัติ"
+            className={`px-3 py-2.5 rounded-xl border transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer ${
+              fastTrackMode 
+                ? 'bg-amber-500 border-amber-600 text-white shadow-xs' 
+                : 'bg-white border-[var(--line)] text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <Zap className={`h-4 w-4 ${fastTrackMode ? 'text-white' : 'text-amber-500'}`} />
+            <span>{fastTrackMode ? '⚡ โหมดเช็คอินด่วน (ON)' : 'โหมดตรวจละเอียด'}</span>
+          </button>
+
           <Link
             href="/staff/walk-in"
             className="editorial-btn-secondary text-xs flex items-center gap-2"
@@ -431,286 +702,387 @@ export default function StaffCheckinPage() {
             </div>
             <span className="text-[11px] text-gray-500 block">ปริมาณผู้ที่สนใจล่วงหน้า</span>
           </div>
-          <div className="p-3 rounded-2xl bg-amber-50 text-amber-700 border border-amber-100">
+          <div className="p-3 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100">
             <User className="h-6 w-6" />
           </div>
         </div>
 
         <div className="bg-white border border-[var(--line)] rounded-2xl p-5 shadow-xs flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">
+            <span className="text-xs font-bold text-sky-700 uppercase tracking-wide">
               2. มาเช็คอินเข้างานแล้ว
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-black text-blue-900">
+              <span className="text-2xl sm:text-3xl font-black text-sky-900">
                 {stats.checkedIn}
               </span>
-              <span className="text-xs text-blue-600 font-bold">คน</span>
+              <span className="text-xs text-sky-600 font-bold">คน</span>
               {stats.totalToday > 0 && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold">
                   {Math.round((stats.checkedIn / stats.totalToday) * 100)}%
                 </span>
               )}
             </div>
-            <span className="text-[11px] text-blue-600/80 block">จำนวนผู้ที่มาถึงงานจริง</span>
+            <span className="text-[11px] text-sky-600 block">มาจริงที่งาน (% Turnout)</span>
           </div>
-          <div className="p-3 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100">
+          <div className="p-3 rounded-2xl bg-sky-50 text-sky-700 border border-sky-100">
             <UserCheck className="h-6 w-6" />
           </div>
         </div>
 
-        <div className="bg-white border border-[var(--line)] rounded-2xl p-5 shadow-xs flex items-center justify-between">
+        <div className="bg-white border border-emerald-200 rounded-2xl p-5 shadow-xs flex items-center justify-between bg-emerald-50/40">
           <div className="space-y-1">
-            <span className="text-xs font-bold text-emerald-700 uppercase tracking-wide">
+            <span className="text-xs font-bold text-emerald-800 uppercase tracking-wide">
               3. บริจาคสำเร็จ & รับของที่ระลึก
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-black text-emerald-900">
+              <span className="text-2xl sm:text-3xl font-black text-emerald-950">
                 {stats.completed}
               </span>
-              <span className="text-xs text-emerald-600 font-bold">คน / ยูนิต</span>
+              <span className="text-xs text-emerald-700 font-bold">คน / ยูนิต</span>
             </div>
-            <span className="text-[11px] text-emerald-600/80 block">มอบของที่ระลึกเรียบร้อย</span>
+            <span className="text-[11px] text-emerald-700 block">
+              สำเร็จ {stats.completed} ยูนิต · มอบของที่ระลึกแล้ว
+            </span>
           </div>
-          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100">
+          <div className="p-3 rounded-2xl bg-emerald-100 text-emerald-800 border border-emerald-200">
             <Gift className="h-6 w-6" />
           </div>
         </div>
       </div>
 
-      {/* Status / Alert Banner */}
+      {/* Alert Banner */}
       {message && (
-        <div className={`p-4 rounded-2xl border text-xs font-bold flex items-center justify-between gap-3 shadow-xs animate-in fade-in slide-in-from-top-2 ${
-          message.type === 'success' ? 'bg-emerald-50 text-emerald-900 border-emerald-200' :
-          message.type === 'warning' ? 'bg-amber-50 text-amber-900 border-amber-200' :
-          message.type === 'info' ? 'bg-blue-50 text-blue-900 border-blue-200' :
-          'bg-rose-50 text-rose-900 border-rose-200'
-        }`}>
-          <div className="flex items-center gap-2.5">
-            {message.type === 'success' && <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />}
-            {message.type === 'warning' && <AlertCircle className="h-5 w-5 text-amber-600 shrink-0" />}
-            {message.type === 'info' && <Sparkles className="h-5 w-5 text-blue-600 shrink-0" />}
-            {message.type === 'error' && <XCircle className="h-5 w-5 text-rose-600 shrink-0" />}
-            <span className="text-sm font-black">{message.text}</span>
-          </div>
-          <button
-            type="button"
+        <div
+          className={`p-4 rounded-2xl border text-sm font-bold flex items-start gap-3 transition-all ${
+            message.type === 'success'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+              : message.type === 'error'
+              ? 'bg-red-50 border-red-200 text-red-800'
+              : message.type === 'warning'
+              ? 'bg-amber-50 border-amber-200 text-amber-800'
+              : 'bg-blue-50 border-blue-200 text-blue-900'
+          }`}
+        >
+          {message.type === 'success' && <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />}
+          {message.type === 'error' && <XCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />}
+          {message.type === 'warning' && <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />}
+          {message.type === 'info' && <Sparkles className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />}
+          <div className="flex-1">{message.text}</div>
+          <button 
+            type="button" 
             onClick={() => setMessage(null)}
-            className="text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
+            className="text-xs opacity-60 hover:opacity-100 cursor-pointer"
           >
-            <XCircle className="h-4 w-4" />
+            ✕
           </button>
         </div>
       )}
 
-      {/* Main Two-Pane Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Main Grid: Left Scanner & Search, Right Donor Review Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
-        {/* Left Pane: High-End QR Scanner & Search (5 cols) */}
-        <div className="lg:col-span-5 bg-white border border-[var(--line)] rounded-3xl p-6 space-y-6 shadow-sm">
-          
-          <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
-            <div className="flex items-center gap-2">
-              <QrCode className="h-4 w-4 text-[var(--burgundy-700)]" />
-              <h2 className="text-xs font-black text-[var(--ink)] uppercase tracking-wider">
-                สแกน QR Code บัตรผู้บริจาค
-              </h2>
-            </div>
-            <div className="flex items-center gap-2">
-              {scanning && (
-                <button
-                  type="button"
-                  onClick={toggleCameraFacing}
-                  title="สลับกล้องหน้า/หลัง"
-                  className="p-1 px-2 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
-                >
-                  <RotateCcw className="h-3 w-3" />
-                  <span>{facingMode === 'environment' ? 'กล้องหลัง' : 'กล้องหน้า'}</span>
-                </button>
-              )}
-              <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-black uppercase ${
-                scanning ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'
-              }`}>
-                {scanning ? 'LIVE CAMERA' : 'STANDBY'}
+        {/* Left Column: Interactive QR Scanner & Practical Tools (5 cols) */}
+        <div className="lg:col-span-5 space-y-6">
+          <div className="editorial-card p-6 space-y-5">
+            <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+              <div className="flex items-center gap-2">
+                <QrCode className="h-5 w-5 text-[var(--burgundy-700)]" />
+                <h2 className="text-base font-black text-[var(--ink)]">
+                  เครื่องสแกน QR Code กล้องสด
+                </h2>
+              </div>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${scanning ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-500'}`}>
+                {scanning ? 'CAMERA ACTIVE' : 'STANDBY'}
               </span>
             </div>
-          </div>
 
-          {/* Camera Region Container */}
-          <div className="relative w-full rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 aspect-square flex items-center justify-center shadow-inner">
-            
-            {/* Always in DOM for Html5Qrcode attach */}
-            <div
-              id="qr-reader-region"
-              className={`w-full h-full ${scanning ? 'block' : 'hidden'}`}
+            {/* Hidden Input for Image File Upload */}
+            <input 
+              ref={fileInputRef}
+              type="file" 
+              accept="image/*" 
+              className="hidden" 
+              onChange={handleImageUpload} 
             />
 
-            {/* Standby Viewfinder Placeholder */}
-            {!scanning && (
-              <div className="relative aspect-square w-full flex flex-col items-center justify-center text-white p-6 text-center space-y-3">
-                {/* Modern Reticle / Guides */}
-                <div className="absolute inset-12 border-2 border-dashed border-rose-400/40 rounded-2xl pointer-events-none flex items-center justify-center">
-                  <div className="h-5 w-5 border-t-2 border-l-2 border-rose-500 absolute -top-1 -left-1 rounded-tl" />
-                  <div className="h-5 w-5 border-t-2 border-r-2 border-rose-500 absolute -top-1 -right-1 rounded-tr" />
-                  <div className="h-5 w-5 border-b-2 border-l-2 border-rose-500 absolute -bottom-1 -left-1 rounded-bl" />
-                  <div className="h-5 w-5 border-b-2 border-r-2 border-rose-500 absolute -bottom-1 -right-1 rounded-br" />
-                </div>
+            {/* Scanner Viewfinder Box */}
+            <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-gray-950 border border-gray-800 shadow-inner flex items-center justify-center">
+              
+              {/* html5-qrcode DOM Region */}
+              <div
+                id="qr-reader-region"
+                className="w-full h-full object-cover"
+                style={{ minHeight: '280px' }}
+              />
 
-                <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md shadow-inner">
-                  <QrCode className="h-10 w-10 text-rose-300" />
-                </div>
-
-                <div className="space-y-1 z-10">
-                  <p className="text-sm font-black text-white">สแกนบัตรลงทะเบียน</p>
-                  <p className="text-[11px] text-slate-400">หันกล้องไปที่ QR Code ของผู้บริจาค</p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => startScanner()}
-                  className="editorial-btn-primary py-2.5 px-6 text-xs flex items-center gap-2 shadow-lg cursor-pointer z-10"
-                >
-                  <Camera className="h-4 w-4" />
-                  <span>เปิดกล้องสแกน</span>
-                </button>
-              </div>
-            )}
-
-            {/* Active Laser Scanning Overlay */}
-            {scanning && (
-              <>
+              {/* Laser Scanning Animation and Reticle Corners when camera is ON */}
+              {scanning && (
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                  <div className="w-56 h-56 border-2 border-rose-500/70 rounded-2xl relative">
-                    <div className="h-6 w-6 border-t-4 border-l-4 border-rose-500 absolute -top-1.5 -left-1.5 rounded-tl" />
-                    <div className="h-6 w-6 border-t-4 border-r-4 border-rose-500 absolute -top-1.5 -right-1.5 rounded-tr" />
-                    <div className="h-6 w-6 border-b-4 border-l-4 border-rose-500 absolute -bottom-1.5 -left-1.5 rounded-bl" />
-                    <div className="h-6 w-6 border-b-4 border-r-4 border-rose-500 absolute -bottom-1.5 -right-1.5 rounded-br" />
-                    {/* Animated Laser Line */}
-                    <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-rose-500 to-transparent absolute top-1/2 -translate-y-1/2 animate-pulse shadow-[0_0_12px_rgba(244,63,94,0.9)]" />
+                  {/* Outer Dim Mask */}
+                  <div className="absolute inset-0 bg-black/30" />
+
+                  {/* Target Scan Frame */}
+                  <div className="relative w-64 h-64 border-2 border-emerald-400/80 rounded-2xl shadow-[0_0_25px_rgba(52,211,153,0.3)] flex flex-col justify-between p-2">
+                    
+                    {/* 4 Reticle Corners */}
+                    <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg" />
+                    <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg" />
+                    <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg" />
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-lg" />
+
+                    {/* Laser Scanner Line */}
+                    <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-bounce" />
+
+                    <div className="text-center text-[10px] font-mono font-bold text-emerald-300 bg-black/60 py-1 px-2 rounded-full self-center">
+                      จัดวาง QR Code ให้อยู่ในกรอบ
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+              {/* Standby Placeholder */}
+              {!scanning && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-gray-400 space-y-3 bg-gray-900">
+                  <div className="p-4 rounded-3xl bg-gray-800 text-gray-300 border border-gray-700">
+                    <Camera className="h-10 w-10" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-bold text-gray-200">กล้องพร้อมใช้งาน</p>
+                    <p className="text-xs text-gray-400 max-w-xs">
+                      กดปุ่ม &ldquo;เปิดกล้องสแกน&rdquo; หรือเลือกรูปภาพ QR Code เพื่อตรวจสอบ
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Practical Camera & Image Controls */}
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                {!scanning ? (
                   <button
                     type="button"
-                    onClick={stopScanner}
-                    className="px-4 py-1.5 rounded-xl bg-black/80 backdrop-blur-md hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 border border-white/20 shadow-lg cursor-pointer transition-colors"
+                    onClick={() => startScanner('environment')}
+                    className="flex-1 editorial-btn-primary py-3 text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                   >
-                    <XCircle className="h-3.5 w-3.5" />
-                    <span>ปิดกล้อง</span>
+                    <Camera className="h-4 w-4" />
+                    <span>เปิดกล้องสแกน QR</span>
                   </button>
-                </div>
-              </>
-            )}
-          </div>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={stopScanner}
+                      className="flex-1 py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all shadow-xs"
+                    >
+                      <Ban className="h-4 w-4" />
+                      <span>ปิดกล้อง</span>
+                    </button>
 
-          {/* Quick Manual Search */}
-          <div className="space-y-2 pt-2 border-t border-gray-100">
-            <label htmlFor="ck-search" className="block text-xs font-black text-[var(--ink)]">
-              หรือค้นหาด่วน (ชื่อ / เบอร์โทร / รหัสยืนยัน)
-            </label>
-            <form onSubmit={handleSearch} className="flex gap-2">
-              <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  id="ck-search"
-                  type="text"
-                  placeholder="ค้นหาชื่อ / เบอร์โทร / รหัสยืนยัน..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-[var(--line)] bg-gray-50 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[var(--burgundy-600)]"
-                />
+                    <button
+                      type="button"
+                      onClick={toggleCameraFacing}
+                      title="สลับกล้องหน้า/หลัง"
+                      className="py-3 px-4 rounded-xl border border-[var(--line)] bg-white hover:bg-gray-50 text-[var(--ink)] text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      <span className="hidden sm:inline">สลับกล้อง</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={toggleTorch}
+                      title="เปิด/ปิดไฟฉาย"
+                      className={`py-3 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
+                        torchOn ? 'bg-amber-400 text-amber-950 border-amber-500' : 'bg-white border-[var(--line)] text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Flashlight className="h-4 w-4" />
+                      <span className="hidden sm:inline">{torchOn ? 'ไฟฉาย ON' : 'ไฟฉาย'}</span>
+                    </button>
+                  </>
+                )}
+
+                {/* Upload Image Button */}
+                <button
+                  type="button"
+                  disabled={uploadingImage}
+                  onClick={() => fileInputRef.current?.click()}
+                  title="อัปโหลดภาพ QR Code จากอัลบั้มหรือไฟล์"
+                  className="py-3 px-4 rounded-xl border border-[var(--line)] bg-white hover:bg-gray-50 text-[var(--ink)] text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
+                >
+                  <UploadCloud className="h-4 w-4 text-blue-600" />
+                  <span>{uploadingImage ? 'กำลังอ่าน...' : 'เลือกรูป QR'}</span>
+                </button>
               </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="editorial-btn-primary px-4 text-xs font-black"
-              >
-                {loading ? '...' : 'ค้นหา'}
-              </button>
+
+              {/* Camera Lens Selector if multiple cameras exist */}
+              {cameras.length > 1 && (
+                <div className="flex items-center gap-2 pt-1">
+                  <SlidersHorizontal className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                  <select
+                    value={selectedCameraId}
+                    onChange={(e) => handleCameraChange(e.target.value)}
+                    className="w-full text-xs py-1.5 px-2.5 rounded-lg border border-[var(--line)] bg-gray-50 text-gray-700 font-medium focus:outline-none focus:ring-1 focus:ring-[var(--burgundy-700)] cursor-pointer"
+                  >
+                    {cameras.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* Hardware Scanner & Keyboard Wedge Helper */}
+            <div className="rounded-xl bg-gray-50 border border-gray-200 p-3 text-[11px] text-gray-600 flex items-center gap-2.5">
+              <span className="px-2 py-0.5 rounded bg-gray-200 text-gray-800 font-mono font-bold text-[10px]">
+                USB / 2D GUN
+              </span>
+              <span>รองรับเครื่องยิงบาร์โค้ด USB/Bluetooth ยิงรหัสได้ทันทีโดยไม่ต้องแตะหน้าจอ</span>
+            </div>
+
+            {/* Manual Search Fallback */}
+            <form onSubmit={handleSearch} className="space-y-3 pt-3 border-t border-[var(--line)]">
+              <label htmlFor="ck-search" className="block text-xs font-bold text-[var(--ink)]">
+                ค้นหาด้วยชื่อ / เบอร์โทร / รหัสลงทะเบียน
+              </label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    id="ck-search"
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="เช่น MBD26-XXXX หรือ 0812345678"
+                    className="editorial-input w-full pl-9 text-xs"
+                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="editorial-btn-primary px-4 py-2 text-xs font-bold shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  {loading ? 'ค้นหา...' : 'ค้นหา'}
+                </button>
+              </div>
             </form>
           </div>
 
+          {/* Recent Scans History Card (5 items) */}
+          {recentScans.length > 0 && (
+            <div className="editorial-card p-5 space-y-3">
+              <div className="flex items-center justify-between border-b border-[var(--line)] pb-2">
+                <div className="flex items-center gap-2">
+                  <History className="h-4 w-4 text-[var(--burgundy-700)]" />
+                  <span className="text-xs font-bold text-[var(--ink)]">ประวัติการสแกนล่าสุด</span>
+                </div>
+                <span className="text-[10px] font-bold text-gray-400">{recentScans.length} รายการ</span>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {recentScans.map((item) => (
+                  <div 
+                    key={item.id}
+                    onClick={() => handleLookupByToken(item.code)}
+                    className="py-2 flex items-center justify-between gap-2 hover:bg-gray-50 px-2 rounded-lg cursor-pointer transition-colors"
+                  >
+                    <div className="space-y-0.5 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-[var(--ink)] truncate">{item.name}</span>
+                        <span className="font-mono text-[10px] text-gray-400">{item.code}</span>
+                      </div>
+                      <span className="text-[10px] text-gray-400 font-mono">{item.time}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        item.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {item.status === 'COMPLETED' ? 'รับของขวัญแล้ว 🎁' : 'เช็คอินแล้ว'}
+                      </span>
+                      <ChevronRight className="h-3.5 w-3.5 text-gray-300" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Right Pane: Donor Confirmation & Souvenir Card (7 cols) */}
+        {/* Right Column: Donor Confirmation Card & Action Workflow (7 cols) */}
         <div className="lg:col-span-7">
           {registration ? (
-            <div className="bg-white border border-[var(--line)] rounded-3xl p-7 space-y-6 shadow-sm animate-in fade-in duration-200">
+            <div className="editorial-card p-6 space-y-6 animate-in fade-in-50 duration-300">
               
-              {/* Card Header: Code & Status */}
-              <div className="flex items-center justify-between border-b border-[var(--line)] pb-4">
-                <div>
-                  <span className="text-[10px] font-mono font-bold text-[var(--muted)] uppercase tracking-wider block">
-                    REGISTRATION PASS
-                  </span>
-                  <span className="text-2xl sm:text-3xl font-mono font-black text-[var(--burgundy-700)]">
-                    {registration.registrationCode}
-                  </span>
+              {/* Card Header & Status */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--line)] pb-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-black text-sm text-[var(--burgundy-700)] bg-[var(--rose-100)] px-2.5 py-0.5 rounded-md border border-[var(--line)]">
+                      {registration.registrationCode}
+                    </span>
+                    <span className="text-xs font-bold text-gray-500">
+                      {getParticipantTypeLabel(registration.participantType)}
+                    </span>
+                  </div>
+                  <h2 className="text-2xl font-black text-[var(--ink)]">
+                    คุณ{registration.firstName} {registration.lastName}
+                  </h2>
                 </div>
 
-                <div className="text-right">
+                <div className="shrink-0">
                   {(() => {
                     const badge = getRegistrationStatusBadge(registration.status);
-                    const engStatus = registration.status === 'CHECKED_IN' ? 'CHECKED IN' : registration.status;
                     return (
-                      <div className="flex flex-col items-end gap-1">
-                        <span className={`px-3 py-1 rounded-full text-xs font-black border ${badge.colorClass}`}>
-                          {badge.label}
-                        </span>
-                        <span className="text-[10px] font-mono font-bold text-[var(--muted)]">
-                          {engStatus}
-                        </span>
-                      </div>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black border ${badge.colorClass}`}>
+                        {badge.label}
+                      </span>
                     );
                   })()}
                 </div>
               </div>
 
-              {/* Donor Data Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
-                  <span className="text-[11px] font-bold text-gray-500 block flex items-center gap-1.5">
-                    <User className="h-3.5 w-3.5 text-gray-400" /> ชื่อ - นามสกุล
+              {/* Information Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/70 p-4 rounded-2xl border border-gray-200/70">
+                <div className="space-y-1">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                    รอบเวลาที่ลงทะเบียน
                   </span>
-                  <p className="text-lg font-black text-[var(--ink)]">
-                    คุณ{registration.firstName} {registration.lastName}
+                  <p className="text-sm font-black text-[var(--ink)] font-mono">
+                    {registration.timeSlotText}
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
-                  <span className="text-[11px] font-bold text-gray-500 block flex items-center gap-1.5">
-                    <Phone className="h-3.5 w-3.5 text-gray-400" /> เบอร์โทรศัพท์
+                <div className="space-y-1">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Phone className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                    เบอร์โทรศัพท์ติดต่อ
                   </span>
-                  <p className="text-lg font-mono font-black text-[var(--ink)]">
+                  <p className="text-sm font-black text-[var(--ink)] font-mono">
                     {registration.phone}
                   </p>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
-                  <span className="text-[11px] font-bold text-gray-500 block">ประเภทผู้บริจาค</span>
-                  <p className="font-bold text-[var(--ink)]">
-                    {getParticipantTypeLabel(registration.participantType)}
-                  </p>
-                  <span className="text-[10px] text-gray-500 block">{registration.facultyName}</span>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
-                  <span className="text-[11px] font-bold text-gray-500 block flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5 text-[var(--burgundy-700)]" /> รอบเวลาที่ลงทะเบียน
+                <div className="space-y-1 sm:col-span-2">
+                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                    สังกัด / คณะ / หน่วยงาน
                   </span>
-                  <p className="font-mono font-bold text-[var(--burgundy-700)] text-sm">
-                    {registration.timeSlotText}
+                  <p className="text-sm font-bold text-[var(--ink)]">
+                    {registration.facultyName}
                   </p>
                 </div>
               </div>
 
-              {/* Status Context & Next Action Guidance */}
-              <div className="rounded-2xl p-4 border space-y-2 bg-[var(--rose-50)]/50 border-[var(--rose-100)]">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[var(--burgundy-800)] flex items-center gap-1.5">
-                    <ShieldCheck className="h-4 w-4 text-[var(--burgundy-700)]" />
-                    สถานะการเข้าร่วมงาน & ของที่ระลึก:
+              {/* Status Guide & Instructions */}
+              <div className="p-4 rounded-2xl border space-y-2 bg-blue-50/40 border-blue-200/60">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-[var(--ink)] flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-blue-700" />
+                    สถานะการเข้าร่วมงานและการรับของที่ระลึก
                   </span>
                   {registration.checkedInAt && (
                     <span className="text-[11px] font-mono text-gray-600">
@@ -743,83 +1115,91 @@ export default function StaffCheckinPage() {
               <div className="space-y-3 pt-2 border-t border-[var(--line)]">
                 <div className="flex flex-col sm:flex-row gap-3">
                   
-                  {/* Step 1: Check In */}
+                  {/* Step 1 Button: Check-in */}
                   {registration.status === 'REGISTERED' && (
                     <button
                       type="button"
                       disabled={actionLoading}
                       onClick={() => handleStatusChange('CHECKED_IN')}
-                      className="flex-1 py-4 px-5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-sm shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
+                      className="flex-1 py-3.5 px-5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-black text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer disabled:opacity-50"
                     >
                       <UserCheck className="h-5 w-5" />
                       <span>1. ยืนยันการเช็คอินเข้างาน (CHECK-IN)</span>
                     </button>
                   )}
 
-                  {/* Step 2: Complete Donation & Give Souvenir */}
+                  {/* Step 2 Button: Completed & Souvenir */}
                   {registration.status === 'CHECKED_IN' && (
                     <button
                       type="button"
                       disabled={actionLoading}
                       onClick={() => handleStatusChange('COMPLETED')}
-                      className="flex-1 py-4 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow-md flex items-center justify-center gap-2 transition-all active:scale-[0.99] cursor-pointer"
+                      className="flex-1 py-3.5 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50 animate-pulse"
                     >
                       <Gift className="h-5 w-5" />
                       <span>2. ยืนยันบริจาคสำเร็จ & มอบของที่ระลึก (COMPLETED)</span>
                     </button>
                   )}
 
-                  {/* If Already Completed */}
+                  {/* Completed State Display */}
                   {registration.status === 'COMPLETED' && (
-                    <div className="flex-1 py-3 px-4 rounded-2xl bg-emerald-100 text-emerald-900 font-black text-xs flex items-center justify-center gap-2 border border-emerald-200">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                      <span>เสร็จสิ้นกระบวนการทั้งหมดแล้ว</span>
+                    <div className="flex-1 py-3.5 px-5 rounded-2xl bg-emerald-100 text-emerald-900 font-black text-sm flex items-center justify-center gap-2 border border-emerald-300">
+                      <CheckCircle2 className="h-5 w-5 text-emerald-700" />
+                      <span>เสร็จสิ้นกระบวนการและมอบของที่ระลึกแล้ว</span>
                     </div>
                   )}
 
-                  {/* Cancel / Ineligible Button */}
-                  {registration.status !== 'CANCELLED' && registration.status !== 'COMPLETED' && (
+                  {/* Cancel / Failed Screening Button */}
+                  {registration.status !== 'COMPLETED' && registration.status !== 'CANCELLED' && (
                     <button
                       type="button"
                       disabled={actionLoading}
-                      onClick={() => handleStatusChange('CANCELLED')}
-                      className="py-3 px-4 rounded-2xl bg-gray-100 hover:bg-rose-50 text-gray-700 hover:text-rose-700 font-bold text-xs border border-gray-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                      onClick={() => {
+                        if (confirm(`ยืนยันการยกเลิก / ไม่ผ่านการคัดกรอง สำหรับคุณ ${registration.firstName}?`)) {
+                          handleStatusChange('CANCELLED');
+                        }
+                      }}
+                      className="py-3.5 px-4 rounded-2xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shrink-0"
                     >
-                      <Ban className="h-4 w-4" />
+                      <Ban className="h-4 w-4 text-red-600" />
                       <span>ยกเลิก / ไม่ผ่านคัดกรอง</span>
                     </button>
                   )}
-
                 </div>
 
-                {/* Reset / Next Scan Action */}
-                <div className="flex justify-end pt-1">
+                {/* Reset / Scan Next Person */}
+                <div className="flex justify-between items-center pt-2">
                   <button
                     type="button"
                     onClick={() => {
                       setRegistration(null);
-                      setMessage(null);
                       setSearchQuery('');
                     }}
-                    className="text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center gap-1 p-1 cursor-pointer"
+                    className="text-xs font-bold text-gray-500 hover:text-[var(--ink)] flex items-center gap-1 cursor-pointer"
                   >
-                    <span>สแกนหรือค้นหารายการถัดไป ➔</span>
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    <span>เคลียร์หน้าจอเพื่อสแกนคนถัดไป</span>
                   </button>
+
+                  <span className="text-[11px] text-gray-400 font-mono">
+                    ID: {registration.id.slice(0, 8)}...
+                  </span>
                 </div>
               </div>
 
             </div>
           ) : (
-            <div className="bg-white border border-[var(--line)] rounded-3xl p-12 text-center space-y-4 shadow-xs">
-              <div className="h-20 w-20 mx-auto rounded-3xl bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center shadow-inner">
-                <QrCode className="h-10 w-10" />
+            /* Empty State */
+            <div className="editorial-card p-12 text-center flex flex-col items-center justify-center space-y-4 min-h-[420px]">
+              <div className="p-4 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)]">
+                <QrCode className="h-12 w-12 stroke-[1.5]" />
               </div>
-              <div className="space-y-1">
+              <div className="space-y-1.5 max-w-sm">
                 <h3 className="text-lg font-black text-[var(--ink)]">
-                  พร้อมสำหรับการสแกนหรือค้นหาผู้บริจาค
+                  พร้อมสำหรับการสแกน
                 </h3>
-                <p className="text-xs text-[var(--muted)] max-w-md mx-auto leading-relaxed">
-                  สแกน QR Code จากบัตรผู้บริจาค หรือพิมพ์ค้นหาด้วยชื่อ เบอร์โทรศัพท์ หรือรหัสบัตร เพื่อตรวจสอบและยืนยันการเช็คอินและมอบของที่ระลึก
+                <p className="text-xs text-[var(--muted)] leading-relaxed">
+                  ส่องกล้องไปที่ QR Code ของผู้บริจาค หรือใช้เครื่องยิงบาร์โค้ด USB หรืออัปโหลดรูปภาพเพื่อดึงข้อมูลและยืนยันเช็คอิน
                 </p>
               </div>
             </div>
