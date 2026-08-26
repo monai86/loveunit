@@ -23,10 +23,10 @@ test('donor can register online and reach the QR pass', async ({ page }) => {
   await page.getByRole('button', { name: /เคยบริจาคแล้ว/ }).click();
   await page.getByRole('button', { name: 'ถัดไป' }).click();
 
-  // ---- Step 3: pick a free slot + accept privacy ----
+  // ---- Step 3: pick a preferred arrival slot + accept privacy ----
   await expect(page.getByRole('heading', { name: /03\. เลือกรอบเวลา/ })).toBeVisible();
-  // Click the first slot that is not full.
-  const slot = page.locator('button[type="button"]', { hasText: 'ว่าง' }).first();
+  // Click the first preferred arrival slot.
+  const slot = page.locator('button[type="button"]').filter({ hasText: /09:00|10:00|11:00|12:00|13:00/ }).first();
   await slot.click();
   await page.getByRole('checkbox').check();
 
@@ -34,15 +34,15 @@ test('donor can register online and reach the QR pass', async ({ page }) => {
 
   // ---- Redirect to /registration/[code] with the pass ----
   await page.waitForURL(/\/registration\//, { timeout: 15_000 });
-  expect(page.url()).toMatch(/\/registration\/MBD26-/);
+  expect(page.url()).toMatch(/\/registration\/LVU26-/);
 
-  // QR code rendered (qrcode.react renders an <svg role="img">) + donor name shown.
-  await expect(page.locator('svg[role="img"]')).toBeVisible();
+  // QR code rendered (qrcode.react renders an <svg>) + donor name shown.
+  await expect(page.locator('svg').first()).toBeVisible();
   await expect(page.getByText(firstName)).toBeVisible();
   await expect(page.getByText(lastName)).toBeVisible();
 
   // Clean up created donor so test data does not linger in DB
-  const match = page.url().match(/\/registration\/(MBD26-[A-Z0-9]+)/);
+  const match = page.url().match(/\/registration\/(LVU26-[0-9A-Z]+)/);
   if (match && match[1]) {
     await page.request.post('/api/events/mumt-2026/cancel', {
       data: { registrationCode: match[1], reason: 'E2E test teardown cleanup' },

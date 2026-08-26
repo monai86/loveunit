@@ -71,7 +71,7 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
   expect(regRes.status(), await regRes.text()).toBe(200);
   const regBody = await regRes.json();
   donorCode = regBody.registration?.registrationCode || regBody.registration?.registration_code;
-  expect(donorCode).toMatch(/^MBD26-/);
+  expect(donorCode).toMatch(/^LVU26-/);
 
   // 2) Admin/Staff sign-in with the known password.
   await page.goto('/staff/login');
