@@ -320,21 +320,132 @@ export default function StaffCheckinPage() {
     setTorchOn(false);
   }, []);
 
-  // Fetch available cameras on mount
+  const startScanner = useCallback(async (targetFacing: 'environment' | 'user' = facingMode, customCameraId?: string) => {
+    setMessage(null);
+    try {
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+        } catch {
+          // ignore
+        }
+        try {
+          scannerRef.current.clear();
+        } catch {
+          // ignore
+        }
+        scannerRef.current = null;
+      }
+
+      setScanning(true);
+      await new Promise((r) => setTimeout(r, 120));
+
+      const element = document.getElementById('qr-reader-region');
+      if (!element) {
+        throw new Error('Scanner container element not found');
+      }
+
+      const scanner = new Html5Qrcode('qr-reader-region');
+      scannerRef.current = scanner;
+
+      const qrConfig = {
+        fps: 15,
+        qrbox: { width: 260, height: 260 },
+        aspectRatio: 1.0,
+      };
+
+      const qrCodeSuccessCallback = (decodedText: string) => {
+        handleLookupByToken(decodedText.trim());
+      };
+
+      const cameraSelection = customCameraId 
+        ? { deviceId: { exact: customCameraId } }
+        : { facingMode: targetFacing };
+
+      try {
+        await scanner.start(
+          cameraSelection,
+          qrConfig,
+          qrCodeSuccessCallback,
+          () => {}
+        );
+        setFacingMode(targetFacing);
+      } catch (envErr) {
+        console.warn(`${targetFacing} camera failed, trying fallback camera:`, envErr);
+        const fallbackMode = targetFacing === 'environment' ? 'user' : 'environment';
+        await scanner.start(
+          { facingMode: fallbackMode },
+          qrConfig,
+          qrCodeSuccessCallback,
+          () => {}
+        );
+        setFacingMode(fallbackMode);
+      }
+    } catch (err: unknown) {
+      console.error('Camera start error:', err);
+      setScanning(false);
+      if (scannerRef.current) {
+        try {
+          await scannerRef.current.stop();
+        } catch {
+          // ignore
+        }
+        try {
+          scannerRef.current.clear();
+        } catch {
+          // ignore
+        }
+        scannerRef.current = null;
+      }
+
+      const errMsg = err instanceof Error ? err.message : String(err);
+      if (errMsg.includes('NotAllowedError') || errMsg.includes('Permission') || errMsg.includes('Permission denied')) {
+        setMessage({ type: 'error', text: 'เบราว์เซอร์ไม่อนุญาตให้เข้าถึงกล้อง กรุณากดอนุญาตสิทธิ์การใช้กล้อง (Camera Permission) ในแถบเบราว์เซอร์' });
+      } else if (errMsg.includes('NotFoundError') || errMsg.includes('no camera')) {
+        setMessage({ type: 'error', text: 'ไม่พบอุปกรณ์กล้องบนเครื่องนี้ กรุณาใช้ช่องค้นหาด้านล่างแทน' });
+      } else {
+        setMessage({ type: 'error', text: 'ไม่สามารถเปิดกล้องได้ กรุณาตรวจสอบการอนุญาตสิทธิ์กล้อง หรือใช้ช่องค้นหาแทน' });
+      }
+    }
+  }, [facingMode, handleLookupByToken]);
+
+  // Fetch available cameras on mount & Auto-start scanner immediately
   useEffect(() => {
-    Html5Qrcode.getCameras()
-      .then((devices) => {
+    let unmounted = false;
+
+    const initCamera = async () => {
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (unmounted) return;
         if (devices && devices.length > 0) {
           setCameras(devices.map((d) => ({ id: d.id, label: d.label || `Camera ${d.id.slice(0, 4)}` })));
           const rear = devices.find((d) => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear') || d.label.toLowerCase().includes('environment'));
-          if (rear) setSelectedCameraId(rear.id);
-          else setSelectedCameraId(devices[0].id);
+          const targetId = rear ? rear.id : devices[0].id;
+          setSelectedCameraId(targetId);
+          if (!unmounted) {
+            void startScanner('environment', targetId);
+          }
+        } else {
+          if (!unmounted) {
+            void startScanner('environment');
+          }
         }
-      })
-      .catch(() => {
-        // Ignored if camera permission not granted yet
-      });
-  }, []);
+      } catch {
+        if (!unmounted) {
+          void startScanner('environment');
+        }
+      }
+    };
+
+    const timer = setTimeout(() => {
+      void initCamera();
+    }, 200);
+
+    return () => {
+      unmounted = true;
+      clearTimeout(timer);
+    };
+  }, [startScanner]);
 
   // Keyboard wedge listener for USB/Bluetooth physical barcode scanners
   useEffect(() => {
@@ -486,94 +597,6 @@ export default function StaffCheckinPage() {
     }
   };
 
-  const startScanner = async (targetFacing: 'environment' | 'user' = facingMode, customCameraId?: string) => {
-    setMessage(null);
-    try {
-      if (scannerRef.current) {
-        try {
-          await scannerRef.current.stop();
-        } catch {
-          // ignore
-        }
-        try {
-          scannerRef.current.clear();
-        } catch {
-          // ignore
-        }
-        scannerRef.current = null;
-      }
-
-      setScanning(true);
-      await new Promise((r) => setTimeout(r, 120));
-
-      const element = document.getElementById('qr-reader-region');
-      if (!element) {
-        throw new Error('Scanner container element not found');
-      }
-
-      const scanner = new Html5Qrcode('qr-reader-region');
-      scannerRef.current = scanner;
-
-      const qrConfig = {
-        fps: 15,
-        qrbox: { width: 260, height: 260 },
-        aspectRatio: 1.0,
-      };
-
-      const qrCodeSuccessCallback = (decodedText: string) => {
-        handleLookupByToken(decodedText.trim());
-      };
-
-      const cameraSelection = customCameraId 
-        ? { deviceId: { exact: customCameraId } }
-        : { facingMode: targetFacing };
-
-      try {
-        await scanner.start(
-          cameraSelection,
-          qrConfig,
-          qrCodeSuccessCallback,
-          () => {}
-        );
-        setFacingMode(targetFacing);
-      } catch (envErr) {
-        console.warn(`${targetFacing} camera failed, trying fallback camera:`, envErr);
-        const fallbackMode = targetFacing === 'environment' ? 'user' : 'environment';
-        await scanner.start(
-          { facingMode: fallbackMode },
-          qrConfig,
-          qrCodeSuccessCallback,
-          () => {}
-        );
-        setFacingMode(fallbackMode);
-      }
-    } catch (err: unknown) {
-      console.error('Camera start error:', err);
-      setScanning(false);
-      if (scannerRef.current) {
-        try {
-          await scannerRef.current.stop();
-        } catch {
-          // ignore
-        }
-        try {
-          scannerRef.current.clear();
-        } catch {
-          // ignore
-        }
-        scannerRef.current = null;
-      }
-
-      const errMsg = err instanceof Error ? err.message : String(err);
-      if (errMsg.includes('NotAllowedError') || errMsg.includes('Permission') || errMsg.includes('Permission denied')) {
-        setMessage({ type: 'error', text: 'เบราว์เซอร์ไม่อนุญาตให้เข้าถึงกล้อง กรุณากดอนุญาตสิทธิ์การใช้กล้อง (Camera Permission) ในแถบเบราว์เซอร์' });
-      } else if (errMsg.includes('NotFoundError') || errMsg.includes('no camera')) {
-        setMessage({ type: 'error', text: 'ไม่พบอุปกรณ์กล้องบนเครื่องนี้ กรุณาใช้ช่องค้นหาด้านล่างแทน' });
-      } else {
-        setMessage({ type: 'error', text: 'ไม่สามารถเปิดกล้องได้ กรุณาตรวจสอบการอนุญาตสิทธิ์กล้อง หรือใช้ช่องค้นหาแทน' });
-      }
-    }
-  };
 
   const toggleCameraFacing = async () => {
     const nextFacing = facingMode === 'environment' ? 'user' : 'environment';
@@ -659,16 +682,16 @@ export default function StaffCheckinPage() {
           </p>
         </div>
 
-        {/* Action Controls & Pay-App Scanner Trigger */}
+        {/* Action Controls & Fullscreen Scanner Trigger */}
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Big Pay-App Style Scanner Button */}
+          {/* Fullscreen Scanner Button */}
           <button
             type="button"
             onClick={openFullscreenScanner}
             className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-black text-xs flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer transform active:scale-95"
           >
             <Maximize2 className="h-4 w-4 text-emerald-200" />
-            <span>📱 โหมดสแกนแบบแอปจ่ายเงิน (Scan Pay)</span>
+            <span>📱 สแกน QR Code เต็มจอ</span>
           </button>
 
           {/* Sound Toggle */}
@@ -866,7 +889,7 @@ export default function StaffCheckinPage() {
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-gray-200">กล้องพร้อมใช้งาน</p>
                     <p className="text-xs text-gray-400 max-w-xs">
-                      กดปุ่ม &ldquo;เปิดกล้องสแกน&rdquo; หรือกด &ldquo;สแกนแบบแอปจ่ายเงิน&rdquo; ด้านบน
+                      กดปุ่ม &ldquo;เปิดกล้องสแกน QR&rdquo; หรือกด &ldquo;สแกน QR Code เต็มจอ&rdquo; ด้านบน
                     </p>
                   </div>
                 </div>
@@ -1215,7 +1238,7 @@ export default function StaffCheckinPage() {
                   พร้อมสำหรับการสแกน
                 </h3>
                 <p className="text-xs text-[var(--muted)] leading-relaxed">
-                  ส่องกล้องไปที่ QR Code ของผู้บริจาค หรือใช้ปุ่ม &ldquo;โหมดสแกนแบบแอปจ่ายเงิน&rdquo; เพื่อสแกนอย่างรวดเร็วและต่อเนื่อง
+                  ส่องกล้องไปที่ QR Code ของผู้บริจาค หรือกดปุ่ม &ldquo;สแกน QR Code เต็มจอ&rdquo; เพื่อสแกนอย่างรวดเร็วและต่อเนื่อง
                 </p>
               </div>
             </div>
