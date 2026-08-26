@@ -18,7 +18,7 @@ let originalBookedCount: number | null = null;
 async function getDb() {
   const { loadEnvLocal } = await import('../../scripts/lib/env');
   loadEnvLocal();
-  const { db } = await import('@/db');
+  const { db } = await import('../../db');
   return db;
 }
 
@@ -28,7 +28,7 @@ async function markLastSlotFull() {
     console.error('keyboard-nav: db is null — cannot mark slot as full');
     return;
   }
-  const { timeSlots } = await import('@/db/schema');
+  const { timeSlots } = await import('../../db/schema');
   const { desc } = await import('drizzle-orm');
 
   const [row] = await db.select().from(timeSlots).orderBy(desc(timeSlots.startAt)).limit(1);
@@ -50,7 +50,7 @@ async function restoreSlot() {
   if (!targetSlotId || originalCapacity === null) return;
   const db = await getDb();
   if (!db) return;
-  const { timeSlots } = await import('@/db/schema');
+  const { timeSlots } = await import('../../db/schema');
   const { eq } = await import('drizzle-orm');
   await db.update(timeSlots).set({
     capacity: originalCapacity,
