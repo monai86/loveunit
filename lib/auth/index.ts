@@ -4,11 +4,25 @@ import { db } from '@/db';
 import * as schema from '@/db/schema';
 
 const getBaseURL = () => {
-  if (process.env.BETTER_AUTH_URL) return process.env.BETTER_AUTH_URL;
-  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
-  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  if (process.env.NODE_ENV === 'production') return 'https://mumt-loveunit.vercel.app';
+  // If running on Vercel or in production, prefer actual deployed production URL
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  if (process.env.BETTER_AUTH_URL && !process.env.BETTER_AUTH_URL.includes('localhost')) {
+    return process.env.BETTER_AUTH_URL;
+  }
+  if (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes('localhost')) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://mumt-loveunit.vercel.app';
+  }
+  if (process.env.BETTER_AUTH_URL) {
+    return process.env.BETTER_AUTH_URL;
+  }
   return 'http://localhost:3000';
 };
 
@@ -30,8 +44,13 @@ export const auth = betterAuth({
       },
     },
   },
-  secret: process.env.BETTER_AUTH_SECRET || 'dev-better-auth-secret-change-in-prod-123456789',
+  secret: process.env.BETTER_AUTH_SECRET || 'mumt-blood-donation-super-secret-key-2026-auth-32chars',
   baseURL: getBaseURL(),
+  advanced: {
+    ipAddress: {
+      ipAddressHeaders: ['x-forwarded-for', 'x-real-ip'],
+    },
+  },
   trustedOrigins: (request?: Request) => {
     const list = [
       'http://localhost:3000',
