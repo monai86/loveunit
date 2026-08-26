@@ -19,7 +19,7 @@ import type { AuthenticatedUser } from '../lib/auth/server';
 
 const BASE = 'http://localhost:3000';
 
-function makeUser(role: 'STAFF' | 'TEAM_LEAD' | 'ADMIN' | 'SUPER_ADMIN', overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {
+function makeUser(role: 'ADMIN' = 'ADMIN', overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {
   return {
     id: `u-${role.toLowerCase()}-test`,
     email: `${role.toLowerCase()}@test.local`,
@@ -76,13 +76,13 @@ async function runAuthTests() {
 
   // Test 1: sign-up creates a user
   console.log('Test 1: Email/Password Sign-Up');
-  const email = 'newstaff@mahidol.ac.th';
+  const email = 'newadmin@mahidol.ac.th';
   const password = 'InitialPass@2026';
-  const signUp = await post('/api/auth/sign-up/email', { email, password, name: 'เจ้าหน้าที่ใหม่' });
+  const signUp = await post('/api/auth/sign-up/email', { email, password, name: 'ผู้ดูแลระบบใหม่' });
   assert.strictEqual(signUp.status, 200);
   const signUpBody = await signUp.json();
   assert.strictEqual(signUpBody.user.email, email);
-  assert.strictEqual(signUpBody.user.name, 'เจ้าหน้าที่ใหม่');
+  assert.strictEqual(signUpBody.user.name, 'ผู้ดูแลระบบใหม่');
   console.log('✓ Sign-up creates user\n');
 
   // Test 2: sign-in — correct password succeeds, wrong password fails
@@ -124,57 +124,38 @@ async function runAuthTests() {
   assert.strictEqual(afterOutText, 'null', 'session must be gone after sign-out');
   console.log('✓ Session lifecycle verified\n');
 
-  // ---- RBAC server guards (injected users, no DB needed) ----
-  console.log('Test 5: RBAC Guards — requireStaff');
-  assert.ok(await requireStaff(makeUser('STAFF')));
+  // ---- Server Guards for unified ADMIN role ----
+  console.log('Test 5: Server Guards — requireStaff & requireAdmin');
   assert.ok(await requireStaff(makeUser('ADMIN')));
-  await assert.rejects(() => requireStaff(null), /UNAUTHORIZED/, 'null user → 401');
-  console.log('✓ requireStaff: STAFF/ADMIN pass, anonymous rejected\n');
-
-  console.log('Test 6: RBAC Guards — requireTeamLead');
-  assert.ok(await requireTeamLead(makeUser('TEAM_LEAD')));
-  assert.ok(await requireTeamLead(makeUser('ADMIN')));
-  await assert.rejects(() => requireTeamLead(makeUser('STAFF')), /FORBIDDEN/, 'STAFF → 403');
-  await assert.rejects(() => requireTeamLead(null), /UNAUTHORIZED/);
-  console.log('✓ requireTeamLead: TEAM_LEAD/ADMIN pass, STAFF rejected\n');
-
-  console.log('Test 7: RBAC Guards — requireAdmin');
   assert.ok(await requireAdmin(makeUser('ADMIN')));
-  assert.ok(await requireAdmin(makeUser('SUPER_ADMIN')));
-  await assert.rejects(() => requireAdmin(makeUser('TEAM_LEAD')), /FORBIDDEN/, 'TEAM_LEAD → 403');
-  await assert.rejects(() => requireAdmin(makeUser('STAFF')), /FORBIDDEN/, 'STAFF → 403');
-  await assert.rejects(() => requireAdmin(null), /UNAUTHORIZED/);
-  console.log('✓ requireAdmin: ADMIN/SUPER_ADMIN pass, others rejected\n');
+  assert.ok(await requireTeamLead(makeUser('ADMIN')));
+  assert.ok(await requireSuperAdmin(makeUser('ADMIN')));
+  await assert.rejects(() => requireStaff(null), /UNAUTHORIZED/, 'null user → 401');
+  await assert.rejects(() => requireAdmin(null), /UNAUTHORIZED/, 'null user → 401');
+  console.log('✓ All guards allow authenticated ADMIN, reject anonymous\n');
 
-  console.log('Test 8: RBAC Guards — requireSuperAdmin');
-  assert.ok(await requireSuperAdmin(makeUser('SUPER_ADMIN')));
-  await assert.rejects(() => requireSuperAdmin(makeUser('ADMIN')), /FORBIDDEN/, 'ADMIN → 403');
-  await assert.rejects(() => requireSuperAdmin(null), /UNAUTHORIZED/);
-  console.log('✓ requireSuperAdmin: only SUPER_ADMIN passes\n');
-
-  // ---- Staff and Role Management CRUD ----
-  console.log('Test 9: Staff & RBAC Role Management in Admin Service');
+  // ---- Staff / Admin Management CRUD in Admin Service ----
+  console.log('Test 6: Admin Management in Admin Service');
   const { getAllStaffMembers, updateStaffRoleAndTeam } = await import('../services/admin-service');
   const initialStaff = await getAllStaffMembers();
-  assert.ok(initialStaff.length >= 4, 'Must have at least 4 seeded in-memory staff');
-  const targetStaff = initialStaff.find((s) => s.role === 'STAFF');
-  assert.ok(targetStaff, 'Must have a staff member with STAFF role');
+  assert.ok(initialStaff.length >= 1, 'Must have at least 1 seeded in-memory admin');
+  const targetAdmin = initialStaff[0];
 
   const updateResult = await updateStaffRoleAndTeam({
-    userId: targetStaff.userId,
-    role: 'TEAM_LEAD',
-    team: 'Emergency Response Lead',
+    userId: targetAdmin.userId,
+    role: 'ADMIN',
+    team: 'Executive Operations',
     actorId: 'u-admin',
   });
   assert.strictEqual(updateResult.success, true);
   const updatedStaff = await getAllStaffMembers();
-  const modifiedUser = updatedStaff.find((s) => s.userId === targetStaff.userId);
-  assert.strictEqual(modifiedUser?.role, 'TEAM_LEAD');
-  assert.strictEqual(modifiedUser?.team, 'Emergency Response Lead');
-  console.log('✓ Staff role update & station assignment verified\n');
+  const modifiedUser = updatedStaff.find((s) => s.userId === targetAdmin.userId);
+  assert.strictEqual(modifiedUser?.role, 'ADMIN');
+  assert.strictEqual(modifiedUser?.team, 'Executive Operations');
+  console.log('✓ Admin update & team assignment verified\n');
 
   // ---- Public Footer Link Verification ----
-  console.log('Test 10: Public Website Does Not Expose Staff Login Button');
+  console.log('Test 7: Public Website Does Not Expose Staff Login Button');
   const fs = await import('node:fs');
   const path = await import('node:path');
   const footerContent = fs.readFileSync(path.join(process.cwd(), 'components/layout/Footer.tsx'), 'utf-8');
@@ -182,7 +163,7 @@ async function runAuthTests() {
   assert.ok(!footerContent.includes('href="/staff/login"'), 'Footer must not link to /staff/login publicly');
   console.log('✓ Public footer verified: staff login button removed from general public view\n');
 
-  console.log('🎉 ALL AUTH & RBAC TESTS PASSED SUCCESSFULLY!');
+  console.log('🎉 ALL AUTH & ADMIN ROLE TESTS PASSED SUCCESSFULLY!');
 }
 
 runAuthTests().catch((err) => {

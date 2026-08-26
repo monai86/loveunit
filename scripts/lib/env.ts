@@ -14,8 +14,7 @@ export function loadEnvLocal(): void {
     let value = match[2] || '';
     if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
     if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
-    // Never override CI-provided values.
-    if (!(match[1] in process.env)) {
+    if (!process.env[match[1]]) {
       process.env[match[1]] = value.trim();
     }
   }

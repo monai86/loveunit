@@ -22,14 +22,9 @@ import { StaffRole } from '@/lib/types/database';
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthenticatedUser();
 
-  // No session → staff login page.
-  if (!user) {
+  // Non-admin or no session → staff login page.
+  if (!user || user.profile.role !== 'ADMIN') {
     redirect('/staff/login');
-  }
-
-  // Logged in but not admin-level → staff checkin.
-  if (user.profile.role !== 'ADMIN' && user.profile.role !== 'SUPER_ADMIN') {
-    redirect('/staff/checkin');
   }
 
   // First login — must set a personal password before accessing admin.
@@ -38,7 +33,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   const role = user.profile.role as StaffRole;
-  const isSuperAdmin = role === 'SUPER_ADMIN';
 
   return (
     <div className="min-h-screen bg-[var(--bg)] flex flex-col font-sans antialiased text-[var(--ink)]">
@@ -121,18 +115,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                     {user.profile.display_name}
                   </span>
                   <div className="flex items-center justify-end gap-1">
-                    <span className={`px-1.5 py-0.2 rounded text-[9px] font-black uppercase tracking-wider ${
-                      isSuperAdmin 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : 'bg-[var(--rose-100)] text-[var(--burgundy-700)]'
-                    }`}>
-                      {role}
+                    <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase tracking-wider bg-[var(--rose-100)] text-[var(--burgundy-700)]">
+                      ADMIN
                     </span>
                   </div>
                 </div>
 
                 <div className="h-7 w-7 rounded-lg bg-[var(--rose-100)] text-[var(--burgundy-700)] font-black text-xs flex items-center justify-center font-mono">
-                  {isSuperAdmin ? <Crown className="h-4 w-4 text-purple-700" /> : <Shield className="h-4 w-4 text-[var(--burgundy-700)]" />}
+                  <Shield className="h-4 w-4 text-[var(--burgundy-700)]" />
                 </div>
 
                 <Link

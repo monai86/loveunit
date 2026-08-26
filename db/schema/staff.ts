@@ -6,7 +6,7 @@ export const staffRoleEnum = pgEnum('staff_role_enum', ['STAFF', 'TEAM_LEAD', 'A
 export const staffProfiles = pgTable('staff_profiles', {
   userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }).primaryKey(),
   displayName: text('display_name').notNull(),
-  role: staffRoleEnum('role').default('STAFF').notNull(),
+  role: staffRoleEnum('role').default('ADMIN').notNull(),
   team: text('team'),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

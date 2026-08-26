@@ -39,7 +39,7 @@ export function StaffHeader() {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-mono font-black tracking-wider text-[var(--burgundy-700)] uppercase">STAFF PORTAL</span>
+                <span className="text-[10px] font-mono font-black tracking-wider text-[var(--burgundy-700)] uppercase">ADMIN PORTAL</span>
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">LIVE OPS</span>
               </div>

@@ -492,7 +492,7 @@ export default function RegisterPage() {
                         >
                           <div className="flex items-center gap-3">
                             <Clock className={`h-4 w-4 ${isSelected ? 'text-[var(--burgundy-700)]' : 'text-gray-400'}`} />
-                            <span className="text-sm font-black">{slot.timeSlot} น.</span>
+                            <span className="text-sm font-black">{slot.timeSlot}</span>
                           </div>
 
                           <div className="flex items-center gap-3">
@@ -695,7 +695,7 @@ function WaitlistDialog({
         <div className="space-y-1">
           <span className="text-[10px] font-mono font-bold text-[var(--burgundy-600)] uppercase">WAITLIST</span>
           <h3 id="waitlist-dialog-title" className="text-lg font-black text-editorial-ink">
-            รอบ {slotLabel} น. เต็มแล้ว
+            รอบ {slotLabel} เต็มแล้ว
           </h3>
           <p id="waitlist-dialog-desc" className="text-xs text-editorial-muted font-medium leading-relaxed">
             ลงชื่อไว้ในรายการรอ — หากมีผู้ยกเลิก ระบบจะเปิดที่ว่างให้อัตโนมัติ เจ้าหน้าที่จะติดต่อกลับทางโทรศัพท์

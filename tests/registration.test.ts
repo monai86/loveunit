@@ -2,7 +2,7 @@
 process.env.DATA_BACKEND = 'memory';
 
 import assert from 'node:assert';
-import { normalizePhoneNumber, generateRegistrationCode } from '../lib/utils/format';
+import { normalizePhoneNumber, generateRegistrationCode, formatTimeRange, formatThaiDate } from '../lib/utils/format';
 import { publicRegistrationSchema } from '../lib/validation/schemas';
 import { 
   registerDonorAtomic, 
@@ -32,13 +32,18 @@ async function runHardeningTests() {
   assert.strictEqual(unknownEvent, null, 'Unknown event slug must return null');
   console.log('✓ Unknown event slug correctly returns null (404 Not Found)\n');
 
-  // Test 3: Phone Normalization & Code Formatting
-  console.log('Test 3: Phone Normalization & Code Format');
+  // Test 3: Phone Normalization, Code Formatting & Time Range
+  console.log('Test 3: Phone Normalization, Code Format & Time Formatting');
   assert.strictEqual(normalizePhoneNumber('081-234-5678'), '0812345678');
   assert.strictEqual(normalizePhoneNumber('+66 81 234 5678'), '0812345678');
   const code = generateRegistrationCode();
   assert.match(code, /^MBD26-[A-Z0-9]{6}$/);
-  console.log('✓ Phone normalization and code format verified\n');
+  const timeFormatted = formatTimeRange('2026-09-16T09:00:00+07:00', '2026-09-16T10:00:00+07:00');
+  assert.strictEqual(timeFormatted, '09:00–10:00 น.');
+  assert.strictEqual(timeFormatted.endsWith('น. น.'), false, 'Must not have duplicate น.');
+  const dateFormatted = formatThaiDate('2026-09-16T09:00:00+07:00');
+  assert.strictEqual(dateFormatted, '16 กันยายน 2569');
+  console.log('✓ Phone normalization, code format, and time/date formatting verified\n');
 
   // Test 4: Zod Validation Schemas
   console.log('Test 4: Zod Validation Schemas');

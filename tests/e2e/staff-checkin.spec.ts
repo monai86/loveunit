@@ -73,15 +73,15 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
   donorCode = regBody.registration?.registrationCode || regBody.registration?.registration_code;
   expect(donorCode).toMatch(/^MBD26-/);
 
-  // 2) Staff sign-in with the known password.
+  // 2) Admin/Staff sign-in with the known password.
   await page.goto('/staff/login');
-  await page.getByPlaceholder('staff@mahidol.ac.th').fill(STAFF_EMAIL);
+  await page.getByPlaceholder('admin@mahidol.ac.th').fill(STAFF_EMAIL);
   await page.getByPlaceholder('••••••••').fill(STAFF_PASS);
-  await page.getByRole('button', { name: 'เข้าสู่ระบบเจ้าหน้าที่' }).click();
+  await page.getByRole('button', { name: 'เข้าสู่ระบบ' }).click();
 
-  // Wait for either the forced password-change page or the checkin dashboard.
+  // Wait for admin or checkin dashboard
   await page
-    .waitForURL(/\/(staff\/change-password|staff\/checkin)/, { timeout: 15_000 })
+    .waitForURL(/\/(staff\/change-password|staff\/checkin|admin)/, { timeout: 15_000 })
     .catch(() => {});
 
   if (page.url().includes('/staff/change-password')) {
@@ -90,7 +90,11 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
     await page.getByPlaceholder('อย่างน้อย 8 ตัวอักษร').first().fill(NEW_PASS);
     await page.getByPlaceholder('พิมพ์รหัสผ่านใหม่อีกครั้ง').fill(NEW_PASS);
     await page.getByRole('button', { name: 'บันทึกรหัสผ่านใหม่' }).click();
-    await page.waitForURL(/\/staff\/checkin/, { timeout: 15_000 });
+    await page.waitForURL(/\/(staff\/checkin|admin)/, { timeout: 15_000 });
+  }
+
+  if (page.url().includes('/admin')) {
+    await page.goto('/staff/checkin');
   }
 
   await expect(page.getByRole('heading', { name: /ระบบเช็คอินและคัดกรอง/ })).toBeVisible();

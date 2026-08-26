@@ -158,17 +158,6 @@ export function formatActionLabel(action: string): string {
   return labels[action] || action;
 }
 
-export function getStaffRoleLabel(role: StaffRole): string {
-  switch (role) {
-    case 'STAFF':
-      return 'เจ้าหน้าที่ประจำจุด';
-    case 'TEAM_LEAD':
-      return 'หัวหน้าทีมปฏิบัติการ';
-    case 'ADMIN':
-      return 'ผู้ดูแลระบบ';
-    case 'SUPER_ADMIN':
-      return 'ผู้ดูแลระบบระดับสูง';
-    default:
-      return role;
-  }
+export function getStaffRoleLabel(role?: string): string {
+  return 'ผู้ดูแลระบบ (Admin)';
 }

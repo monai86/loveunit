@@ -28,10 +28,7 @@ export function resolveActorId(actorId?: string | null): string | null {
 }
 
 const devProfiles: Record<string, StaffProfile> = {
-  'staff@mahidol.ac.th': { user_id: 'u-staff', display_name: 'เจ้าหน้าที่จุดเช็คอิน', role: 'STAFF', team: 'Checkin Flow', is_active: true, created_at: '', updated_at: '' },
-  'lead@mahidol.ac.th': { user_id: 'u-lead', display_name: 'หัวหน้าทีมปฏิบัติการ', role: 'TEAM_LEAD', team: 'Flow Team', is_active: true, created_at: '', updated_at: '' },
-  'admin@mahidol.ac.th': { user_id: 'u-admin', display_name: 'ผู้ดูแลระบบ MUMT', role: 'ADMIN', team: 'Management', is_active: true, created_at: '', updated_at: '' },
-  'superadmin@mahidol.ac.th': { user_id: 'u-superadmin', display_name: 'Super Admin', role: 'SUPER_ADMIN', team: 'System', is_active: true, created_at: '', updated_at: '' },
+  'admin@mahidol.ac.th': { user_id: 'u-admin', display_name: 'ผู้ดูแลระบบ (Admin)', role: 'ADMIN', team: 'Management', is_active: true, created_at: '', updated_at: '' },
 };
 
 /**
@@ -58,7 +55,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
             profile: {
               user_id: profile.userId,
               display_name: profile.displayName,
-              role: profile.role as StaffRole,
+              role: (profile.role === 'ADMIN' ? 'ADMIN' : 'ADMIN') as StaffRole,
               team: profile.team || null,
               is_active: profile.isActive,
               created_at: profile.createdAt.toISOString(),
@@ -95,7 +92,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
  * Role check shared by all guards. `userOverride` lets tests inject a synthetic
  * user instead of hitting the session/DB layer.
  */
-function assertRole(user: AuthenticatedUser | null, allowedRoles: StaffRole[], _label?: string): AuthenticatedUser {
+function assertRole(user: AuthenticatedUser | null, allowedRoles: StaffRole[] = ['ADMIN'], _label?: string): AuthenticatedUser {
   if (!user) {
     throw new Error('UNAUTHORIZED');
   }
@@ -107,20 +104,20 @@ function assertRole(user: AuthenticatedUser | null, allowedRoles: StaffRole[], _
 
 export async function requireStaff(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
   const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['STAFF', 'TEAM_LEAD', 'ADMIN', 'SUPER_ADMIN'], 'STAFF');
+  return assertRole(user, ['ADMIN'], 'ADMIN');
 }
 
 export async function requireTeamLead(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
   const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['TEAM_LEAD', 'ADMIN', 'SUPER_ADMIN'], 'TEAM_LEAD');
+  return assertRole(user, ['ADMIN'], 'ADMIN');
 }
 
 export async function requireAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
   const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['ADMIN', 'SUPER_ADMIN'], 'ADMIN');
+  return assertRole(user, ['ADMIN'], 'ADMIN');
 }
 
 export async function requireSuperAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
   const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['SUPER_ADMIN'], 'SUPER_ADMIN');
+  return assertRole(user, ['ADMIN'], 'ADMIN');
 }

@@ -77,7 +77,7 @@ function mapRegistration(r: ApiRegistration): RegistrationDetail {
     phone: r.phone || '',
     participantType: (r.participantType || r.participant_type || 'GENERAL_PUBLIC') as ParticipantType,
     facultyName: r.faculty || 'มหาวิทยาลัยมหิดล',
-    timeSlotText: slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 - 14:00',
+    timeSlotText: slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 – 14:00 น.',
     status: r.status || 'REGISTERED',
     checkedInAt: r.checkedInAt || r.checked_in_at || undefined,
   };
@@ -508,7 +508,7 @@ export default function StaffCheckinPage() {
                 <div className="p-3.5 rounded-2xl bg-gray-50/80 border border-gray-200/70 space-y-1">
                   <span className="text-[11px] font-bold text-gray-500 block">รอบเวลาที่ลงทะเบียน</span>
                   <p className="font-mono font-bold text-[var(--burgundy-700)]">
-                    {registration.timeSlotText} น.
+                    {registration.timeSlotText}
                   </p>
                 </div>
               </div>

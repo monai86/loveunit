@@ -388,7 +388,7 @@ export default async function AdminDashboardPage() {
                   const slot = reg.timeSlot || reg.time_slot;
                   const timeLabel = slot
                     ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '')
-                    : '09:00 - 14:00';
+                    : '09:00 – 14:00 น.';
                   const regCode = reg.registration_code || reg.registrationCode || '';
                   const fullName = `${reg.first_name || reg.firstName || ''} ${reg.last_name || reg.lastName || ''}`.trim();
                   const pType = reg.participant_type || reg.participantType || 'STUDENT';

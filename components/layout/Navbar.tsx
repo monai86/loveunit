@@ -64,7 +64,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Public Navigation */}
-        <nav className="hidden items-center gap-2 lg:flex">
+        <nav className="hidden items-center gap-1 xl:gap-2 lg:flex">
           {navLinks.map((item) => {
             const Icon = item.icon;
             const isActive = mounted && (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
@@ -72,14 +72,14 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition-all ${
+                className={`flex items-center gap-1.5 xl:gap-2 rounded-xl px-3 xl:px-4 py-2 text-sm font-bold whitespace-nowrap transition-all ${
                   isActive
                     ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)]'
                     : 'text-[var(--ink)] hover:bg-[var(--rose-100)]/60 hover:text-[var(--burgundy-700)]'
                 }`}
               >
-                <Icon className={`h-4 w-4 ${isActive ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`} />
-                <span>{item.label}</span>
+                <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`} />
+                <span className="whitespace-nowrap">{item.label}</span>
               </Link>
             );
           })}

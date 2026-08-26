@@ -47,7 +47,7 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
   const phone = reg.phone || '';
   const qrToken = reg.qrToken || reg.qr_token || '';
   const slot = reg.timeSlot || reg.time_slot;
-  const timeSlot = slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 - 14:00';
+  const timeSlot = slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 – 14:00 น.';
   const facultyName = reg.faculty || 'มหาวิทยาลัยมหิดล';
 
   return (
