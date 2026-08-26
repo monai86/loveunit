@@ -28,9 +28,21 @@ export async function applyMigrations(db: MigrationExecutable, options: ApplyMig
     const stmts = content.split('--> statement-breakpoint;').map((s) => s.trim()).filter(Boolean);
     if (verbose) console.log(`\n=== ${file} (${stmts.length} statements) ===`);
     for (const stmt of stmts) {
-      await db.execute(sql.raw(stmt));
-      total += 1;
-      if (verbose) console.log('applied:', stmt.slice(0, 60).replace(/\n/g, ' '));
+      try {
+        await db.execute(sql.raw(stmt));
+        total += 1;
+        if (verbose) console.log('applied:', stmt.slice(0, 60).replace(/\n/g, ' '));
+      } catch (err: unknown) {
+        const error = err as { code?: string; message?: string; cause?: { code?: string; message?: string } };
+        const code = error.code || error.cause?.code;
+        const msg = error.message || error.cause?.message || '';
+        // 42710: duplicate_object, 42P07: duplicate_table, 42701: duplicate_column
+        if (code === '42710' || code === '42P07' || code === '42701' || msg.includes('already exists')) {
+          if (verbose) console.log('skipped (already exists):', stmt.slice(0, 60).replace(/\n/g, ' '));
+        } else {
+          throw err;
+        }
+      }
     }
   }
   return total;
