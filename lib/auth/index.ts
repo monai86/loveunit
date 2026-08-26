@@ -8,6 +8,9 @@ const getBaseURL = () => {
   if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
     return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   }
+  if (process.env.NODE_ENV === 'production') {
+    return 'https://mumt-loveunit.vercel.app';
+  }
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
@@ -16,9 +19,6 @@ const getBaseURL = () => {
   }
   if (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes('localhost')) {
     return process.env.NEXT_PUBLIC_APP_URL;
-  }
-  if (process.env.NODE_ENV === 'production') {
-    return 'https://mumt-loveunit.vercel.app';
   }
   if (process.env.BETTER_AUTH_URL) {
     return process.env.BETTER_AUTH_URL;
@@ -55,6 +55,7 @@ export const auth = betterAuth({
     const list = [
       'http://localhost:3000',
       'https://mumt-loveunit.vercel.app',
+      'https://mumtloveunit.vercel.app',
     ];
     if (process.env.BETTER_AUTH_URL) list.push(process.env.BETTER_AUTH_URL);
     if (process.env.NEXT_PUBLIC_APP_URL) list.push(process.env.NEXT_PUBLIC_APP_URL);
