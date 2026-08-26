@@ -130,6 +130,10 @@ jobs:
       - name: Run Playwright E2E
         run: E2E_BASE_URL=http://localhost:3003 npx playwright test --reporter=github
 
+      - name: Teardown test data from live DB
+        if: always()
+        run: npx tsx scripts/seed-e2e.ts
+
       - name: Stop E2E server
         if: always()
         run: |

@@ -31,6 +31,16 @@ async function main() {
       ilike(registrations.firstName, 'สมชาย%'),
       ilike(registrations.firstName, 'สมหญิง%')
     ));
+
+    const allSlots = await db.select().from(timeSlots);
+    for (const s of allSlots) {
+      const [countRow] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(registrations)
+        .where(sql`${registrations.slotId} = ${s.id} AND ${registrations.status} != 'CANCELLED'`);
+      const realCount = Number(countRow?.count || 0);
+      await db.update(timeSlots).set({ bookedCount: realCount }).where(eq(timeSlots.id, s.id));
+    }
   } catch {
     // ignore
   }
