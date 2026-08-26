@@ -57,9 +57,9 @@ async function loginStaff(page: Page) {
   for (let attempt = 1; attempt <= 3; attempt++) {
     await page.goto('/staff/login');
     await page.waitForLoadState('networkidle').catch(() => {});
-    await page.getByPlaceholder('staff@mahidol.ac.th').fill('lead@mahidol.ac.th');
-    await page.getByPlaceholder('••••••••').fill(pw);
-    await page.getByRole('button', { name: 'เข้าสู่ระบบเจ้าหน้าที่' }).click();
+    await page.locator('#staff-email').fill('lead@mahidol.ac.th');
+    await page.locator('#staff-password').fill(pw);
+    await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
     await page.waitForURL(/(\/(staff\/change-password|staff\/checkin))/, { timeout: 20_000 }).catch(() => {});
     if (!page.url().includes('/staff/login')) break;
     console.log(`[WALKIN login attempt ${attempt} failed — still on /staff/login]`);

@@ -20,6 +20,13 @@ const ACCOUNTS: Array<{ email: string; password: string; displayName: string; ro
     role: 'ADMIN',
     team: 'Operations',
   },
+  {
+    email: 'lead@mahidol.ac.th',
+    password: 'Lead@MUMT2026',
+    displayName: 'หัวหน้าทีมปฏิบัติการ',
+    role: 'ADMIN',
+    team: 'Operations',
+  },
 ];
 
 async function main() {

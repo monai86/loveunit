@@ -10,14 +10,8 @@ import {
   ScrollText, 
   QrCode, 
   LogOut, 
-  ShieldCheck, 
-  Crown, 
-  Shield, 
-  ExternalLink,
-  ChevronRight,
-  Sparkles
+  Shield
 } from 'lucide-react';
-import { StaffRole } from '@/lib/types/database';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthenticatedUser();
@@ -31,8 +25,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (user.mustChangePassword) {
     redirect('/staff/change-password');
   }
-
-  const role = user.profile.role as StaffRole;
 
   return (
     <div className="min-h-screen bg-[var(--bg)] flex flex-col font-sans antialiased text-[var(--ink)]">

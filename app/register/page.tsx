@@ -477,16 +477,23 @@ export default function RegisterPage() {
                   <div className="space-y-2">
                     {timeSlots.map((slot) => {
                       const isSelected = formData.timeSlotId === slot.id;
+                      const isFull = slot.status === 'FULL' || slot.remainingCapacity <= 0;
                       return (
                         <button
                           key={slot.id}
                           type="button"
                           onClick={() => {
-                            setFormData({ ...formData, timeSlotId: slot.id });
+                            if (isFull) {
+                              setWaitlistSlot(slot);
+                            } else {
+                              setFormData({ ...formData, timeSlotId: slot.id });
+                            }
                           }}
                           className={`w-full p-3.5 rounded-xl border text-left text-xs font-bold transition-all flex items-center justify-between ${
                             isSelected
                               ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1 ring-[var(--burgundy-700)]'
+                              : isFull
+                              ? 'border-gray-200 bg-gray-50/70 hover:border-amber-400 text-gray-600'
                               : 'border-gray-200 bg-white hover:border-[var(--burgundy-700)] text-editorial-ink'
                           }`}
                         >
@@ -496,9 +503,15 @@ export default function RegisterPage() {
                           </div>
 
                           <div className="flex items-center gap-3">
-                            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
-                              เปิดรับลงทะเบียน
-                            </span>
+                            {isFull ? (
+                              <span className="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-md border border-amber-200">
+                                เต็มแล้ว (ลงชื่อรอคิว)
+                              </span>
+                            ) : (
+                              <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
+                                ว่าง ({slot.remainingCapacity} ที่)
+                              </span>
+                            )}
 
                             {isSelected && (
                               <div className="h-5 w-5 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center">
