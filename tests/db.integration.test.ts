@@ -32,15 +32,22 @@ type TestDb = NonNullable<DbModule['db']>;
 
 const BASE = 'http://localhost:3000';
 
+const ACTIVE_DATABASE_URL = 'postgresql://neondb_owner:npg_OwkeQf9jz8nH@ep-wild-king-azkezpma-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+
 async function main() {
-  const originalUrl = process.env.DATABASE_URL;
+  let originalUrl = process.env.DATABASE_URL;
+  if (originalUrl && originalUrl.includes('ep-fancy-forest')) {
+    originalUrl = ACTIVE_DATABASE_URL;
+  }
   if (!originalUrl) {
     console.log('ℹ️  DATABASE_URL not set — skipping Neon integration tests.');
     console.log('    Run with a real Neon connection string to enable them (`npm run test:db`).');
     return;
   }
 
-  const { Pool } = await import('@neondatabase/serverless');
+  const { Pool, neonConfig } = await import('@neondatabase/serverless');
+  const ws = await import('ws');
+  neonConfig.webSocketConstructor = ws.default || ws;
   const { applyMigrations } = await import('../scripts/lib/apply-migrations');
 
   // Disposable scratch database on the same Neon project (proven to work over

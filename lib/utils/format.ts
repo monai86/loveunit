@@ -62,11 +62,11 @@ export function generateQRToken(registrationCode: string): string {
 }
 
 /**
- * Formats a Date object or ISO string into Thai date string.
+ * Formats a Date object or ISO string into Thai date string in Bangkok timezone.
  * e.g., "18 กันยายน 2569"
  */
 export function formatThaiDate(dateInput: string | Date): string {
-  const d = new Date(dateInput);
+  const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
   if (isNaN(d.getTime())) return '';
   
   const thaiMonths = [
@@ -74,27 +74,40 @@ export function formatThaiDate(dateInput: string | Date): string {
     'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
   ];
   
-  const day = d.getDate();
-  const month = thaiMonths[d.getMonth()];
-  const yearBE = d.getFullYear() + 543;
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Bangkok',
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  }).formatToParts(d);
+
+  const day = parts.find((p) => p.type === 'day')?.value || '1';
+  const monthIdx = parseInt(parts.find((p) => p.type === 'month')?.value || '1', 10) - 1;
+  const yearCE = parseInt(parts.find((p) => p.type === 'year')?.value || '2026', 10);
+  const yearBE = yearCE + 543;
   
-  return `${day} ${month} ${yearBE}`;
+  return `${day} ${thaiMonths[monthIdx] || ''} ${yearBE}`;
 }
 
 /**
- * Formats time range into HH:MM - HH:MM น.
+ * Formats time range into HH:MM–HH:MM น. in Bangkok timezone.
  */
 export function formatTimeRange(startIso: string, endIso: string): string {
-  const start = new Date(startIso);
-  const end = new Date(endIso);
-  
-  const formatTime = (d: Date) => {
-    const hours = d.getHours().toString().padStart(2, '0');
-    const mins = d.getMinutes().toString().padStart(2, '0');
+  const formatTime = (iso: string) => {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Bangkok',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).formatToParts(d);
+    const hours = parts.find((p) => p.type === 'hour')?.value || '00';
+    const mins = parts.find((p) => p.type === 'minute')?.value || '00';
     return `${hours}:${mins}`;
   };
   
-  return `${formatTime(start)}–${formatTime(end)} น.`;
+  return `${formatTime(startIso)}–${formatTime(endIso)} น.`;
 }
 
 /**
