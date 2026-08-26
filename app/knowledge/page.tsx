@@ -404,14 +404,14 @@ export default function KnowledgePage() {
             </div>
 
             {/* Infographic Post 1 Image Display & Quick Summary */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-5 space-y-2">
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-[var(--line)] bg-white shadow-md">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              <div className="lg:col-span-5 flex flex-col space-y-2">
+                <div className="relative flex-1 min-h-[380px] w-full rounded-2xl overflow-hidden border border-[var(--line)] bg-white/70 shadow-xs flex items-center justify-center p-2">
                   <Image
                     src="/images/education/blood-groups-part1.png"
                     alt="ความรู้เรื่องกรุ๊ปเลือด ตอนที่ 1 ABO"
                     fill
-                    sizes="(min-width: 1024px) 40vw, 90vw"
+                    sizes="(min-width: 1024px) 380px, 90vw"
                     className="object-contain"
                   />
                 </div>
@@ -420,28 +420,53 @@ export default function KnowledgePage() {
                 </p>
               </div>
 
-              {/* Thai Blood Group Distribution Stats */}
-              <div className="lg:col-span-7 space-y-4">
-                <h3 className="text-sm font-black text-[var(--ink)]">
-                  สัดส่วนหมู่เลือดในประชากรไทย (Thai Population Distribution)
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {bloodGroupStats.map((item) => (
-                    <div key={item.group} className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xl font-black font-mono text-[var(--burgundy-700)]">
-                          กรุ๊ป {item.group}
-                        </span>
-                        <span className="text-base font-black font-mono text-gray-900">
-                          {item.percent}%
-                        </span>
+              {/* Thai Blood Group Distribution Stats & Key Clinical Rules */}
+              <div className="lg:col-span-7 flex flex-col justify-between space-y-3">
+                <div>
+                  <h3 className="text-xs sm:text-sm font-bold text-[var(--ink)] mb-2.5">
+                    สัดส่วนหมู่เลือดในประชากรไทย (Thai Population Distribution)
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {bloodGroupStats.map((item) => (
+                      <div key={item.group} className="p-3 rounded-xl bg-gray-50/80 border border-gray-200 space-y-1.5 shadow-2xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-lg font-black font-mono text-[var(--burgundy-700)]">
+                            กรุ๊ป {item.group}
+                          </span>
+                          <span className="text-xs font-black font-mono text-gray-900 bg-white px-2 py-0.5 rounded-md border border-gray-200">
+                            {item.percent}%
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
+                          <div className="h-full bg-[var(--burgundy-600)]" style={{ width: `${item.percent * 2.5}%` }} />
+                        </div>
+                        <p className="text-[11px] text-[var(--muted)] leading-snug">{item.role}</p>
                       </div>
-                      <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
-                        <div className="h-full bg-[var(--burgundy-600)]" style={{ width: `${item.percent * 2.5}%` }} />
-                      </div>
-                      <p className="text-[10px] text-[var(--muted)] leading-tight">{item.role}</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </div>
+
+                {/* Clinical Rules & Universal Donors (Fills the space seamlessly) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  <div className="p-3 rounded-xl bg-rose-50/70 border border-rose-200/80 text-xs space-y-1 shadow-2xs">
+                    <span className="font-bold text-[var(--burgundy-700)] flex items-center gap-1.5">
+                      <Droplets className="h-3.5 w-3.5 text-[var(--burgundy-600)] shrink-0" />
+                      <span>ผู้ให้เม็ดเลือดแดงสากล: กรุ๊ป O</span>
+                    </span>
+                    <p className="text-[11px] text-[var(--ink)] leading-relaxed">
+                      ไม่มีแอนติเจน A และ B บนผิวเม็ดเลือดแดง จึงให้แก่ผู้ป่วยได้ทุกหมู่เลือดในภาวะฉุกเฉิน
+                    </p>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs space-y-1 shadow-2xs">
+                    <span className="font-bold text-amber-900 flex items-center gap-1.5">
+                      <Layers className="h-3.5 w-3.5 text-amber-700 shrink-0" />
+                      <span>ผู้ให้พลาสมาสากล: กรุ๊ป AB</span>
+                    </span>
+                    <p className="text-[11px] text-amber-950 leading-relaxed">
+                      ในพลาสมาไม่มี Anti-A และ Anti-B จึงสามารถให้พลาสมาแก่ผู้ป่วยได้ทุกกรุ๊ปอย่างปลอดภัย
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -458,14 +483,14 @@ export default function KnowledgePage() {
                       key={grp}
                       type="button"
                       onClick={() => setSelectedBloodGroup(grp)}
-                      className={`p-4 rounded-2xl border text-center transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
+                      className={`p-3.5 sm:p-4 rounded-xl border text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
                         isSelected
-                          ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-md ring-2 ring-[var(--burgundy-700)] scale-105'
+                          ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs ring-2 ring-[var(--burgundy-700)]'
                           : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
                       }`}
                     >
-                      <span className="text-2xl font-black font-mono">กรุ๊ป {grp}</span>
-                      <span className="text-xs font-bold text-[var(--muted)]">ประชากรไทย {stat.percent}%</span>
+                      <span className="text-xl sm:text-2xl font-black font-mono">กรุ๊ป {grp}</span>
+                      <span className="text-[11px] font-bold text-[var(--muted)]">ประชากรไทย {stat.percent}%</span>
                     </button>
                   );
                 })}
@@ -473,10 +498,10 @@ export default function KnowledgePage() {
             </div>
 
             {/* Interactive Compatibility Result */}
-            <div className="p-6 rounded-2xl bg-white border border-[var(--line)] shadow-xs space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--line)] pb-4">
-                <div className="space-y-1">
-                  <h3 className="text-lg font-black text-[var(--ink)]">
+            <div className="p-5 sm:p-6 rounded-2xl bg-white border border-[var(--line)] shadow-2xs space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--line)] pb-3">
+                <div className="space-y-0.5">
+                  <h3 className="text-base sm:text-lg font-black text-[var(--ink)]">
                     ผลการวิเคราะห์ความเข้ากันได้ของ <span className="text-[var(--burgundy-700)]">หมู่เลือด {selectedBloodGroup}</span>
                   </h3>
                   <p className="text-xs text-[var(--muted)]">
@@ -488,32 +513,32 @@ export default function KnowledgePage() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 
                 {/* RBC GIVING & RECEIVING */}
-                <div className="p-5 rounded-xl bg-red-50/60 border border-red-200 space-y-4">
-                  <h4 className="text-sm font-black text-red-950 flex items-center gap-2">
+                <div className="p-4 sm:p-5 rounded-xl bg-red-50/60 border border-red-200 space-y-3">
+                  <h4 className="text-xs sm:text-sm font-black text-red-950 flex items-center gap-2">
                     <Droplets className="h-4 w-4 text-red-600" />
                     <span>เม็ดเลือดแดง (Red Blood Cells)</span>
                   </h4>
                   
                   <div className="space-y-2 text-xs">
-                    <div className="p-3 rounded-lg bg-white border border-red-100 space-y-1">
+                    <div className="p-2.5 rounded-lg bg-white border border-red-100 space-y-1">
                       <span className="text-gray-500 font-bold block text-[11px]">สามารถให้เม็ดเลือดแดงแก่:</span>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
                         {currentCompat.rbcGiveTo.map((g) => (
-                          <span key={g} className="px-3 py-1 rounded-lg bg-red-600 text-white font-mono font-black text-xs">
+                          <span key={g} className="px-2.5 py-0.5 rounded-md bg-red-600 text-white font-mono font-black text-xs">
                             กรุ๊ป {g}
                           </span>
                         ))}
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-lg bg-white border border-red-100 space-y-1">
+                    <div className="p-2.5 rounded-lg bg-white border border-red-100 space-y-1">
                       <span className="text-gray-500 font-bold block text-[11px]">สามารถรับเม็ดเลือดแดงจาก:</span>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
                         {currentCompat.rbcReceiveFrom.map((g) => (
-                          <span key={g} className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-mono font-black text-xs">
+                          <span key={g} className="px-2.5 py-0.5 rounded-md bg-emerald-600 text-white font-mono font-black text-xs">
                             กรุ๊ป {g}
                           </span>
                         ))}
@@ -523,29 +548,29 @@ export default function KnowledgePage() {
                 </div>
 
                 {/* PLASMA GIVING & RECEIVING */}
-                <div className="p-5 rounded-xl bg-yellow-50/60 border border-yellow-200 space-y-4">
-                  <h4 className="text-sm font-black text-yellow-950 flex items-center gap-2">
+                <div className="p-4 sm:p-5 rounded-xl bg-yellow-50/60 border border-yellow-200 space-y-3">
+                  <h4 className="text-xs sm:text-sm font-black text-yellow-950 flex items-center gap-2">
                     <Layers className="h-4 w-4 text-yellow-600" />
                     <span>พลาสมา (Plasma)</span>
                   </h4>
                   
                   <div className="space-y-2 text-xs">
-                    <div className="p-3 rounded-lg bg-white border border-yellow-100 space-y-1">
+                    <div className="p-2.5 rounded-lg bg-white border border-yellow-100 space-y-1">
                       <span className="text-gray-500 font-bold block text-[11px]">สามารถให้พลาสมาแก่:</span>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
                         {currentCompat.plasmaGiveTo.map((g) => (
-                          <span key={g} className="px-3 py-1 rounded-lg bg-yellow-600 text-white font-mono font-black text-xs">
+                          <span key={g} className="px-2.5 py-0.5 rounded-md bg-yellow-600 text-white font-mono font-black text-xs">
                             กรุ๊ป {g}
                           </span>
                         ))}
                       </div>
                     </div>
 
-                    <div className="p-3 rounded-lg bg-white border border-yellow-100 space-y-1">
+                    <div className="p-2.5 rounded-lg bg-white border border-yellow-100 space-y-1">
                       <span className="text-gray-500 font-bold block text-[11px]">สามารถรับพลาสมาจาก:</span>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
                         {currentCompat.plasmaReceiveFrom.map((g) => (
-                          <span key={g} className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-mono font-black text-xs">
+                          <span key={g} className="px-2.5 py-0.5 rounded-md bg-emerald-600 text-white font-mono font-black text-xs">
                             กรุ๊ป {g}
                           </span>
                         ))}
@@ -564,7 +589,7 @@ export default function KnowledgePage() {
               <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 text-blue-900 px-3 py-0.5 text-xs font-black">
                 <span>ความรู้เรื่องกรุ๊ปเลือด ตอนที่ 2</span>
               </div>
-              <h2 className="text-2xl font-black text-[var(--ink)]">
+              <h2 className="text-xl sm:text-2xl font-black text-[var(--ink)]">
                 Rh+ vs Rh- : ทำความเข้าใจหมู่เลือดและหมู่เลือดหายาก (Rare Blood)
               </h2>
               <p className="text-xs text-[var(--muted)]">
@@ -572,17 +597,18 @@ export default function KnowledgePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               
               {/* Infographic Post 2 Image Display */}
-              <div className="lg:col-span-5 space-y-2">
-                <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-[var(--line)] bg-white shadow-md">
+              <div className="lg:col-span-5 flex flex-col space-y-2">
+                <div className="relative flex-1 min-h-[380px] w-full rounded-2xl overflow-hidden border border-[var(--line)] bg-white/70 shadow-xs flex items-center justify-center p-2">
                   <Image
                     src="/images/education/blood-groups-part2.png"
                     alt="Rh+ vs Rh- ความรู้เรื่องกรุ๊ปเลือด 2"
                     fill
-                    sizes="(min-width: 1024px) 40vw, 90vw"
+                    sizes="(min-width: 1024px) 380px, 90vw"
                     className="object-contain"
+                    priority
                   />
                 </div>
                 <p className="text-[11px] text-center font-bold text-[var(--muted)]">
@@ -591,42 +617,42 @@ export default function KnowledgePage() {
               </div>
 
               {/* Detailed Breakdown Table & Facts */}
-              <div className="lg:col-span-7 space-y-4">
+              <div className="lg:col-span-7 flex flex-col justify-between space-y-3">
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   
                   {/* Rh Positive Card */}
-                  <div className="p-4 rounded-2xl bg-red-50/70 border border-red-200 space-y-2 text-xs">
+                  <div className="p-3 rounded-xl bg-red-50/70 border border-red-200 space-y-1.5 text-xs shadow-2xs">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-1 rounded-full bg-red-600 text-white font-black font-mono text-xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white font-bold font-mono text-xs">
                         Rh Positive (Rh+)
                       </span>
                       <span className="font-bold text-red-900">99.7% ในคนไทย</span>
                     </div>
-                    <div className="space-y-1.5 pt-1 text-[var(--ink)] font-medium">
-                      <p>• <strong>แอนติเจน:</strong> มีแอนติเจน D บนผิวเม็ดเลือดแดง</p>
-                      <p>• <strong>การรับเลือด:</strong> รับเลือดได้ทั้ง Rh+ และ Rh-</p>
-                      <p>• <strong>การให้เลือด:</strong> ให้เลือดแก่ผู้ป่วย <strong>Rh+ เท่านั้น!</strong></p>
-                      <p className="text-[11px] text-red-800 pt-1">
-                        เป็นหมู่เลือดหลักของคนไทย จึงมีความต้องการใช้ในโรงพยาบาลปริมาณมากอย่างต่อเนื่อง
+                    <div className="space-y-1 pt-0.5 text-[var(--ink)] font-medium">
+                      <p>• <strong>แอนติเจน:</strong> มีแอนติเจน D บนผิวเซลล์</p>
+                      <p>• <strong>การรับเลือด:</strong> รับได้ทั้ง Rh+ และ Rh-</p>
+                      <p>• <strong>การให้เลือด:</strong> ให้ได้เฉพาะ <strong>Rh+</strong></p>
+                      <p className="text-[11px] text-red-800 pt-0.5">
+                        เป็นหมู่เลือดหลักของคนไทย ต้องการใช้อย่างต่อเนื่อง
                       </p>
                     </div>
                   </div>
 
                   {/* Rh Negative Card */}
-                  <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2 text-xs">
+                  <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200 space-y-1.5 text-xs shadow-2xs">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-1 rounded-full bg-blue-600 text-white font-black font-mono text-xs">
+                      <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white font-bold font-mono text-xs">
                         Rh Negative (Rh-)
                       </span>
                       <span className="font-bold text-blue-900">0.3% ในคนไทย</span>
                     </div>
-                    <div className="space-y-1.5 pt-1 text-[var(--ink)] font-medium">
-                      <p>• <strong>แอนติเจน:</strong> <strong>ไม่มีแอนติเจน D</strong> บนผิวเม็ดเลือดแดง</p>
-                      <p>• <strong>การรับเลือด:</strong> <strong className="text-red-700 underline">รับเลือดจาก Rh- เท่านั้น!</strong></p>
-                      <p>• <strong>การให้เลือด:</strong> ให้เลือดแก่ผู้ป่วยได้ทั้ง Rh+ และ Rh-</p>
-                      <p className="text-[11px] text-blue-800 pt-1">
-                        พบเพียง 3 ใน 1,000 คน เรียกว่า <strong>“หมู่เลือดหายาก (Rare Blood)”</strong> เสี่ยงขาดแคลนเมื่อฉุกเฉิน
+                    <div className="space-y-1 pt-0.5 text-[var(--ink)] font-medium">
+                      <p>• <strong>แอนติเจน:</strong> <strong>ไม่มีแอนติเจน D</strong></p>
+                      <p>• <strong>การรับเลือด:</strong> <strong className="text-red-700 underline">รับจาก Rh- เท่านั้น!</strong></p>
+                      <p>• <strong>การให้เลือด:</strong> ให้แก่ Rh+ และ Rh- ได้</p>
+                      <p className="text-[11px] text-blue-800 pt-0.5">
+                        พบเพียง 3 ใน 1,000 คน <strong>“หมู่เลือดหายาก”</strong>
                       </p>
                     </div>
                   </div>

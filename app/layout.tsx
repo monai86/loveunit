@@ -10,14 +10,14 @@ import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 
 const prompt = Prompt({
   subsets: ["thai", "latin"],
-  weight: ["500", "700", "800", "900"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-display",
   display: "swap",
 });
 
 const notoSansThai = Noto_Sans_Thai({
   subsets: ["thai", "latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-body",
   display: "swap",
 });

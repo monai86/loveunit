@@ -121,87 +121,101 @@ export function HeroClient({
   return (
     <>
       {/* ============ HERO — full-bleed red field ============ */}
-      <section className="hero-field relative">
-        <div className="mx-auto max-w-7xl px-4 pt-12 pb-28 sm:px-6 sm:pt-16 sm:pb-32 lg:pt-20 lg:pb-16">
-          <div className="flex justify-end mb-4">{toggle}</div>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start lg:items-end">
+      <section className="hero-field relative overflow-hidden">
+        <div className="mx-auto max-w-7xl px-4 pt-6 pb-12 sm:px-6 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-16">
+          
+          {/* Top Bar: Badges on left, Language Switcher on right (Balanced & Symmetric) */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="brand-chip rise-in">
+                <Heart className="h-3.5 w-3.5 fill-current" />
+                {copy.badge}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 border border-amber-300/40 px-3 py-1 text-[11px] font-bold text-amber-200 backdrop-blur-xs shadow-2xs">
+                ✨ {isEn ? 'Mahidol AT: 1 hr Health Literacy + 1 hr Volunteer' : 'สะสม Mahidol AT: 1 ชม. Health Literacy + 1 ชม. จิตอาสา'}
+              </span>
+            </div>
+            <div className="self-end sm:self-auto shrink-0">{toggle}</div>
+          </div>
 
-            {/* Left: campaign statement */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+
+            {/* Left Column: Headline, Description, Event Facts & CTAs (7 cols) */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="brand-chip rise-in">
-                  <Heart className="h-3.5 w-3.5 fill-current" />
-                  {copy.badge}
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 border border-amber-300/40 px-3 py-1 text-[11px] font-black text-amber-200 backdrop-blur-sm shadow-sm">
-                  ✨ {isEn ? 'Mahidol AT: 1 hr Health Literacy + 1 hr Volunteer' : 'สะสม Mahidol AT: 1 ชม. Health Literacy + 1 ชม. จิตอาสา'}
-                </span>
-              </div>
-
-              {/* lg keeps sm:text-6xl (60px); only xl (≥1280px, where the left
-                  column is wide enough) bumps to 4.5rem — at 4.5rem the Thai line
-                  “ต่อชีวิตด้วยโลหิตคุณ” (≈650px) overflows the 7-col column on
-                  smaller desktops and orphans “คุณ” onto its own line. EN lines
-                  are longer, so they get a smaller scale. */}
-              <h1 className={`text-[2.25rem] leading-[1.08] font-black text-[var(--cream)] min-[420px]:text-[2.6rem] ${isEn ? 'sm:text-4xl xl:text-5xl' : 'sm:text-6xl xl:text-[4.5rem]'} tracking-[-0.02em]`}>
-                {copy.title1a}{' '}
-                <span className="text-[var(--burgundy-300)]">{copy.title1b}</span>
+              
+              {/* Campaign Headline */}
+              <h1 className="text-3xl sm:text-5xl lg:text-5xl xl:text-6xl font-bold text-[var(--cream)] leading-[1.25] tracking-normal font-sans">
+                <span>{copy.title1a}</span>{' '}
+                <span className="text-[var(--burgundy-300)] font-extrabold font-display tracking-wider">{copy.title1b}</span>
                 {copy.title1c && <> {copy.title1c}</>}
                 <br />
-                {copy.title2}
+                <span className="inline-block mt-1 font-bold">{copy.title2}</span>
               </h1>
 
-              <p className="max-w-xl text-[15px] sm:text-base leading-relaxed text-[var(--cream-dim)] font-medium">
+              {/* Description */}
+              <p className="max-w-xl text-sm sm:text-base leading-relaxed text-[var(--cream-dim)] font-medium">
                 {copy.description}
               </p>
 
-              {/* Event facts */}
-              <div className="flex flex-wrap items-center gap-x-7 gap-y-3 pt-2">
-                <div className="flex items-center gap-2.5">
-                  <Calendar className="h-4.5 w-4.5 text-[var(--burgundy-300)]" />
-                  <span className="text-sm font-bold text-[var(--cream)]">{copy.date}</span>
+              {/* Event Facts: Symmetric 3-column cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                <div className="flex items-center gap-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-2.5 text-xs text-[var(--cream)] font-bold shadow-2xs">
+                  <Calendar className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
+                  <span className="truncate">{copy.date}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <Clock className="h-4.5 w-4.5 text-[var(--burgundy-300)]" />
-                  <span className="text-sm font-bold text-[var(--cream)]">{copy.time}</span>
+                <div className="flex items-center gap-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-2.5 text-xs text-[var(--cream)] font-bold shadow-2xs">
+                  <Clock className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
+                  <span className="truncate">{copy.time}</span>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <MapPin className="h-4.5 w-4.5 text-[var(--burgundy-300)]" />
-                  <span className="text-sm font-bold text-[var(--cream)]">{copy.venue}</span>
+                <div className="flex items-center gap-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-2.5 text-xs text-[var(--cream)] font-bold shadow-2xs">
+                  <MapPin className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
+                  <span className="truncate">{copy.venue}</span>
                 </div>
               </div>
 
-              {/* CTAs */}
+              {/* CTAs Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 pt-2">
-                <Link href="/register" className="btn-cream">
+                <Link 
+                  href="/register" 
+                  className="btn-cream shadow-lg hover:shadow-xl font-display font-extrabold text-xs sm:text-sm px-5 sm:px-6 py-3.5 rounded-xl flex items-center gap-2 active:scale-95 transition-transform"
+                >
                   <span>{copy.ctaRegister}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link href="/screening" className="btn-outline-cream border-amber-300/60 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20">
+                <Link 
+                  href="/screening" 
+                  className="btn-outline-cream border-amber-300/50 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20 font-bold text-xs sm:text-sm px-4 sm:px-5 py-3.5 rounded-xl flex items-center gap-1.5 transition-colors"
+                >
                   <span>{isEn ? 'Self-Screening Quiz' : 'ประเมินความพร้อมตนเอง'}</span>
                 </Link>
-                <Link href="/knowledge" className="btn-outline-cream">
-                  <span>{isEn ? 'Blood Knowledge & Labs' : 'ความรู้โลหิต & แล็บตรวจ'}</span>
+                <Link 
+                  href="/knowledge" 
+                  className="btn-outline-cream border-white/20 bg-white/5 hover:bg-white/15 font-bold text-xs sm:text-sm px-4 sm:px-5 py-3.5 rounded-xl flex items-center gap-1.5 transition-colors"
+                >
+                  <span>{isEn ? 'Knowledge & Labs' : 'ความรู้ & แล็บตรวจ'}</span>
                 </Link>
               </div>
             </div>
 
-            {/* Right: Official Event Poster breaks out of the hero */}
-            <div className="lg:col-span-5 hidden lg:flex justify-end">
-              <div className="rise-in w-full max-w-sm relative z-10 lg:translate-y-16 group">
-                <Link href="/poster" className="block relative aspect-[1/1.414] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 hover:border-white/50 transition-all duration-300 transform group-hover:-translate-y-2 group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            {/* Right Column: Official Event Poster (5 cols) */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-end">
+              <div className="rise-in w-full max-w-xs sm:max-w-sm lg:max-w-xs xl:max-w-sm relative group">
+                <Link 
+                  href="/poster" 
+                  className="block relative aspect-[1/1.414] rounded-2xl overflow-hidden shadow-2xl border-2 border-white/25 hover:border-white/60 transition-all duration-300 transform group-hover:scale-[1.01] group-hover:shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                >
                   <Image
                     src={isEn ? '/images/poster-en.jpg' : '/images/poster-th.jpg'}
                     alt="MUMT Blood Donation 2026 Official Poster"
                     fill
-                    sizes="(min-width: 1024px) 400px, 90vw"
+                    sizes="(min-width: 1024px) 380px, 90vw"
                     className="object-cover"
                     priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-4">
-                    <span className="text-xs font-black text-white bg-[var(--burgundy-600)] px-3 py-1.5 rounded-xl shadow-md flex items-center gap-1.5">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-4">
+                    <span className="text-xs font-bold text-white bg-[var(--burgundy-700)] px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5">
                       <span>คลิกเพื่อดูโปสเตอร์เต็ม</span>
-                      <ArrowRight className="h-3 w-3" />
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </span>
                   </div>
                 </Link>
@@ -210,20 +224,6 @@ export function HeroClient({
           </div>
         </div>
       </section>
-
-      {/* Mobile Poster — hangs off the hero bottom */}
-      <div className="lg:hidden mx-auto -mt-16 max-w-xs px-4 relative z-10">
-        <Link href="/poster" className="block relative aspect-[1/1.414] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/30">
-          <Image
-            src={isEn ? '/images/poster-en.jpg' : '/images/poster-th.jpg'}
-            alt="MUMT Blood Donation 2026 Official Poster"
-            fill
-            sizes="300px"
-            className="object-cover"
-            priority
-          />
-        </Link>
-      </div>
     </>
   );
 }

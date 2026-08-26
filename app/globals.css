@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --font-display: var(--font-display), 'Prompt', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: var(--font-body), 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 :root {
   /* =========================================================
      MUMT BLOOD DONATION 2026 — design tokens
@@ -49,7 +54,7 @@
 body {
   background-color: var(--bg);
   color: var(--ink);
-  font-family: var(--font-body), 'Prompt', 'Noto Sans Thai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body), 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -57,12 +62,15 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-h1, h2, h3, .font-display {
-  font-family: var(--font-display), 'Prompt', 'Noto Sans Thai', system-ui, sans-serif;
+h1, h2, h3, h4, h5, h6, .font-display {
+  font-family: var(--font-display), 'Prompt', 'Noto Sans Thai', sans-serif;
   text-wrap: balance;
+  letter-spacing: 0;
 }
 
-p, li, td, span { text-wrap: pretty; }
+p, li, td, span { 
+  text-wrap: pretty; 
+}
 
 /* =========================================================
    CAMPAIGN SURFACES

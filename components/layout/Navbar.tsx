@@ -40,31 +40,33 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[var(--bg)]/95 backdrop-blur-md select-none" suppressHydrationWarning>
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[var(--bg)]/95 backdrop-blur-md select-none shadow-2xs" suppressHydrationWarning>
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 sm:px-6 lg:px-8 gap-4">
         
-        {/* Public Brand Logo & Title */}
-        <Link href="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white p-1 border border-[var(--line)] shadow-sm">
+        {/* 1. Left: Brand Logo & Title */}
+        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0 group">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white p-1 border border-[var(--line)] shadow-xs transition-transform group-hover:scale-105">
             <Image 
               src="/images/logo.png" 
               alt="MUMT LOVE UNIT Logo" 
               width={40}
               height={40}
-              className="h-full w-auto object-contain"
+              className="h-full w-full object-contain"
               priority
             />
           </div>
-          <div>
-            <h1 className="text-sm font-black text-[var(--ink)] sm:text-base">
-              MUMT Blood Donation 2026 <span className="text-[var(--burgundy-400)]">ครั้งที่ 9</span>
-            </h1>
-            <p className="text-xs font-semibold text-[var(--muted)]">เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ</p>
+          <div className="shrink-0 flex flex-col justify-center">
+            <span className="text-xs sm:text-sm font-bold text-[var(--ink)] tracking-normal whitespace-nowrap font-display">
+              MUMT Blood Donation 2026 <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
+            </span>
+            <span className="text-[10px] sm:text-xs text-[var(--muted)] whitespace-nowrap hidden xl:block">
+              เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ
+            </span>
           </div>
         </Link>
 
-        {/* Desktop Public Navigation */}
-        <nav className="hidden items-center gap-1 xl:gap-2 lg:flex shrink-0">
+        {/* 2. Center: Public Navigation links distributed evenly */}
+        <nav className="hidden lg:flex items-center justify-center gap-0.5 xl:gap-1.5 flex-1 min-w-0 mx-1">
           {navLinks.map((item) => {
             const Icon = item.icon;
             const isActive = mounted && (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
@@ -72,35 +74,36 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-1.5 xl:gap-2 rounded-xl px-2.5 xl:px-3.5 py-2 text-xs xl:text-sm font-black whitespace-nowrap shrink-0 transition-all ${
+                className={`flex items-center gap-1 xl:gap-1.5 rounded-lg px-2 xl:px-2.5 py-1.5 text-xs xl:text-[13px] font-semibold whitespace-nowrap shrink-0 transition-all ${
                   isActive
-                    ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)]'
-                    : 'text-[var(--ink)] hover:bg-[var(--rose-100)]/60 hover:text-[var(--burgundy-700)]'
+                    ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-2xs font-bold'
+                    : 'text-[var(--ink)] hover:bg-black/5 hover:text-[var(--burgundy-700)]'
                 }`}
               >
-                <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`} />
+                <Icon className={`h-3.5 w-3.5 xl:h-4 xl:w-4 shrink-0 ${isActive ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`} />
                 <span className="whitespace-nowrap">{item.label}</span>
               </Link>
             );
           })}
-
-          <div className="ml-2 xl:ml-3 border-l border-[var(--line)] pl-2 xl:pl-3 shrink-0">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 bg-[var(--burgundy-600)] hover:bg-[var(--burgundy-700)] text-white font-extrabold px-3.5 xl:px-5 py-2.5 rounded-xl text-xs xl:text-sm shadow-md transition-all active:scale-95 whitespace-nowrap shrink-0"
-            >
-              <Heart className="h-4 w-4 fill-white shrink-0" />
-              <span>ลงทะเบียนบริจาคโลหิต</span>
-              <ArrowRight className="h-3.5 w-3.5 shrink-0" />
-            </Link>
-          </div>
         </nav>
+
+        {/* 3. Right: Desktop CTA Button */}
+        <div className="hidden lg:flex items-center shrink-0">
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-3 xl:px-4 py-2 rounded-xl text-xs xl:text-[13px] shadow-xs transition-all active:scale-95 whitespace-nowrap shrink-0"
+          >
+            <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
+            <span>ลงทะเบียน<span className="hidden xl:inline">บริจาคโลหิต</span></span>
+            <ArrowRight className="h-3 w-3 shrink-0 hidden xl:inline" />
+          </Link>
+        </div>
 
         {/* Mobile Action & Hamburger */}
         <div className="flex items-center gap-2 lg:hidden">
           <Link
             href="/register"
-            className="inline-flex items-center gap-1 bg-[var(--burgundy-700)] text-white font-extrabold px-3.5 py-2.5 rounded-xl text-xs shadow-xs"
+            className="inline-flex items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-3 py-2 rounded-xl text-xs shadow-xs"
           >
             <Heart className="h-3.5 w-3.5 fill-white" />
             <span>ลงทะเบียน</span>
@@ -108,7 +111,7 @@ export function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)]"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
