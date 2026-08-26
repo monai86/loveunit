@@ -591,11 +591,23 @@ export async function getDashboardKPIs(_eventId: string): Promise<DashboardKPIs>
     ? Math.round((checkedInCount / totalRegistrations) * 100) 
     : 0;
 
+  const formatBangkokHour = (date: Date) => {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Bangkok',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).formatToParts(date);
+    const hour = parts.find(p => p.type === 'hour')?.value || '00';
+    const minute = parts.find(p => p.type === 'minute')?.value || '00';
+    return `${hour}:${minute}`;
+  };
+
   const slotBreakdown = slots.map(s => {
     const start = new Date(s.start_at);
     const end = new Date(s.end_at);
-    const startStr = `${start.getHours().toString().padStart(2, '0')}:${start.getMinutes().toString().padStart(2, '0')}`;
-    const endStr = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
+    const startStr = formatBangkokHour(start);
+    const endStr = formatBangkokHour(end);
     
     const slotRegs = regs.filter(r => r.slot_id === s.id && r.status !== 'CANCELLED');
     const slotCheckedIn = slotRegs.filter(r => r.status === 'CHECKED_IN' || r.status === 'IN_PROCESS' || r.status === 'COMPLETED').length;
