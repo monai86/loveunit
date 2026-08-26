@@ -27,7 +27,10 @@ import {
   History,
   Flashlight,
   SlidersHorizontal,
-  ChevronRight
+  ChevronRight,
+  Maximize2,
+  X,
+  ArrowRight
 } from 'lucide-react';
 import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
@@ -118,17 +121,17 @@ function playAudioChime(type: 'success' | 'souvenir' | 'error' | 'click') {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(880, now);
       osc.frequency.exponentialRampToValueAtTime(1320, now + 0.1);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
       osc.start(now);
-      osc.stop(now + 0.15);
+      osc.stop(now + 0.16);
     } else if (type === 'souvenir') {
       // Triumphant chord (587Hz -> 880Hz -> 1174Hz)
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(587.33, now);
       osc.frequency.setValueAtTime(880, now + 0.08);
       osc.frequency.setValueAtTime(1174.66, now + 0.16);
-      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.setValueAtTime(0.3, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
       osc.start(now);
       osc.stop(now + 0.35);
@@ -163,9 +166,10 @@ export default function StaffCheckinPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; text: string } | null>(null);
   const [stats, setStats] = useState<StaffStats>({ totalToday: 0, checkedIn: 0, completed: 0, cancelled: 0 });
 
-  // Practical Features State
+  // Camera & Scanner State
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [fullscreenScanner, setFullscreenScanner] = useState(false); // Mobile Payment-App Style Fullscreen
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
   const [cameras, setCameras] = useState<Array<{ id: string; label: string }>>([]);
   const [selectedCameraId, setSelectedCameraId] = useState<string>('');
@@ -214,7 +218,7 @@ export default function StaffCheckinPage() {
     const cleanToken = tokenOrCode.trim();
     if (!cleanToken) return;
 
-    // Debounce duplicate scans of the exact same code within 2 seconds
+    // Debounce duplicate scans within 2s
     const now = Date.now();
     if (lastScannedCodeRef.current.code === cleanToken && now - lastScannedCodeRef.current.time < 2000) {
       return;
@@ -225,9 +229,9 @@ export default function StaffCheckinPage() {
     busyRef.current = true;
     setMessage(null);
 
-    // Haptic feedback if available on mobile
+    // Tactile haptic vibration
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-      try { navigator.vibrate(100); } catch { /* ignore */ }
+      try { navigator.vibrate(120); } catch { /* ignore */ }
     }
 
     try {
@@ -271,7 +275,7 @@ export default function StaffCheckinPage() {
           if (soundEnabled) playAudioChime('success');
           setMessage({
             type: 'info',
-            text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (รอเช็คอิน) — กรุณากดยืนยันเช็คอินเข้างานด้านล่าง`,
+            text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (รอเช็คอิน) — กรุณากดยืนยันเช็คอินเข้างาน`,
           });
         } else if (found.status === 'CHECKED_IN') {
           if (soundEnabled) playAudioChime('click');
@@ -500,7 +504,7 @@ export default function StaffCheckinPage() {
       }
 
       setScanning(true);
-      await new Promise((r) => setTimeout(r, 100));
+      await new Promise((r) => setTimeout(r, 120));
 
       const element = document.getElementById('qr-reader-region');
       if (!element) {
@@ -512,7 +516,7 @@ export default function StaffCheckinPage() {
 
       const qrConfig = {
         fps: 15,
-        qrbox: { width: 250, height: 250 },
+        qrbox: { width: 260, height: 260 },
         aspectRatio: 1.0,
       };
 
@@ -622,6 +626,16 @@ export default function StaffCheckinPage() {
     }
   };
 
+  const openFullscreenScanner = async () => {
+    setFullscreenScanner(true);
+    await startScanner('environment');
+  };
+
+  const closeFullscreenScanner = async () => {
+    setFullscreenScanner(false);
+    await stopScanner();
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-8">
       
@@ -631,7 +645,7 @@ export default function StaffCheckinPage() {
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-xs font-mono font-black text-[var(--burgundy-700)] uppercase tracking-wider">
-              PRACTICAL STAFF SCANNER & SOUVENIR
+              STAFF CHECK-IN & SOUVENIR DESK
             </span>
             <span className="px-2 py-0.5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] text-[10px] font-black border border-[var(--line)]">
               ห้องประชุม 217
@@ -645,8 +659,18 @@ export default function StaffCheckinPage() {
           </p>
         </div>
 
-        {/* Action Badges & Walk-in */}
+        {/* Action Controls & Pay-App Scanner Trigger */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Big Pay-App Style Scanner Button */}
+          <button
+            type="button"
+            onClick={openFullscreenScanner}
+            className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-black text-xs flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer transform active:scale-95"
+          >
+            <Maximize2 className="h-4 w-4 text-emerald-200" />
+            <span>📱 โหมดสแกนแบบแอปจ่ายเงิน (Scan Pay)</span>
+          </button>
+
           {/* Sound Toggle */}
           <button
             type="button"
@@ -674,7 +698,7 @@ export default function StaffCheckinPage() {
             }`}
           >
             <Zap className={`h-4 w-4 ${fastTrackMode ? 'text-white' : 'text-amber-500'}`} />
-            <span>{fastTrackMode ? '⚡ โหมดเช็คอินด่วน (ON)' : 'โหมดตรวจละเอียด'}</span>
+            <span>{fastTrackMode ? '⚡ โหมดด่วน (ON)' : 'โหมดตรวจละเอียด'}</span>
           </button>
 
           <Link
@@ -682,7 +706,7 @@ export default function StaffCheckinPage() {
             className="editorial-btn-secondary text-xs flex items-center gap-2"
           >
             <UserPlus className="h-4 w-4" />
-            <span>Walk-in หน้างาน</span>
+            <span>Walk-in</span>
           </Link>
         </div>
       </div>
@@ -789,7 +813,7 @@ export default function StaffCheckinPage() {
               <div className="flex items-center gap-2">
                 <QrCode className="h-5 w-5 text-[var(--burgundy-700)]" />
                 <h2 className="text-base font-black text-[var(--ink)]">
-                  เครื่องสแกน QR Code กล้องสด
+                  เครื่องสแกน QR Code หน้าโต๊ะ
                 </h2>
               </div>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${scanning ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-500'}`}>
@@ -817,23 +841,15 @@ export default function StaffCheckinPage() {
               />
 
               {/* Laser Scanning Animation and Reticle Corners when camera is ON */}
-              {scanning && (
+              {scanning && !fullscreenScanner && (
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                  {/* Outer Dim Mask */}
                   <div className="absolute inset-0 bg-black/30" />
-
-                  {/* Target Scan Frame */}
                   <div className="relative w-64 h-64 border-2 border-emerald-400/80 rounded-2xl shadow-[0_0_25px_rgba(52,211,153,0.3)] flex flex-col justify-between p-2">
-                    
-                    {/* 4 Reticle Corners */}
                     <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg" />
                     <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg" />
                     <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg" />
                     <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-lg" />
-
-                    {/* Laser Scanner Line */}
                     <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-bounce" />
-
                     <div className="text-center text-[10px] font-mono font-bold text-emerald-300 bg-black/60 py-1 px-2 rounded-full self-center">
                       จัดวาง QR Code ให้อยู่ในกรอบ
                     </div>
@@ -850,7 +866,7 @@ export default function StaffCheckinPage() {
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-gray-200">กล้องพร้อมใช้งาน</p>
                     <p className="text-xs text-gray-400 max-w-xs">
-                      กดปุ่ม &ldquo;เปิดกล้องสแกน&rdquo; หรือเลือกรูปภาพ QR Code เพื่อตรวจสอบ
+                      กดปุ่ม &ldquo;เปิดกล้องสแกน&rdquo; หรือกด &ldquo;สแกนแบบแอปจ่ายเงิน&rdquo; ด้านบน
                     </p>
                   </div>
                 </div>
@@ -978,7 +994,7 @@ export default function StaffCheckinPage() {
               <div className="flex items-center justify-between border-b border-[var(--line)] pb-2">
                 <div className="flex items-center gap-2">
                   <History className="h-4 w-4 text-[var(--burgundy-700)]" />
-                  <span className="text-xs font-bold text-[var(--ink)]">ประวัติการสแกนล่าสุด</span>
+                  <span className="text-xs font-bold text-[var(--ink)]">ประวัติการสแกนล่าสุด (5 ท่าน)</span>
                 </div>
                 <span className="text-[10px] font-bold text-gray-400">{recentScans.length} รายการ</span>
               </div>
@@ -987,7 +1003,7 @@ export default function StaffCheckinPage() {
                   <div 
                     key={item.id}
                     onClick={() => handleLookupByToken(item.code)}
-                    className="py-2 flex items-center justify-between gap-2 hover:bg-gray-50 px-2 rounded-lg cursor-pointer transition-colors"
+                    className="py-2.5 flex items-center justify-between gap-2 hover:bg-gray-50 px-2 rounded-lg cursor-pointer transition-colors"
                   >
                     <div className="space-y-0.5 min-w-0">
                       <div className="flex items-center gap-2">
@@ -1199,7 +1215,7 @@ export default function StaffCheckinPage() {
                   พร้อมสำหรับการสแกน
                 </h3>
                 <p className="text-xs text-[var(--muted)] leading-relaxed">
-                  ส่องกล้องไปที่ QR Code ของผู้บริจาค หรือใช้เครื่องยิงบาร์โค้ด USB หรืออัปโหลดรูปภาพเพื่อดึงข้อมูลและยืนยันเช็คอิน
+                  ส่องกล้องไปที่ QR Code ของผู้บริจาค หรือใช้ปุ่ม &ldquo;โหมดสแกนแบบแอปจ่ายเงิน&rdquo; เพื่อสแกนอย่างรวดเร็วและต่อเนื่อง
                 </p>
               </div>
             </div>
@@ -1207,6 +1223,187 @@ export default function StaffCheckinPage() {
         </div>
 
       </div>
+
+      {/* ========================================================================= */}
+      {/* 📱 FULLSCREEN MOBILE PAYMENT-APP STYLE SCANNER OVERLAY (PROMPTPAY / SCAN-PAY STYLE) */}
+      {/* ========================================================================= */}
+      {fullscreenScanner && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col animate-in fade-in-100 duration-200">
+          
+          {/* Top Floating Glassmorphic Header */}
+          <div className="absolute top-0 inset-x-0 z-20 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
+            
+            {/* Close / Back Button */}
+            <button
+              type="button"
+              onClick={closeFullscreenScanner}
+              className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 border border-white/20 transition-all cursor-pointer shadow-lg"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {/* Title / Badge */}
+            <div className="flex flex-col items-center">
+              <span className="text-xs font-mono font-black text-emerald-400 tracking-wider uppercase">
+                MUMT SCAN & CHECK-IN
+              </span>
+              <span className="text-[10px] text-white/70">
+                {fastTrackMode ? '⚡ โหมดเช็คอินด่วน' : 'โหมดตรวจละเอียด'}
+              </span>
+            </div>
+
+            {/* Quick Action Toggles */}
+            <div className="flex items-center gap-2">
+              {/* Sound Toggle */}
+              <button
+                type="button"
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className={`p-3 rounded-full backdrop-blur-md border transition-all cursor-pointer shadow-lg ${
+                  soundEnabled ? 'bg-blue-600/80 border-blue-400 text-white' : 'bg-black/50 border-white/20 text-white/60'
+                }`}
+              >
+                {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+              </button>
+
+              {/* Torch Toggle */}
+              <button
+                type="button"
+                onClick={toggleTorch}
+                className={`p-3 rounded-full backdrop-blur-md border transition-all cursor-pointer shadow-lg ${
+                  torchOn ? 'bg-amber-400 border-amber-300 text-amber-950' : 'bg-black/50 border-white/20 text-white'
+                }`}
+              >
+                <Flashlight className="h-5 w-5" />
+              </button>
+
+              {/* Camera Switch Toggle */}
+              <button
+                type="button"
+                onClick={toggleCameraFacing}
+                className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 border border-white/20 transition-all cursor-pointer shadow-lg"
+              >
+                <RotateCcw className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Center Immersive Viewfinder Box */}
+          <div className="relative flex-1 flex items-center justify-center overflow-hidden">
+            
+            {/* Viewfinder Target Frame (Payment App Scanner Style) */}
+            <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-3xl border-2 border-emerald-400/90 shadow-[0_0_50px_rgba(52,211,153,0.4)] flex flex-col justify-between p-3 pointer-events-none z-10">
+              {/* 4 Glowing Corner L-Brackets */}
+              <div className="absolute -top-1.5 -left-1.5 w-8 h-8 border-t-4 border-l-4 border-emerald-400 rounded-tl-xl shadow-[0_0_10px_#34d399]" />
+              <div className="absolute -top-1.5 -right-1.5 w-8 h-8 border-t-4 border-r-4 border-emerald-400 rounded-tr-xl shadow-[0_0_10px_#34d399]" />
+              <div className="absolute -bottom-1.5 -left-1.5 w-8 h-8 border-b-4 border-l-4 border-emerald-400 rounded-bl-xl shadow-[0_0_10px_#34d399]" />
+              <div className="absolute -bottom-1.5 -right-1.5 w-8 h-8 border-b-4 border-r-4 border-emerald-400 rounded-br-xl shadow-[0_0_10px_#34d399]" />
+
+              {/* Laser Scanning Line */}
+              <div className="w-full h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_16px_#34d399] animate-bounce" />
+
+              <div className="text-center text-xs font-bold text-white bg-black/60 backdrop-blur-md py-1.5 px-4 rounded-full self-center border border-white/20">
+                ส่อง QR Code ในกรอบ
+              </div>
+            </div>
+
+            {/* Instruction Tip */}
+            <div className="absolute bottom-28 inset-x-0 text-center text-white/80 text-xs z-10 font-medium px-4">
+              สแกน QR Code จากหน้าจอมือถือหรือบัตรลงทะเบียนของผู้บริจาค
+            </div>
+          </div>
+
+          {/* Slide-Up Bottom Action Drawer (Like Payment Apps Confirmation Sheet) */}
+          {registration && (
+            <div className="absolute bottom-0 inset-x-0 z-30 bg-white rounded-t-3xl p-6 space-y-4 shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[85vh] overflow-y-auto">
+              
+              {/* Drawer Drag Bar */}
+              <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto" />
+
+              {/* Header Info & Status */}
+              <div className="flex items-center justify-between gap-3 border-b border-gray-100 pb-3">
+                <div>
+                  <span className="font-mono font-black text-xs text-[var(--burgundy-700)] bg-[var(--rose-100)] px-2 py-0.5 rounded border border-[var(--line)]">
+                    {registration.registrationCode}
+                  </span>
+                  <h3 className="text-xl font-black text-[var(--ink)] mt-1">
+                    คุณ{registration.firstName} {registration.lastName}
+                  </h3>
+                </div>
+                <div>
+                  {(() => {
+                    const badge = getRegistrationStatusBadge(registration.status);
+                    return (
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border ${badge.colorClass}`}>
+                        {badge.label}
+                      </span>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Details Summary */}
+              <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 p-3 rounded-xl">
+                <div>
+                  <span className="text-gray-400 font-bold block text-[10px]">รอบเวลา</span>
+                  <span className="font-black text-gray-800 font-mono">{registration.timeSlotText}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400 font-bold block text-[10px]">เบอร์โทร</span>
+                  <span className="font-black text-gray-800 font-mono">{registration.phone}</span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-2 pt-1">
+                {registration.status === 'REGISTERED' && (
+                  <button
+                    type="button"
+                    disabled={actionLoading}
+                    onClick={() => handleStatusChange('CHECKED_IN')}
+                    className="w-full py-4 px-5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50"
+                  >
+                    <UserCheck className="h-5 w-5" />
+                    <span>ยืนยันเช็คอินเข้างาน (CHECK-IN)</span>
+                  </button>
+                )}
+
+                {registration.status === 'CHECKED_IN' && (
+                  <button
+                    type="button"
+                    disabled={actionLoading}
+                    onClick={() => handleStatusChange('COMPLETED')}
+                    className="w-full py-4 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50 animate-pulse"
+                  >
+                    <Gift className="h-5 w-5" />
+                    <span>บริจาคสำเร็จ & มอบของที่ระลึก (COMPLETED)</span>
+                  </button>
+                )}
+
+                {registration.status === 'COMPLETED' && (
+                  <div className="w-full py-3.5 px-4 rounded-2xl bg-emerald-100 text-emerald-900 font-black text-sm flex items-center justify-center gap-2 border border-emerald-300">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-700" />
+                    <span>🎉 มอบของที่ระลึกเรียบร้อยแล้ว</span>
+                  </div>
+                )}
+
+                {/* Dismiss & Scan Next */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRegistration(null);
+                  }}
+                  className="w-full py-3 text-xs font-bold text-gray-600 hover:text-gray-900 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>สแกนคนถัดไป</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+            </div>
+          )}
+
+        </div>
+      )}
 
     </div>
   );
