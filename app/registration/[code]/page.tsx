@@ -71,8 +71,8 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
         {/* Ticket Header */}
         <div className="border-b-2 border-dashed border-[var(--burgundy-700)] pb-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-lg bg-white p-1 border border-[var(--line)] flex items-center justify-center">
-              <Image src="/images/logo.png" alt="MUMT Logo" width={32} height={32} className="h-full w-auto object-contain" />
+            <div className="h-9 w-9 rounded-full bg-white p-1 border border-[var(--line)] flex items-center justify-center overflow-hidden">
+              <Image src="/images/logo.png" alt="MUMT Logo" width={32} height={32} className="h-full w-auto object-contain rounded-full" />
             </div>
             <div>
               <span className="text-[11px] font-bold text-[var(--burgundy-700)] uppercase block">MUMT Blood Donation 2026</span>

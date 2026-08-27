@@ -84,8 +84,8 @@ export default function StaffLoginPage() {
           
           {/* Header */}
           <div className="text-center space-y-3">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--bg)] p-2 border border-[var(--line)] shadow-xs">
-              <Image src="/images/logo.png" alt="MUMT Logo" width={48} height={48} className="h-full w-auto object-contain" />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg)] p-2 border border-[var(--line)] shadow-xs overflow-hidden">
+              <Image src="/images/logo.png" alt="MUMT Logo" width={48} height={48} className="h-full w-auto object-contain rounded-full" />
             </div>
 
             <div className="space-y-1">

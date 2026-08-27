@@ -18,20 +18,20 @@ export default function Loading() {
           <div className="absolute h-24 w-24 rounded-full bg-rose-500/20 animate-ping" />
           <div className="absolute h-20 w-20 rounded-full bg-[var(--burgundy-500)]/25 animate-pulse" />
           
-          {/* Center Brand Badge */}
-          <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-2.5 shadow-xl border border-[var(--line)]">
+          {/* Center Circular Brand Badge */}
+          <div className="relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-white p-2.5 shadow-xl border border-[var(--line)] overflow-hidden">
             <Image
               src="/images/logo.png"
               alt="MUMT LOVE UNIT Logo"
-              width={48}
-              height={48}
-              className="h-full w-full object-contain"
+              width={56}
+              height={56}
+              className="h-full w-full object-contain rounded-full"
               priority
             />
           </div>
 
           {/* Floating Micro Heart with Heartbeat Animation */}
-          <div className="absolute -top-1.5 -right-1.5 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-[var(--burgundy-700)] to-rose-500 text-white shadow-md animate-bounce">
+          <div className="absolute -top-1 -right-1 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-tr from-[var(--burgundy-700)] to-rose-500 text-white shadow-md animate-bounce">
             <Heart className="h-3.5 w-3.5 fill-white" />
           </div>
         </div>

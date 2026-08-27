@@ -36,8 +36,8 @@ export function TicketStub({
           {/* Header */}
           <div className="flex items-center justify-between gap-2 border-b border-[var(--line)] pb-3">
             <div className="flex min-w-0 items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white p-1 border border-[var(--line)]">
-                <Image src="/images/logo.png" alt="MUMT Logo" width={32} height={32} className="h-full w-auto object-contain" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white p-1 border border-[var(--line)] overflow-hidden">
+                <Image src="/images/logo.png" alt="MUMT Logo" width={32} height={32} className="h-full w-auto object-contain rounded-full" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-black tracking-wide text-[var(--burgundy-700)] uppercase">MUMT</p>

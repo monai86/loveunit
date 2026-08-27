@@ -37,8 +37,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             {/* Brand Logo & Title */}
             <div className="flex items-center gap-3">
               <Link href="/admin" className="flex items-center gap-2.5 group">
-                <div className="h-9 w-9 rounded-xl bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs">
-                  <Image src="/images/logo.png" alt="MUMT Logo" width={28} height={28} className="h-6 w-6 object-contain" />
+                <div className="h-9 w-9 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs overflow-hidden">
+                  <Image src="/images/logo.png" alt="MUMT Logo" width={28} height={28} className="h-6 w-6 object-contain rounded-full" />
                 </div>
                 <div className="hidden sm:block">
                   <div className="flex items-center gap-1.5">

@@ -45,13 +45,13 @@ export function Navbar() {
         
         {/* 1. Left: Brand Logo & Title */}
         <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink min-w-0 group">
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white p-1 border border-[var(--line)] shadow-xs transition-transform group-hover:scale-105">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-white p-1 border border-[var(--line)] shadow-xs transition-transform group-hover:scale-105 overflow-hidden">
             <Image 
               src="/images/logo.png" 
               alt="MUMT LOVE UNIT Logo" 
               width={40}
               height={40}
-              className="h-full w-full object-contain"
+              className="h-full w-full object-contain rounded-full"
               priority
             />
           </div>

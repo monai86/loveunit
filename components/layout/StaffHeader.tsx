@@ -34,8 +34,8 @@ export function StaffHeader() {
         {/* Brand & Badge */}
         <div className="flex items-center gap-3">
           <Link href="/staff/checkin" className="flex items-center gap-2.5 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--burgundy-700)] text-white p-1 shadow-xs">
-              <Image src="/images/logo.png" alt="MUMT Logo" width={28} height={28} className="h-6 w-6 object-contain" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--burgundy-700)] text-white p-1 shadow-xs overflow-hidden">
+              <Image src="/images/logo.png" alt="MUMT Logo" width={28} height={28} className="h-6 w-6 object-contain rounded-full" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">

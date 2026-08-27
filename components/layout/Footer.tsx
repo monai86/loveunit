@@ -22,8 +22,8 @@ export function Footer() {
           {/* Brand Info (5 columns) */}
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--bg)] p-1 border border-[var(--line)]">
-                <Image src="/images/logo.png" alt="MUMT Logo" width={40} height={40} className="h-full w-auto object-contain" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[var(--bg)] p-1 border border-[var(--line)] overflow-hidden">
+                <Image src="/images/logo.png" alt="MUMT Logo" width={40} height={40} className="h-full w-auto object-contain rounded-full" />
               </div>
               <div>
                 <span className="text-xs font-black text-[var(--ink)] block">MUMT Blood Donation 2026</span>
