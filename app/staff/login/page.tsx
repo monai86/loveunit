@@ -53,7 +53,12 @@ export default function StaffLoginPage() {
         return;
       }
 
-      router.replace('/mt70');
+      const userObj = res?.data?.user as { mustChangePassword?: boolean } | undefined;
+      if (userObj?.mustChangePassword) {
+        window.location.href = '/staff/change-password';
+      } else {
+        window.location.href = '/mt70';
+      }
     } catch (err) {
       console.error(err);
       setError('การเข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ');
@@ -66,7 +71,7 @@ export default function StaffLoginPage() {
     <div className="min-h-[85vh] flex flex-col justify-center items-center px-4 py-12 sm:px-6">
       
       {/* Container Card */}
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-md space-y-5">
         
         {/* Return to Home link */}
         <div className="text-left">
@@ -75,41 +80,34 @@ export default function StaffLoginPage() {
             className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--muted)] hover:text-[var(--burgundy-700)] transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            <span>กลับสู่หน้าหลักผู้บริจาค</span>
+            <span>กลับสู่หน้าหลัก</span>
           </Link>
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-3xl border border-[var(--line)] p-7 sm:p-9 shadow-xl space-y-6">
+        <div className="bg-white rounded-3xl border border-[var(--line)] p-6 sm:p-8 shadow-xl space-y-6">
           
           {/* Header */}
-          <div className="text-center space-y-3">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg)] p-2 border border-[var(--line)] shadow-xs overflow-hidden">
+          <div className="text-center space-y-2">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg)] p-1.5 border border-[var(--line)] shadow-2xs overflow-hidden">
               <Image src="/images/logo.png" alt="MUMT Logo" width={48} height={48} className="h-full w-auto object-contain rounded-full" />
             </div>
 
             <div className="space-y-1">
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="px-2.5 py-0.5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] text-[10px] font-black uppercase tracking-wider border border-[var(--burgundy-300)]/40">
-                  ADMIN PORTAL
-                </span>
-              </div>
-              <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] tracking-tight">
-                เข้าสู่ระบบผู้ดูแลระบบ (Admin)
+              <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] tracking-tight font-display">
+                เข้าสู่ระบบผู้ดูแลระบบ
               </h1>
               <p className="text-xs text-[var(--muted)] font-medium">
-                MUMT Blood Donation 2026 “เติมรักให้เต็ม Unit ครั้งที่ 9”
+                MUMT LoveUnit ครั้งที่ 9
               </p>
             </div>
           </div>
 
           {/* Error Notice */}
           {error && (
-            <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-xs font-bold text-red-800 animate-fadeIn">
+            <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-bold text-red-800 animate-fadeIn">
               <AlertCircle className="h-4 w-4 shrink-0 text-red-600 mt-0.5" />
-              <div className="space-y-0.5">
-                <p>{error}</p>
-              </div>
+              <p>{error}</p>
             </div>
           )}
 
@@ -118,8 +116,8 @@ export default function StaffLoginPage() {
             
             {/* Email Field */}
             <div className="space-y-1">
-              <label htmlFor="staff-email" className="block text-xs font-black text-[var(--ink)]">
-                อีเมลเข้าสู่ระบบ (Email)
+              <label htmlFor="staff-email" className="block text-xs font-bold text-[var(--ink)]">
+                อีเมล
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
@@ -129,22 +127,20 @@ export default function StaffLoginPage() {
                   id="staff-email"
                   type="email"
                   required
-                  autoComplete="email"
+                  autoComplete="username email"
                   placeholder="admin@mahidol.ac.th"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[var(--line)] bg-gray-50/50 focus:bg-white text-xs font-bold text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)] transition-all font-mono"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[var(--line)] bg-gray-50/50 focus:bg-white text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)] transition-all font-mono"
                 />
               </div>
             </div>
 
             {/* Password Field with Show/Hide Eye Toggle */}
             <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label htmlFor="staff-password" className="block text-xs font-black text-[var(--ink)]">
-                  รหัสผ่าน (Password)
-                </label>
-              </div>
+              <label htmlFor="staff-password" className="block text-xs font-bold text-[var(--ink)]">
+                รหัสผ่าน
+              </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                   <Lock className="h-4 w-4" />
@@ -157,7 +153,7 @@ export default function StaffLoginPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-[var(--line)] bg-gray-50/50 focus:bg-white text-xs font-bold text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)] transition-all font-mono"
+                  className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-[var(--line)] bg-gray-50/50 focus:bg-white text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)] transition-all font-mono"
                 />
                 <button
                   type="button"
@@ -180,12 +176,12 @@ export default function StaffLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 px-4 rounded-xl bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-70"
+                className="editorial-btn-primary w-full py-3 px-4 text-xs font-bold flex items-center justify-center gap-2 disabled:opacity-70"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>กำลังตรวจสอบสิทธิ์...</span>
+                    <span>กำลังเข้าสู่ระบบ...</span>
                   </span>
                 ) : (
                   <span>เข้าสู่ระบบ</span>
@@ -198,13 +194,10 @@ export default function StaffLoginPage() {
         </div>
 
         {/* Security strip footer */}
-        <div className="text-center space-y-1 text-[11px] text-[var(--muted)]">
-          <p className="flex items-center justify-center gap-1.5 font-medium">
+        <div className="text-center space-y-0.5 text-[11px] text-[var(--muted)]">
+          <p className="flex items-center justify-center gap-1 font-medium">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-            <span>ระบบความปลอดภัยและควบคุมสิทธิ์การจัดการระบบ</span>
-          </p>
-          <p className="text-gray-400 font-mono text-[10px]">
-            Faculty of Medical Technology, Mahidol University
+            <span>ระบบความปลอดภัย คณะเทคนิคการแพทย์ ม.มหิดล</span>
           </p>
         </div>
 

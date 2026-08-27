@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { QrCode, UserPlus, BarChart3, LogOut, ListOrdered, Loader2, ArrowLeft } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 
@@ -22,10 +22,10 @@ export function StaffHeader() {
   }
 
   const tabs = [
-    { href: '/staff/checkin', label: 'จุดสแกน QR & เช็คอิน', icon: QrCode },
-    { href: '/staff/queue', label: 'คิวผู้บริจาค (Queue)', icon: ListOrdered },
+    { href: '/staff/checkin', label: 'จุดสแกน QR', icon: QrCode },
+    { href: '/staff/queue', label: 'คิวผู้บริจาค', icon: ListOrdered },
     { href: '/staff/walk-in', label: 'ลงทะเบียน Walk-in', icon: UserPlus },
-    { href: '/mt70', label: 'แดชบอร์ดผู้บริหาร (Admin)', icon: BarChart3 },
+    { href: '/mt70', label: 'แดชบอร์ด (Admin)', icon: BarChart3 },
   ];
 
   return (
@@ -40,12 +40,11 @@ export function StaffHeader() {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-mono font-black tracking-wider text-[var(--burgundy-700)] uppercase">ADMIN PORTAL</span>
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">LIVE OPS</span>
+                <span className="text-xs font-black text-[var(--burgundy-700)] font-display">MUMT LoveUnit</span>
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[var(--rose-100)] text-[var(--burgundy-700)]">ครั้งที่ 9</span>
               </div>
-              <h1 className="text-xs font-black text-[var(--ink)] sm:text-sm leading-tight">
-                ระบบปฏิบัติการหน้างาน — MUMT 2026
+              <h1 className="text-xs font-bold text-[var(--muted)] leading-tight">
+                ระบบหน้างาน
               </h1>
             </div>
           </Link>
@@ -60,10 +59,10 @@ export function StaffHeader() {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
                   isActive
                     ? 'bg-[var(--burgundy-700)] text-white shadow-xs'
-                    : 'bg-gray-50/80 text-gray-700 hover:bg-gray-100 hover:text-[var(--ink)] border border-gray-200/60'
+                    : 'text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]'
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -73,20 +72,20 @@ export function StaffHeader() {
           })}
         </nav>
 
-        {/* Actions */}
+        {/* Right Actions */}
         <div className="flex items-center gap-2">
           <Link
             href="/"
-            className="inline-flex items-center gap-1 text-xs font-bold text-[var(--muted)] hover:text-[var(--burgundy-700)] px-2.5 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+            className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-[var(--burgundy-700)] px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">หน้าประชาชน</span>
+            <span>หน้าหลัก</span>
           </Link>
           <LogoutButton />
         </div>
       </div>
 
-      {/* Mobile Switcher Bar */}
+      {/* Mobile Bottom Subnav */}
       <div className="flex items-center justify-around border-t border-[var(--line)] bg-gray-50/90 p-1.5 md:hidden">
         {tabs.map((tab) => {
           const Icon = tab.icon;
@@ -110,7 +109,6 @@ export function StaffHeader() {
 }
 
 function LogoutButton() {
-  const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
 
   const handleLogout = async () => {
@@ -118,7 +116,7 @@ function LogoutButton() {
     try {
       await authClient.signOut();
     } finally {
-      router.push('/staff/login');
+      window.location.href = '/staff/login';
     }
   };
 

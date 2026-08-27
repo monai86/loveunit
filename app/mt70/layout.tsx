@@ -9,9 +9,9 @@ import {
   FileText, 
   ScrollText, 
   QrCode, 
-  LogOut, 
   Shield
 } from 'lucide-react';
+import { AdminLogoutButton } from '@/components/admin/AdminLogoutButton';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthenticatedUser();
@@ -40,13 +40,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 <div className="h-9 w-9 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs overflow-hidden">
                   <Image src="/images/logo.png" alt="MUMT Logo" width={28} height={28} className="h-6 w-6 object-contain rounded-full" />
                 </div>
-                <div className="hidden sm:block">
+                <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-mono font-black text-[var(--burgundy-700)] uppercase tracking-wider">MUMT 2026</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-bold text-emerald-700 font-mono">LIVE OPS</span>
+                    <span className="text-xs font-black text-[var(--burgundy-700)] font-display">MUMT LoveUnit</span>
+                    <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[var(--rose-100)] text-[var(--burgundy-700)]">ครั้งที่ 9</span>
                   </div>
-                  <span className="text-xs font-black text-[var(--ink)] block leading-tight">Admin & Operations Portal</span>
+                  <span className="text-[11px] font-bold text-[var(--muted)] block leading-tight">แดชบอร์ดแอดมิน</span>
                 </div>
               </Link>
             </div>
@@ -58,7 +57,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
               >
                 <LayoutDashboard className="h-4 w-4 text-[var(--burgundy-600)]" />
-                <span>แดชบอร์ดภาพรวม</span>
+                <span>แดชบอร์ด</span>
               </Link>
 
               <Link
@@ -74,7 +73,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
               >
                 <FileText className="h-4 w-4 text-amber-600" />
-                <span>จัดการสื่อ & โปสเตอร์</span>
+                <span>สื่อ & โปสเตอร์</span>
               </Link>
 
               <Link
@@ -82,7 +81,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
               >
                 <ScrollText className="h-4 w-4 text-gray-600" />
-                <span>ประวัติ Audit Log</span>
+                <span>Audit Log</span>
               </Link>
             </nav>
 
@@ -100,30 +99,22 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
               <div className="h-4 w-px bg-gray-200 hidden sm:block" />
 
-              {/* User Pill */}
-              <div className="flex items-center gap-2 p-1.5 pl-3 rounded-xl bg-gray-50 border border-[var(--line)]">
-                <div className="text-right hidden sm:block">
-                  <span className="text-xs font-black text-[var(--ink)] block leading-tight truncate max-w-[140px]">
-                    {user.profile.display_name}
-                  </span>
-                  <div className="flex items-center justify-end gap-1">
-                    <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase tracking-wider bg-[var(--rose-100)] text-[var(--burgundy-700)]">
-                      ADMIN
+              {/* User & Logout */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 p-1.5 pl-3 rounded-xl bg-gray-50 border border-[var(--line)]">
+                  <div className="text-right hidden sm:block">
+                    <span className="text-xs font-black text-[var(--ink)] block leading-tight truncate max-w-[130px]">
+                      {user.profile.display_name}
                     </span>
+                    <span className="text-[10px] font-bold text-[var(--muted)]">Admin</span>
+                  </div>
+
+                  <div className="h-7 w-7 rounded-lg bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center">
+                    <Shield className="h-4 w-4 text-[var(--burgundy-700)]" />
                   </div>
                 </div>
 
-                <div className="h-7 w-7 rounded-lg bg-[var(--rose-100)] text-[var(--burgundy-700)] font-black text-xs flex items-center justify-center font-mono">
-                  <Shield className="h-4 w-4 text-[var(--burgundy-700)]" />
-                </div>
-
-                <Link
-                  href="/staff/login"
-                  className="p-1 rounded-lg hover:bg-gray-200 text-gray-500 hover:text-red-600 transition-colors ml-1"
-                  title="ออกจากระบบ / สลับบัญชี"
-                >
-                  <LogOut className="h-4 w-4" />
-                </Link>
+                <AdminLogoutButton />
               </div>
 
             </div>
@@ -140,8 +131,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Admin Footer */}
       <footer className="border-t border-[var(--line)] bg-white py-4 text-center text-xs text-[var(--muted)] font-medium">
         <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>MUMT Blood Donation 2026 Admin Portal (ครั้งที่ 9)</span>
-          <span className="font-mono text-[11px] text-gray-400">Secured with Role-Based Access Control (RBAC)</span>
+          <span>MUMT LoveUnit ครั้งที่ 9 · แดชบอร์ดผู้ดูแลระบบ</span>
+          <span className="font-mono text-[11px] text-gray-400">ระบบปฏิบัติการออนไลน์ คณะเทคนิคการแพทย์ ม.มหิดล</span>
         </div>
       </footer>
 

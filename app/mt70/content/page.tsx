@@ -74,16 +74,15 @@ export default function AdminContentPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       
-      <div className="border-b border-[var(--rose-100)] pb-6">
-        <Link href="/mt70" className="inline-flex items-center gap-1 text-xs font-bold text-[var(--burgundy-700)] hover:underline mb-1 py-3.5">
-          <ArrowLeft className="h-3.5 w-3.5" /> <span>กลับหน้าแดชบอร์ดหลัก</span>
+      <div className="border-b border-[var(--line)] pb-4">
+        <Link href="/mt70" className="inline-flex items-center gap-1 text-xs font-bold text-[var(--burgundy-700)] hover:underline mb-1">
+          <ArrowLeft className="h-3.5 w-3.5" /> <span>กลับหน้าแดชบอร์ด</span>
         </Link>
-        <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl">
-          จัดการสื่อ & อินโฟกราฟิก (Content PR & Media Manager)
+        <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] font-display">
+          จัดการสื่อ & โปสเตอร์ประชาสัมพันธ์
         </h1>
-        <p className="mt-1 text-xs text-gray-600">
-          ระบบจัดการไฟล์ภาพ โปสเตอร์ และเนื้อหาประชาสัมพันธ์โครงการ MUMT 2026 
-          (อัปเดตข้อมูลจริงในฐานข้อมูล DB)
+        <p className="mt-0.5 text-xs text-[var(--muted)] font-medium">
+          MUMT LoveUnit ครั้งที่ 9
         </p>
       </div>
 

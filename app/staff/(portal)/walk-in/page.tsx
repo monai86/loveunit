@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, ArrowLeft, Phone, Loader2, Zap } from 'lucide-react';
+import { CheckCircle2, ArrowLeft, Phone, Loader2 } from 'lucide-react';
 import { ParticipantType, DonationExperience } from '@/lib/types/database';
 import { MAHIDOL_FACULTIES } from '@/lib/constants/mahidol';
 
@@ -80,25 +80,24 @@ export default function StaffWalkInPage() {
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
       
       {/* Top Navigation */}
-      <div className="flex items-center justify-between border-b border-[var(--rose-100)] pb-4">
+      <div className="flex items-center justify-between border-b border-[var(--line)] pb-4">
         <Link
           href="/staff/checkin"
           className="flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)] hover:underline"
         >
-          <ArrowLeft className="h-4 w-4" /> กลับสู่หน้าเช็คอิน
+          <ArrowLeft className="h-3.5 w-3.5" /> <span>กลับสู่หน้าสแกน QR</span>
         </Link>
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
-          <Zap className="h-3.5 w-3.5 fill-amber-500 text-amber-700" />
-          Fast Walk-in Mode (20-30s Target)
-        </div>
+        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
+          Walk-in
+        </span>
       </div>
 
-      <div className="mt-6 text-center">
-        <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl">
-          ลงทะเบียนผู้บริจาคหน้างาน (Walk-in)
+      <div className="mt-6 text-center space-y-1">
+        <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] font-display">
+          ลงทะเบียน Walk-in หน้างาน
         </h1>
-        <p className="mt-1 text-xs text-gray-600">
-          ฟอร์มลงทะเบียนอย่างรวดเร็วสำหรับผู้บริจาคที่ไม่ได้ลงทะเบียนออนไลน์ล่วงหน้า ระบบจะทำการ Register & Check In ให้อัตโนมัติ
+        <p className="text-xs text-[var(--muted)] font-medium">
+          สำหรับผู้ที่ไม่ได้ลงทะเบียนออนไลน์ล่วงหน้า (ระบบจะบันทึกและเช็คอินให้อัตโนมัติ)
         </p>
       </div>
 

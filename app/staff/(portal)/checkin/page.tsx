@@ -682,22 +682,22 @@ export default function StaffCheckinPage() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-8">
       
       {/* Top Header & Quick Mode Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--line)] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--line)] pb-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-mono font-black text-[var(--burgundy-700)] uppercase tracking-wider">
-              STAFF CHECK-IN & SOUVENIR DESK
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-bold text-[var(--burgundy-700)]">
+              MUMT LoveUnit ครั้งที่ 9
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] text-[10px] font-black border border-[var(--line)]">
-              ห้องประชุม 217
+            <span className="px-2 py-0.5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] text-[11px] font-bold">
+              ห้อง 217 อาคารสิริวิทยา
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[var(--ink)]">
-            ระบบเช็คอินและมอบของที่ระลึก
+          <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] font-display">
+            จุดสแกน QR & เช็คอินหน้างาน
           </h1>
-          <p className="text-xs text-[var(--muted)]">
-            สแกน QR Code ตรวจสอบผู้มาจริง และบันทึกของที่ระลึกสุดพิเศษเมื่อบริจาคโลหิตสำเร็จ
+          <p className="text-xs text-[var(--muted)] font-medium">
+            สแกน QR Code ตรวจสอบรายชื่อ และบันทึกการรับของที่ระลึก
           </p>
         </div>
 

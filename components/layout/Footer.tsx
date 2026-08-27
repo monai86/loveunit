@@ -9,8 +9,8 @@ import { MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 export function Footer() {
   const pathname = usePathname();
 
-  // Hide footer on staff checkin tablet layout if needed or keep subtle
-  if (pathname.startsWith('/staff/checkin')) {
+  // Hide footer on staff and admin portal routes
+  if (pathname.startsWith('/staff') || pathname.startsWith('/admin') || pathname.startsWith('/mt70')) {
     return null;
   }
 
