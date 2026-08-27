@@ -152,24 +152,25 @@ export function HeroClient({
                 {copy.description}
               </p>
 
-              {/* Event Facts: Symmetric 3-column cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-                <div className="flex items-center gap-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-2.5 text-xs text-[var(--cream)] font-bold shadow-2xs">
-                  <Calendar className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
-                  <span className="truncate">{copy.date}</span>
+              {/* Event Facts & Action Buttons - Unified Width & Perfect Symmetry */}
+              <div className="space-y-3 pt-1 w-full">
+                
+                {/* Event Facts: 3-column cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full">
+                  <div className="flex items-center gap-2.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-3 text-xs text-[var(--cream)] font-bold shadow-2xs">
+                    <Calendar className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
+                    <span className="truncate">{copy.date}</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-3 text-xs text-[var(--cream)] font-bold shadow-2xs">
+                    <Clock className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
+                    <span className="truncate">{copy.time}</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-3 text-xs text-[var(--cream)] font-bold shadow-2xs">
+                    <MapPin className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
+                    <span className="truncate">{copy.venue}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-2.5 text-xs text-[var(--cream)] font-bold shadow-2xs">
-                  <Clock className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
-                  <span className="truncate">{copy.time}</span>
-                </div>
-                <div className="flex items-center gap-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-2.5 text-xs text-[var(--cream)] font-bold shadow-2xs">
-                  <MapPin className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
-                  <span className="truncate">{copy.venue}</span>
-                </div>
-              </div>
 
-              {/* CTAs Action Buttons - Perfectly Symmetrical & Balanced */}
-              <div className="space-y-2.5 pt-2 max-w-xl">
                 {/* Main Action: Full-width Primary Button */}
                 <Link 
                   href="/register" 
@@ -180,20 +181,21 @@ export function HeroClient({
                 </Link>
 
                 {/* Secondary Actions: Symmetrical 2-Column Grid */}
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-2 gap-2.5 w-full">
                   <Link 
                     href="/screening" 
-                    className="btn-outline-cream !w-full border-amber-300/50 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20 font-bold text-xs sm:text-sm px-3 py-3 rounded-xl flex items-center justify-center text-center transition-colors shadow-2xs"
+                    className="btn-outline-cream !w-full border-amber-300/50 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20 font-bold text-xs sm:text-sm px-3 py-3 rounded-2xl flex items-center justify-center text-center transition-colors shadow-2xs"
                   >
                     <span className="truncate">{isEn ? 'Self-Screening Quiz' : 'ประเมินความพร้อมตนเอง'}</span>
                   </Link>
                   <Link 
                     href="/knowledge" 
-                    className="btn-outline-cream !w-full border-white/25 bg-white/10 hover:bg-white/20 text-[var(--cream)] font-bold text-xs sm:text-sm px-3 py-3 rounded-xl flex items-center justify-center text-center transition-colors shadow-2xs"
+                    className="btn-outline-cream !w-full border-white/25 bg-white/10 hover:bg-white/20 text-[var(--cream)] font-bold text-xs sm:text-sm px-3 py-3 rounded-2xl flex items-center justify-center text-center transition-colors shadow-2xs"
                   >
                     <span className="truncate">{isEn ? 'Knowledge & Labs' : 'ความรู้ & แล็บตรวจ'}</span>
                   </Link>
                 </div>
+
               </div>
             </div>
 
