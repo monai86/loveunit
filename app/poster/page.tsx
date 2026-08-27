@@ -19,6 +19,7 @@ import {
   Share2,
   Check
 } from 'lucide-react';
+import { SocialLinks } from '@/components/common/SocialLinks';
 
 const OFFICIAL_POSTERS = [
   {
@@ -402,31 +403,8 @@ export default function PosterPage() {
                 <span>แตงโม</span>
                 <a href="tel:0656274319" className="font-mono text-sm text-[var(--burgundy-700)] hover:underline">06-5627-4319</a>
               </div>
-              <div className="border-t border-[var(--line)] pt-2.5 flex flex-wrap gap-2 text-[11px]">
-                <a
-                  href="https://www.instagram.com/mumt_loveunit/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-2.5 py-1 rounded-md bg-white border border-pink-200 text-pink-700 font-bold hover:underline"
-                >
-                  IG: @mumt_loveunit
-                </a>
-                <a
-                  href="https://www.tiktok.com/@mumt_loveunit"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-2.5 py-1 rounded-md bg-gray-900 text-white font-bold hover:underline"
-                >
-                  TikTok: @mumt_loveunit
-                </a>
-                <a
-                  href="https://www.facebook.com/profile.php?id=100064643707063&utm_source=ig&utm_medium=social&utm_content=link_in_bio"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-2.5 py-1 rounded-md bg-blue-50 border border-blue-200 text-blue-700 font-bold hover:underline"
-                >
-                  Facebook Page
-                </a>
+              <div className="border-t border-[var(--line)] pt-2.5">
+                <SocialLinks />
               </div>
             </div>
           </div>

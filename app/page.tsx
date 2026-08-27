@@ -16,17 +16,14 @@ import {
   Microscope,
   Sparkles,
   Gift,
-  Layers,
   Heart,
-  Droplets,
-  Calendar,
-  Clock,
   MapPin,
-  Phone
+  Clock
 } from 'lucide-react';
 import { HeroClient } from '@/components/home/HeroClient';
 import { getEventBySlug } from '@/services/event-service';
 import { pickField } from '@/lib/utils/format';
+import { SocialLinks } from '@/components/common/SocialLinks';
 
 export const dynamic = 'force-dynamic';
 
@@ -191,7 +188,7 @@ export default async function HomePage() {
         </div>
 
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {donorSteps.map((step, i) => (
+          {donorSteps.map((step) => (
             <div
               key={step.num}
               className="relative bg-[var(--surface)] border border-[var(--line)] rounded-xl p-5 pt-7 hover:border-[var(--burgundy-500)] hover:shadow-[var(--shadow-soft)] transition-all"
@@ -347,6 +344,9 @@ export default async function HomePage() {
             <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-1 text-xs font-bold text-[var(--burgundy-700)]">
               <span>📞 เปา: <a href="tel:0969866245" className="underline">09-6986-6245</a></span>
               <span>📞 แตงโม: <a href="tel:0656274319" className="underline">06-5627-4319</a></span>
+            </div>
+            <div className="pt-2 flex justify-center md:justify-start">
+              <SocialLinks />
             </div>
           </div>
 

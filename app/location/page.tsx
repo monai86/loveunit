@@ -4,6 +4,7 @@ import { Bus, Car, ArrowRight, MapPin } from 'lucide-react';
 import { getEventBySlug, getEventContentBlocks } from '@/services/event-service';
 import { InfographicSlot } from '@/components/infographic/InfographicSlot';
 import { pickField } from '@/lib/utils/format';
+import { SocialLinks } from '@/components/common/SocialLinks';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,10 +57,15 @@ export default async function LocationPage() {
                 </a>
               </div>
 
-              <div className="pt-2 border-t border-[var(--rose-100)] text-[11px] font-bold text-[var(--muted)] space-y-1">
+              <div className="pt-2 border-t border-[var(--rose-100)] text-[11px] font-bold text-[var(--muted)] space-y-2">
                 <p>📞 ติดต่อสอบถามเส้นทางในวันงาน:</p>
-                <p>• เปา: <a href="tel:0969866245" className="text-[var(--burgundy-700)] underline">09-6986-6245</a></p>
-                <p>• แตงโม: <a href="tel:0656274319" className="text-[var(--burgundy-700)] underline">06-5627-4319</a></p>
+                <div className="space-y-0.5">
+                  <p>• เปา: <a href="tel:0969866245" className="text-[var(--burgundy-700)] underline">09-6986-6245</a></p>
+                  <p>• แตงโม: <a href="tel:0656274319" className="text-[var(--burgundy-700)] underline">06-5627-4319</a></p>
+                </div>
+                <div className="pt-1">
+                  <SocialLinks />
+                </div>
               </div>
             </div>
           </div>

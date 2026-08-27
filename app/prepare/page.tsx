@@ -3,34 +3,21 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
   CheckCircle2, 
-  AlertCircle, 
   ArrowRight, 
   Heart, 
-  Clock, 
   GlassWater, 
   Utensils, 
   Moon, 
   Wine, 
-  Cigarette, 
-  Scale, 
   ShieldCheck, 
   Gift,
   ChevronRight,
-  Activity,
-  Droplets,
-  Calendar
+  Activity
 } from 'lucide-react';
-import { getEventBySlug, getEventContentBlocks } from '@/services/event-service';
-import { InfographicSlot } from '@/components/infographic/InfographicSlot';
-import { pickField } from '@/lib/utils/format';
 
 export const dynamic = 'force-dynamic';
 
-export default async function PreparePage() {
-  const event = await getEventBySlug('mumt-2026');
-  const contentBlocks = event ? await getEventContentBlocks(event.id) : [];
-  const prepInfographic = contentBlocks.find(b => pickField<string>(b, 'contentKey', 'content_key') === 'preparation_infographic');
-
+export default function PreparePage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-12">
       
