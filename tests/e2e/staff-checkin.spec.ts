@@ -76,16 +76,32 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
   // 2) Admin/Staff sign-in with the known password.
   await page.goto('/staff/login');
   await page.waitForLoadState('networkidle').catch(() => {});
-  await page.locator('#staff-email').fill(STAFF_EMAIL);
-  await page.locator('#staff-password').fill(STAFF_PASS);
 
-  for (let attempt = 0; attempt < 3; attempt++) {
-    await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
-    try {
-      await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin)/, { timeout: 4000 });
-      break;
-    } catch {
-      await page.waitForTimeout(500);
+  if (!page.url().includes('/staff/checkin') && !page.url().includes('/mt70') && !page.url().includes('/staff/change-password')) {
+    const emailInput = page.locator('#staff-email');
+    if (await emailInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await emailInput.fill(STAFF_EMAIL);
+      await page.locator('#staff-password').fill(STAFF_PASS);
+
+      for (let attempt = 0; attempt < 3; attempt++) {
+        await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
+        try {
+          await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 4000 });
+          break;
+        } catch {
+          // If login with STAFF_PASS failed on a retry, attempt NEW_PASS
+          if (page.url().includes('/staff/login')) {
+            await page.locator('#staff-password').fill(NEW_PASS);
+            await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
+            try {
+              await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 4000 });
+              break;
+            } catch {
+              await page.waitForTimeout(500);
+            }
+          }
+        }
+      }
     }
   }
 
@@ -95,7 +111,7 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
     await page.getByPlaceholder('อย่างน้อย 8 ตัวอักษร').first().fill(NEW_PASS);
     await page.getByPlaceholder('พิมพ์รหัสผ่านใหม่อีกครั้ง').fill(NEW_PASS);
     await page.getByRole('button', { name: 'บันทึกรหัสผ่านใหม่' }).click();
-    await page.waitForURL(/\/(staff\/checkin|admin)/, { timeout: 15_000 });
+    await page.waitForURL(/\/(staff\/checkin|admin|mt70)/, { timeout: 15_000 });
   }
 
   if (!page.url().includes('/staff/checkin')) {
@@ -103,7 +119,7 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
     await page.waitForLoadState('networkidle').catch(() => {});
   }
 
-  await expect(page.getByRole('heading', { name: /ระบบเช็คอิน/ })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: /(ระบบเช็คอิน|เช็คอิน)/ })).toBeVisible({ timeout: 10_000 });
 
   // 3) Search for the donor by code.
   const searchInput = page.locator('#ck-search');

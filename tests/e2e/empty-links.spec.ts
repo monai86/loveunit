@@ -7,10 +7,24 @@ const NEW = 'E2eAdminNew@2026';
 test('find empty links on admin/registrations', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/staff/login');
-  await page.locator('#staff-email').fill(EMAIL);
-  await page.locator('#staff-password').fill(PASS);
-  await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
-  await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin)/, { timeout: 15_000 }).catch(() => {});
+  await page.waitForLoadState('networkidle').catch(() => {});
+  if (!page.url().includes('/mt70') && !page.url().includes('/admin') && !page.url().includes('/staff/change-password')) {
+    const emailInput = page.locator('#staff-email');
+    if (await emailInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await emailInput.fill(EMAIL);
+      await page.locator('#staff-password').fill(PASS);
+      await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
+      try {
+        await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 15_000 });
+      } catch {
+        if (page.url().includes('/staff/login')) {
+          await page.locator('#staff-password').fill(NEW);
+          await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
+          await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 15_000 }).catch(() => {});
+        }
+      }
+    }
+  }
   if (page.url().includes('/staff/change-password')) {
     await page.getByPlaceholder('รหัสที่ระบบแจกให้ครั้งแรก').fill(PASS);
     await page.getByPlaceholder('อย่างน้อย 8 ตัวอักษร').first().fill(NEW);

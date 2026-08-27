@@ -694,7 +694,7 @@ export default function StaffCheckinPage() {
             </span>
           </div>
           <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] font-display">
-            จุดสแกน QR & เช็คอินหน้างาน
+            ระบบเช็คอิน & จุดสแกน QR หน้างาน
           </h1>
           <p className="text-xs text-[var(--muted)] font-medium">
             สแกน QR Code ตรวจสอบรายชื่อ และบันทึกการรับของที่ระลึก
