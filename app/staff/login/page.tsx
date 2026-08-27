@@ -24,11 +24,11 @@ export default function StaffLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Already signed in? Redirect to /admin.
+  // Already signed in? Redirect to /mt70.
   useEffect(() => {
     authClient.getSession().then((res) => {
       if (res?.data?.session) {
-        router.replace('/admin');
+        router.replace('/mt70');
       }
     }).catch(() => {});
   }, [router]);
@@ -53,7 +53,7 @@ export default function StaffLoginPage() {
         return;
       }
 
-      router.replace('/admin');
+      router.replace('/mt70');
     } catch (err) {
       console.error(err);
       setError('การเข้าสู่ระบบไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ');

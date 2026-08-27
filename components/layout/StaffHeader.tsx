@@ -15,6 +15,7 @@ export function StaffHeader() {
     pathname.startsWith('/staff/login') ||
     pathname.startsWith('/staff/change-password') ||
     pathname.startsWith('/admin') ||
+    pathname.startsWith('/mt70') ||
     !pathname.startsWith('/staff')
   ) {
     return null;
@@ -24,7 +25,7 @@ export function StaffHeader() {
     { href: '/staff/checkin', label: 'จุดสแกน QR & เช็คอิน', icon: QrCode },
     { href: '/staff/queue', label: 'คิวผู้บริจาค (Queue)', icon: ListOrdered },
     { href: '/staff/walk-in', label: 'ลงทะเบียน Walk-in', icon: UserPlus },
-    { href: '/admin', label: 'แดชบอร์ดผู้บริหาร (Admin)', icon: BarChart3 },
+    { href: '/mt70', label: 'แดชบอร์ดผู้บริหาร (Admin)', icon: BarChart3 },
   ];
 
   return (
@@ -54,7 +55,7 @@ export function StaffHeader() {
         <nav className="hidden items-center gap-1.5 md:flex">
           {tabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = pathname === tab.href || (tab.href !== '/admin' && pathname.startsWith(tab.href));
+            const isActive = pathname === tab.href || (tab.href !== '/mt70' && tab.href !== '/admin' && pathname.startsWith(tab.href));
             return (
               <Link
                 key={tab.href}

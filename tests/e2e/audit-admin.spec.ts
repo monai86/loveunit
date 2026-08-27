@@ -98,19 +98,19 @@ async function auditPage(page: import('@playwright/test').Page) {
 test('audit admin registrations', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
-  await page.goto('/admin/registrations');
+  await page.goto('/mt70/registrations');
   await page.waitForTimeout(600);
   const out = await auditPage(page);
-  console.log('\n[admin/registrations]', JSON.stringify(out, null, 1));
+  console.log('\n[mt70/registrations]', JSON.stringify(out, null, 1));
 });
 
 test('audit admin content', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
-  await page.goto('/admin/content');
+  await page.goto('/mt70/content');
   await page.waitForTimeout(600);
   const out = await auditPage(page);
-  console.log('\n[admin/content]', JSON.stringify(out, null, 1));
+  console.log('\n[mt70/content]', JSON.stringify(out, null, 1));
 });
 
 test.afterAll(async ({ request }) => {

@@ -8,8 +8,8 @@ import { Home, Heart, MapPin, BookOpen, CheckSquare } from 'lucide-react';
 export function MobileBottomNav() {
   const pathname = usePathname();
 
-  // Do not render public mobile bottom nav on staff or admin pages
-  if (pathname.startsWith('/staff') || pathname.startsWith('/admin')) {
+  // Do not render public mobile bottom nav on staff or admin or mt70 pages
+  if (pathname.startsWith('/staff') || pathname.startsWith('/admin') || pathname.startsWith('/mt70')) {
     return null;
   }
 

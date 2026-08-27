@@ -319,7 +319,7 @@ export default async function AdminDashboardPage() {
 
           <div className="pt-4 border-t border-[var(--line)]">
             <Link
-              href="/admin/registrations"
+              href="/mt70/registrations"
               className="text-xs font-black text-[var(--burgundy-700)] hover:underline flex items-center justify-between"
             >
               <span>ดูตารางผู้ลงทะเบียนทั้งหมด ({allRegistrations.length} รายการ) →</span>
@@ -342,7 +342,7 @@ export default async function AdminDashboardPage() {
           </div>
 
           <Link
-            href="/admin/registrations"
+            href="/mt70/registrations"
             className="editorial-btn-secondary py-2 px-3 text-xs"
           >
             <span>จัดการรายชื่อทั้งหมด</span>

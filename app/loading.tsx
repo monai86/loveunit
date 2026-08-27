@@ -38,7 +38,7 @@ export default function Loading() {
 
         {/* Brand Text */}
         <h3 className="text-base font-bold text-[var(--ink)] font-display tracking-tight">
-          MUMT Blood Donation 2026 <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
+          MUMT LoveUnit <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
         </h3>
         <p className="mt-1 text-xs text-[var(--muted)] font-medium">
           เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ

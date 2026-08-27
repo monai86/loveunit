@@ -26,8 +26,8 @@ export function Footer() {
                 <Image src="/images/logo.png" alt="MUMT Logo" width={40} height={40} className="h-full w-auto object-contain rounded-full" />
               </div>
               <div>
-                <span className="text-xs font-black text-[var(--ink)] block">MUMT Blood Donation 2026</span>
-                <span className="text-sm font-black text-[var(--burgundy-600)]">ครั้งที่ 9 “เติมรักให้เต็ม Unit”</span>
+                <span className="text-sm font-black text-[var(--ink)] block font-display">MUMT LoveUnit <span className="text-[var(--burgundy-600)]">ครั้งที่ 9</span></span>
+                <span className="text-xs font-bold text-[var(--muted)]">“เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ”</span>
               </div>
             </div>
             <p className="text-sm leading-relaxed text-[var(--muted)] font-medium max-w-md">

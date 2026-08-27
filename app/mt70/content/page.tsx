@@ -75,8 +75,8 @@ export default function AdminContentPage() {
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       
       <div className="border-b border-[var(--rose-100)] pb-6">
-        <Link href="/admin" className="inline-flex items-center gap-1 text-xs font-bold text-[var(--burgundy-700)] hover:underline mb-1 py-3.5">
-          <ArrowLeft className="h-3.5 w-3.5" /> กลับหน้า Dashboard
+        <Link href="/mt70" className="inline-flex items-center gap-1 text-xs font-bold text-[var(--burgundy-700)] hover:underline mb-1 py-3.5">
+          <ArrowLeft className="h-3.5 w-3.5" /> <span>กลับหน้าแดชบอร์ดหลัก</span>
         </Link>
         <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl">
           จัดการสื่อ & อินโฟกราฟิก (Content PR & Media Manager)

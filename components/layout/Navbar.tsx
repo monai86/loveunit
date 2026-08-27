@@ -34,8 +34,8 @@ export function Navbar() {
     { href: '/location', label: 'สถานที่ & การเดินทาง', icon: MapPin },
   ];
 
-  // Do not render public navbar on staff/admin routes (they use StaffHeader)
-  if (pathname.startsWith('/staff') || pathname.startsWith('/admin')) {
+  // Do not render public navbar on staff/admin/mt70 routes (they use StaffHeader)
+  if (pathname.startsWith('/staff') || pathname.startsWith('/admin') || pathname.startsWith('/mt70')) {
     return null;
   }
 
@@ -57,9 +57,7 @@ export function Navbar() {
           </div>
           <div className="shrink-0 flex flex-col justify-center">
             <span className="text-xs sm:text-sm font-bold text-[var(--ink)] tracking-normal whitespace-nowrap font-display">
-              <span className="sm:hidden">MUMT 2026</span>
-              <span className="hidden sm:inline">MUMT Blood Donation 2026</span>{' '}
-              <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
+              MUMT LoveUnit <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
             </span>
             <span className="text-[10px] sm:text-xs text-[var(--muted)] whitespace-nowrap hidden xl:block">
               เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ

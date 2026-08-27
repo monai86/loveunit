@@ -104,8 +104,9 @@ export default function AdminRegistrationsPage() {
       {/* Top Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--rose-100)] pb-6">
         <div>
-          <Link href="/admin" className="inline-flex items-center gap-1 text-xs font-bold text-[var(--burgundy-700)] hover:underline mb-1 py-3.5">
-            <ArrowLeft className="h-3.5 w-3.5" /> กลับหน้า Dashboard
+          <Link href="/mt70" className="inline-flex items-center gap-1 text-xs font-bold text-[var(--burgundy-700)] hover:underline mb-1 py-3.5">
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>กลับหน้าแดชบอร์ดหลัก</span>
           </Link>
           <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl">
             รายชื่อผู้ลงทะเบียนบริจาคโลหิต ({filteredList.length})

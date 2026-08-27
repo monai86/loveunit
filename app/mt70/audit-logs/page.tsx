@@ -64,8 +64,8 @@ export default function AdminAuditLogsPage() {
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--rose-100)] pb-4">
         <div>
-          <Link href="/admin" className="flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)] hover:underline">
-            <ArrowLeft className="h-4 w-4" /> กลับสู่แดชบอร์ด
+          <Link href="/mt70" className="flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)] hover:underline">
+            <ArrowLeft className="h-4 w-4" /> <span>กลับหน้าแดชบอร์ดหลัก</span>
           </Link>
           <div className="mt-2 flex items-center gap-2">
             <span className="unit-tag">ADMIN / AUDIT</span>

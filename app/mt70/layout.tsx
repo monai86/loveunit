@@ -36,7 +36,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             
             {/* Brand Logo & Title */}
             <div className="flex items-center gap-3">
-              <Link href="/admin" className="flex items-center gap-2.5 group">
+              <Link href="/mt70" className="flex items-center gap-2.5 group">
                 <div className="h-9 w-9 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs overflow-hidden">
                   <Image src="/images/logo.png" alt="MUMT Logo" width={28} height={28} className="h-6 w-6 object-contain rounded-full" />
                 </div>
@@ -54,7 +54,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             {/* Desktop Navigation Links */}
             <nav className="hidden md:flex items-center gap-1 text-xs font-black">
               <Link
-                href="/admin"
+                href="/mt70"
                 className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
               >
                 <LayoutDashboard className="h-4 w-4 text-[var(--burgundy-600)]" />
@@ -62,7 +62,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               </Link>
 
               <Link
-                href="/admin/registrations"
+                href="/mt70/registrations"
                 className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
               >
                 <Users className="h-4 w-4 text-blue-600" />
@@ -70,7 +70,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               </Link>
 
               <Link
-                href="/admin/content"
+                href="/mt70/content"
                 className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
               >
                 <FileText className="h-4 w-4 text-amber-600" />
@@ -78,7 +78,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               </Link>
 
               <Link
-                href="/admin/audit-logs"
+                href="/mt70/audit-logs"
                 className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
               >
                 <ScrollText className="h-4 w-4 text-gray-600" />

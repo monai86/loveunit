@@ -16,9 +16,9 @@ test('find empty links on admin/registrations', async ({ page }) => {
     await page.getByPlaceholder('อย่างน้อย 8 ตัวอักษร').first().fill(NEW);
     await page.getByPlaceholder('พิมพ์รหัสผ่านใหม่อีกครั้ง').fill(NEW);
     await page.getByRole('button', { name: 'บันทึกรหัสผ่านใหม่' }).click();
-    await page.waitForURL(/\/(staff\/checkin|admin)/, { timeout: 15_000 });
+    await page.waitForURL(/\/(staff\/checkin|admin|mt70)/, { timeout: 15_000 });
   }
-  await page.goto('/admin/registrations');
+  await page.goto('/mt70/registrations');
   await page.waitForTimeout(600);
   const empty = await page.evaluate(() => {
     return [...document.querySelectorAll('a')]

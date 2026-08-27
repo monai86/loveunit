@@ -13,7 +13,7 @@ const CACHE_VERSION = 'mumt-2026-v1';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
-const APP_SHELL = ['/', '/staff/checkin', '/staff/queue', '/staff/walk-in', '/staff/login', '/admin'];
+const APP_SHELL = ['/', '/staff/checkin', '/staff/queue', '/staff/walk-in', '/staff/login', '/mt70'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
