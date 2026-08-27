@@ -76,12 +76,14 @@ p, li, td, span {
    CAMPAIGN SURFACES
    ========================================================= */
 
-/* Full-bleed deep red field — the campaign poster */
+/* Full-bleed rich red gradient field — the campaign poster */
 .hero-field {
-  background-color: var(--burgundy-800);
+  background-color: #7E0E1D;
   background-image:
-    radial-gradient(120% 90% at 85% -10%, rgba(193, 58, 43, 0.28), transparent 55%),
-    radial-gradient(90% 70% at -10% 110%, rgba(56, 6, 15, 0.55), transparent 60%);
+    radial-gradient(100% 75% at 85% 0%, rgba(240, 100, 85, 0.32) 0%, transparent 60%),
+    radial-gradient(90% 80% at 10% 100%, rgba(210, 45, 60, 0.38) 0%, transparent 65%),
+    radial-gradient(60% 60% at 50% 30%, rgba(185, 25, 45, 0.25) 0%, transparent 70%),
+    linear-gradient(140deg, #9C1528 0%, #7E0E1D 30%, #5E0B17 65%, #3B060F 100%);
   color: var(--cream);
 }
 
@@ -298,4 +300,13 @@ p, li, td, span {
   letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
   font-family: var(--font-display), sans-serif !important;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
 }

@@ -44,7 +44,7 @@ export function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 sm:px-6 lg:px-8 gap-4">
         
         {/* 1. Left: Brand Logo & Title */}
-        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0 group">
+        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink min-w-0 group">
           <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white p-1 border border-[var(--line)] shadow-xs transition-transform group-hover:scale-105">
             <Image 
               src="/images/logo.png" 
@@ -57,7 +57,9 @@ export function Navbar() {
           </div>
           <div className="shrink-0 flex flex-col justify-center">
             <span className="text-xs sm:text-sm font-bold text-[var(--ink)] tracking-normal whitespace-nowrap font-display">
-              MUMT Blood Donation 2026 <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
+              <span className="sm:hidden">MUMT 2026</span>
+              <span className="hidden sm:inline">MUMT Blood Donation 2026</span>{' '}
+              <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
             </span>
             <span className="text-[10px] sm:text-xs text-[var(--muted)] whitespace-nowrap hidden xl:block">
               เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ
@@ -100,18 +102,18 @@ export function Navbar() {
         </div>
 
         {/* Mobile Action & Hamburger */}
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 lg:hidden">
           <Link
             href="/register"
-            className="inline-flex items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-3 py-2 rounded-xl text-xs shadow-xs"
+            className="inline-flex items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-3 py-2 rounded-xl text-xs shadow-xs whitespace-nowrap shrink-0 transition-all active:scale-95"
           >
-            <Heart className="h-3.5 w-3.5 fill-white" />
-            <span>ลงทะเบียน</span>
+            <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
+            <span className="whitespace-nowrap font-extrabold">ลงทะเบียน</span>
           </Link>
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer"
+            className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
