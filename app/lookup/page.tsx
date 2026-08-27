@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { QRCodeSVG } from 'qrcode.react';
-import { AlertTriangle } from 'lucide-react';
-import { Search, ArrowLeft, QrCode, ShieldCheck, Loader2 } from 'lucide-react';
+import { AlertTriangle, Search, ShieldCheck, Loader2 } from 'lucide-react';
+import { DonorTicketPass } from '@/components/ui/DonorTicketPass';
 
 interface LookupResult {
   registration_code: string;
@@ -148,62 +146,20 @@ export default function LookupPage() {
           </div>
         </form>
       ) : (
-        <div className="editorial-ticket p-6 sm:p-8 space-y-5 bg-white">
-          <div className="text-center space-y-1">
-            <span className="text-[10px] font-mono font-bold text-editorial-muted uppercase tracking-wider block">
-              พบการลงทะเบียนของคุณ
-            </span>
-            <p className="text-lg font-black text-editorial-ink">
-              {result.first_name} {result.last_name_initial}
-            </p>
-            {result.time_slot && (
-              <p className="text-xs font-bold text-[#7A1020]">
-                รอบเวลาเดินทาง: {result.time_slot.time_label}
-              </p>
-            )}
-          </div>
-
-          <div className="bg-[#FFF9F9] p-4 rounded-lg border border-[#F0C4CC] text-center space-y-1">
-            <span className="text-[10px] font-mono font-bold text-editorial-muted uppercase tracking-wider block">
-              REGISTRATION CODE
-            </span>
-            <div className="text-2xl font-mono font-black text-[#7A1020] tracking-wider">
-              {result.registration_code}
-            </div>
-          </div>
-
-          <div className="pt-2 border-t-2 border-dashed border-[#7A1020] text-center space-y-3">
-            <span className="text-[10px] font-mono font-bold text-[#7A1020] uppercase tracking-wider block">
-              QR CODE FOR EVENT SCAN
-            </span>
-            {result.qr_token ? (
-              <div className="mx-auto h-48 w-48 rounded-xl border-2 border-[#7A1020] p-2 bg-white flex items-center justify-center shadow-xs">
-                <QRCodeSVG value={result.qr_token} size={176} level="M" />
-              </div>
-            ) : (
-              <div className="mx-auto h-48 w-48 rounded-xl border border-gray-300 bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-500">
-                <QrCode className="h-8 w-8" />
-              </div>
-            )}
-            <p className="text-[11px] text-editorial-muted font-medium">
-              บันทึกภาพหน้านี้ หรือแสดง QR Code ต่อเจ้าหน้าที่ ณ จุดลงทะเบียนในวันงาน
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => { setResult(null); setErrorMessage(null); }}
-              className="editorial-btn-secondary py-2.5 text-xs justify-center flex-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>ค้นหาใหม่</span>
-            </button>
-            <Link href="/" className="editorial-btn-primary py-2.5 text-xs justify-center flex-1">
-              <span>กลับหน้าแรก</span>
-            </Link>
-          </div>
-        </div>
+        <DonorTicketPass
+          registrationCode={result.registration_code}
+          name={`${result.first_name} ${result.last_name_initial}`}
+          timeSlot={result.time_slot?.time_label || '09:00 - 14:00 น.'}
+          date={result.event?.start_at ? 'พุธที่ 16 กันยายน 2569' : 'พุธที่ 16 กันยายน 2569'}
+          venue={result.event?.venue_name || 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา'}
+          qrToken={result.qr_token}
+          isConfirmed={result.status !== 'CANCELLED'}
+          onReset={() => {
+            setResult(null);
+            setErrorMessage(null);
+          }}
+          resetLabel="ค้นหาการลงทะเบียนอื่น"
+        />
       )}
     </div>
   );

@@ -1,13 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { QRCodeSVG } from 'qrcode.react';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { getRegistrationByCode } from '@/services/registration-service';
-import { formatTimeRange, extractQueueNumber } from '@/lib/utils/format';
+import { formatTimeRange } from '@/lib/utils/format';
 import { RegistrationPoster } from '@/components/registration/RegistrationPoster';
-import { Sparkles } from 'lucide-react';
+import { DonorTicketPass } from '@/components/ui/DonorTicketPass';
 
 // Registration may arrive from either the Drizzle backend (camelCase) or the
 // legacy in-memory backend (snake_case); this view type covers both shapes.
@@ -52,149 +49,38 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
   const facultyName = reg.faculty || 'มหาวิทยาลัยมหิดล';
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-xl px-4 py-8 sm:px-6 space-y-8">
       
       {/* Top Banner Alert */}
-      <div className="mb-6 text-center space-y-2">
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-          <CheckCircle2 className="h-6 w-6" />
+      <div className="text-center space-y-2">
+        <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 shadow-xs ring-4 ring-emerald-50">
+          <CheckCircle2 className="h-7 w-7" />
         </div>
-        <h1 className="text-2xl font-black text-editorial-ink">ลงทะเบียนบริจาคโลหิตสำเร็จ!</h1>
-        <p className="text-xs text-editorial-muted font-medium">
-          กรุณาบันทึกภาพหน้าจอนี้ หรือแสดง QR Code ต่อเจ้าหน้าที่ ณ จุดลงทะเบียนในวันงาน
+        <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl font-display">
+          ลงทะเบียนบริจาคโลหิตสำเร็จ!
+        </h1>
+        <p className="text-xs sm:text-sm text-[var(--muted)] font-medium max-w-md mx-auto">
+          ยินดีต้อนรับสู่ MUMT LoveUnit ครั้งที่ 9 กรุณาบันทึกภาพตั๋วนี้เพื่อนำไปแสดงต่อเจ้าหน้าที่ในวันงาน
         </p>
       </div>
 
-      {/* EVENT PASS / REGISTRATION TICKET ARTIFACT */}
-      <div className="editorial-ticket p-6 sm:p-8 space-y-6 relative overflow-hidden bg-white">
-        
-        {/* Ticket Header */}
-        <div className="border-b-2 border-dashed border-[var(--burgundy-700)] pb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-full bg-white p-1 border border-[var(--line)] flex items-center justify-center overflow-hidden">
-              <Image src="/images/logo.png" alt="MUMT Logo" width={32} height={32} className="h-full w-auto object-contain rounded-full" />
-            </div>
-            <div>
-              <span className="text-[11px] font-bold text-[var(--burgundy-700)] uppercase block">MUMT Blood Donation 2026</span>
-              <span className="text-sm font-black text-[var(--ink)]">REGISTRATION PASS</span>
-            </div>
-          </div>
-          <span className="brand-chip--light text-[11px]">Official Pass</span>
-        </div>
-
-        {/* Ticket Registration Code & Queue Number */}
-        <div className="bg-gradient-to-br from-[var(--rose-100)]/80 to-amber-50 p-4 rounded-xl border border-[var(--rose-200)] text-center space-y-2">
-          <div className="flex items-center justify-center gap-2">
-            <span className="text-[11px] font-black text-[var(--burgundy-700)] uppercase tracking-wider bg-white px-2.5 py-0.5 rounded-full border border-[var(--rose-200)] shadow-2xs">
-              {(() => {
-                const q = extractQueueNumber(regCode);
-                return q ? `ลำดับผู้ลงทะเบียนที่ #${String(q).padStart(3, '0')}` : 'DONOR PASS';
-              })()}
-            </span>
-          </div>
-
-          <div className="text-3xl font-black text-[var(--burgundy-700)] font-mono tracking-wider">
-            {regCode}
-          </div>
-
-          {/* 100 Early-Bird Gift Badge */}
-          {(() => {
-            const q = extractQueueNumber(regCode);
-            if (q && q <= 100) {
-              return (
-                <div className="pt-1 flex items-center justify-center gap-1.5 text-[11px] font-black text-amber-900 bg-amber-100/80 py-1 px-3 rounded-lg border border-amber-300 shadow-2xs">
-                  <Sparkles className="h-3.5 w-3.5 text-amber-600 shrink-0" />
-                  <span>อยู่ในลำดับ 100 ท่านแรก! (รับของที่ระลึกพิเศษเมื่อบริจาคสำเร็จ 🎁)</span>
-                </div>
-              );
-            }
-            return null;
-          })()}
-        </div>
-
-        {/* Donor Information */}
-        <div className="space-y-3 text-xs">
-          <div className="flex justify-between py-1.5 border-b border-gray-100">
-            <span className="text-editorial-muted font-bold">ลำดับคิวลงทะเบียน (Queue No.):</span>
-            <span className="font-mono font-black text-[var(--burgundy-700)] text-sm">
-              {(() => {
-                const q = extractQueueNumber(regCode);
-                return q ? `#${String(q).padStart(3, '0')}` : '-';
-              })()}
-            </span>
-          </div>
-
-          <div className="flex justify-between py-1.5 border-b border-gray-100">
-            <span className="text-editorial-muted font-bold">ชื่อ-นามสกุล:</span>
-            <span className="font-black text-editorial-ink">{fullName}</span>
-          </div>
-
-          <div className="flex justify-between py-1.5 border-b border-gray-100">
-            <span className="text-editorial-muted font-bold">เบอร์โทรศัพท์:</span>
-            <span className="font-mono font-bold text-editorial-ink">{phone}</span>
-          </div>
-
-          <div className="flex justify-between py-1.5 border-b border-gray-100">
-            <span className="text-editorial-muted font-bold">คณะ / สังกัด:</span>
-            <span className="font-bold text-editorial-ink truncate max-w-[220px] text-right">{facultyName}</span>
-          </div>
-
-          <div className="flex justify-between py-1.5 border-b border-gray-100">
-            <span className="text-editorial-muted font-bold">วันที่จัดงาน:</span>
-            <span className="font-bold text-[var(--burgundy-700)]">พุธ 16 กันยายน 2569</span>
-          </div>
-
-          <div className="flex justify-between py-1.5 border-b border-gray-100">
-            <span className="text-editorial-muted font-bold">รอบเวลาเดินทางแนะนำ:</span>
-            <span className="font-black text-[var(--burgundy-700)]">{timeSlot}</span>
-          </div>
-
-          <div className="flex justify-between py-1.5">
-            <span className="text-editorial-muted font-bold">สถานที่:</span>
-            <span className="font-bold text-editorial-ink">ห้อง 217 สิริวิทยา ศาลายา</span>
-          </div>
-        </div>
-
-        {/* QR Code Container */}
-        <div className="pt-4 border-t-2 border-dashed border-[var(--burgundy-700)] text-center space-y-3">
-          <span className="text-[11px] font-bold text-[var(--burgundy-700)] uppercase tracking-wider block">
-            QR Code for Event Scan
-          </span>
-
-          {qrToken ? (
-            <div className="mx-auto h-48 w-48 rounded-xl border-2 border-[var(--burgundy-700)] p-2 bg-white flex items-center justify-center shadow-xs">
-              <QRCodeSVG value={qrToken} size={176} level="M" />
-            </div>
-          ) : (
-            <div className="mx-auto h-48 w-48 rounded-xl border border-gray-300 bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-500">
-              [QR Token Generated]
-            </div>
-          )}
-
-          <p className="text-[12px] text-editorial-muted font-medium">
-            แสดง QR สแกน ณ จุดลงทะเบียน หน้าห้องประชุม 217
-          </p>
-        </div>
-
-      </div>
-
-      {/* Actions */}
-      <div className="mt-6 flex flex-col sm:flex-row gap-3">
-        <Link
-          href="/"
-          className="editorial-btn-secondary py-3 text-xs justify-center flex-1"
-        >
-          <span>กลับหน้าแรก</span>
-        </Link>
-
-        <Link
-          href="/prepare"
-          className="editorial-btn-primary py-3 text-xs justify-center flex-1"
-        >
-          <span>ดูข้อปฏิบัติตัวก่อนบริจาค</span>
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
+      {/* High-Fidelity Donor Ticket Pass */}
+      <DonorTicketPass
+        registrationCode={regCode}
+        name={fullName}
+        phone={phone}
+        faculty={facultyName}
+        timeSlot={timeSlot}
+        date="พุธที่ 16 กันยายน 2569"
+        venue="ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา"
+        qrToken={qrToken}
+        isConfirmed={true}
+        primaryAction={{
+          href: '/prepare',
+          label: 'ดูข้อปฏิบัติตัวก่อนบริจาค',
+          icon: <ArrowRight className="h-4 w-4" />,
+        }}
+      />
 
       {/* Event poster matching the visitor's saved language (TH/EN toggle) */}
       <RegistrationPoster />

@@ -40,8 +40,8 @@ export function TicketStub({
                 <Image src="/images/logo.png" alt="MUMT Logo" width={32} height={32} className="h-full w-auto object-contain rounded-full" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-black tracking-wide text-[var(--burgundy-700)] uppercase">MUMT</p>
-                <p className="truncate text-[11px] font-semibold text-[var(--muted)] tracking-tight">BLOOD DONATION 2026</p>
+                <p className="text-xs font-black tracking-wide text-[var(--burgundy-700)] uppercase">MUMT LoveUnit</p>
+                <p className="truncate text-[11px] font-semibold text-[var(--muted)] tracking-tight">ครั้งที่ 9 · 2026</p>
               </div>
             </div>
 
