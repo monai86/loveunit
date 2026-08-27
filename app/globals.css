@@ -190,6 +190,22 @@ p, li, td, span {
 
 .btn-outline-cream:hover { background-color: rgba(253, 246, 241, 0.14) !important; }
 
+/* Mobile touch & input auto-zoom prevention */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+a, button, input, select, textarea, label {
+  touch-action: manipulation;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px !important; /* Minimum 16px to prevent iOS Safari auto-zoom on focus */
+}
+
 /* Form controls */
 .editorial-input, select.editorial-input {
   width: 100% !important;
@@ -197,9 +213,15 @@ p, li, td, span {
   border: 1.5px solid #D9C4C0 !important;
   border-radius: var(--radius-md) !important;
   padding: 0.7rem 0.95rem !important;
-  font-size: 0.9375rem !important;
+  font-size: 16px !important; /* Prevents auto-zoom on iOS */
   color: var(--ink) !important;
   outline: none !important;
+}
+
+@media screen and (min-width: 640px) {
+  .editorial-input, select.editorial-input {
+    font-size: 0.9375rem !important; /* 15px on tablet/desktop */
+  }
 }
 
 .editorial-input:focus, select.editorial-input:focus {
