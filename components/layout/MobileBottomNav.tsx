@@ -14,15 +14,19 @@ export function MobileBottomNav() {
   }
 
   const navItems = [
-    { href: '/', label: 'หน้าแรก', icon: Home },
-    { href: '/screening', label: 'คัดกรอง', icon: CheckSquare },
-    { href: '/prepare', label: 'เตรียมตัว', icon: BookOpen },
-    { href: '/location', label: 'สถานที่', icon: MapPin },
+    { href: '/', label: 'หน้าแรก', icon: Home, isPrimary: false },
+    { href: '/screening', label: 'คัดกรอง', icon: CheckSquare, isPrimary: false },
+    { href: '/prepare', label: 'เตรียมตัว', icon: BookOpen, isPrimary: false },
+    { href: '/location', label: 'สถานที่', icon: MapPin, isPrimary: false },
+    { href: '/register', label: 'ลงทะเบียน', icon: Heart, isPrimary: true },
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 p-2 lg:hidden pointer-events-none select-none">
-      <div className="mx-auto max-w-md bg-[var(--burgundy-700)] text-white rounded-2xl p-1.5 shadow-2xl border border-white/20 flex items-center justify-around pointer-events-auto backdrop-blur-lg">
+    <nav 
+      aria-label="Mobile Navigation"
+      className="fixed bottom-0 left-0 right-0 z-40 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden pointer-events-none select-none"
+    >
+      <div className="mx-auto max-w-md bg-[var(--burgundy-700)]/95 text-white rounded-2xl p-1 shadow-2xl border border-white/20 grid grid-cols-5 items-stretch pointer-events-auto backdrop-blur-xl">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
@@ -30,24 +34,22 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 py-1.5 px-4 rounded-xl transition-all ${
-                isActive ? 'bg-white/20 font-black text-white' : 'text-white/70 hover:text-white'
+              className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all ${
+                item.isPrimary
+                  ? 'bg-gradient-to-r from-red-500 to-[var(--burgundy-400)] text-white shadow-md font-black'
+                  : isActive
+                    ? 'bg-white/20 font-black text-white shadow-2xs'
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
               }`}
             >
-              <Icon className="h-4.5 w-4.5" />
-              <span className="text-[11px] font-bold">{item.label}</span>
+              <Icon className={`h-4 w-4 shrink-0 ${item.isPrimary ? 'fill-white text-white' : ''}`} />
+              <span className="text-[10px] sm:text-[11px] font-bold tracking-tight whitespace-nowrap mt-0.5">
+                {item.label}
+              </span>
             </Link>
           );
         })}
-
-        <Link
-          href="/register"
-          className="flex items-center gap-1.5 bg-[var(--burgundy-400)] hover:bg-[var(--burgundy-500)] text-white font-extrabold px-4 py-2 rounded-xl text-sm shadow-md transition-all active:scale-95"
-        >
-          <Heart className="h-4 w-4 fill-white text-white" />
-          <span>ลงทะเบียน</span>
-        </Link>
       </div>
-    </div>
+    </nav>
   );
 }

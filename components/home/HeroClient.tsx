@@ -124,18 +124,13 @@ export function HeroClient({
       <section className="hero-field relative overflow-hidden">
         <div className="mx-auto max-w-6xl px-4 pt-6 pb-12 sm:px-6 sm:pt-10 sm:pb-16 lg:px-8 lg:pt-12 lg:pb-16">
           
-          {/* Top Bar: Badges on left, Language Switcher on right (Balanced & Symmetric) */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="brand-chip rise-in">
-                <Heart className="h-3.5 w-3.5 fill-current" />
-                {copy.badge}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 border border-amber-300/40 px-3 py-1 text-[11px] font-bold text-amber-200 backdrop-blur-xs shadow-2xs">
-                ✨ {isEn ? 'Mahidol AT: 1 hr Health Literacy + 1 hr Volunteer' : 'สะสม Mahidol AT: 1 ชม. Health Literacy + 1 ชม. จิตอาสา'}
-              </span>
-            </div>
-            <div className="self-end sm:self-auto shrink-0">{toggle}</div>
+          {/* Top Bar: Event Badge on left, Language Switcher on right (Balanced & Symmetrical Single Row) */}
+          <div className="flex items-center justify-between gap-3 mb-6 sm:mb-8">
+            <span className="brand-chip rise-in whitespace-nowrap text-xs font-bold shadow-2xs">
+              <Heart className="h-3.5 w-3.5 fill-current shrink-0 text-[var(--burgundy-300)]" />
+              <span>{copy.badge}</span>
+            </span>
+            <div className="shrink-0">{toggle}</div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center">

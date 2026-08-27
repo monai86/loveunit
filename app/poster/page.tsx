@@ -14,7 +14,7 @@ import {
   Calendar, 
   Clock, 
   MapPin, 
-  Award,
+  Gift,
   IdCard,
   Share2,
   Check
@@ -29,7 +29,7 @@ const OFFICIAL_POSTERS = [
     alt: 'โปสเตอร์ประชาสัมพันธ์ MUMT Blood Donation 2026 ครั้งที่ 9 เวลา 09.00 - 14.00 น. (ภาษาไทย)',
     fileName: 'mumt-blood-donation-2026-poster-th.jpg',
     aspectRatio: '1655 / 2340',
-    description: 'โปสเตอร์ทางการระบุเวลา 09.00 - 14.00 น., สถานที่ห้อง 217 อาคารสิริวิทยา, เบอร์ติดต่อ และสิทธิประโยชน์ Mahidol AT',
+    description: 'โปสเตอร์ทางการระบุเวลา 09.00 - 14.00 น., สถานที่ห้อง 217 อาคารสิริวิทยา, เบอร์ติดต่อ และรายละเอียดโครงการ',
   },
   {
     src: '/images/poster-en.jpg',
@@ -214,11 +214,11 @@ export default function PosterPage() {
 
         <div className="flex items-start gap-3">
           <div className="p-2.5 rounded-xl bg-white text-[var(--burgundy-700)] shadow-xs">
-            <Award className="h-5 w-5" />
+            <Gift className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-[var(--muted)] block">สิทธิประโยชน์ Mahidol AT</span>
-            <span className="text-xs font-black text-amber-900">รับ AT รวมสูงสุด 2 ชั่วโมง</span>
+            <span className="text-[11px] font-bold text-[var(--muted)] block">ของที่ระลึกพิเศษ</span>
+            <span className="text-xs font-black text-amber-900">รับของที่ระลึก Limited Edition</span>
           </div>
         </div>
       </div>
@@ -379,7 +379,7 @@ export default function PosterPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="h-5 w-5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center shrink-0 text-[10px]">2</span>
-                <span><strong>รับชั่วโมงกิจกรรม Mahidol AT:</strong> AT Health Literacy 1 ชม. (ร่วมกิจกรรมฐาน) และ AT จิตอาสา 1 ชม. (ร่วมบริจาคโลหิต)</span>
+                <span><strong>ตรวจคัดกรองสุขภาพและหมู่โลหิต:</strong> ตรวจความเข้มข้นเลือด (Hb), ความดันโลหิต และตรวจแล็บมาตรฐานสภากาชาดไทย</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="h-5 w-5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center shrink-0 text-[10px]">3</span>

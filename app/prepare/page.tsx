@@ -14,7 +14,7 @@ import {
   Cigarette, 
   Scale, 
   ShieldCheck, 
-  Award,
+  Gift,
   ChevronRight,
   Activity,
   Droplets,
@@ -215,18 +215,14 @@ export default async function PreparePage() {
             </div>
           </div>
 
-          {/* Mahidol AT Benefit Banner */}
-          <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-xs space-y-2">
-            <div className="flex items-center gap-2 font-black text-amber-900">
-              <Award className="h-5 w-5 text-amber-700 shrink-0" />
-              <span>สิทธิประโยชน์ชั่วโมงกิจกรรม Mahidol Activity Transcript (AT)</span>
+          {/* Souvenir & Donor Care Banner */}
+          <div className="p-5 rounded-2xl bg-[var(--rose-100)] border border-[var(--line)] text-xs space-y-2">
+            <div className="flex items-center gap-2 font-black text-[var(--burgundy-700)]">
+              <Gift className="h-5 w-5 text-[var(--burgundy-700)] shrink-0" />
+              <span>สิทธิประโยชน์และของที่ระลึกสุดพิเศษประจำโครงการ</span>
             </div>
-            <p className="text-amber-800 leading-relaxed font-medium">
-              นักศึกษามหาวิทยาลัยมหิดลที่เข้าร่วมกิจกรรมจะได้รับบันทึกชั่วโมงกิจกรรม AT:
-              <br />
-              • <strong>AT Health Literacy 1 ชั่วโมง:</strong> เมื่อร่วมกิจกรรมฐานความรู้และชมนิทรรศการ
-              <br />
-              • <strong>AT จิตอาสา 1 ชั่วโมง:</strong> เมื่อร่วมบริจาคโลหิตในงาน
+            <p className="text-[var(--ink)] leading-relaxed font-medium">
+              ผู้เข้าร่วมกิจกรรมบริจาคโลหิตทุกท่านจะได้รับของที่ระลึก Limited Edition โครงการ MUMT ครั้งที่ 9 พร้อมอาหารว่างและเครื่องดื่มบำรุงสุขภาพหลังบริจาคโลหิต
             </p>
           </div>
 

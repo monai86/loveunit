@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   Microscope,
   Sparkles,
-  Award,
+  Gift,
   Layers,
   Heart,
   Droplets,
@@ -94,12 +94,12 @@ export default async function HomePage() {
 
           <div className="flex items-start gap-3.5 border-t md:border-t-0 md:border-l border-[var(--line)] pt-3 md:pt-0 md:pl-4">
             <div className="p-3 rounded-xl bg-amber-100 text-amber-900">
-              <Award className="h-6 w-6 text-amber-700" />
+              <Gift className="h-6 w-6 text-amber-700" />
             </div>
             <div>
-              <span className="text-xs font-bold text-[var(--muted)] block">ชั่วโมงกิจกรรม Mahidol AT</span>
-              <span className="text-sm font-black text-amber-950">รับ AT สูงสุด 2 ชั่วโมง</span>
-              <span className="text-xs text-amber-800 block">Health Literacy 1 ชม. + จิตอาสา 1 ชม.</span>
+              <span className="text-xs font-bold text-[var(--muted)] block">ของที่ระลึก & สิทธิประโยชน์</span>
+              <span className="text-sm font-black text-amber-950">ของที่ระลึก Limited Edition</span>
+              <span className="text-xs text-amber-800 block">และอาหารว่างเครื่องดื่มบำรุงสุขภาพ</span>
             </div>
           </div>
 
