@@ -305,7 +305,9 @@ export default function StaffCheckinPage() {
   const stopScanner = useCallback(async () => {
     if (scannerRef.current) {
       try {
-        await scannerRef.current.stop();
+        if (scannerRef.current.isScanning) {
+          await scannerRef.current.stop();
+        }
       } catch {
         // ignore
       }
@@ -320,12 +322,19 @@ export default function StaffCheckinPage() {
     setTorchOn(false);
   }, []);
 
-  const startScanner = useCallback(async (targetFacing: 'environment' | 'user' = facingMode, customCameraId?: string) => {
+  const startScanner = useCallback(async (
+    targetFacing: 'environment' | 'user' = facingMode, 
+    customCameraId?: string,
+    targetContainerId?: string
+  ) => {
+    const containerId = targetContainerId || (fullscreenScanner ? 'qr-reader-fullscreen' : 'qr-reader-region');
     setMessage(null);
     try {
       if (scannerRef.current) {
         try {
-          await scannerRef.current.stop();
+          if (scannerRef.current.isScanning) {
+            await scannerRef.current.stop();
+          }
         } catch {
           // ignore
         }
@@ -340,18 +349,26 @@ export default function StaffCheckinPage() {
       setScanning(true);
       await new Promise((r) => setTimeout(r, 120));
 
-      const element = document.getElementById('qr-reader-region');
+      const element = document.getElementById(containerId);
       if (!element) {
-        throw new Error('Scanner container element not found');
+        return;
       }
 
-      const scanner = new Html5Qrcode('qr-reader-region');
+      const scanner = new Html5Qrcode(containerId);
       scannerRef.current = scanner;
 
+      const isFullscreen = containerId === 'qr-reader-fullscreen';
       const qrConfig = {
-        fps: 15,
-        qrbox: { width: 260, height: 260 },
-        aspectRatio: 1.0,
+        fps: 20,
+        qrbox: (viewfinderWidth: number, viewfinderHeight: number) => {
+          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+          const qrEdgeSize = Math.floor(minEdge * 0.72);
+          return {
+            width: Math.max(200, Math.min(qrEdgeSize, 320)),
+            height: Math.max(200, Math.min(qrEdgeSize, 320)),
+          };
+        },
+        aspectRatio: isFullscreen ? undefined : 1.0,
       };
 
       const qrCodeSuccessCallback = (decodedText: string) => {
@@ -386,7 +403,9 @@ export default function StaffCheckinPage() {
       setScanning(false);
       if (scannerRef.current) {
         try {
-          await scannerRef.current.stop();
+          if (scannerRef.current.isScanning) {
+            await scannerRef.current.stop();
+          }
         } catch {
           // ignore
         }
@@ -407,45 +426,47 @@ export default function StaffCheckinPage() {
         setMessage({ type: 'error', text: 'ไม่สามารถเปิดกล้องได้ กรุณาตรวจสอบการอนุญาตสิทธิ์กล้อง หรือใช้ช่องค้นหาแทน' });
       }
     }
-  }, [facingMode, handleLookupByToken]);
+  }, [facingMode, fullscreenScanner, handleLookupByToken]);
 
-  // Fetch available cameras on mount & Auto-start scanner immediately
+  // Camera device discovery on mount
   useEffect(() => {
-    let unmounted = false;
-
-    const initCamera = async () => {
-      try {
-        const devices = await Html5Qrcode.getCameras();
-        if (unmounted) return;
+    Html5Qrcode.getCameras()
+      .then((devices) => {
         if (devices && devices.length > 0) {
           setCameras(devices.map((d) => ({ id: d.id, label: d.label || `Camera ${d.id.slice(0, 4)}` })));
-          const rear = devices.find((d) => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear') || d.label.toLowerCase().includes('environment'));
-          const targetId = rear ? rear.id : devices[0].id;
-          setSelectedCameraId(targetId);
-          if (!unmounted) {
-            void startScanner('environment', targetId);
-          }
-        } else {
-          if (!unmounted) {
-            void startScanner('environment');
+          const rear = devices.find((d) => 
+            d.label.toLowerCase().includes('back') || 
+            d.label.toLowerCase().includes('rear') || 
+            d.label.toLowerCase().includes('environment')
+          );
+          if (rear) {
+            setSelectedCameraId(rear.id);
+          } else {
+            setSelectedCameraId(devices[0].id);
           }
         }
-      } catch {
-        if (!unmounted) {
-          void startScanner('environment');
-        }
-      }
-    };
+      })
+      .catch(() => {
+        // Ignored if camera permission not granted yet
+      });
+  }, []);
+
+  // Reactive camera startup when mode, camera device, or facing changes
+  useEffect(() => {
+    let unmounted = false;
+    const targetContainer = fullscreenScanner ? 'qr-reader-fullscreen' : 'qr-reader-region';
 
     const timer = setTimeout(() => {
-      void initCamera();
+      if (!unmounted) {
+        void startScanner(facingMode, selectedCameraId, targetContainer);
+      }
     }, 200);
 
     return () => {
       unmounted = true;
       clearTimeout(timer);
     };
-  }, [startScanner]);
+  }, [fullscreenScanner, facingMode, selectedCameraId, startScanner]);
 
   // Keyboard wedge listener for USB/Bluetooth physical barcode scanners
   useEffect(() => {
@@ -600,14 +621,11 @@ export default function StaffCheckinPage() {
 
   const toggleCameraFacing = async () => {
     const nextFacing = facingMode === 'environment' ? 'user' : 'environment';
-    await startScanner(nextFacing);
+    setFacingMode(nextFacing);
   };
 
   const handleCameraChange = async (deviceId: string) => {
     setSelectedCameraId(deviceId);
-    if (scanning) {
-      await startScanner(facingMode, deviceId);
-    }
   };
 
   const toggleTorch = async () => {
@@ -631,8 +649,9 @@ export default function StaffCheckinPage() {
     setUploadingImage(true);
     setMessage(null);
 
+    const activeContainer = fullscreenScanner ? 'qr-reader-fullscreen' : 'qr-reader-region';
     try {
-      const tempScanner = scannerRef.current || new Html5Qrcode('qr-reader-region');
+      const tempScanner = scannerRef.current || new Html5Qrcode(activeContainer);
       const decodedText = await tempScanner.scanFile(file, true);
       if (decodedText) {
         await handleLookupByToken(decodedText.trim());
@@ -650,13 +669,13 @@ export default function StaffCheckinPage() {
   };
 
   const openFullscreenScanner = async () => {
+    await stopScanner();
     setFullscreenScanner(true);
-    await startScanner('environment');
   };
 
   const closeFullscreenScanner = async () => {
-    setFullscreenScanner(false);
     await stopScanner();
+    setFullscreenScanner(false);
   };
 
   return (
@@ -859,7 +878,7 @@ export default function StaffCheckinPage() {
               {/* html5-qrcode DOM Region */}
               <div
                 id="qr-reader-region"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover [&_video]:!w-full [&_video]:!h-full [&_video]:!object-cover [&_#qr-shaded-region]:!hidden [&_div]:!border-none"
                 style={{ minHeight: '280px' }}
               />
 
@@ -1310,10 +1329,16 @@ export default function StaffCheckinPage() {
             </div>
           </div>
 
+          {/* HTML5-QRCode Live Camera Viewport Container */}
+          <div
+            id="qr-reader-fullscreen"
+            className="absolute inset-0 w-full h-full object-cover overflow-hidden bg-black [&_video]:!w-full [&_video]:!h-full [&_video]:!object-cover [&_#qr-shaded-region]:!hidden [&_div]:!border-none"
+          />
+
           {/* Center Immersive Viewfinder Box */}
-          <div className="relative flex-1 flex items-center justify-center overflow-hidden">
+          <div className="relative flex-1 flex items-center justify-center overflow-hidden pointer-events-none z-10">
             
-            {/* Viewfinder Target Frame (Payment App Scanner Style) */}
+            {/* Viewfinder Target Frame */}
             <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-3xl border-2 border-emerald-400/90 shadow-[0_0_50px_rgba(52,211,153,0.4)] flex flex-col justify-between p-3 pointer-events-none z-10">
               {/* 4 Glowing Corner L-Brackets */}
               <div className="absolute -top-1.5 -left-1.5 w-8 h-8 border-t-4 border-l-4 border-emerald-400 rounded-tl-xl shadow-[0_0_10px_#34d399]" />
@@ -1325,12 +1350,12 @@ export default function StaffCheckinPage() {
               <div className="w-full h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_16px_#34d399] animate-bounce" />
 
               <div className="text-center text-xs font-bold text-white bg-black/60 backdrop-blur-md py-1.5 px-4 rounded-full self-center border border-white/20">
-                ส่อง QR Code ในกรอบ
+                จัดวาง QR Code ให้อยู่ในกรอบ
               </div>
             </div>
 
             {/* Instruction Tip */}
-            <div className="absolute bottom-28 inset-x-0 text-center text-white/80 text-xs z-10 font-medium px-4">
+            <div className="absolute bottom-28 inset-x-0 text-center text-white/90 text-xs z-10 font-semibold px-4 drop-shadow-md">
               สแกน QR Code จากหน้าจอมือถือหรือบัตรลงทะเบียนของผู้บริจาค
             </div>
           </div>
