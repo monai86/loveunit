@@ -168,27 +168,32 @@ export function HeroClient({
                 </div>
               </div>
 
-              {/* CTAs Action Buttons */}
-              <div className="flex flex-wrap items-center gap-2.5 pt-2">
+              {/* CTAs Action Buttons - Perfectly Symmetrical & Balanced */}
+              <div className="space-y-2.5 pt-2 max-w-xl">
+                {/* Main Action: Full-width Primary Button */}
                 <Link 
                   href="/register" 
-                  className="btn-cream shadow-lg hover:shadow-xl font-display font-extrabold text-xs sm:text-sm px-4 sm:px-5 py-3 rounded-xl flex items-center gap-2 active:scale-95 transition-transform"
+                  className="btn-cream !w-full shadow-lg hover:shadow-xl font-display font-black text-sm sm:text-base px-6 py-3.5 rounded-2xl flex items-center justify-center gap-2.5 active:scale-95 transition-all text-center tracking-wide"
                 >
                   <span>{copy.ctaRegister}</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-4.5 w-4.5 shrink-0" />
                 </Link>
-                <Link 
-                  href="/screening" 
-                  className="btn-outline-cream border-amber-300/50 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20 font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-3 rounded-xl flex items-center gap-1.5 transition-colors"
-                >
-                  <span>{isEn ? 'Self-Screening Quiz' : 'ประเมินความพร้อมตนเอง'}</span>
-                </Link>
-                <Link 
-                  href="/knowledge" 
-                  className="btn-outline-cream border-white/20 bg-white/5 hover:bg-white/15 font-bold text-xs sm:text-sm px-3.5 sm:px-4 py-3 rounded-xl flex items-center gap-1.5 transition-colors"
-                >
-                  <span>{isEn ? 'Knowledge & Labs' : 'ความรู้ & แล็บตรวจ'}</span>
-                </Link>
+
+                {/* Secondary Actions: Symmetrical 2-Column Grid */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  <Link 
+                    href="/screening" 
+                    className="btn-outline-cream !w-full border-amber-300/50 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20 font-bold text-xs sm:text-sm px-3 py-3 rounded-xl flex items-center justify-center text-center transition-colors shadow-2xs"
+                  >
+                    <span className="truncate">{isEn ? 'Self-Screening Quiz' : 'ประเมินความพร้อมตนเอง'}</span>
+                  </Link>
+                  <Link 
+                    href="/knowledge" 
+                    className="btn-outline-cream !w-full border-white/25 bg-white/10 hover:bg-white/20 text-[var(--cream)] font-bold text-xs sm:text-sm px-3 py-3 rounded-xl flex items-center justify-center text-center transition-colors shadow-2xs"
+                  >
+                    <span className="truncate">{isEn ? 'Knowledge & Labs' : 'ความรู้ & แล็บตรวจ'}</span>
+                  </Link>
+                </div>
               </div>
             </div>
 
