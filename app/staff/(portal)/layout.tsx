@@ -1,10 +1,10 @@
 import { redirect } from 'next/navigation';
-import { getAuthenticatedUser } from '@/lib/auth/server';
+import { getAuthenticatedUser, isStaffPortalRole } from '@/lib/auth/server';
 
 export default async function StaffPortalLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthenticatedUser();
 
-  if (!user || user.profile.role !== 'ADMIN') {
+  if (!user || !isStaffPortalRole(user.profile.role)) {
     redirect('/staff/login');
   }
 

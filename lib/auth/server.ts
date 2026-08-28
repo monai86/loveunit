@@ -40,6 +40,10 @@ export function canDeleteManagedAccount(actor: AuthenticatedUser, target: { id: 
   return actor.id !== target.id && !isPrimaryAdminEmail(target.email);
 }
 
+export function isStaffPortalRole(role: StaffRole): boolean {
+  return role === 'ADMIN' || role === 'STAFF';
+}
+
 function toEffectiveRole(email: string, _storedRole: string): StaffRole {
   if (isPrimaryAdminEmail(email)) return 'ADMIN';
   return 'STAFF';

@@ -15,6 +15,7 @@ import {
   requireTeamLead,
   requireSuperAdmin,
   canDeleteManagedAccount,
+  isStaffPortalRole,
 } from '../lib/auth/server';
 import type { AuthenticatedUser } from '../lib/auth/server';
 
@@ -134,6 +135,8 @@ async function runAuthTests() {
 
   assert.ok(await requireStaff(primaryAdmin));
   assert.ok(await requireStaff(staff));
+  assert.strictEqual(isStaffPortalRole('STAFF'), true, 'staff role must access staff portal');
+  assert.strictEqual(isStaffPortalRole('ADMIN'), true, 'admin role must access staff portal');
   assert.ok(await requireAdmin(primaryAdmin));
   assert.ok(await requireTeamLead(primaryAdmin));
   assert.ok(await requireSuperAdmin(primaryAdmin));
