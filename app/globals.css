@@ -333,12 +333,62 @@ textarea {
   font-family: var(--font-display), sans-serif !important;
 }
 
-/* Loading fallback: avoid backdrop filters and moving elements during navigation. */
+/* =========================================================
+   LOADING — lightweight, GPU-composited animations only.
+   No backdrop-blur, no layout-triggering properties.
+   ========================================================= */
+
+/* Opacity pulse on the progress fill */
 @keyframes loading-progress {
-  from { opacity: 0.55; }
-  to { opacity: 1; }
+  from { opacity: 0.45; }
+  to   { opacity: 1; }
 }
 
 .loading-progress {
-  animation: loading-progress 1.2s ease-in-out infinite alternate;
+  animation: loading-progress 1.4s ease-in-out infinite alternate;
+}
+
+/* Shimmer sweep — a bright band that travels along the progress bar */
+@keyframes loading-shimmer-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.loading-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(253, 246, 241, 0.45) 50%,
+    transparent 100%
+  );
+  animation: loading-shimmer-sweep 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* Gentle vertical float for the heart icon — transform-only, GPU-composited */
+@keyframes loading-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+.loading-float {
+  animation: loading-float 2.4s ease-in-out infinite;
+}
+
+/* Reduced-motion: disable everything */
+@media (prefers-reduced-motion: reduce) {
+  .loading-progress,
+  .loading-shimmer::after,
+  .loading-float {
+    animation: none !important;
+  }
 }
