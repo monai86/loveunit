@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle } from 'lucide-react';
 import { MAHIDOL_FACULTIES, ACADEMIC_YEARS } from '@/lib/constants/mahidol';
 import { formatTimeRange } from '@/lib/utils/format';
+import { isTimeSlotSelectable } from '@/lib/registration/slot-availability';
 
 const PARTICIPANT_TYPES = [
   { id: 'STUDENT', name: 'นักศึกษา ม.มหิดล' },
@@ -511,14 +512,20 @@ export default function RegisterPage() {
                   <div className="space-y-2.5">
                     {timeSlots.map((slot) => {
                       const isSelected = formData.timeSlotId === slot.id;
+                      const isSelectable = isTimeSlotSelectable(slot);
                       return (
                         <button
                           key={slot.id}
                           type="button"
+                          disabled={!isSelectable}
                           onClick={() => {
+                            if (!isSelectable) return;
                             setFormData({ ...formData, timeSlotId: slot.id });
                           }}
                           className={`w-full p-4 rounded-xl border text-left text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+                            !isSelectable
+                              ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-75'
+                              :
                             isSelected
                               ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-2 ring-[var(--burgundy-700)] shadow-sm'
                               : 'border-gray-200 bg-white hover:border-[var(--burgundy-700)] text-editorial-ink'
@@ -533,7 +540,9 @@ export default function RegisterPage() {
                           </div>
 
                           <div className="flex items-center gap-2">
-                            {isSelected ? (
+                            {!isSelectable ? (
+                              <span className="text-[11px] font-bold text-gray-400">เต็มแล้ว</span>
+                            ) : isSelected ? (
                               <div className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs">
                                 <Check className="h-3.5 w-3.5" />
                               </div>
