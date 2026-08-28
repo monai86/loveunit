@@ -333,11 +333,12 @@ textarea {
   font-family: var(--font-display), sans-serif !important;
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(200%);
-  }
+/* Loading fallback: avoid backdrop filters and moving elements during navigation. */
+@keyframes loading-progress {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+.loading-progress {
+  animation: loading-progress 1.2s ease-in-out infinite alternate;
 }
