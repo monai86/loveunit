@@ -3,7 +3,7 @@ import assert from 'node:assert';
 async function runEmailTests() {
   console.log('✉️  Running donor confirmation email tests...\n');
 
-  const { buildDonorConfirmationEmail } = await import('../services/email-service');
+  const { buildDonorConfirmationEmail, sendRegistrationConfirmation } = await import('../services/email-service');
   const email = await buildDonorConfirmationEmail({
     to: 'donor@example.com',
     firstName: 'สมชาย',
@@ -30,6 +30,24 @@ async function runEmailTests() {
   assert.ok(Buffer.isBuffer(email.attachments[0].content), 'QR attachment must be a binary image');
   assert.ok(Buffer.isBuffer(email.attachments[1].content), 'poster attachment must be a binary image');
   console.log('✓ Thank-you email includes event details and donor QR code\n');
+
+  const smtpVariables = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS'] as const;
+  const originalSmtp = Object.fromEntries(smtpVariables.map((key) => [key, process.env[key]]));
+  for (const key of smtpVariables) delete process.env[key];
+
+  const skipped = await sendRegistrationConfirmation({
+    to: 'donor@example.com',
+    firstName: 'Donor',
+    lastName: 'Example',
+    registrationCode: 'LVU26-002',
+  });
+
+  assert.strictEqual(skipped.status, 'skipped');
+
+  for (const key of smtpVariables) {
+    if (originalSmtp[key]) process.env[key] = originalSmtp[key];
+  }
+  console.log('✓ Confirmation delivery reports when SMTP is unavailable\n');
 }
 
 runEmailTests().catch((error) => {

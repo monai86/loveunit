@@ -20,6 +20,11 @@ export interface ConfirmationInput {
   eventDateLabel?: string;
 }
 
+export type EmailDeliveryResult =
+  | { status: 'sent' }
+  | { status: 'skipped'; reason: 'missing-recipient' | 'smtp-not-configured' }
+  | { status: 'failed'; error: string };
+
 function isSmtpConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
@@ -114,15 +119,15 @@ export async function buildDonorConfirmationEmail(input: ConfirmationInput) {
 }
 
 /**
- * Sends the registration confirmation email. Resolves silently when SMTP is
- * not configured or sending fails — never blocks the registration itself.
+ * Sends the registration confirmation email. A delivery error is reported to
+ * the caller but never prevents a successful registration from being saved.
  */
-export async function sendRegistrationConfirmation(input: ConfirmationInput): Promise<void> {
-  if (!input.to) return;
+export async function sendRegistrationConfirmation(input: ConfirmationInput): Promise<EmailDeliveryResult> {
+  if (!input.to) return { status: 'skipped', reason: 'missing-recipient' };
 
   if (!isSmtpConfigured()) {
     console.log(`[email] SMTP not configured — skipping confirmation email to ${input.to}`);
-    return;
+    return { status: 'skipped', reason: 'smtp-not-configured' };
   }
 
   try {
@@ -142,7 +147,12 @@ export async function sendRegistrationConfirmation(input: ConfirmationInput): Pr
       to: input.to,
       ...email,
     });
+    return { status: 'sent' };
   } catch (error) {
     console.error('[email] Failed to send confirmation email:', error);
+    return {
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Unknown SMTP error',
+    };
   }
 }

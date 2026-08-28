@@ -72,10 +72,11 @@ export async function POST(
       }, { status: 400 });
     }
 
-    // Fire-and-forget confirmation email — never blocks or fails the registration.
+    // Await the delivery attempt so a serverless runtime does not end before SMTP
+    // receives it. Delivery failures are logged but do not affect registration.
     const reg = result.registration;
     const regSlot = pickField<{ startAt?: string; endAt?: string; start_at?: string; end_at?: string }>(reg, 'timeSlot', 'time_slot');
-    void sendRegistrationConfirmation({
+    const emailDelivery = await sendRegistrationConfirmation({
       to: (pickField<string>(reg, 'email', 'email') || '').trim(),
       firstName: pickField<string>(reg, 'firstName', 'first_name') || '',
       lastName: pickField<string>(reg, 'lastName', 'last_name') || '',
@@ -85,6 +86,13 @@ export async function POST(
       venueName: pickField<string>(event, 'venueName', 'venue_name'),
       eventDateLabel: 'พุธ 16 กันยายน 2569 (09:00 – 14:00 น.)',
     });
+    if (emailDelivery.status !== 'sent') {
+      console.warn('[email] Registration confirmation was not delivered', {
+        registrationCode: pickField<string>(reg, 'registrationCode', 'registration_code'),
+        status: emailDelivery.status,
+        ...(emailDelivery.status === 'skipped' ? { reason: emailDelivery.reason } : { error: emailDelivery.error }),
+      });
+    }
 
     return NextResponse.json({
       success: true,
