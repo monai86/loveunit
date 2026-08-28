@@ -45,6 +45,15 @@ export function generateRegistrationCode(seq?: number): string {
   return `LVU26-${String(randomNum).padStart(3, '0')}`;
 }
 
+/** Returns the next sequence after the largest existing event registration code. */
+export function nextRegistrationSequence(codes: string[]): number {
+  const largest = codes.reduce((max, code) => {
+    const match = code.match(/^LVU26-(\d+)$/i);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0);
+  return largest + 1;
+}
+
 /**
  * Extracts numeric queue number from a registration code (e.g. "LVU26-042" -> 42).
  */

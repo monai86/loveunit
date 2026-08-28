@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { registrations, timeSlots } from '@/db/schema';
 import { eq, and, ne, sql, ilike } from 'drizzle-orm';
-import { normalizePhoneNumber, generateRegistrationCode, generateQRToken } from '@/lib/utils/format';
+import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence } from '@/lib/utils/format';
 import { isMemoryBackendAllowed, registerDonorAtomic as memoryRegisterAtomic, inMemoryRegistrations, defaultSlots, defaultEvent } from '@/lib/db/store';
 import { ParticipantType, DonationExperience, RegistrationSource } from '@/lib/types/database';
 
@@ -71,11 +71,13 @@ export async function registerDonorAtomic(input: {
           .where(eq(timeSlots.id, input.slotId));
       }
 
-      // 3. Create Registration Record with sequential running number
-      const countResult = await tx.execute(
-        sql`SELECT COUNT(*)::int as count FROM registrations WHERE event_id = ${input.eventId}`
+      // 3. Create a monotonic event code. Lock per event so concurrent requests
+      // cannot receive the same number, and never reuse a deleted code.
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${input.eventId}))`);
+      const codeRows = await tx.execute(
+        sql`SELECT registration_code FROM registrations WHERE event_id = ${input.eventId}`
       );
-      const nextSeq = (Number(countResult.rows[0]?.count) || 0) + 1;
+      const nextSeq = nextRegistrationSequence(codeRows.rows.map((row) => String(row.registration_code)));
       const code = generateRegistrationCode(nextSeq);
       const token = generateQRToken(code);
 

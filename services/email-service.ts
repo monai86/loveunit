@@ -61,16 +61,16 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
     : '09:00 – 14:00 น.';
 
   const checklist = [
-    'นอนหลับพักผ่อนให้เพียงพออย่างน้อย 6 ชั่วโมง / Get at least 6 hours of sleep.',
-    'ดื่มน้ำเปล่า 3-4 แก้วก่อนบริจาคประมาณ 30 นาที / Drink 3–4 glasses of water about 30 minutes before donation.',
-    'รับประทานอาหารมื้อหลักก่อนมา (งดอาหารไขมันสูง) / Have a proper meal and avoid high-fat foods.',
-    'เตรียมบัตรประชาชน หรือบัตรผู้บริจาคโลหิตสภากาชาดไทย / Bring your national ID or Red Cross donor card.',
-    'นำ QR Code ในอีเมลนี้ (หรือหน้ายืนยันการลงทะเบียน) มาแสดง ณ จุดลงทะเบียน / Show this QR code at registration.',
-  ].map(item => `<li>${item}</li>`).join('');
+    ['นอนหลับพักผ่อนให้เพียงพออย่างน้อย 6 ชั่วโมง', 'Get at least 6 hours of sleep.'],
+    ['ดื่มน้ำเปล่า 3-4 แก้วก่อนบริจาคประมาณ 30 นาที', 'Drink 3–4 glasses of water about 30 minutes before donation.'],
+    ['รับประทานอาหารมื้อหลักก่อนมา (งดอาหารไขมันสูง)', 'Have a proper meal and avoid high-fat foods.'],
+    ['เตรียมบัตรประชาชน หรือบัตรผู้บริจาคโลหิตสภากาชาดไทย', 'Bring your national ID or Red Cross donor card.'],
+    ['นำ QR Code ในอีเมลนี้ (หรือหน้ายืนยันการลงทะเบียน) มาแสดง ณ จุดลงทะเบียน', 'Show this QR code at registration.'],
+  ].map(([thai, english]) => `<li><span class="checklist-th" style="display:block;">${thai}</span><span class="checklist-en" style="display:block;color:#6B6366;">${english}</span></li>`).join('');
 
   return `
   <div style="font-family:'Prompt','Kanit',sans-serif;background:#FFF9F9;padding:24px;">
-    <div style="max-width:560px;margin:0 auto;background:#FFFFFF;border:2px dashed #7A1020;border-radius:14px;padding:28px;">
+    <div style="max-width:600px;margin:0 auto;background:#FFFFFF;border:2px dashed #7A1020;border-radius:14px;padding:clamp(18px,5vw,28px);">
       <div style="text-align:center;border-bottom:2px solid #F0C4CC;padding-bottom:16px;margin-bottom:20px;">
         <div style="font-size:11px;letter-spacing:2px;color:#7A1020;font-weight:700;">MUMT BLOOD DONATION 2026 · ครั้งที่ 9</div>
         <div style="font-size:18px;font-weight:800;color:#29272A;">เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ</div>
@@ -82,20 +82,20 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
         <div style="font-size:10px;letter-spacing:2px;color:#6B6366;">REGISTRATION CODE</div>
         <div style="font-size:22px;font-weight:800;color:#7A1020;letter-spacing:1px;">${escapeHtml(input.registrationCode)}</div>
       </div>
-      <table style="width:100%;font-size:13px;color:#29272A;">
-        <tr><td style="padding:6px 0;color:#6B6366;">วันจัดงาน / Event date</td><td style="text-align:right;font-weight:700;">${escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569')}</td></tr>
-        <tr><td style="padding:6px 0;color:#6B6366;">รอบเวลา / Arrival time</td><td style="text-align:right;font-weight:700;color:#7A1020;">${timeSlot}</td></tr>
-        <tr><td style="padding:6px 0;color:#6B6366;">สถานที่ / Venue</td><td style="text-align:right;font-weight:700;">${escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา ศาลายา')}</td></tr>
+      <table style="width:100%;table-layout:fixed;font-size:13px;color:#29272A;">
+        <tr><td style="width:36%;padding:6px 10px 6px 0;color:#6B6366;vertical-align:top;">วันจัดงาน / Event date</td><td style="width:64%;padding:6px 0;text-align:right;font-weight:700;word-break:break-word;">${escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569')}</td></tr>
+        <tr><td style="width:36%;padding:6px 10px 6px 0;color:#6B6366;vertical-align:top;">รอบเวลา / Arrival time</td><td style="width:64%;padding:6px 0;text-align:right;font-weight:700;color:#7A1020;word-break:break-word;">${timeSlot}</td></tr>
+        <tr><td style="width:36%;padding:6px 10px 6px 0;color:#6B6366;vertical-align:top;">สถานที่ / Venue</td><td style="width:64%;padding:6px 0;text-align:right;font-weight:700;word-break:break-word;">${escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา ศาลายา')}</td></tr>
       </table>
       <div style="text-align:center;margin:22px 0 8px;"><img src="cid:event-poster" width="280" alt="MUMT LoveUnit event poster" style="display:inline-block;max-width:100%;height:auto;border-radius:10px;" /></div>
       ${hasQrCode ? `<div style="text-align:center;margin:22px 0 8px;"><img src="cid:donor-qr-code" width="200" height="200" alt="QR Code for check-in" style="display:inline-block;border:1px solid #F0C4CC;padding:8px;border-radius:10px;background:#fff;" /><p style="font-size:12px;color:#6B6366;margin:8px 0 0;">แสดง QR Code นี้ ณ จุดลงทะเบียน<br/>Show this QR code at registration.</p></div>` : ''}
       <div style="margin:18px 0;border-top:2px dashed #7A1020;"></div>
       <div style="font-size:11px;letter-spacing:2px;color:#7A1020;font-weight:700;">ข้อปฏิบัติก่อนบริจาค / PRE-DONATION CHECKLIST</div>
-      <ul style="font-size:13px;color:#29272A;padding-left:20px;line-height:1.9;">${checklist}</ul>
+      <ul style="font-size:13px;color:#29272A;padding-left:20px;line-height:1.65;">${checklist}</ul>
       <div style="text-align:center;margin-top:20px;">
         <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/registration/${input.registrationCode}"
            style="display:inline-block;background:#7A1020;color:#FFFFFF;text-decoration:none;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;">
-          ดู QR Code ของฉัน / View my QR Code
+          <span style="display:block;white-space:nowrap;">ดู QR Code ของฉัน</span><span style="display:block;white-space:nowrap;font-size:12px;margin-top:2px;">View my QR Code</span>
         </a>
       </div>
       <p style="font-size:11px;color:#6B6366;text-align:center;margin-top:20px;">หากไม่ได้ลงทะเบียนด้วยอีเมลนี้ กรุณาเพิกเฉยอีเมลฉบับนี้<br/>If you did not register with this email address, please disregard this message.</p>

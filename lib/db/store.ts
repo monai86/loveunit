@@ -15,7 +15,7 @@ import {
   StaffProfile,
   StaffRole
 } from '@/lib/types/database';
-import { normalizePhoneNumber, generateRegistrationCode, generateQRToken } from '@/lib/utils/format';
+import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence } from '@/lib/utils/format';
 
 // Collision-safe id generator for in-memory records. Date.now() alone collides
 // when several records are created within the same millisecond (fast machines
@@ -386,7 +386,11 @@ export async function registerDonorAtomic(input: {
       slot.booked_count += 1;
     }
 
-    const nextSeq = inMemoryRegistrations.filter((r: Registration) => r.event_id === input.eventId).length + 1;
+    const nextSeq = nextRegistrationSequence(
+      inMemoryRegistrations
+        .filter((r: Registration) => r.event_id === input.eventId)
+        .map((r: Registration) => r.registration_code)
+    );
     const code = generateRegistrationCode(nextSeq);
     const token = generateQRToken(code);
     const newReg: Registration = {
