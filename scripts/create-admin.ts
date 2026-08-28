@@ -36,10 +36,21 @@ Example:
   const [emailArg, password, displayName = 'ผู้ดูแลระบบ MUMT', team = 'Management'] = args;
   const email = emailArg.trim().toLowerCase();
 
+  if (password.length < 8) {
+    throw new Error('Password must contain at least 8 characters.');
+  }
+  const primaryEmail = process.env.PRIMARY_ADMIN_EMAIL?.trim().toLowerCase();
+  if (!primaryEmail) {
+    throw new Error('PRIMARY_ADMIN_EMAIL must be configured before creating the admin account.');
+  }
+  if (email !== primaryEmail) {
+    throw new Error('The bootstrap account email must exactly match PRIMARY_ADMIN_EMAIL.');
+  }
+
   const { auth } = await import('@/lib/auth');
   const { db } = await import('@/db');
   const { user, staffProfiles, account } = await import('@/db/schema');
-  const { eq, and } = await import('drizzle-orm');
+  const { eq, and, ne } = await import('drizzle-orm');
   const { hashPassword } = await import('better-auth/crypto');
 
   if (!db) {
@@ -177,7 +188,14 @@ Example:
     console.log(`✅ Created new staff profile with role: [ADMIN] (${displayName})`);
   }
 
-  console.log(`\n🎉 Success! Admin account [${email}] is ready with role [ADMIN].`);
+  // A primary admin is unique by policy. Existing accounts remain in the
+  // database but are disabled until invited again as STAFF.
+  await db
+    .update(staffProfiles)
+    .set({ role: 'STAFF', isActive: false, updatedAt: new Date() })
+    .where(ne(staffProfiles.userId, userId));
+
+  console.log(`\n🎉 Success! Primary admin [${email}] is ready; all other staff profiles are disabled.`);
   process.exit(0);
 }
 

@@ -26,6 +26,14 @@ export const publicRegistrationSchema = z.object({
 
 export type PublicRegistrationInput = z.infer<typeof publicRegistrationSchema>;
 
+// Admins may correct donor profile data, but cannot change queue state or slot
+// assignment through this endpoint (those flows affect capacity and waitlists).
+export const adminRegistrationUpdateSchema = publicRegistrationSchema
+  .omit({ slotId: true, privacyAccepted: true })
+  .extend({ email: z.string().email('รูปแบบอีเมลไม่ถูกต้อง').nullable().optional() });
+
+export type AdminRegistrationUpdateInput = z.infer<typeof adminRegistrationUpdateSchema>;
+
 export const walkInRegistrationSchema = z.object({
   firstName: z.string().min(1, 'กรุณากรอกชื่อจริง'),
   lastName: z.string().min(1, 'กรุณากรอกนามสกุล'),

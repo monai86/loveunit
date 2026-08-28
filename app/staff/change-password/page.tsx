@@ -39,7 +39,7 @@ export default function ChangePasswordPage() {
       const me = await fetch('/api/auth/me').then((r) => r.json()).catch(() => ({}));
       if (me?.user?.mustChangePassword === false) {
         const role = me?.user?.profile?.role;
-        router.replace(role === 'ADMIN' || role === 'SUPER_ADMIN' ? '/mt70' : '/staff/checkin');
+        router.replace(role === 'ADMIN' ? '/mt70' : '/staff/checkin');
       }
     }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -4,7 +4,7 @@ export type ParticipantType = 'STUDENT' | 'STAFF' | 'GENERAL_PUBLIC';
 export type DonationExperience = 'FIRST_TIME' | 'RETURNING';
 export type RegistrationSource = 'ONLINE' | 'WALK_IN' | 'ADMIN';
 export type RegistrationStatus = 'REGISTERED' | 'CHECKED_IN' | 'IN_PROCESS' | 'COMPLETED' | 'CANCELLED' | 'NO_SHOW';
-export type StaffRole = 'ADMIN';
+export type StaffRole = 'ADMIN' | 'STAFF';
 export type EventStatus = 'DRAFT' | 'PUBLISHED' | 'REGISTRATION_OPEN' | 'REGISTRATION_CLOSED' | 'COMPLETED' | 'ARCHIVED';
 
 export interface Event {

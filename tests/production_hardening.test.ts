@@ -3,6 +3,7 @@ process.env.DATA_BACKEND = 'memory';
 
 import assert from 'node:assert';
 import { generateQRToken, generateRegistrationCode } from '../lib/utils/format';
+import { adminRegistrationUpdateSchema } from '../lib/validation/schemas';
 import { 
   getEventBySlug, 
   isTransitionAllowed, 
@@ -92,6 +93,16 @@ async function runProductionHardeningTests() {
   const currentAllowed = isMemoryBackendAllowed();
   assert.strictEqual(typeof currentAllowed, 'boolean');
   console.log(`✓ Fail-closed storage inspection rule verified (Memory backend allowed in current env: ${currentAllowed})\n`);
+
+  // Test 7: Admin Donor Edit Validation
+  console.log('Test 7: Admin Donor Edit Validation');
+  const edit = adminRegistrationUpdateSchema.safeParse({
+    firstName: 'สมชาย', lastName: 'แก้ไข', phone: '081-234-5678', email: 'donor@example.com',
+    participantType: 'STUDENT', faculty: 'คณะเทคนิคการแพทย์', academicYear: 'ปี 3', donationExperience: 'FIRST_TIME',
+  });
+  assert.strictEqual(edit.success, true, 'admin can submit corrected donor details');
+  assert.strictEqual(adminRegistrationUpdateSchema.safeParse({ ...edit.data, phone: '123' }).success, false, 'invalid corrected phone is rejected');
+  console.log('✓ Admin donor edits validate before persistence\n');
 
   console.log('🎉 ALL PRODUCTION HARDENING TESTS PASSED SUCCESSFULLY!');
 }

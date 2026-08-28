@@ -161,6 +161,7 @@ export default function StaffCheckinPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [registration, setRegistration] = useState<RegistrationDetail | null>(null);
 
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; text: string } | null>(null);
@@ -178,6 +179,13 @@ export default function StaffCheckinPage() {
   const [fastTrackMode, setFastTrackMode] = useState(false);
   const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => setIsAdmin(data?.user?.profile?.role === 'ADMIN'))
+      .catch(() => setIsAdmin(false));
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const busyRef = useRef(false);
@@ -1208,7 +1216,7 @@ export default function StaffCheckinPage() {
                   )}
 
                   {/* Cancel / Failed Screening Button */}
-                  {registration.status !== 'COMPLETED' && registration.status !== 'CANCELLED' && (
+                  {isAdmin && registration.status !== 'COMPLETED' && registration.status !== 'CANCELLED' && (
                     <button
                       type="button"
                       disabled={actionLoading}

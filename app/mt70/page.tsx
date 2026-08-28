@@ -485,6 +485,7 @@ export default async function AdminDashboardPage() {
       <section className="pt-4 border-t border-[var(--line)]">
         <StaffRoleManagement
           currentUserRole={user?.profile.role}
+          currentUserEmail={user?.email}
           initialStaffList={staffMembers}
         />
       </section>

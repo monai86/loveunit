@@ -14,6 +14,7 @@ export * from './content';
 export * from './audit';
 export * from './auth';
 export * from './waitlist';
+export * from './staff-invitations';
 
 // Relations
 export const eventsRelations = relations(events, ({ many }) => ({

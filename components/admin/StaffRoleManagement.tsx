@@ -14,16 +14,18 @@ import {
   Eye,
   EyeOff,
   UserCheck,
-  UserX
+  UserX,
+  Trash2
 } from 'lucide-react';
 import { StaffListItem } from '@/services/admin-service';
 
 interface Props {
   currentUserRole?: string;
+  currentUserEmail?: string;
   initialStaffList?: StaffListItem[];
 }
 
-export function StaffRoleManagement({ initialStaffList = [] }: Props) {
+export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }: Props) {
   const [staffList, setStaffList] = useState<StaffListItem[]>(initialStaffList);
   const [loading, setLoading] = useState(initialStaffList.length === 0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -102,6 +104,22 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
     setModalOpen(true);
   };
 
+  const handleDelete = async (staff: StaffListItem) => {
+    if (!confirm(`ลบบัญชี ${staff.email} ถาวรหรือไม่? บัญชีจะไม่สามารถเข้าสู่ระบบได้อีก`)) return;
+    try {
+      const res = await fetch('/api/admin/staff', {
+        method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: staff.userId }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || 'ไม่สามารถลบบัญชีได้');
+      await fetchStaff();
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'ไม่สามารถลบบัญชีได้');
+    }
+  };
+
+  const canDelete = (staff: StaffListItem) => staff.email.toLowerCase() !== currentUserEmail?.toLowerCase();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
@@ -124,7 +142,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.message || data.error);
-        setFormSuccess(formPassword ? 'อัปเดตข้อมูลและเปลี่ยนรหัสผ่านเรียบร้อย' : 'อัปเดตข้อมูลผู้ดูแลระบบเรียบร้อย');
+        setFormSuccess('อัปเดตข้อมูล Staff เรียบร้อย');
       } else {
         // Create Mode (POST)
         const res = await fetch('/api/admin/staff', {
@@ -139,7 +157,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.message || data.error);
-        setFormSuccess('เพิ่มผู้ดูแลระบบเรียบร้อยแล้ว');
+        setFormSuccess('ส่งคำเชิญ Staff เรียบร้อยแล้ว');
       }
 
       await fetchStaff();
@@ -172,10 +190,10 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
         <div>
           <h2 className="text-lg sm:text-xl font-black text-[var(--ink)] flex items-center gap-2">
             <Shield className="h-5 w-5 text-[var(--burgundy-700)]" />
-            <span>ผู้ดูแลระบบ</span>
+            <span>เจ้าหน้าที่ (Staff)</span>
           </h2>
           <p className="text-xs text-[var(--muted)] font-medium mt-0.5">
-            จัดการบัญชีและรหัสผ่านสำหรับเข้าใช้งานระบบ
+            ส่งคำเชิญและจัดการบัญชีเจ้าหน้าที่
           </p>
         </div>
 
@@ -197,7 +215,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
             className="editorial-btn-primary py-2 px-3.5 text-xs flex items-center gap-1.5 shadow-2xs"
           >
             <UserPlus className="h-4 w-4" />
-            <span>เพิ่มผู้ดูแล</span>
+            <span>เชิญ Staff</span>
           </button>
         </div>
       </div>
@@ -229,7 +247,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
       <div className="rounded-2xl border border-[var(--line)] bg-white shadow-2xs overflow-hidden">
         {filteredStaff.length === 0 ? (
           <div className="px-6 py-8 text-center text-gray-400 text-xs">
-            ไม่พบบัญชีผู้ดูแลระบบที่ค้นหา
+            ไม่พบบัญชี Staff ที่ค้นหา
           </div>
         ) : (
           <>
@@ -271,6 +289,9 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
                       <Edit2 className="h-3 w-3 text-gray-500" />
                       <span>แก้ไข / รหัสผ่าน</span>
                     </button>
+                    {canDelete(staff) && <button type="button" onClick={() => handleDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700">
+                      <Trash2 className="h-3 w-3" /><span>ลบ</span>
+                    </button>}
                   </div>
                 </div>
               ))}
@@ -304,7 +325,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[var(--rose-100)] text-[var(--burgundy-700)]">
-                          Admin
+                          Staff
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-600 font-medium whitespace-nowrap">
@@ -332,6 +353,9 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
                           <Edit2 className="h-3 w-3 text-gray-500" />
                           <span>แก้ไข / รหัสผ่าน</span>
                         </button>
+                        {canDelete(staff) && <button type="button" onClick={() => handleDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700 transition-colors shadow-2xs">
+                          <Trash2 className="h-3 w-3" /><span>ลบ</span>
+                        </button>}
                       </td>
                     </tr>
                   ))}
@@ -353,7 +377,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
                   <ShieldCheck className="h-4 w-4" />
                 </div>
                 <h3 className="text-sm sm:text-base font-bold text-[var(--ink)]">
-                  {editingStaff ? 'แก้ไขข้อมูลแอดมิน' : 'เพิ่มผู้ดูแลระบบใหม่'}
+                  {editingStaff ? 'แก้ไขข้อมูล Staff' : 'เชิญ Staff ใหม่'}
                 </h3>
               </div>
               <button
@@ -390,7 +414,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
                   type="email"
                   required
                   disabled={!!editingStaff}
-                  placeholder="admin@mahidol.ac.th"
+                  placeholder="staff@mahidol.ac.th"
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-[var(--line)] bg-gray-50 focus:bg-white text-xs font-medium text-[var(--ink)] disabled:opacity-60 disabled:cursor-not-allowed font-mono"
@@ -426,8 +450,8 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
                 />
               </div>
 
-              {/* Password */}
-              <div className="space-y-1">
+              {/* Passwords are set by the recipient through the invitation link. */}
+              <div className="hidden space-y-1">
                 <div className="flex items-center justify-between">
                   <label className="block text-xs font-bold text-[var(--ink)]">
                     {editingStaff ? 'เปลี่ยนรหัสผ่าน' : 'รหัสผ่าน'}
@@ -439,7 +463,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    required={!editingStaff}
+                    required={false}
                     placeholder={editingStaff ? 'พิมพ์รหัสผ่านใหม่...' : 'อย่างน้อย 6 ตัวอักษร'}
                     value={formPassword}
                     onChange={(e) => setFormPassword(e.target.value)}
@@ -489,7 +513,7 @@ export function StaffRoleManagement({ initialStaffList = [] }: Props) {
                   disabled={submitting}
                   className="editorial-btn-primary py-2 px-4 text-xs font-bold"
                 >
-                  {submitting ? 'กำลังบันทึก...' : (editingStaff ? 'บันทึก' : 'เพิ่มผู้ดูแล')}
+                  {submitting ? 'กำลังบันทึก...' : (editingStaff ? 'บันทึก' : 'ส่งคำเชิญ')}
                 </button>
               </div>
 

@@ -8,6 +8,8 @@ import {
   ArrowLeft,
   Loader2,
   Eye,
+  Edit2,
+  Trash2,
   Calendar,
   Phone
 } from 'lucide-react';
@@ -34,6 +36,10 @@ interface ApiRegistration {
   checked_in_at?: string;
   completedAt?: string;
   completed_at?: string;
+  email?: string | null;
+  faculty?: string | null;
+  academicYear?: string | null;
+  academic_year?: string | null;
   timeSlot?: SlotView | null;
   time_slot?: SlotView | null;
 }
@@ -94,6 +100,38 @@ export default function AdminRegistrationsPage() {
     if (filterExperience !== 'ALL' && r.donation_experience !== filterExperience) return false;
     return true;
   });
+
+  const editDonor = async (row: Registration) => {
+    const firstName = window.prompt('ชื่อ', row.first_name);
+    if (firstName === null) return;
+    const lastName = window.prompt('นามสกุล', row.last_name);
+    if (lastName === null) return;
+    const phone = window.prompt('เบอร์โทรศัพท์', row.phone);
+    if (phone === null) return;
+    const email = window.prompt('อีเมล (เว้นว่างได้)', row.email || '');
+    if (email === null) return;
+    const res = await fetch('/api/admin/registrations', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        registrationId: row.id, firstName, lastName, phone, email: email || null,
+        participantType: row.participant_type, faculty: row.faculty || undefined, academicYear: row.academic_year || undefined,
+        donationExperience: row.donation_experience,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) return window.alert(data.message || 'ไม่สามารถบันทึกข้อมูลได้');
+    setRegistrations((current) => current.map((item) => item.id === row.id ? { ...item, first_name: firstName, last_name: lastName, phone, email: email || null } : item));
+  };
+
+  const deleteDonor = async (row: Registration) => {
+    if (!confirm(`ลบข้อมูลของ ${row.first_name} ${row.last_name} ถาวรหรือไม่?`)) return;
+    const res = await fetch('/api/admin/registrations', {
+      method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registrationId: row.id }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) return window.alert(data.message || 'ไม่สามารถลบข้อมูลได้');
+    setRegistrations((current) => current.filter((item) => item.id !== row.id));
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-6">
@@ -242,6 +280,12 @@ export default function AdminRegistrationsPage() {
                         <Eye className="h-3.5 w-3.5" />
                         <span>ดูบัตร</span>
                       </Link>
+                      <button type="button" onClick={() => editDonor(row)} className="inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
+                        <Edit2 className="h-3.5 w-3.5" /><span>แก้ไข</span>
+                      </button>
+                      <button type="button" onClick={() => deleteDonor(row)} className="inline-flex items-center gap-1 font-bold text-red-700 hover:underline">
+                        <Trash2 className="h-3.5 w-3.5" /><span>ลบ</span>
+                      </button>
                     </div>
                   </div>
                 );
@@ -259,7 +303,7 @@ export default function AdminRegistrationsPage() {
                     <th className="p-3.5 whitespace-nowrap">เบอร์โทรศัพท์</th>
                     <th className="p-3.5 whitespace-nowrap">รอบเวลา</th>
                     <th className="p-3.5 whitespace-nowrap">สถานะ</th>
-                    <th className="p-3.5 text-right whitespace-nowrap">บัตรผู้บริจาค</th>
+                    <th className="p-3.5 text-right whitespace-nowrap">การจัดการ</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 font-medium">
@@ -301,6 +345,12 @@ export default function AdminRegistrationsPage() {
                             <Eye className="h-3.5 w-3.5" />
                             <span>ดูบัตร</span>
                           </Link>
+                          <button type="button" onClick={() => editDonor(row)} className="ml-3 inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
+                            <Edit2 className="h-3.5 w-3.5" /><span>แก้ไข</span>
+                          </button>
+                          <button type="button" onClick={() => deleteDonor(row)} className="ml-3 inline-flex items-center gap-1 font-bold text-red-700 hover:underline">
+                            <Trash2 className="h-3.5 w-3.5" /><span>ลบ</span>
+                          </button>
                         </td>
                       </tr>
                     );

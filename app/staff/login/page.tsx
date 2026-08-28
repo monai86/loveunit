@@ -24,11 +24,17 @@ export default function StaffLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Already signed in? Redirect to /mt70.
+  const redirectForRole = async () => {
+    const me = await fetch('/api/auth/me');
+    const data = await me.json();
+    window.location.href = data?.user?.profile?.role === 'ADMIN' ? '/mt70' : '/staff/checkin';
+  };
+
+  // Already signed in? Redirect to the matching portal.
   useEffect(() => {
     authClient.getSession().then((res) => {
       if (res?.data?.session) {
-        router.replace('/mt70');
+        redirectForRole().catch(() => router.replace('/staff/checkin'));
       }
     }).catch(() => {});
   }, [router]);
@@ -57,7 +63,7 @@ export default function StaffLoginPage() {
       if (userObj?.mustChangePassword) {
         window.location.href = '/staff/change-password';
       } else {
-        window.location.href = '/mt70';
+        await redirectForRole();
       }
     } catch (err) {
       console.error(err);

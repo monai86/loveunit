@@ -14,6 +14,7 @@ import {
   getInMemoryCheckinEvents,
 } from '../lib/db/store';
 import { cancelRegistration } from '../services/checkin-service';
+import { deleteDonorRegistration } from '../services/admin-service';
 import { joinWaitlist, inMemoryWaitlist } from '../services/waitlist-service';
 
 async function runCancelTests() {
@@ -127,6 +128,20 @@ async function runCancelTests() {
   assert.strictEqual(cancelMissing.success, false, 'unknown registration id must fail');
   assert.match(cancelMissing.message || '', /ไม่พบข้อมูล/, 'unknown id reports not-found');
   console.log('✓ state machine gates cancel; unknown ids rejected\n');
+
+  // ---- Test 4: admin deletion removes an uncompleted donor and releases seat ----
+  console.log('Test 4: Delete an uncompleted donor permanently releases the seat');
+  const beforeDelete = slot5.booked_count;
+  const regD = await registerDonorAtomic({
+    eventId: defaultEvent.id, firstName: 'ลบ', lastName: 'ถาวร', phone: '0900000006',
+    participantType: 'GENERAL_PUBLIC', donationExperience: 'FIRST_TIME', slotId: 'ts-5',
+  });
+  assert.strictEqual(regD.success, true);
+  const deleted = await deleteDonorRegistration(regD.registration!.id, 'u-admin');
+  assert.strictEqual(deleted.success, true);
+  assert.strictEqual(inMemoryRegistrations.some((r) => r.id === regD.registration!.id), false, 'deleted donor is removed from the list');
+  assert.strictEqual(slot5.booked_count, beforeDelete, 'deletion releases the slot seat');
+  console.log('✓ donor record is deleted and seat released\n');
 
   console.log('🎉 ALL CANCEL FLOW TESTS PASSED SUCCESSFULLY!');
 }

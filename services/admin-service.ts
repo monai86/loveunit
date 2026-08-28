@@ -1,15 +1,20 @@
 import { db } from '@/db';
 import { registrations, timeSlots, auditLogs, staffProfiles, user } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { and, eq, desc, sql } from 'drizzle-orm';
 import { 
   isMemoryBackendAllowed, 
   getDashboardKPIs as memoryGetKPIs, 
   getAllRegistrations as memoryGetAllRegs, 
+  inMemoryRegistrations,
+  defaultSlots,
   logAuditAction as memoryLogAudit,
   getInMemoryStaffProfiles
 } from '@/lib/db/store';
 import { resolveActorId } from '@/lib/auth/server';
 import { StaffRole } from '@/lib/types/database';
+import { normalizePhoneNumber } from '@/lib/utils/format';
+import type { AdminRegistrationUpdateInput } from '@/lib/validation/schemas';
+import { promoteFromWaitlist } from '@/services/waitlist-service';
 
 export async function getAllRegistrations(eventId: string) {
   if (db) {
@@ -26,6 +31,83 @@ export async function getAllRegistrations(eventId: string) {
     return await memoryGetAllRegs(eventId);
   }
 
+  throw new Error('DATABASE_URL is unconfigured in production environment.');
+}
+
+export async function updateDonorRegistration(params: AdminRegistrationUpdateInput & { registrationId: string; actorId: string }) {
+  const values = {
+    firstName: params.firstName.trim(),
+    lastName: params.lastName.trim(),
+    phone: params.phone.trim(),
+    phoneNormalized: normalizePhoneNumber(params.phone),
+    email: params.email?.trim() || null,
+    participantType: params.participantType,
+    faculty: params.faculty?.trim() || null,
+    academicYear: params.academicYear?.trim() || null,
+    donationExperience: params.donationExperience,
+    updatedAt: new Date(),
+  };
+  if (db) {
+    try {
+      return await db.transaction(async (tx) => {
+        const [updated] = await tx.update(registrations).set(values).where(eq(registrations.id, params.registrationId)).returning();
+        if (!updated) return { success: false as const, message: 'ไม่พบผู้ลงทะเบียน' };
+        await tx.insert(auditLogs).values({
+          actorId: resolveActorId(params.actorId), action: 'UPDATE_DONOR_REGISTRATION', entityType: 'registration', entityId: params.registrationId,
+          metadata: { changedFields: ['firstName', 'lastName', 'phone', 'email', 'participantType', 'faculty', 'academicYear', 'donationExperience'] },
+        });
+        return { success: true as const, registration: updated };
+      });
+    } catch (error) {
+      if (error instanceof Error && /unique|duplicate/i.test(error.message)) return { success: false as const, message: 'เบอร์โทรศัพท์นี้ลงทะเบียนในงานนี้แล้ว' };
+      throw error;
+    }
+  }
+  if (isMemoryBackendAllowed()) {
+    const found = inMemoryRegistrations.find((registration) => registration.id === params.registrationId);
+    if (!found) return { success: false as const, message: 'ไม่พบผู้ลงทะเบียน' };
+    Object.assign(found, {
+      first_name: values.firstName, last_name: values.lastName, phone: values.phone, phone_normalized: values.phoneNormalized,
+      email: values.email, participant_type: values.participantType, faculty: values.faculty, academic_year: values.academicYear,
+      donation_experience: values.donationExperience, updated_at: values.updatedAt.toISOString(),
+    });
+    await recordAuditLog({ actorId: params.actorId, action: 'UPDATE_DONOR_REGISTRATION', entityType: 'registration', entityId: params.registrationId });
+    return { success: true as const, registration: found };
+  }
+  throw new Error('DATABASE_URL is unconfigured in production environment.');
+}
+
+export async function deleteDonorRegistration(registrationId: string, actorId: string) {
+  if (db) {
+    const [current] = await db.select({ id: registrations.id, eventId: registrations.eventId, slotId: registrations.slotId, status: registrations.status })
+      .from(registrations).where(eq(registrations.id, registrationId)).limit(1);
+    if (!current) return { success: false as const, message: 'ไม่พบผู้ลงทะเบียน' };
+    if (current.status === 'COMPLETED') return { success: false as const, message: 'ไม่สามารถลบรายการที่บริจาคสำเร็จแล้ว' };
+    await db.transaction(async (tx) => {
+      await tx.delete(registrations).where(eq(registrations.id, registrationId));
+      if (current.slotId) {
+        await tx.update(timeSlots).set({ bookedCount: sql`GREATEST(${timeSlots.bookedCount} - 1, 0)` })
+          .where(and(eq(timeSlots.id, current.slotId), eq(timeSlots.eventId, current.eventId)));
+      }
+      await tx.insert(auditLogs).values({ actorId: resolveActorId(actorId), action: 'DELETE_DONOR_REGISTRATION', entityType: 'registration', entityId: registrationId });
+    });
+    const promoted = current.slotId ? await promoteFromWaitlist(current.slotId, current.eventId) : null;
+    return { success: true as const, promoted: promoted?.success ? promoted : null };
+  }
+  if (isMemoryBackendAllowed()) {
+    const index = inMemoryRegistrations.findIndex((registration) => registration.id === registrationId);
+    const current = inMemoryRegistrations[index];
+    if (!current) return { success: false as const, message: 'ไม่พบผู้ลงทะเบียน' };
+    if (current.status === 'COMPLETED') return { success: false as const, message: 'ไม่สามารถลบรายการที่บริจาคสำเร็จแล้ว' };
+    if (current.slot_id) {
+      const slot = defaultSlots.find((candidate) => candidate.id === current.slot_id);
+      if (slot) slot.booked_count = Math.max(0, slot.booked_count - 1);
+    }
+    inMemoryRegistrations.splice(index, 1);
+    await recordAuditLog({ actorId, action: 'DELETE_DONOR_REGISTRATION', entityType: 'registration', entityId: registrationId });
+    const promoted = current.slot_id ? await promoteFromWaitlist(current.slot_id, current.event_id) : null;
+    return { success: true as const, promoted: promoted?.success ? promoted : null };
+  }
   throw new Error('DATABASE_URL is unconfigured in production environment.');
 }
 

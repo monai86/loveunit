@@ -14,12 +14,13 @@ import {
   requireAdmin,
   requireTeamLead,
   requireSuperAdmin,
+  canDeleteManagedAccount,
 } from '../lib/auth/server';
 import type { AuthenticatedUser } from '../lib/auth/server';
 
 const BASE = 'http://localhost:3000';
 
-function makeUser(role: 'ADMIN' = 'ADMIN', overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {
+function makeUser(role: 'ADMIN' | 'STAFF' = 'ADMIN', overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {
   return {
     id: `u-${role.toLowerCase()}-test`,
     email: `${role.toLowerCase()}@test.local`,
@@ -125,17 +126,47 @@ async function runAuthTests() {
   console.log('✓ Session lifecycle verified\n');
 
   // ---- Server Guards for unified ADMIN role ----
-  console.log('Test 5: Server Guards — requireStaff & requireAdmin');
-  assert.ok(await requireStaff(makeUser('ADMIN')));
-  assert.ok(await requireAdmin(makeUser('ADMIN')));
-  assert.ok(await requireTeamLead(makeUser('ADMIN')));
-  assert.ok(await requireSuperAdmin(makeUser('ADMIN')));
+  console.log('Test 5: Server Guards — primary Admin and Staff separation');
+  process.env.PRIMARY_ADMIN_EMAIL = 'primary-admin@test.local';
+  const primaryAdmin = makeUser('ADMIN', { email: 'primary-admin@test.local' });
+  const legacyAdmin = makeUser('ADMIN', { email: 'legacy-admin@test.local' });
+  const staff = makeUser('STAFF');
+
+  assert.ok(await requireStaff(primaryAdmin));
+  assert.ok(await requireStaff(staff));
+  assert.ok(await requireAdmin(primaryAdmin));
+  assert.ok(await requireTeamLead(primaryAdmin));
+  assert.ok(await requireSuperAdmin(primaryAdmin));
+  await assert.rejects(() => requireAdmin(legacyAdmin), /FORBIDDEN/, 'only PRIMARY_ADMIN_EMAIL may be admin');
+  await assert.rejects(() => requireAdmin(staff), /FORBIDDEN/, 'staff cannot access admin functions');
   await assert.rejects(() => requireStaff(null), /UNAUTHORIZED/, 'null user → 401');
   await assert.rejects(() => requireAdmin(null), /UNAUTHORIZED/, 'null user → 401');
-  console.log('✓ All guards allow authenticated ADMIN, reject anonymous\n');
+  console.log('✓ Primary admin and staff guards enforce least privilege\n');
+
+  // ---- Account deletion policy ----
+  console.log('Test 6: Account deletion policy');
+  assert.strictEqual(canDeleteManagedAccount(primaryAdmin, { id: 'staff-1', email: 'staff@test.local' }), true, 'primary admin may delete another account');
+  assert.strictEqual(canDeleteManagedAccount(primaryAdmin, { id: primaryAdmin.id, email: primaryAdmin.email }), false, 'primary admin cannot delete itself');
+  assert.strictEqual(canDeleteManagedAccount(primaryAdmin, { id: 'another-admin', email: primaryAdmin.email }), false, 'primary admin email can never be deleted');
+  console.log('✓ Primary account is protected from deletion\n');
+
+  // ---- Staff invitation token lifecycle ----
+  console.log('Test 7: Staff invitation token lifecycle');
+  const { createInvitationToken, hashInvitationToken, isInvitationUsable } = await import('../lib/auth/invitation-token');
+  const invitationToken = createInvitationToken();
+  const invitation = {
+    tokenHash: hashInvitationToken(invitationToken),
+    expiresAt: new Date(Date.now() + 60_000),
+    acceptedAt: null,
+  };
+  assert.strictEqual(isInvitationUsable(invitation, invitationToken), true, 'a fresh matching token is usable');
+  assert.strictEqual(isInvitationUsable(invitation, 'wrong-token'), false, 'a different token is rejected');
+  assert.strictEqual(isInvitationUsable({ ...invitation, expiresAt: new Date(Date.now() - 1) }, invitationToken), false, 'an expired token is rejected');
+  assert.strictEqual(isInvitationUsable({ ...invitation, acceptedAt: new Date() }, invitationToken), false, 'a used token is rejected');
+  console.log('✓ Invitation token is single-use and expiry-bound\n');
 
   // ---- Staff / Admin Management CRUD in Admin Service ----
-  console.log('Test 6: Admin Management in Admin Service');
+  console.log('Test 8: Admin Management in Admin Service');
   const { getAllStaffMembers, updateStaffRoleAndTeam } = await import('../services/admin-service');
   const initialStaff = await getAllStaffMembers();
   assert.ok(initialStaff.length >= 1, 'Must have at least 1 seeded in-memory admin');
@@ -155,7 +186,7 @@ async function runAuthTests() {
   console.log('✓ Admin update & team assignment verified\n');
 
   // ---- Public Footer Link Verification ----
-  console.log('Test 7: Public Website Does Not Expose Staff Login Button');
+  console.log('Test 9: Public Website Does Not Expose Staff Login Button');
   const fs = await import('node:fs');
   const path = await import('node:path');
   const footerContent = fs.readFileSync(path.join(process.cwd(), 'components/layout/Footer.tsx'), 'utf-8');

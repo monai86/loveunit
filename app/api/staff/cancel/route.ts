@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import { cancelRegistration } from '@/services/checkin-service';
 import { getRegistrationByQRToken, getRegistrationByCode } from '@/services/registration-service';
-import { requireStaff } from '@/lib/auth/server';
+import { requireAdmin } from '@/lib/auth/server';
 import { getErrorMessage } from '@/lib/utils/format';
 
-// Staff-only cancel endpoint. Unlike a raw status flip, this releases the
+// Admin-only cancel endpoint. Unlike a raw status flip, this releases the
 // donor's time-slot seat (booked_count − 1) and promotes the next WAITING
 // donor for that slot (FIFO) into the freed seat. See
 // services/checkin-service.cancelRegistration.
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   try {
     let currentUser;
     try {
-      currentUser = await requireStaff();
+      currentUser = await requireAdmin();
     } catch (err: unknown) {
       const status = getErrorMessage(err) === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์ยกเลิกการลงทะเบียน' }, { status });

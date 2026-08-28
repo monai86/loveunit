@@ -31,6 +31,20 @@ const devProfiles: Record<string, StaffProfile> = {
   'admin@mahidol.ac.th': { user_id: 'u-admin', display_name: 'ผู้ดูแลระบบ (Admin)', role: 'ADMIN', team: 'Management', is_active: true, created_at: '', updated_at: '' },
 };
 
+export function isPrimaryAdminEmail(email: string): boolean {
+  const configuredEmail = process.env.PRIMARY_ADMIN_EMAIL?.trim().toLowerCase();
+  return Boolean(configuredEmail && email.trim().toLowerCase() === configuredEmail);
+}
+
+export function canDeleteManagedAccount(actor: AuthenticatedUser, target: { id: string; email: string }): boolean {
+  return actor.id !== target.id && !isPrimaryAdminEmail(target.email);
+}
+
+function toEffectiveRole(email: string, _storedRole: string): StaffRole {
+  if (isPrimaryAdminEmail(email)) return 'ADMIN';
+  return 'STAFF';
+}
+
 /**
  * Reads Better Auth authenticated server session and loads staff profile from Drizzle DB.
  */
@@ -55,7 +69,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
             profile: {
               user_id: profile.userId,
               display_name: profile.displayName,
-              role: (profile.role === 'ADMIN' ? 'ADMIN' : 'ADMIN') as StaffRole,
+              role: toEffectiveRole(session.user.email, profile.role),
               team: profile.team || null,
               is_active: profile.isActive,
               created_at: profile.createdAt.toISOString(),
@@ -104,20 +118,22 @@ function assertRole(user: AuthenticatedUser | null, allowedRoles: StaffRole[] = 
 
 export async function requireStaff(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
   const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['ADMIN'], 'ADMIN');
+  return assertRole(user, ['ADMIN', 'STAFF'], 'STAFF');
 }
 
 export async function requireTeamLead(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
-  const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['ADMIN'], 'ADMIN');
+  return requireAdmin(userOverride);
 }
 
 export async function requireAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
   const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['ADMIN'], 'ADMIN');
+  const authenticated = assertRole(user, ['ADMIN'], 'ADMIN');
+  if (!isPrimaryAdminEmail(authenticated.email)) {
+    throw new Error('FORBIDDEN');
+  }
+  return authenticated;
 }
 
 export async function requireSuperAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
-  const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['ADMIN'], 'ADMIN');
+  return requireAdmin(userOverride);
 }
