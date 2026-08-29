@@ -3,7 +3,7 @@
   "crons": [
     {
       "path": "/api/cron/donor-preparation-reminder",
-      "schedule": "0 2,3,4 14 9 *"
+      "schedule": "0 2 14 9 *"
     }
   ]
 }

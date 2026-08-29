@@ -1,27 +1,19 @@
 import { test, expect } from '@playwright/test';
 
-async function addStaffAuth(page: import('@playwright/test').Page, request: import('@playwright/test').APIRequestContext) {
-  let response = await request.post('/api/auth/sign-in/email', {
-    data: { email: 'monai.yut@student.mahidol.edu', password: 'loveunit2026' },
-  });
-  if (response.status() !== 200) {
-    await new Promise((r) => setTimeout(r, 500));
-    response = await request.post('/api/auth/sign-in/email', {
-      data: { email: 'monai.yut@student.mahidol.edu', password: 'loveunit2026' },
-    });
-  }
-  expect(response.status(), await response.text()).toBe(200);
-  const setCookieHeaders = response.headersArray().filter((h) => h.name.toLowerCase() === 'set-cookie');
-  const baseUrl = process.env.E2E_BASE_URL || 'http://localhost:3003';
-  const cookiesToAdd = setCookieHeaders.map((h) => {
-    const parts = h.value.split(';')[0];
-    const eqIdx = parts.indexOf('=');
-    const name = parts.slice(0, eqIdx);
-    const value = parts.slice(eqIdx + 1);
-    return { name, value, url: baseUrl };
-  });
-  if (cookiesToAdd.length > 0) {
-    await page.context().addCookies(cookiesToAdd);
+async function loginStaff(page: import('@playwright/test').Page) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    await page.goto('/staff/login');
+    await page.waitForLoadState('networkidle').catch(() => {});
+    if (page.url().includes('/mt70') || page.url().includes('/admin') || page.url().includes('/staff/checkin') || page.url().includes('/staff/walk-in') || page.url().includes('/staff/overview')) break;
+    const emailInput = page.locator('#staff-email');
+    if (await emailInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await emailInput.fill('monai.yut@student.mahidol.edu');
+      await page.locator('#staff-password').fill('loveunit2026');
+      await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
+      await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70|staff\/overview|staff\/walk-in)/, { timeout: 15_000 }).catch(() => {});
+    }
+    if (!page.url().includes('/staff/login')) break;
+    await page.waitForTimeout(300);
   }
 }
 
@@ -47,8 +39,8 @@ test.describe('WCAG 2.2 AA baseline', () => {
     expect(mobileNavBoxes.every((box) => box.width >= 44 && box.height >= 44)).toBe(true);
   });
 
-  test('staff walk-in exposes the donor type picker as a keyboard-ready radio group', async ({ page, request }) => {
-    await addStaffAuth(page, request);
+  test('staff walk-in exposes the donor type picker as a keyboard-ready radio group', async ({ page }) => {
+    await loginStaff(page);
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/staff/walk-in');
@@ -61,8 +53,8 @@ test.describe('WCAG 2.2 AA baseline', () => {
     expect(boxes.every((height) => height >= 44)).toBe(true);
   });
 
-  test('admin destructive dialog keeps keyboard focus inside while it is open', async ({ page, request }) => {
-    await addStaffAuth(page, request);
+  test('admin destructive dialog keeps keyboard focus inside while it is open', async ({ page }) => {
+    await loginStaff(page);
 
     await page.goto('/mt70/registrations');
     await page.getByRole('button', { name: 'เริ่มเลข Registration Code ใหม่' }).click();
@@ -76,8 +68,8 @@ test.describe('WCAG 2.2 AA baseline', () => {
     }
   });
 
-  test('staff invitation dialog has modal semantics and labelled fields', async ({ page, request }) => {
-    await addStaffAuth(page, request);
+  test('staff invitation dialog has modal semantics and labelled fields', async ({ page }) => {
+    await loginStaff(page);
 
     await page.goto('/mt70/staff');
     await page.getByRole('button', { name: 'เชิญ Staff' }).click();
@@ -88,8 +80,8 @@ test.describe('WCAG 2.2 AA baseline', () => {
     await expect(dialog.getByLabel('ฝ่าย / ทีม')).toBeVisible();
   });
 
-  test('staff scan opens as a non-scrolling full-screen camera workspace', async ({ page, request }) => {
-    await addStaffAuth(page, request);
+  test('staff scan opens as a non-scrolling full-screen camera workspace', async ({ page }) => {
+    await loginStaff(page);
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/staff/checkin');
