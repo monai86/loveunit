@@ -151,7 +151,7 @@ export function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs"
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs"
             aria-label={isTh ? 'เปิดเมนูหลัก' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
             aria-controls="public-mobile-menu"

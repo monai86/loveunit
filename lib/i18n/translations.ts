@@ -42,7 +42,7 @@ export const TRANSLATIONS = {
     },
     step1Title: { th: 'ข้อมูลส่วนตัว', en: 'Personal Information' },
     step1Sub: { th: 'ใช้เวลาลงทะเบียนประมาณ 2 นาที', en: 'Takes approx. 2 minutes' },
-    step2Title: { th: 'สังกัดและคณะ', en: 'Affiliation & Faculty' },
+    step2Title: { th: 'สังกัดและสถานภาพ', en: 'Affiliation & Status' },
     step2Sub: { th: 'เลือกสถานะและประสบการณ์การบริจาค', en: 'Select status and donation experience' },
     step3Title: { th: 'รอบเวลาเดินทาง', en: 'Arrival Time Slot' },
     step3Sub: { th: 'เลือกรอบเวลาที่คุณสะดวกเดินทางมาถึง', en: 'Choose your preferred arrival window' },
@@ -62,7 +62,7 @@ export const TRANSLATIONS = {
     emailHelp: { th: '* ระบบจะส่งอีเมลยืนยันพร้อม QR Code ให้ที่อีเมลนี้ (ถ้าระบุ)', en: '* A confirmation email with QR Code will be sent here if provided' },
     
     // Step 2 Form
-    section2: { th: '02. สังกัดและคณะ', en: '02. Affiliation & Faculty' },
+    section2: { th: '02. สังกัดและสถานภาพ', en: '02. Affiliation & Status' },
     participantType: { th: 'ประเภทผู้เข้าร่วม', en: 'Participant Category' },
     typeStudent: { th: 'นักศึกษา ม.มหิดล', en: 'Mahidol Student' },
     typeStaff: { th: 'บุคลากร ม.มหิดล', en: 'Mahidol Staff' },
