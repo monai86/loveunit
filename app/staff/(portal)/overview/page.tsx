@@ -88,7 +88,7 @@ export default function StaffOverviewPage() {
   ];
 
   return (
-    <main className="mx-auto max-w-7xl space-y-5 px-4 py-5 pb-28 sm:px-6 lg:py-7 lg:pb-7">
+    <main className="mx-auto max-w-7xl space-y-5 px-4 py-5 pb-[calc(7.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:py-7 lg:pb-7">
       <header className="flex flex-col gap-4 border-b border-[var(--line)] pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="flex items-center gap-2 text-xs font-bold text-[var(--burgundy-700)]"><span className="h-2 w-2 rounded-full bg-emerald-500" />MUMT LoveUnit · หน้างาน</p>
@@ -115,7 +115,6 @@ export default function StaffOverviewPage() {
         </div>
         {loading ? <div className="flex min-h-56 items-center justify-center gap-2 text-sm font-bold text-[var(--muted)]"><Loader2 className="h-5 w-5 animate-spin" />กำลังโหลดรายชื่อ…</div> : error ? <div className="p-8 text-center text-sm font-bold text-red-700">{error}</div> : visibleRows.length === 0 ? <div className="p-10 text-center text-sm font-bold text-[var(--muted)]">ไม่พบรายชื่อที่ตรงกับเงื่อนไข</div> : <><div className="hidden overflow-x-auto md:block"><table className="w-full text-left"><thead className="bg-[var(--bg)] text-xs text-[var(--muted)]"><tr><th className="px-5 py-3 font-bold">รหัส</th><th className="px-5 py-3 font-bold">ชื่อ-นามสกุล</th><th className="px-5 py-3 font-bold">รอบเวลา</th><th className="px-5 py-3 font-bold">สถานะ</th></tr></thead><tbody className="divide-y divide-[var(--line)]">{visibleRows.map((row) => { const badge = getRegistrationStatusBadge(row.status); return <tr key={row.id}><td className="px-5 py-4 font-mono text-xs font-bold text-[var(--burgundy-700)]">{row.registrationCode}</td><td className="px-5 py-4 text-sm font-bold text-[var(--ink)]">{row.firstName} {row.lastName}</td><td className="px-5 py-4 text-sm text-[var(--muted)]">{row.timeSlotText}</td><td className="px-5 py-4"><span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-bold ${badge.colorClass}`}>{badge.label}</span></td></tr>; })}</tbody></table></div><div className="divide-y divide-[var(--line)] md:hidden">{visibleRows.map((row) => { const badge = getRegistrationStatusBadge(row.status); return <article key={row.id} className="flex items-center justify-between gap-3 p-4"><div className="min-w-0"><p className="font-mono text-[11px] font-bold text-[var(--burgundy-700)]">{row.registrationCode}</p><h3 className="mt-1 truncate text-sm font-black text-[var(--ink)]">{row.firstName} {row.lastName}</h3><p className="mt-1 text-xs text-[var(--muted)]">{row.timeSlotText}</p></div><span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-bold ${badge.colorClass}`}>{badge.label}</span></article>; })}</div></>}
       </section>
-      <Link href="/staff/checkin" className="fixed bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] right-4 z-40 inline-flex min-h-12 items-center gap-2 rounded-full bg-[var(--burgundy-700)] px-4 text-sm font-black text-white shadow-lg md:hidden"><Activity className="h-4 w-4" />สแกน QR</Link>
     </main>
   );
 }

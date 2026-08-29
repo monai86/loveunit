@@ -77,7 +77,7 @@ export default function StaffWalkInPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-2xl px-4 pt-6 pb-[calc(7.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:pb-12">
       
       {/* Top Navigation */}
       <div className="flex items-center justify-between border-b border-[var(--line)] pb-4">
