@@ -12,12 +12,13 @@ async function addStaffAuth(page: import('@playwright/test').Page, request: impo
   }
   expect(response.status(), await response.text()).toBe(200);
   const setCookieHeaders = response.headersArray().filter((h) => h.name.toLowerCase() === 'set-cookie');
+  const baseUrl = process.env.E2E_BASE_URL || 'http://localhost:3003';
   const cookiesToAdd = setCookieHeaders.map((h) => {
     const parts = h.value.split(';')[0];
     const eqIdx = parts.indexOf('=');
     const name = parts.slice(0, eqIdx);
     const value = parts.slice(eqIdx + 1);
-    return { name, value, domain: 'localhost', path: '/' };
+    return { name, value, url: baseUrl };
   });
   if (cookiesToAdd.length > 0) {
     await page.context().addCookies(cookiesToAdd);
