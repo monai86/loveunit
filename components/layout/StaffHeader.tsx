@@ -23,6 +23,7 @@ export function StaffHeader() {
   if (
     pathname.startsWith('/staff/login') ||
     pathname.startsWith('/staff/change-password') ||
+    pathname.startsWith('/staff/apply') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/mt70') ||
     !pathname.startsWith('/staff')
