@@ -29,12 +29,28 @@ function isSmtpConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
 
+function getPublicAppUrl(): string {
+  if (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes('localhost')) {
+    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '');
+  }
+  if (process.env.BETTER_AUTH_URL && !process.env.BETTER_AUTH_URL.includes('localhost')) {
+    return process.env.BETTER_AUTH_URL.replace(/\/$/, '');
+  }
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL.replace(/\/$/, '')}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL.replace(/\/$/, '')}`;
+  }
+  return (process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || 'https://mumt-loveunit.vercel.app').replace(/\/$/, '');
+}
+
 export async function sendStaffInvitation(input: { to: string; displayName: string; token: string }): Promise<void> {
   if (!isSmtpConfigured()) {
     throw new Error('SMTP is not configured. Configure SMTP before sending staff invitations.');
   }
 
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const appUrl = getPublicAppUrl();
   const invitationUrl = `${appUrl}/staff/invite/${encodeURIComponent(input.token)}`;
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -60,7 +76,7 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
     ? formatTimeRange(input.slot.startAt || input.slot.start_at || '', input.slot.endAt || input.slot.end_at || '')
     : '09:00 – 14:00 น.';
 
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const appUrl = getPublicAppUrl();
   const eventDate = escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569');
   const venue = escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา');
   const recipient = escapeHtml(`${input.firstName} ${input.lastName}`);
@@ -237,6 +253,23 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                   </table>
                 </div>
 
+                <!-- Event Poster Section -->
+                <div style="margin:26px 0 0;">
+                  <p style="margin:0 0 10px;font-size:14.5px;font-weight:800;color:#0F172A;letter-spacing:-0.01em;">
+                    📢 โปสเตอร์ประชาสัมพันธ์ / Event Poster
+                  </p>
+                  <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;padding:14px;text-align:center;">
+                    <a href="${appUrl}/poster" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;">
+                      <img src="${appUrl}/images/poster-th.jpg" alt="MUMT LoveUnit ครั้งที่ 9 โปสเตอร์กิจกรรมบริจาคโลหิต" width="500" style="width:100%;max-width:500px;height:auto;border-radius:12px;display:block;margin:0 auto;box-shadow:0 4px 14px rgba(0,0,0,0.06);border:1px solid #E2E8F0;" />
+                    </a>
+                    <p style="margin:10px 0 2px;font-size:11.5px;color:#64748B;font-weight:600;">
+                      <a href="${appUrl}/poster" target="_blank" rel="noopener noreferrer" style="color:#7A1222;text-decoration:none;font-weight:700;">
+                        🔍 ดูโปสเตอร์ฉบับเต็ม / View Full Poster &rarr;
+                      </a>
+                    </p>
+                  </div>
+                </div>
+
                 <!-- Action Button -->
                 <div style="margin:28px 0 6px;text-align:center;">
                   <a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:linear-gradient(135deg, #C5222F 0%, #A6192E 100%);background-color:#A6192E;color:#FFFFFF;text-decoration:none;padding:14px 32px;border-radius:9999px;font-size:14px;font-weight:700;letter-spacing:.02em;box-shadow:0 4px 14px rgba(166,25,46,0.25);">
@@ -285,7 +318,7 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
   const timeSlot = input.slot
     ? formatTimeRange(input.slot.startAt || input.slot.start_at || '', input.slot.endAt || input.slot.end_at || '')
     : '09:00 – 14:00 น.';
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const appUrl = getPublicAppUrl();
   const eventDate = escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569');
   const venue = escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา');
   const recipient = escapeHtml(`${input.firstName} ${input.lastName}`);
@@ -410,6 +443,23 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
                       </td>
                     </tr>
                   </table>
+                </div>
+
+                <!-- Event Poster Section -->
+                <div style="margin:26px 0 0;">
+                  <p style="margin:0 0 10px;font-size:14.5px;font-weight:800;color:#0F172A;letter-spacing:-0.01em;">
+                    📢 โปสเตอร์กิจกรรม / Event Poster
+                  </p>
+                  <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;padding:14px;text-align:center;">
+                    <a href="${appUrl}/poster" target="_blank" rel="noopener noreferrer" style="display:block;text-decoration:none;">
+                      <img src="${appUrl}/images/poster-th.jpg" alt="MUMT LoveUnit ครั้งที่ 9 โปสเตอร์กิจกรรมบริจาคโลหิต" width="500" style="width:100%;max-width:500px;height:auto;border-radius:12px;display:block;margin:0 auto;box-shadow:0 4px 14px rgba(0,0,0,0.06);border:1px solid #E2E8F0;" />
+                    </a>
+                    <p style="margin:10px 0 2px;font-size:11.5px;color:#64748B;font-weight:600;">
+                      <a href="${appUrl}/poster" target="_blank" rel="noopener noreferrer" style="color:#7A1222;text-decoration:none;font-weight:700;">
+                        🔍 ดูโปสเตอร์ฉบับเต็ม / View Full Poster &rarr;
+                      </a>
+                    </p>
+                  </div>
                 </div>
 
                 <!-- QR Code Preview -->
@@ -544,4 +594,3 @@ export async function sendDonorPreparationReminder(input: ConfirmationInput): Pr
     };
   }
 }
-
