@@ -43,6 +43,13 @@
       "when": 1787979000000,
       "tag": "0005_remove_legacy_staff_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787979600000,
+      "tag": "0006_set_primary_admin_password",
+      "breakpoints": true
     }
   ]
 }

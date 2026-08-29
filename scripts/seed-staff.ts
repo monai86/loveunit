@@ -8,7 +8,7 @@ loadEnvLocal();
 const ACCOUNTS: Array<{ email: string; password: string; displayName: string; role: 'SUPER_ADMIN'; team: string }> = [
   {
     email: 'monai.yut@student.mahidol.edu',
-    password: 'Admin@MUMT2026',
+    password: 'loveunit2026',
     displayName: 'ผู้ดูแลระบบ MUMT',
     role: 'SUPER_ADMIN',
     team: 'Management',
