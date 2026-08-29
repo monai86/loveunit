@@ -75,11 +75,18 @@ export default function AdminRegistrationsPage() {
   const [filterType, setFilterType] = useState<string>('ALL');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [filterExperience, setFilterExperience] = useState<string>('ALL');
+  const [canManage, setCanManage] = useState(false);
   const [editingRow, setEditingRow] = useState<Registration | null>(null);
   const [editForm, setEditForm] = useState({ firstName: '', lastName: '', phone: '', email: '' });
   const [editError, setEditError] = useState('');
   const [editSubmitting, setEditSubmitting] = useState(false);
   const editTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    fetch('/api/auth/me').then((res) => res.json()).then((data) => {
+      setCanManage(data?.user?.profile?.role === 'SUPER_ADMIN');
+    }).catch(() => setCanManage(false));
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -334,12 +341,12 @@ export default function AdminRegistrationsPage() {
                         <Eye className="h-3.5 w-3.5" />
                         <span>ดูบัตร</span>
                       </Link>
-                      <button type="button" onClick={(event) => openEditModal(row, event.currentTarget)} className="inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
+                      {canManage && <button type="button" onClick={(event) => openEditModal(row, event.currentTarget)} className="inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
                         <Edit2 className="h-3.5 w-3.5" /><span>แก้ไข</span>
-                      </button>
-                      <button type="button" onClick={() => deleteDonor(row)} className="inline-flex items-center gap-1 font-bold text-red-700 hover:underline">
+                      </button>}
+                      {canManage && <button type="button" onClick={() => deleteDonor(row)} className="inline-flex items-center gap-1 font-bold text-red-700 hover:underline">
                         <Trash2 className="h-3.5 w-3.5" /><span>ลบ</span>
-                      </button>
+                      </button>}
                     </div>
                   </div>
                 );
@@ -399,12 +406,12 @@ export default function AdminRegistrationsPage() {
                             <Eye className="h-3.5 w-3.5" />
                             <span>ดูบัตร</span>
                           </Link>
-                          <button type="button" onClick={(event) => openEditModal(row, event.currentTarget)} className="ml-3 inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
+                          {canManage && <button type="button" onClick={(event) => openEditModal(row, event.currentTarget)} className="ml-3 inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
                             <Edit2 className="h-3.5 w-3.5" /><span>แก้ไข</span>
-                          </button>
-                          <button type="button" onClick={() => deleteDonor(row)} className="ml-3 inline-flex items-center gap-1 font-bold text-red-700 hover:underline">
+                          </button>}
+                          {canManage && <button type="button" onClick={() => deleteDonor(row)} className="ml-3 inline-flex items-center gap-1 font-bold text-red-700 hover:underline">
                             <Trash2 className="h-3.5 w-3.5" /><span>ลบ</span>
-                          </button>
+                          </button>}
                         </td>
                       </tr>
                     );

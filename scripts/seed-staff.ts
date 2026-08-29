@@ -5,27 +5,13 @@ import { loadEnvLocal } from './lib/env';
 
 loadEnvLocal();
 
-const ACCOUNTS: Array<{ email: string; password: string; displayName: string; role: 'ADMIN'; team: string }> = [
+const ACCOUNTS: Array<{ email: string; password: string; displayName: string; role: 'SUPER_ADMIN'; team: string }> = [
   {
-    email: 'admin@mahidol.ac.th',
+    email: 'monai.yut@student.mahidol.edu',
     password: 'Admin@MUMT2026',
     displayName: 'ผู้ดูแลระบบ MUMT',
-    role: 'ADMIN',
+    role: 'SUPER_ADMIN',
     team: 'Management',
-  },
-  {
-    email: 'staff@mahidol.ac.th',
-    password: 'Staff@MUMT2026',
-    displayName: 'เจ้าหน้าที่จุดเช็คอิน',
-    role: 'ADMIN',
-    team: 'Operations',
-  },
-  {
-    email: 'lead@mahidol.ac.th',
-    password: 'Lead@MUMT2026',
-    displayName: 'หัวหน้าทีมปฏิบัติการ',
-    role: 'ADMIN',
-    team: 'Operations',
   },
 ];
 
@@ -39,14 +25,6 @@ async function main() {
   if (!db) {
     console.error('❌ DATABASE_URL not set — cannot seed.');
     process.exit(1);
-  }
-
-  // Update any existing staff profiles in DB to role = 'ADMIN'
-  try {
-    await db.update(staffProfiles).set({ role: 'ADMIN' });
-    console.log('🔄 All existing profiles normalized to role [ADMIN].');
-  } catch (e) {
-    console.warn('⚠️ Profile normalization warning:', e);
   }
 
   for (const acc of ACCOUNTS) {
@@ -111,22 +89,22 @@ async function main() {
     if (profile) {
       await db
         .update(staffProfiles)
-        .set({ displayName: acc.displayName, role: 'ADMIN', team: acc.team, isActive: true })
+        .set({ displayName: acc.displayName, role: acc.role, team: acc.team, isActive: true })
         .where(eq(staffProfiles.userId, userId));
-      console.log(`ℹ️  Profile updated for ${acc.email} (ADMIN)`);
+        console.log(`ℹ️  Profile updated for ${acc.email} (${acc.role})`);
     } else {
       await db.insert(staffProfiles).values({
         userId,
         displayName: acc.displayName,
-        role: 'ADMIN',
+        role: acc.role,
         team: acc.team,
         isActive: true,
       });
-      console.log(`✅ Profile created for ${acc.email} (ADMIN)`);
+      console.log(`✅ Profile created for ${acc.email} (${acc.role})`);
     }
   }
 
-  console.log('\n🎉 Admin account ready (admin@mahidol.ac.th / Admin@MUMT2026)!');
+  console.log('\n🎉 Super Admin account ready (monai.yut@student.mahidol.edu)!');
   process.exit(0);
 }
 

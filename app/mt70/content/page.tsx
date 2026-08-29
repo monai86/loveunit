@@ -12,8 +12,12 @@ export default function AdminContentPage() {
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [canManage, setCanManage] = useState(false);
 
   useEffect(() => {
+    fetch('/api/auth/me').then((res) => res.json()).then((data) => {
+      setCanManage(data?.user?.profile?.role === 'SUPER_ADMIN');
+    }).catch(() => setCanManage(false));
     async function loadContent() {
       try {
         setLoading(true);
@@ -81,9 +85,10 @@ export default function AdminContentPage() {
         <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] font-display">
           จัดการสื่อ & โปสเตอร์ประชาสัมพันธ์
         </h1>
-        <p className="mt-0.5 text-xs text-[var(--muted)] font-medium">
+      <p className="mt-0.5 text-xs text-[var(--muted)] font-medium">
           MUMT LoveUnit ครั้งที่ 9
         </p>
+        {!canManage && <p className="mt-2 text-sm font-medium text-blue-800">บัญชีนี้ดูข้อมูลได้อย่างเดียว การแก้ไขสื่อทำได้โดย Super Admin</p>}
       </div>
 
       {successMsg && (
@@ -123,6 +128,7 @@ export default function AdminContentPage() {
                       type="checkbox"
                       checked={block.is_visible}
                       onChange={(e) => handleUpdateBlock(block.content_key, 'is_visible', e.target.checked)}
+                      disabled={!canManage}
                       className="rounded border-gray-300 text-[var(--burgundy-700)] focus:ring-[var(--burgundy-700)]"
                     />
                     แสดงผลสาธารณะ
@@ -131,7 +137,7 @@ export default function AdminContentPage() {
                   <button
                     type="button"
                     onClick={() => handleSaveBlock(block)}
-                    disabled={savingKey === block.content_key}
+                    disabled={!canManage || savingKey === block.content_key}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--burgundy-700)] px-4 py-3.5 text-xs font-bold text-white shadow hover:bg-[var(--burgundy-900)] disabled:opacity-50"
                   >
                     {savingKey === block.content_key ? (
@@ -158,6 +164,7 @@ export default function AdminContentPage() {
                       type="text"
                       value={block.title}
                       onChange={(e) => handleUpdateBlock(block.content_key, 'title', e.target.value)}
+                      disabled={!canManage}
                       className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
                     />
                   </div>
@@ -169,6 +176,7 @@ export default function AdminContentPage() {
                       rows={2}
                       value={block.description || ''}
                       onChange={(e) => handleUpdateBlock(block.content_key, 'description', e.target.value)}
+                      disabled={!canManage}
                       className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
                     />
                   </div>
@@ -181,6 +189,7 @@ export default function AdminContentPage() {
                       placeholder="https://example.com/images/poster.png หรือ /images/poster.png"
                       value={block.image_url || ''}
                       onChange={(e) => handleUpdateBlock(block.content_key, 'image_url', e.target.value)}
+                      disabled={!canManage}
                       className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
                     />
                   </div>

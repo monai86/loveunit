@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
 import { getEventBySlug } from '@/services/event-service';
 import { getAllRegistrations, getDashboardKPIs, recordAuditLog } from '@/services/admin-service';
-import { requireAdmin } from '@/lib/auth/server';
+import { requireReadOnlyAdmin } from '@/lib/auth/server';
 import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
 
 function pick<T>(obj: Record<string, T>, camel: string, snake: string): T | undefined {
@@ -27,7 +27,7 @@ export async function GET() {
   try {
     let currentUser;
     try {
-      currentUser = await requireAdmin();
+      currentUser = await requireReadOnlyAdmin();
     } catch (err: unknown) {
       const status = (err as Error).message === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์ส่งออกข้อมูลผู้ลงทะเบียน' }, { status });

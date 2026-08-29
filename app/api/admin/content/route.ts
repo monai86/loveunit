@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 import { getEventBySlug } from '@/services/event-service';
 import { getAdminContentBlocks, updateEventContentBlock } from '@/services/content-service';
 import { recordAuditLog } from '@/services/admin-service';
-import { requireAdmin } from '@/lib/auth/server';
+import { requireAdmin, requireReadOnlyAdmin } from '@/lib/auth/server';
 import { getErrorMessage } from '@/lib/utils/format';
 
 export async function GET() {
   try {
     try {
-      await requireAdmin();
+      await requireReadOnlyAdmin();
     } catch (err: unknown) {
       const status = getErrorMessage(err) === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์เข้าถึงส่วนจัดการเนื้อหา' }, { status });

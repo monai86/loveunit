@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const user = await getAuthenticatedUser();
 
   // Non-admin or no session → staff login page.
-  if (!user || user.profile.role !== 'ADMIN') {
+  if (!user || !['SUPER_ADMIN', 'ADMIN'].includes(user.profile.role)) {
     redirect('/staff/login');
   }
 

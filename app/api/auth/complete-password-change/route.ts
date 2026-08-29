@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const me = await getAuthenticatedUser();
     return NextResponse.json({
       success: true,
-      redirect: me?.profile?.role === 'ADMIN' ? '/mt70' : '/staff/checkin',
+      redirect: typeof me?.profile?.role === 'string' && ['SUPER_ADMIN', 'ADMIN'].includes(me.profile.role) ? '/mt70' : '/staff/checkin',
     });
   } catch (err) {
     const message = (err as Error)?.message || '';

@@ -25,7 +25,11 @@ interface Props {
   initialStaffList?: StaffListItem[];
 }
 
-export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }: Props) {
+interface StaffApplication {
+  id: string; referenceCode: string; status: string; email: string; displayName: string; team: string; rejectionReason: string | null;
+}
+
+export function StaffRoleManagement({ currentUserRole, currentUserEmail, initialStaffList = [] }: Props) {
   const [staffList, setStaffList] = useState<StaffListItem[]>(initialStaffList);
   const [loading, setLoading] = useState(initialStaffList.length === 0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +46,10 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [applications, setApplications] = useState<StaffApplication[]>([]);
+  const [reviewPassword, setReviewPassword] = useState<Record<string, string>>({});
+  const [reviewReason, setReviewReason] = useState<Record<string, string>>({});
+  const [reviewError, setReviewError] = useState('');
 
   const fetchStaff = useCallback(async () => {
     setLoading(true);
@@ -51,12 +59,17 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
       if (data.success && data.staff) {
         setStaffList(data.staff);
       }
+      if (data.success && currentUserRole === 'SUPER_ADMIN') {
+        const appRes = await fetch('/api/admin/staff-applications');
+        const appData = await appRes.json();
+        if (appData.success) setApplications(appData.applications || []);
+      }
     } catch {
       // Ignored
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentUserRole]);
 
   useEffect(() => {
     let ignore = false;
@@ -77,6 +90,13 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
       ignore = true;
     };
   }, [initialStaffList.length]);
+
+  useEffect(() => {
+    if (currentUserRole !== 'SUPER_ADMIN') return;
+    fetch('/api/admin/staff-applications').then((res) => res.json()).then((data) => {
+      if (data.success) setApplications(data.applications || []);
+    }).catch(() => {});
+  }, [currentUserRole]);
 
   const handleOpenCreate = () => {
     setEditingStaff(null);
@@ -181,6 +201,21 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
   });
 
   const activeCount = staffList.filter((s) => s.isActive).length;
+  const canManage = currentUserRole === 'SUPER_ADMIN';
+  const pendingApplications = applications.filter((application) => application.status === 'PENDING');
+
+  const reviewApplication = async (application: StaffApplication, action: 'APPROVE' | 'REJECT') => {
+    setReviewError('');
+    const body = action === 'APPROVE'
+      ? { action, initialPassword: reviewPassword[application.id] || '' }
+      : { action, reason: reviewReason[application.id] || '' };
+    try {
+      const res = await fetch(`/api/admin/staff-applications/${application.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok || !data.success) { setReviewError(data.message || 'ไม่สามารถดำเนินการกับคำขอได้'); return; }
+      setApplications((current) => current.map((item) => item.id === application.id ? { ...item, status: action === 'APPROVE' ? 'APPROVED' : 'REJECTED', rejectionReason: action === 'REJECT' ? (reviewReason[application.id] || null) : null } : item));
+    } catch { setReviewError('ไม่สามารถเชื่อมต่อระบบได้'); }
+  };
 
   return (
     <div className="space-y-4">
@@ -209,16 +244,30 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
             <span>รีเฟรช</span>
           </button>
 
-          <button
+          {canManage && <button
             type="button"
             onClick={handleOpenCreate}
             className="editorial-btn-primary py-2 px-3.5 text-xs flex items-center gap-1.5 shadow-2xs"
           >
             <UserPlus className="h-4 w-4" />
             <span>เชิญ Staff</span>
-          </button>
+          </button>}
         </div>
       </div>
+
+      {!canManage && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-900">
+          บัญชีนี้มีสิทธิ์ดูข้อมูลเท่านั้น การเพิ่ม แก้ไข ระงับ หรือลบบัญชีทำได้โดย Super Admin
+        </div>
+      )}
+
+      {canManage && pendingApplications.length > 0 && (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-3">
+          <div><h3 className="text-base font-black text-amber-950">คำขอสมัคร Staff ({pendingApplications.length})</h3><p className="text-xs text-amber-800">ตรวจสอบข้อมูลและตั้งรหัสผ่านเริ่มต้นก่อนอนุมัติ</p></div>
+          {reviewError && <p role="alert" className="rounded-lg bg-red-100 px-3 py-2 text-xs font-medium text-red-800">{reviewError}</p>}
+          {pendingApplications.map((application) => <div key={application.id} className="rounded-xl border border-amber-200 bg-white p-3"><div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-bold text-sm text-[var(--ink)]">{application.displayName}</p><p className="font-mono text-xs text-gray-500">{application.email} · {application.team}</p><p className="font-mono text-[11px] text-amber-700">{application.referenceCode}</p></div><div className="flex flex-col gap-2 sm:flex-row"><input aria-label={`รหัสผ่านเริ่มต้น ${application.displayName}`} type="password" minLength={8} placeholder="รหัสผ่านเริ่มต้น (8+ ตัว)" value={reviewPassword[application.id] || ''} onChange={(e) => setReviewPassword((v) => ({ ...v, [application.id]: e.target.value }))} className="rounded-lg border border-[var(--line)] px-2 py-2 text-xs" /><button type="button" onClick={() => void reviewApplication(application, 'APPROVE')} className="rounded-lg bg-emerald-700 px-3 py-2 text-xs font-bold text-white">อนุมัติ</button></div></div><div className="mt-2 flex gap-2"><input aria-label={`เหตุผลปฏิเสธ ${application.displayName}`} placeholder="เหตุผลปฏิเสธ (ถ้าปฏิเสธ)" value={reviewReason[application.id] || ''} onChange={(e) => setReviewReason((v) => ({ ...v, [application.id]: e.target.value }))} className="min-w-0 flex-1 rounded-lg border border-[var(--line)] px-2 py-2 text-xs" /><button type="button" onClick={() => void reviewApplication(application, 'REJECT')} className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700">ปฏิเสธ</button></div></div>)}
+        </section>
+      )}
 
       {/* Summary Pill & Search */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -280,16 +329,16 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
                   </div>
 
                   <div className="flex items-center justify-between pt-1 border-t border-gray-50 text-xs">
-                    <span className="text-gray-500 text-[11px]">{staff.role === 'ADMIN' ? 'Admin' : 'Staff'} · ฝ่าย: {staff.team || 'Management'}</span>
-                    <button
+                    <span className="text-gray-500 text-[11px]">{staff.role === 'SUPER_ADMIN' ? 'Super Admin' : staff.role === 'ADMIN' ? 'Admin (ดูอย่างเดียว)' : 'Staff'} · ฝ่าย: {staff.team || 'Management'}</span>
+                    {canManage && <button
                       type="button"
                       onClick={() => handleOpenEdit(staff)}
                       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[var(--line)] bg-gray-50 hover:bg-gray-100 text-xs font-bold text-[var(--ink)]"
                     >
                       <Edit2 className="h-3 w-3 text-gray-500" />
                       <span>แก้ไข / รหัสผ่าน</span>
-                    </button>
-                    {canDelete(staff) && <button type="button" onClick={() => handleDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700">
+                    </button>}
+                    {canManage && canDelete(staff) && <button type="button" onClick={() => handleDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700">
                       <Trash2 className="h-3 w-3" /><span>ลบ</span>
                     </button>}
                   </div>
@@ -325,7 +374,7 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${staff.role === 'ADMIN' ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'bg-gray-100 text-gray-700'}`}>
-                          {staff.role === 'ADMIN' ? 'Admin' : 'Staff'}
+                          {staff.role === 'SUPER_ADMIN' ? 'Super Admin' : staff.role === 'ADMIN' ? 'Admin (ดูอย่างเดียว)' : 'Staff'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-600 font-medium whitespace-nowrap">
@@ -345,15 +394,15 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
                         )}
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <button
+                        {canManage && <button
                           type="button"
                           onClick={() => handleOpenEdit(staff)}
                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[var(--line)] bg-white hover:bg-gray-50 text-xs font-bold text-[var(--ink)] transition-colors shadow-2xs"
                         >
                           <Edit2 className="h-3 w-3 text-gray-500" />
                           <span>แก้ไข / รหัสผ่าน</span>
-                        </button>
-                        {canDelete(staff) && <button type="button" onClick={() => handleDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700 transition-colors shadow-2xs">
+                        </button>}
+                        {canManage && canDelete(staff) && <button type="button" onClick={() => handleDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700 transition-colors shadow-2xs">
                           <Trash2 className="h-3 w-3" /><span>ลบ</span>
                         </button>}
                       </td>

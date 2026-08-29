@@ -158,7 +158,7 @@ Example:
     .set({ mustChangePassword: false })
     .where(eq(user.id, userId));
 
-  // Update or insert staff profile with role = 'ADMIN'
+  // Update or insert the single primary profile with role = 'SUPER_ADMIN'
   const [profile] = await db
     .select()
     .from(staffProfiles)
@@ -170,22 +170,22 @@ Example:
       .update(staffProfiles)
       .set({
         displayName,
-        role: 'ADMIN',
+        role: 'SUPER_ADMIN',
         team,
         isActive: true,
         updatedAt: new Date(),
       })
       .where(eq(staffProfiles.userId, userId));
-    console.log(`✅ Updated staff profile to role: [ADMIN] (${displayName})`);
+    console.log(`✅ Updated staff profile to role: [SUPER_ADMIN] (${displayName})`);
   } else {
     await db.insert(staffProfiles).values({
       userId,
       displayName,
-      role: 'ADMIN',
+      role: 'SUPER_ADMIN',
       team,
       isActive: true,
     });
-    console.log(`✅ Created new staff profile with role: [ADMIN] (${displayName})`);
+    console.log(`✅ Created new staff profile with role: [SUPER_ADMIN] (${displayName})`);
   }
 
   // A primary admin is unique by policy. Existing accounts remain in the

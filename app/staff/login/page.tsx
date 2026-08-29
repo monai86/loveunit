@@ -27,7 +27,7 @@ export default function StaffLoginPage() {
   const redirectForRole = async () => {
     const me = await fetch('/api/auth/me');
     const data = await me.json();
-    window.location.href = data?.user?.profile?.role === 'ADMIN' ? '/mt70' : '/staff/checkin';
+    window.location.href = ['SUPER_ADMIN', 'ADMIN'].includes(data?.user?.profile?.role) ? '/mt70' : '/staff/checkin';
   };
 
   // Already signed in? Redirect to the matching portal.
@@ -134,7 +134,7 @@ export default function StaffLoginPage() {
                   type="email"
                   required
                   autoComplete="username email"
-                  placeholder="admin@mahidol.ac.th"
+                  placeholder="monai.yut@student.mahidol.edu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[var(--line)] bg-gray-50/50 focus:bg-white text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)] transition-all font-mono"
@@ -196,6 +196,10 @@ export default function StaffLoginPage() {
             </div>
 
           </form>
+
+          <div className="border-t border-[var(--line)] pt-4 text-center">
+            <Link href="/staff/apply" className="text-sm font-bold text-[var(--burgundy-700)] hover:underline">ยังไม่มีบัญชี? สมัครเป็น Staff</Link>
+          </div>
 
         </div>
 

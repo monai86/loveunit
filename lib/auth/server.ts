@@ -28,7 +28,7 @@ export function resolveActorId(actorId?: string | null): string | null {
 }
 
 const devProfiles: Record<string, StaffProfile> = {
-  'admin@mahidol.ac.th': { user_id: 'u-admin', display_name: 'ผู้ดูแลระบบ (Admin)', role: 'ADMIN', team: 'Management', is_active: true, created_at: '', updated_at: '' },
+  'monai.yut@student.mahidol.edu': { user_id: 'u-primary-admin', display_name: 'Super Admin', role: 'SUPER_ADMIN', team: 'Management', is_active: true, created_at: '', updated_at: '' },
 };
 
 export function isPrimaryAdminEmail(email: string): boolean {
@@ -41,13 +41,13 @@ export function canDeleteManagedAccount(actor: AuthenticatedUser, target: { id: 
 }
 
 export function isStaffPortalRole(role: StaffRole): boolean {
-  return role === 'ADMIN' || role === 'STAFF';
+  return role === 'SUPER_ADMIN' || role === 'ADMIN' || role === 'STAFF';
 }
 
 function toEffectiveRole(email: string, storedRole: string): StaffRole {
-  // The configured owner is always an Admin for bootstrap/recovery, while
-  // every explicitly assigned ADMIN profile keeps its database role.
-  if (isPrimaryAdminEmail(email) || storedRole === 'ADMIN') return 'ADMIN';
+  if (isPrimaryAdminEmail(email)) return 'SUPER_ADMIN';
+  if (storedRole === 'SUPER_ADMIN') return 'ADMIN';
+  if (storedRole === 'ADMIN') return 'ADMIN';
   return 'STAFF';
 }
 
@@ -95,10 +95,10 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
   // exists (even in development) we require a real session — no synthetic admin.
   if (!db || process.env.DATA_BACKEND === 'memory' || process.env.NODE_ENV === 'test') {
     if (isMemoryBackendAllowed()) {
-      const devProfile = devProfiles['admin@mahidol.ac.th'];
+      const devProfile = devProfiles['monai.yut@student.mahidol.edu'];
       return {
         id: devProfile.user_id,
-        email: 'admin@mahidol.ac.th',
+        email: 'monai.yut@student.mahidol.edu',
         profile: devProfile,
         mustChangePassword: false,
       };
@@ -124,16 +124,21 @@ function assertRole(user: AuthenticatedUser | null, allowedRoles: StaffRole[] = 
 
 export async function requireStaff(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
   const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['ADMIN', 'STAFF'], 'STAFF');
+  return assertRole(user, ['SUPER_ADMIN', 'ADMIN', 'STAFF'], 'STAFF');
 }
 
 export async function requireTeamLead(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
-  return requireAdmin(userOverride);
+  return requireReadOnlyAdmin(userOverride);
 }
 
 export async function requireAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
   const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  return assertRole(user, ['ADMIN'], 'ADMIN');
+  return assertRole(user, ['SUPER_ADMIN'], 'SUPER_ADMIN');
+}
+
+export async function requireReadOnlyAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
+  const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
+  return assertRole(user, ['SUPER_ADMIN', 'ADMIN'], 'ADMIN');
 }
 
 export async function requireSuperAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {

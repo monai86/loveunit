@@ -219,12 +219,36 @@ export interface InMemoryStaffUser extends StaffProfile {
   email: string;
 }
 
+export type InMemoryStaffApplicationStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'EXPIRED';
+
+export interface InMemoryStaffApplication {
+  id: string;
+  reference_code: string;
+  email: string;
+  display_name: string;
+  team: string;
+  status: InMemoryStaffApplicationStatus;
+  rejection_reason: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  expires_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface InMemoryProvisionedStaffAccount {
+  userId: string;
+  email: string;
+  passwordHash: string;
+  mustChangePassword: boolean;
+}
+
 export const inMemoryStaffProfiles: InMemoryStaffUser[] = [
   {
-    user_id: 'u-admin',
-    email: 'admin@mahidol.ac.th',
-    display_name: 'ผู้ดูแลระบบ MUMT',
-    role: 'ADMIN',
+    user_id: 'u-primary-admin',
+    email: 'monai.yut@student.mahidol.edu',
+    display_name: 'Super Admin',
+    role: 'SUPER_ADMIN',
     team: 'Management & Ops',
     is_active: true,
     created_at: new Date(Date.now() - 86400000 * 20).toISOString(),
@@ -270,6 +294,40 @@ export async function upsertInMemoryStaff(params: {
 
   inMemoryStaffProfiles.push(newStaff);
   return newStaff;
+}
+
+/**
+ * Memory-only equivalents of the pending application and credential records.
+ * They let local development and unit tests exercise the same lifecycle as the
+ * PostgreSQL implementation without exposing a public registration path.
+ */
+export const inMemoryStaffApplications: InMemoryStaffApplication[] = [];
+const inMemoryProvisionedStaffAccounts: InMemoryProvisionedStaffAccount[] = [];
+
+export async function provisionInMemoryStaffAccount(params: {
+  email: string;
+  displayName: string;
+  team: string;
+  passwordHash: string;
+  mustChangePassword: boolean;
+}) {
+  const existing = inMemoryStaffProfiles.find((staff) => staff.email.toLowerCase() === params.email.toLowerCase());
+  if (existing) return { success: false as const, code: 'EMAIL_ALREADY_REGISTERED' as const };
+
+  const staff = await upsertInMemoryStaff({
+    email: params.email,
+    displayName: params.displayName,
+    role: 'STAFF',
+    team: params.team,
+    isActive: true,
+  });
+  inMemoryProvisionedStaffAccounts.push({
+    userId: staff.user_id,
+    email: params.email,
+    passwordHash: params.passwordHash,
+    mustChangePassword: params.mustChangePassword,
+  });
+  return { success: true as const, user: { ...staff, mustChangePassword: params.mustChangePassword } };
 }
 
 /** Read-only accessors for the audit-log viewer (memory backend). */

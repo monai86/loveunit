@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getEventBySlug } from '@/services/event-service';
 import { getWaitlist } from '@/services/waitlist-service';
-import { requireAdmin } from '@/lib/auth/server';
+import { requireReadOnlyAdmin } from '@/lib/auth/server';
 
 export async function GET() {
   try {
     try {
-      await requireAdmin();
+    await requireReadOnlyAdmin();
     } catch (err: unknown) {
       const status = (err as Error).message === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์เข้าถึงรายการรอ' }, { status });

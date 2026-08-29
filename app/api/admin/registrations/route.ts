@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getEventBySlug } from '@/services/event-service';
 import { deleteDonorRegistration, getAllRegistrations, updateDonorRegistration } from '@/services/admin-service';
-import { requireAdmin } from '@/lib/auth/server';
+import { requireAdmin, requireReadOnlyAdmin } from '@/lib/auth/server';
 import { getErrorMessage } from '@/lib/utils/format';
 import { adminRegistrationUpdateSchema } from '@/lib/validation/schemas';
 
 export async function GET() {
   try {
     try {
-      await requireAdmin();
+      await requireReadOnlyAdmin();
     } catch (err: unknown) {
       const status = getErrorMessage(err) === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์เข้าถึงรายการลงทะเบียนทั้งหมด' }, { status });

@@ -15,7 +15,7 @@ export function StaffHeader() {
     if (!pathname.startsWith('/staff/')) return;
     fetch('/api/auth/me')
       .then((res) => res.json())
-      .then((data) => setIsAdmin(data?.user?.profile?.role === 'ADMIN'))
+      .then((data) => setIsAdmin(['SUPER_ADMIN', 'ADMIN'].includes(data?.user?.profile?.role)))
       .catch(() => setIsAdmin(false));
   }, [pathname]);
 

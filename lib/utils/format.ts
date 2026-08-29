@@ -182,6 +182,8 @@ export function formatActionLabel(action: string): string {
   return labels[action] || action;
 }
 
-export function getStaffRoleLabel(_role?: string): string {
-  return 'ผู้ดูแลระบบ (Admin)';
+export function getStaffRoleLabel(role?: string): string {
+  if (role === 'SUPER_ADMIN') return 'Super Admin';
+  if (role === 'ADMIN') return 'Admin (ดูอย่างเดียว)';
+  return 'Staff';
 }

@@ -1,6 +1,6 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
 
-const ADMIN_EMAIL = 'admin@mahidol.ac.th';
+const ADMIN_EMAIL = 'monai.yut@student.mahidol.edu';
 const ADMIN_PASS = 'Admin@MUMT2026';
 const NEW_PASS = 'E2eAdminNew@2026';
 

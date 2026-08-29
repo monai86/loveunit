@@ -14,6 +14,7 @@ import {
   requireAdmin,
   requireTeamLead,
   requireSuperAdmin,
+  requireReadOnlyAdmin,
   canDeleteManagedAccount,
   isStaffPortalRole,
 } from '../lib/auth/server';
@@ -21,7 +22,7 @@ import type { AuthenticatedUser } from '../lib/auth/server';
 
 const BASE = 'http://localhost:3000';
 
-function makeUser(role: 'ADMIN' | 'STAFF' = 'ADMIN', overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {
+function makeUser(role: 'SUPER_ADMIN' | 'ADMIN' | 'STAFF' = 'ADMIN', overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser {
   return {
     id: `u-${role.toLowerCase()}-test`,
     email: `${role.toLowerCase()}@test.local`,
@@ -128,8 +129,8 @@ async function runAuthTests() {
 
   // ---- Server Guards for unified ADMIN role ----
   console.log('Test 5: Server Guards — role-based Admin and Staff separation');
-  process.env.PRIMARY_ADMIN_EMAIL = 'primary-admin@test.local';
-  const primaryAdmin = makeUser('ADMIN', { email: 'primary-admin@test.local' });
+  process.env.PRIMARY_ADMIN_EMAIL = 'monai.yut@student.mahidol.edu';
+  const primaryAdmin = makeUser('SUPER_ADMIN', { email: 'monai.yut@student.mahidol.edu' });
   const legacyAdmin = makeUser('ADMIN', { email: 'legacy-admin@test.local' });
   const staff = makeUser('STAFF');
 
@@ -140,7 +141,8 @@ async function runAuthTests() {
   assert.ok(await requireAdmin(primaryAdmin));
   assert.ok(await requireTeamLead(primaryAdmin));
   assert.ok(await requireSuperAdmin(primaryAdmin));
-  assert.ok(await requireAdmin(legacyAdmin), 'any stored ADMIN role may access admin functions');
+  await assert.rejects(() => requireAdmin(legacyAdmin), /FORBIDDEN/, 'viewer admin cannot mutate admin functions');
+  assert.ok(await requireReadOnlyAdmin(legacyAdmin), 'viewer admin can read admin pages');
   await assert.rejects(() => requireSuperAdmin(legacyAdmin), /FORBIDDEN/, 'only PRIMARY_ADMIN_EMAIL may use super-admin guard');
   await assert.rejects(() => requireAdmin(staff), /FORBIDDEN/, 'staff cannot access admin functions');
   await assert.rejects(() => requireStaff(null), /UNAUTHORIZED/, 'null user → 401');

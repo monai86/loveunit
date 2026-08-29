@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/auth/server';
+import { requireReadOnlyAdmin } from '@/lib/auth/server';
 import { getAuditLogs, getAuditActions } from '@/services/audit-service';
 
 export async function GET(request: Request) {
   try {
     try {
-      await requireAdmin();
+      await requireReadOnlyAdmin();
     } catch (err: unknown) {
       const status = (err as Error).message === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์เข้าถึงบันทึกการใช้งาน' }, { status });

@@ -1,8 +1,8 @@
 import { pgTable, text, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 
-// Historical values remain in the PostgreSQL enum for migration compatibility.
-// Application code exposes only ADMIN and STAFF.
+// Historical TEAM_LEAD remains for migration compatibility; application roles
+// are SUPER_ADMIN, ADMIN (read-only), and STAFF (operations).
 export const staffRoleEnum = pgEnum('staff_role_enum', ['STAFF', 'TEAM_LEAD', 'ADMIN', 'SUPER_ADMIN']);
 
 export const staffProfiles = pgTable('staff_profiles', {

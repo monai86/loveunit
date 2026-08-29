@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { canDeleteManagedAccount, requireAdmin } from '@/lib/auth/server';
+import { canDeleteManagedAccount, requireAdmin, requireReadOnlyAdmin } from '@/lib/auth/server';
 import { getAllStaffMembers, updateStaffRoleAndTeam, recordAuditLog } from '@/services/admin-service';
 import { db } from '@/db';
 import { auditLogs, staffProfiles, staffInvitations, user, account } from '@/db/schema';
@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    await requireAdmin();
+    await requireReadOnlyAdmin();
     const staffList = await getAllStaffMembers();
     const invitations = db
       ? await db.select({
