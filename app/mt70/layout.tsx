@@ -109,16 +109,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
               {/* User & Logout */}
               <div className="flex items-center gap-2">
-                <div className="flex h-11 items-center gap-2 rounded-xl border border-[var(--line)] bg-gray-50 pl-3 pr-1.5">
-                  <div className="text-right hidden sm:block">
-                    <span className="text-xs font-black text-[var(--ink)] block leading-tight truncate max-w-[130px]">
+                <div
+                  role="group"
+                  aria-label={`บัญชีผู้ใช้ ${user.profile.display_name} (${user.profile.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'})`}
+                  className="flex h-11 min-w-0 items-center gap-2 rounded-xl border border-[var(--line)] bg-gray-50 px-2.5"
+                >
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--rose-100)] text-[var(--burgundy-700)]">
+                    <Shield className="h-4 w-4 text-[var(--burgundy-700)]" />
+                  </div>
+                  <div className="hidden min-w-0 text-left sm:block">
+                    <span className="block max-w-[116px] truncate text-xs font-black leading-tight text-[var(--ink)]">
                       {user.profile.display_name}
                     </span>
-                    <span className="text-[10px] font-bold text-[var(--muted)]">{user.profile.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}</span>
-                  </div>
-
-                  <div className="h-7 w-7 rounded-lg bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center">
-                    <Shield className="h-4 w-4 text-[var(--burgundy-700)]" />
+                    <span className="block text-[10px] font-bold leading-tight text-[var(--muted)]">{user.profile.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}</span>
                   </div>
                 </div>
 

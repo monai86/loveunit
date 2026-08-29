@@ -149,6 +149,17 @@ test('admin header actions share a balanced height and baseline', async ({ page 
   expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(2);
 });
 
+test('admin header presents the current account as one compact control', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await login(page);
+  await page.goto('/mt70');
+  const account = page.getByLabel(/บัญชีผู้ใช้/);
+  await expect(account).toBeVisible();
+  const accountBox = await account.boundingBox();
+  const logoutBox = await page.getByRole('button', { name: 'ออกจากระบบ' }).boundingBox();
+  expect(accountBox?.height).toBe(logoutBox?.height);
+});
+
 test('retired queue URL returns staff to scan workspace', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
