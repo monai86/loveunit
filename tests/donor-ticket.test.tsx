@@ -19,6 +19,7 @@ async function runDonorTicketTests() {
   assert.match(markup, /data-testid="donor-ticket"/);
   assert.match(markup, /หมายเลขลงทะเบียน/);
   assert.match(markup, /รายละเอียดการนัดหมาย/);
+  assert.match(markup, /อย่าลืมนำบัตรประชาชนมาด้วย/);
   assert.doesNotMatch(markup, /ลำดับคิวผู้ลงทะเบียน/);
   assert.doesNotMatch(markup, /Limited Edition/);
   console.log('Ticket presents a registration pass, not a donor queue.\n');

@@ -65,6 +65,7 @@ Copy `.env.example` to `.env.local` and fill in:
 | `NEXT_PUBLIC_APP_URL` | Public base URL (used for links in emails) | ✅ |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | SMTP server for confirmation emails | only for email |
 | `SMTP_FROM` | Sender address for confirmation emails | only for email |
+| `CRON_SECRET` | Random server-only secret used to authenticate Vercel Cron | required for scheduled reminder |
 
 Email is a **silent no-op** when SMTP is not configured — registrations never fail because of email.
 
@@ -74,6 +75,10 @@ Email is a **silent no-op** when SMTP is not configured — registrations never 
 
 On successful online registration, a confirmation email is sent (when SMTP is configured) containing:
 the registration code, arrival time slot, venue, pre-donation checklist, and a link to the QR pass page.
+
+## ⏰ Donor preparation reminder
+
+`vercel.json` schedules the reminder endpoint for 09:00 ICT on Monday, 14 September 2026, with two hourly recovery runs at 10:00 and 11:00 ICT. Each successful delivery is recorded against that registration, so recovery runs do not resend the email. Set `CRON_SECRET` in the Vercel production environment before deploying; Vercel supplies it in the Cron request authorization header.
 
 ---
 

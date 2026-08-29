@@ -1,35 +1,351 @@
-'use client';
+"use client";
 
-import React, { useRef, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { QRCodeSVG } from 'qrcode.react';
-import { ArrowLeft, ArrowRight, Building2, Calendar, Check, CheckCircle2, Clock, Copy, Download, MapPin, Phone, ShieldCheck, User } from 'lucide-react';
+import React, { useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { QRCodeSVG } from "qrcode.react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Building2,
+  Calendar,
+  Check,
+  CheckCircle2,
+  Clock,
+  Copy,
+  Download,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  User,
+} from "lucide-react";
 
-export interface DonorTicketPassProps { registrationCode: string; name: string; phone?: string; faculty?: string | null; timeSlot?: string; date?: string; venue?: string; qrToken?: string; isConfirmed?: boolean; onReset?: () => void; resetLabel?: string; primaryAction?: { href: string; label: string; icon?: React.ReactNode }; }
+export interface DonorTicketPassProps {
+  registrationCode: string;
+  name: string;
+  phone?: string;
+  faculty?: string | null;
+  timeSlot?: string;
+  date?: string;
+  venue?: string;
+  qrToken?: string;
+  isConfirmed?: boolean;
+  onReset?: () => void;
+  resetLabel?: string;
+  primaryAction?: { href: string; label: string; icon?: React.ReactNode };
+}
 
-export function DonorTicketPass({ registrationCode, name, phone, faculty, timeSlot = '09:00–14:00 น.', date = 'พุธที่ 16 กันยายน 2569', venue = 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา', qrToken, isConfirmed = true, onReset, resetLabel = 'ค้นหาใหม่', primaryAction }: DonorTicketPassProps) {
+export function DonorTicketPass({
+  registrationCode,
+  name,
+  phone,
+  faculty,
+  timeSlot = "09:00–14:00 น.",
+  date = "พุธที่ 16 กันยายน 2569",
+  venue = "ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา",
+  qrToken,
+  isConfirmed = true,
+  onReset,
+  resetLabel = "ค้นหาใหม่",
+  primaryAction,
+}: DonorTicketPassProps) {
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
-  const copyCode = async () => { try { await navigator.clipboard.writeText(registrationCode); setCopied(true); window.setTimeout(() => setCopied(false), 2000); } catch {} };
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(registrationCode);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  };
   const downloadTicket = async () => {
     setDownloading(true);
     try {
-      const canvas = document.createElement('canvas'); const context = canvas.getContext('2d'); if (!context) return;
-      const scale = 2, width = 480 * scale, height = 700 * scale, inset = 24 * scale; canvas.width = width; canvas.height = height;
-      context.fillStyle = '#F6F4F4'; context.fillRect(0, 0, width, height); context.fillStyle = '#FFFFFF'; context.fillRect(inset, inset, width - inset * 2, height - inset * 2);
-      context.strokeStyle = '#E8DCD8'; context.lineWidth = scale; context.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
-      context.fillStyle = '#560D19'; context.fillRect(inset, inset, width - inset * 2, 118 * scale); context.fillStyle = '#FDF6F1'; context.textAlign = 'left'; context.font = `700 ${16 * scale}px sans-serif`; context.fillText('MUMT LoveUnit ครั้งที่ 9', inset + 24 * scale, inset + 38 * scale); context.font = `800 ${22 * scale}px sans-serif`; context.fillText('ตั๋วลงทะเบียนบริจาคโลหิต', inset + 24 * scale, inset + 74 * scale);
-      const x = inset + 24 * scale; let y = inset + 160 * scale; context.fillStyle = '#6E101E'; context.font = `700 ${11 * scale}px sans-serif`; context.fillText('หมายเลขลงทะเบียน', x, y); context.font = `800 ${28 * scale}px monospace`; context.fillText(registrationCode, x, y + 34 * scale); y += 92 * scale;
-      context.fillStyle = '#241B1D'; context.font = `600 ${12 * scale}px sans-serif`; [`ผู้ลงทะเบียน  ${name}`, `วันจัดงาน  ${date}`, `เวลามาถึง  ${timeSlot}`, `สถานที่  ${venue}`].forEach((detail) => { context.fillText(detail.slice(0, 54), x, y); y += 27 * scale; });
-      const svg = qrRef.current?.querySelector('svg'); if (svg) { const blobUrl = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml;charset=utf-8' })); const image = new window.Image(); await new Promise<void>((resolve) => { image.onload = () => { const size = 166 * scale, qrX = (width - size) / 2, qrY = height - inset - size - 58 * scale; context.fillStyle = '#FFFFFF'; context.fillRect(qrX - 10 * scale, qrY - 10 * scale, size + 20 * scale, size + 20 * scale); context.strokeStyle = '#E8DCD8'; context.strokeRect(qrX - 10 * scale, qrY - 10 * scale, size + 20 * scale, size + 20 * scale); context.drawImage(image, qrX, qrY, size, size); URL.revokeObjectURL(blobUrl); resolve(); }; image.src = blobUrl; }); }
-      context.fillStyle = '#5F5558'; context.textAlign = 'center'; context.font = `500 ${10 * scale}px sans-serif`; context.fillText('แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน', width / 2, height - inset - 22 * scale);
-      const link = document.createElement('a'); link.download = `MUMT-LoveUnit-${registrationCode}.png`; link.href = canvas.toDataURL('image/png'); link.click();
-    } catch (error) { console.error('Failed to export donor ticket', error); } finally { setDownloading(false); }
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context) return;
+      const scale = 2,
+        width = 480 * scale,
+        height = 700 * scale,
+        inset = 24 * scale;
+      canvas.width = width;
+      canvas.height = height;
+      context.fillStyle = "#F6F4F4";
+      context.fillRect(0, 0, width, height);
+      context.fillStyle = "#FFFFFF";
+      context.fillRect(inset, inset, width - inset * 2, height - inset * 2);
+      context.strokeStyle = "#E8DCD8";
+      context.lineWidth = scale;
+      context.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
+      context.fillStyle = "#560D19";
+      context.fillRect(inset, inset, width - inset * 2, 118 * scale);
+      context.fillStyle = "#FDF6F1";
+      context.textAlign = "left";
+      context.font = `700 ${16 * scale}px sans-serif`;
+      context.fillText(
+        "MUMT LoveUnit ครั้งที่ 9",
+        inset + 24 * scale,
+        inset + 38 * scale,
+      );
+      context.font = `800 ${22 * scale}px sans-serif`;
+      context.fillText(
+        "ตั๋วลงทะเบียนบริจาคโลหิต",
+        inset + 24 * scale,
+        inset + 74 * scale,
+      );
+      const x = inset + 24 * scale;
+      let y = inset + 160 * scale;
+      context.fillStyle = "#6E101E";
+      context.font = `700 ${11 * scale}px sans-serif`;
+      context.fillText("หมายเลขลงทะเบียน", x, y);
+      context.font = `800 ${28 * scale}px monospace`;
+      context.fillText(registrationCode, x, y + 34 * scale);
+      y += 92 * scale;
+      context.fillStyle = "#241B1D";
+      context.font = `600 ${12 * scale}px sans-serif`;
+      [
+        `ผู้ลงทะเบียน  ${name}`,
+        `วันจัดงาน  ${date}`,
+        `เวลามาถึง  ${timeSlot}`,
+        `สถานที่  ${venue}`,
+      ].forEach((detail) => {
+        context.fillText(detail.slice(0, 54), x, y);
+        y += 27 * scale;
+      });
+      const svg = qrRef.current?.querySelector("svg");
+      if (svg) {
+        const blobUrl = URL.createObjectURL(
+          new Blob([new XMLSerializer().serializeToString(svg)], {
+            type: "image/svg+xml;charset=utf-8",
+          }),
+        );
+        const image = new window.Image();
+        await new Promise<void>((resolve) => {
+          image.onload = () => {
+            const size = 166 * scale,
+              qrX = (width - size) / 2,
+              qrY = height - inset - size - 58 * scale;
+            context.fillStyle = "#FFFFFF";
+            context.fillRect(
+              qrX - 10 * scale,
+              qrY - 10 * scale,
+              size + 20 * scale,
+              size + 20 * scale,
+            );
+            context.strokeStyle = "#E8DCD8";
+            context.strokeRect(
+              qrX - 10 * scale,
+              qrY - 10 * scale,
+              size + 20 * scale,
+              size + 20 * scale,
+            );
+            context.drawImage(image, qrX, qrY, size, size);
+            URL.revokeObjectURL(blobUrl);
+            resolve();
+          };
+          image.src = blobUrl;
+        });
+      }
+      context.fillStyle = "#5F5558";
+      context.textAlign = "center";
+      context.font = `500 ${10 * scale}px sans-serif`;
+      context.fillText(
+        "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน",
+        width / 2,
+        height - inset - 22 * scale,
+      );
+      const link = document.createElement("a");
+      link.download = `MUMT-LoveUnit-${registrationCode}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (error) {
+      console.error("Failed to export donor ticket", error);
+    } finally {
+      setDownloading(false);
+    }
   };
-  const details = [{ label: 'ผู้ลงทะเบียน', value: name, icon: User }, { label: 'วันจัดกิจกรรม', value: date, icon: Calendar }, { label: 'เวลามาถึง', value: timeSlot, icon: Clock }, { label: 'สถานที่', value: venue, icon: MapPin }, ...(phone ? [{ label: 'เบอร์โทรศัพท์', value: phone, icon: Phone }] : []), ...(faculty ? [{ label: 'คณะ / สังกัด', value: faculty, icon: Building2 }] : [])];
+  const details = [
+    { label: "ผู้ลงทะเบียน", value: name, icon: User },
+    { label: "วันจัดกิจกรรม", value: date, icon: Calendar },
+    { label: "เวลามาถึง", value: timeSlot, icon: Clock },
+    { label: "สถานที่", value: venue, icon: MapPin },
+    ...(phone ? [{ label: "เบอร์โทรศัพท์", value: phone, icon: Phone }] : []),
+    ...(faculty
+      ? [{ label: "คณะ / สังกัด", value: faculty, icon: Building2 }]
+      : []),
+  ];
 
-  return <div className="mx-auto w-full max-w-xl space-y-5"><article data-testid="donor-ticket" className="overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-[0_8px_24px_-16px_rgba(56,6,15,0.32)]"><header className="bg-[var(--burgundy-800)] px-5 py-5 text-[var(--cream)] sm:px-7"><div className="flex items-start justify-between gap-4"><div className="flex items-center gap-3"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--cream)] p-1.5"><Image src="/images/logo.png" alt="MUMT LoveUnit" width={32} height={32} className="h-8 w-8 rounded-full object-contain" /></div><div><p className="text-xs font-bold text-[var(--cream-dim)]">MUMT LoveUnit ครั้งที่ 9</p><h2 className="mt-0.5 text-lg font-black">ตั๋วลงทะเบียนบริจาคโลหิต</h2></div></div>{isConfirmed && <span className="inline-flex shrink-0 items-center gap-1.5 border border-emerald-200/35 bg-emerald-300/15 px-2.5 py-1.5 text-xs font-bold text-emerald-100"><CheckCircle2 className="h-4 w-4" />ยืนยันแล้ว</span>}</div></header><div className="px-5 py-6 sm:px-7"><div className="border-b border-[var(--line)] pb-5"><p className="text-xs font-bold text-[var(--muted)]">หมายเลขลงทะเบียน</p><div className="mt-1 flex items-center justify-between gap-3"><p className="font-mono text-2xl font-black tracking-[0.04em] text-[var(--burgundy-800)] sm:text-3xl">{registrationCode}</p><button type="button" onClick={copyCode} aria-label="คัดลอกหมายเลขลงทะเบียน" className="inline-flex min-h-11 min-w-11 items-center justify-center border border-[var(--line)] text-[var(--burgundy-700)] transition-colors hover:bg-[var(--rose-100)] active:translate-y-px">{copied ? <Check className="h-5 w-5 text-[var(--ok)]" /> : <Copy className="h-5 w-5" />}</button></div><p role="status" className="mt-1 min-h-5 text-xs font-medium text-[var(--ok)]">{copied ? 'คัดลอกหมายเลขแล้ว' : 'เก็บหมายเลขนี้ไว้ใช้ในวันงาน'}</p></div><section aria-labelledby="appointment-details" className="pt-5"><h3 id="appointment-details" className="text-base font-black text-[var(--ink)]">รายละเอียดการนัดหมาย</h3><dl className="mt-3 divide-y divide-[var(--line)] border-y border-[var(--line)]">{details.map(({ label, value, icon: Icon }) => <div key={label} className="grid grid-cols-[2rem_1fr] gap-3 py-3"><Icon className="mt-0.5 h-4 w-4 text-[var(--burgundy-700)]" aria-hidden="true" /><div><dt className="text-xs font-bold text-[var(--muted)]">{label}</dt><dd className="mt-0.5 text-sm font-bold leading-6 text-[var(--ink)]">{value}</dd></div></div>)}</dl></section><section className="grid items-center gap-5 border-b border-[var(--line)] py-6 sm:grid-cols-[1fr_auto]" aria-labelledby="ticket-qr-heading"><div><h3 id="ticket-qr-heading" className="text-base font-black text-[var(--ink)]">QR สำหรับเช็กอิน</h3><p className="mt-1 max-w-xs text-sm leading-6 text-[var(--muted)]">แสดง QR Code นี้ต่อเจ้าหน้าที่เมื่อมาถึงจุดลงทะเบียน</p><button type="button" onClick={downloadTicket} disabled={downloading} className="mt-4 inline-flex min-h-11 items-center gap-2 bg-[var(--burgundy-700)] px-4 text-sm font-bold text-white transition-colors hover:bg-[var(--burgundy-900)] active:translate-y-px disabled:opacity-60"><Download className="h-4 w-4" />{downloading ? 'กำลังบันทึก...' : 'บันทึกตั๋วเป็นรูปภาพ'}</button></div><div ref={qrRef} className="justify-self-center border border-[var(--line)] bg-white p-3">{qrToken ? <QRCodeSVG value={qrToken} size={176} level="M" title="QR Code สำหรับเช็กอิน" imageSettings={{ src: '/images/logo.png', height: 30, width: 30, excavate: true }} /> : <div className="flex h-44 w-44 items-center justify-center bg-[var(--bg)] text-center text-xs font-bold text-[var(--muted)]">กำลังสร้าง QR Code</div>}</div></section><p className="flex items-start gap-2 pt-5 text-xs leading-5 text-[var(--muted)]"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ok)]" />เตรียมบัตรประชาชนหรือบัตรผู้บริจาคโลหิต และพักผ่อนให้เพียงพอก่อนมาร่วมกิจกรรม</p></div></article><div className="flex flex-col gap-3 sm:flex-row">{onReset && <button type="button" onClick={onReset} className="editorial-btn-secondary min-h-11 flex-1 py-3 text-xs"><ArrowLeft className="h-4 w-4" />{resetLabel}</button>}<Link href={primaryAction?.href || '/'} className="editorial-btn-primary min-h-11 flex-1 py-3 text-xs"><span>{primaryAction?.label || 'กลับสู่หน้าแรก'}</span>{primaryAction?.icon || <ArrowRight className="h-4 w-4" />}</Link></div></div>;
+  return (
+    <div className="mx-auto w-full max-w-xl space-y-5">
+      <article
+        data-testid="donor-ticket"
+        className="overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-[0_8px_24px_-16px_rgba(56,6,15,0.32)]"
+      >
+        <header className="bg-[var(--burgundy-800)] px-5 py-5 text-[var(--cream)] sm:px-7">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--cream)] p-1.5">
+                <Image
+                  src="/images/logo.png"
+                  alt="MUMT LoveUnit"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 rounded-full object-contain"
+                />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[var(--cream-dim)]">
+                  MUMT LoveUnit ครั้งที่ 9
+                </p>
+                <h2 className="mt-0.5 text-lg font-black">
+                  ตั๋วลงทะเบียนบริจาคโลหิต
+                </h2>
+              </div>
+            </div>
+            {isConfirmed && (
+              <span className="inline-flex shrink-0 items-center gap-1.5 border border-emerald-200/35 bg-emerald-300/15 px-2.5 py-1.5 text-xs font-bold text-emerald-100">
+                <CheckCircle2 className="h-4 w-4" />
+                ยืนยันแล้ว
+              </span>
+            )}
+          </div>
+        </header>
+        <div className="px-5 py-6 sm:px-7">
+          <div className="border-b border-[var(--line)] pb-5">
+            <p className="text-xs font-bold text-[var(--muted)]">
+              หมายเลขลงทะเบียน
+            </p>
+            <div className="mt-1 flex items-center justify-between gap-3">
+              <p className="font-mono text-2xl font-black tracking-[0.04em] text-[var(--burgundy-800)] sm:text-3xl">
+                {registrationCode}
+              </p>
+              <button
+                type="button"
+                onClick={copyCode}
+                aria-label="คัดลอกหมายเลขลงทะเบียน"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center border border-[var(--line)] text-[var(--burgundy-700)] transition-colors hover:bg-[var(--rose-100)] active:translate-y-px"
+              >
+                {copied ? (
+                  <Check className="h-5 w-5 text-[var(--ok)]" />
+                ) : (
+                  <Copy className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+            <p
+              role="status"
+              className="mt-1 min-h-5 text-xs font-medium text-[var(--ok)]"
+            >
+              {copied ? "คัดลอกหมายเลขแล้ว" : "เก็บหมายเลขนี้ไว้ใช้ในวันงาน"}
+            </p>
+          </div>
+          <section aria-labelledby="appointment-details" className="pt-5">
+            <h3
+              id="appointment-details"
+              className="text-base font-black text-[var(--ink)]"
+            >
+              รายละเอียดการนัดหมาย
+            </h3>
+            <dl className="mt-3 divide-y divide-[var(--line)] border-y border-[var(--line)]">
+              {details.map(({ label, value, icon: Icon }) => (
+                <div
+                  key={label}
+                  className="grid grid-cols-[2rem_1fr] gap-3 py-3"
+                >
+                  <Icon
+                    className="mt-0.5 h-4 w-4 text-[var(--burgundy-700)]"
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <dt className="text-xs font-bold text-[var(--muted)]">
+                      {label}
+                    </dt>
+                    <dd className="mt-0.5 text-sm font-bold leading-6 text-[var(--ink)]">
+                      {value}
+                    </dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          </section>
+          <section
+            className="grid items-center gap-5 border-b border-[var(--line)] py-6 sm:grid-cols-[1fr_auto]"
+            aria-labelledby="ticket-qr-heading"
+          >
+            <div>
+              <h3
+                id="ticket-qr-heading"
+                className="text-base font-black text-[var(--ink)]"
+              >
+                QR สำหรับเช็กอิน
+              </h3>
+              <p className="mt-1 max-w-xs text-sm leading-6 text-[var(--muted)]">
+                แสดง QR Code นี้ต่อเจ้าหน้าที่เมื่อมาถึงจุดลงทะเบียน
+              </p>
+              <button
+                type="button"
+                onClick={downloadTicket}
+                disabled={downloading}
+                className="mt-4 inline-flex min-h-11 items-center gap-2 bg-[var(--burgundy-700)] px-4 text-sm font-bold text-white transition-colors hover:bg-[var(--burgundy-900)] active:translate-y-px disabled:opacity-60"
+              >
+                <Download className="h-4 w-4" />
+                {downloading ? "กำลังบันทึก..." : "บันทึกตั๋วเป็นรูปภาพ"}
+              </button>
+            </div>
+            <div
+              ref={qrRef}
+              className="justify-self-center border border-[var(--line)] bg-white p-3"
+            >
+              {qrToken ? (
+                <QRCodeSVG
+                  value={qrToken}
+                  size={176}
+                  level="M"
+                  title="QR Code สำหรับเช็กอิน"
+                  imageSettings={{
+                    src: "/images/logo.png",
+                    height: 30,
+                    width: 30,
+                    excavate: true,
+                  }}
+                />
+              ) : (
+                <div className="flex h-44 w-44 items-center justify-center bg-[var(--bg)] text-center text-xs font-bold text-[var(--muted)]">
+                  กำลังสร้าง QR Code
+                </div>
+              )}
+            </div>
+          </section>
+          <p className="flex items-start gap-2 pt-5 text-xs leading-5 text-[var(--muted)]">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[var(--ok)]" />
+            <span>
+              <strong className="text-[var(--burgundy-800)]">อย่าลืมนำบัตรประชาชนมาด้วย</strong>
+              {' '}หรือใช้บัตรผู้บริจาคโลหิต และพักผ่อนให้เพียงพอก่อนมาร่วมกิจกรรม
+            </span>
+          </p>
+        </div>
+      </article>
+      <div className="flex flex-col gap-3 sm:flex-row">
+        {onReset && (
+          <button
+            type="button"
+            onClick={onReset}
+            className="editorial-btn-secondary min-h-11 flex-1 py-3 text-xs"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {resetLabel}
+          </button>
+        )}
+        <Link
+          href={primaryAction?.href || "/"}
+          className="editorial-btn-primary min-h-11 flex-1 py-3 text-xs"
+        >
+          <span>{primaryAction?.label || "กลับสู่หน้าแรก"}</span>
+          {primaryAction?.icon || <ArrowRight className="h-4 w-4" />}
+        </Link>
+      </div>
+    </div>
+  );
 }
