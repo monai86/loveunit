@@ -58,6 +58,8 @@ describe('i18n Unified Translation Dictionary', () => {
     const year1Val = 'ปี 1';
     assert.strictEqual(getYearLabel(year1Val, 'th'), 'ปี 1');
     assert.strictEqual(getYearLabel(year1Val, 'en'), 'Year 1 (Freshman)');
+
+    assert.ok(ACADEMIC_YEARS.length > 0, 'ACADEMIC_YEARS should not be empty');
   });
 
   it('should ensure all 24 screening questions and categories have English translations', () => {

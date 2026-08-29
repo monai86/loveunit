@@ -20,7 +20,7 @@ import {
   AlertCircle,
   AlertTriangle
 } from 'lucide-react';
-import { formatTimeRange, formatBangkokTime, getRegistrationStatusBadge, isWalkInRecord } from '@/lib/utils/format';
+import { formatTimeRange, formatBangkokTime, getRegistrationStatusBadge, isWalkInRecord, type SouvenirEligibilityDetails } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
 import { enqueueOfflineAction } from '@/lib/pwa/offline-queue';
 import { LoadingOverlay } from '@/components/common/LoadingOverlay';
@@ -45,8 +45,8 @@ interface ApiRegistration {
   completed_at?: string;
   souvenirEligible?: boolean;
   souvenir_eligible?: boolean;
-  souvenirDetails?: any;
-  souvenir_details?: any;
+  souvenirDetails?: SouvenirEligibilityDetails | null;
+  souvenir_details?: SouvenirEligibilityDetails | null;
   timeSlot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
   time_slot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
 }
@@ -65,7 +65,7 @@ interface RegistrationDetail {
   checkedInAt?: string;
   completedAt?: string;
   souvenirEligible: boolean;
-  souvenirDetails?: any;
+  souvenirDetails?: SouvenirEligibilityDetails | null;
 }
 
 function mapRegistration(r: ApiRegistration): RegistrationDetail {

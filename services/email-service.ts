@@ -337,8 +337,6 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
   const eventDate = escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569');
   const venue = escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา');
   const recipient = escapeHtml(`${input.firstName} ${input.lastName}`);
-  const phone = escapeHtml(input.phone || '—');
-  const faculty = escapeHtml(input.faculty || 'บุคคลทั่วไป (General Public)');
 
   return `<!DOCTYPE html>
 <html lang="th">

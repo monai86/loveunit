@@ -22,7 +22,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 type TabType = 'LAB_TESTING' | 'COMPONENTS' | 'ABO_RH_SYSTEM' | 'BENEFITS';
 
 export default function KnowledgePage() {
-  const { isTh, isEn } = useLanguage();
+  const { isTh } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabType>('LAB_TESTING');
   const [selectedBloodGroup, setSelectedBloodGroup] = useState<'O' | 'A' | 'B' | 'AB'>('O');
   const [copied, setCopied] = useState(false);

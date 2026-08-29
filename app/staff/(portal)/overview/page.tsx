@@ -1,8 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { Activity, CheckCircle2, ClipboardList, Loader2, RefreshCw, Search, Users, UserCheck } from 'lucide-react';
+import { CheckCircle2, ClipboardList, Loader2, RefreshCw, Search, Users, UserCheck } from 'lucide-react';
 import { getRegistrationStatusBadge, pickField } from '@/lib/utils/format';
 import { summarizeStaffRegistrations } from '@/lib/staff/registration-summary';
 import type { RegistrationStatus } from '@/lib/types/database';
@@ -76,8 +75,29 @@ export default function StaffOverviewPage() {
   }, []);
 
   useEffect(() => {
-    // Initial fetch
-    void load(false);
+    let mounted = true;
+    const fetchInitial = async () => {
+      try {
+        const response = await fetch('/api/staff/registrations', { 
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+        const data = await response.json();
+        if (mounted) {
+          if (!response.ok || !data.success) throw new Error(data.message || 'ไม่สามารถโหลดข้อมูลได้');
+          setRegistrations((data.registrations as RawRegistration[]).map(normalizeRegistration));
+          setLastUpdated(new Date());
+        }
+      } catch (loadError) {
+        if (mounted) {
+          setError(loadError instanceof Error ? loadError.message : 'ไม่สามารถโหลดข้อมูลได้');
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    void fetchInitial();
 
     // Auto-polling interval: 5 seconds when tab is active/visible
     const interval = setInterval(() => {
@@ -95,6 +115,7 @@ export default function StaffOverviewPage() {
     document.addEventListener('visibilitychange', onVisibilityChange);
 
     return () => {
+      mounted = false;
       clearInterval(interval);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };

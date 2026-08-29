@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { registrations, checkinEvents, timeSlots } from '@/db/schema';
 import { eq, and, or, ne, ilike, sql } from 'drizzle-orm';
-import { normalizePhoneNumber, isRegistrationEligibleForSouvenir, getSouvenirEligibilityDetails, isWalkInRecord } from '@/lib/utils/format';
+import { normalizePhoneNumber, isRegistrationEligibleForSouvenir, getSouvenirEligibilityDetails, isWalkInRecord, type SouvenirCandidate } from '@/lib/utils/format';
 import { isTransitionAllowed } from '@/lib/db/store';
 import { isMemoryBackendAllowed, searchRegistrations as memorySearch, updateRegistrationStatus as memoryUpdateStatus, cancelRegistration as memoryCancelRegistration } from '@/lib/db/store';
 import { resolveActorId } from '@/lib/auth/server';
@@ -9,13 +9,13 @@ import { RegistrationStatus } from '@/lib/types/database';
 import { promoteFromWaitlist } from '@/services/waitlist-service';
 
 // Short TTL cache for souvenir ranking to avoid querying all records per scan keystroke
-let souvenirRankingCache: { eventId: string; expiresAt: number; regs: any[] } | null = null;
+let souvenirRankingCache: { eventId: string; expiresAt: number; regs: SouvenirCandidate[] } | null = null;
 
 export function invalidateSouvenirCache() {
   souvenirRankingCache = null;
 }
 
-async function getAllCandidates(eventId: string) {
+async function getAllCandidates(eventId: string): Promise<SouvenirCandidate[]> {
   const now = Date.now();
   if (souvenirRankingCache && souvenirRankingCache.eventId === eventId && now < souvenirRankingCache.expiresAt) {
     return souvenirRankingCache.regs;

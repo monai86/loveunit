@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useSyncExternalStore, useMemo } from 'react';
+import React, { createContext, useContext, useSyncExternalStore, useMemo, useCallback } from 'react';
 import { Language, TRANSLATIONS } from './translations';
 
 export { TRANSLATIONS };
@@ -59,16 +59,9 @@ export function LanguageProvider({
     () => defaultLanguage || 'th'
   );
 
-  const [activeLang, setActiveLang] = useState<Language>(defaultLanguage || storedLang);
+  const activeLang = defaultLanguage || storedLang;
 
-  useEffect(() => {
-    if (!defaultLanguage) {
-      setActiveLang(storedLang);
-    }
-  }, [storedLang, defaultLanguage]);
-
-  const setLanguage = (next: Language) => {
-    setActiveLang(next);
+  const setLanguage = useCallback((next: Language) => {
     try {
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(STORAGE_KEY, next);
@@ -80,12 +73,10 @@ export function LanguageProvider({
         document.documentElement.lang = next;
       }
     } catch {}
-  };
+  }, []);
 
-  const t = useMemo(() => {
-    return (thText: string, enText: string): string => {
-      return activeLang === 'en' ? enText : thText;
-    };
+  const t = useCallback((thText: string, enText: string): string => {
+    return activeLang === 'en' ? enText : thText;
   }, [activeLang]);
 
   const value = useMemo(() => ({
@@ -94,7 +85,7 @@ export function LanguageProvider({
     t,
     isTh: activeLang === 'th',
     isEn: activeLang === 'en',
-  }), [activeLang, t]);
+  }), [activeLang, setLanguage, t]);
 
   return (
     <LanguageContext.Provider value={value}>

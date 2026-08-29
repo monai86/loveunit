@@ -26,7 +26,7 @@ export function LocationClient({
   locationInfographic,
   transportInfographic,
 }: LocationClientProps) {
-  const { isTh, isEn } = useLanguage();
+  const { isTh } = useLanguage();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-12">

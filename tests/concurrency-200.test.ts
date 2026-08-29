@@ -4,7 +4,6 @@ process.env.DATA_BACKEND = 'memory';
 
 import assert from 'node:assert/strict';
 import { registerDonorAtomic, getRegistrationByCode, getDashboardKPIs, getEventBySlug } from '../lib/db/store';
-import { nextRegistrationSequence, generateRegistrationCode } from '../lib/utils/format';
 
 async function runConcurrencyStressTest() {
   console.log('🚀 Running 200+ Concurrent Users Stress Simulation Test...\n');
@@ -49,7 +48,7 @@ async function runConcurrencyStressTest() {
   assert.equal(failed.length, 0, 'No registration should fail under concurrency');
 
   // Verify all registration codes are unique
-  const codes = new Set(successful.map((r) => (r.registration as any).registration_code));
+  const codes = new Set(successful.map((r) => (r.registration as { registration_code: string }).registration_code));
   assert.equal(codes.size, CONCURRENT_USERS, 'Every registration must have a unique monotonic registration code');
 
   // Test simultaneous lookups

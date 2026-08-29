@@ -119,7 +119,7 @@ const EDUCATIONAL_INFOGRAPHICS = [
 ];
 
 export default function PosterPage() {
-  const { isTh, isEn } = useLanguage();
+  const { isTh } = useLanguage();
   const [activePoster, setActivePoster] = useState<{ src: string; title: string; alt: string; fileName: string } | null>(null);
   const [copied, setCopied] = useState(false);
 

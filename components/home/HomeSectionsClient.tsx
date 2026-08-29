@@ -26,7 +26,7 @@ import { SocialLinks } from '@/components/common/SocialLinks';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export function HomeSectionsClient() {
-  const { isTh, isEn } = useLanguage();
+  const { isTh } = useLanguage();
 
   const donorSteps = isTh
     ? [

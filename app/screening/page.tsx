@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   CheckCircle2, 
@@ -27,7 +27,11 @@ export default function ScreeningPage() {
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const [result, setResult] = useState<ScreeningEvaluationResult | null>(null);
+
+  const result: ScreeningEvaluationResult | null = useMemo(() => {
+    if (!submitted) return null;
+    return evaluateScreeningAnswers(answers, isEn ? 'en' : 'th');
+  }, [submitted, answers, isEn]);
 
   const activeCategory = SCREENING_CATEGORIES[currentCategoryIndex];
   const categoryQuestions = OFFICIAL_SCREENING_QUESTIONS.filter(
@@ -37,13 +41,6 @@ export default function ScreeningPage() {
   const totalQuestions = OFFICIAL_SCREENING_QUESTIONS.length;
   const answeredCount = Object.keys(answers).length;
   const progressPercent = Math.round((answeredCount / totalQuestions) * 100);
-
-  // If user toggles language while seeing results, update the evaluation text language
-  useEffect(() => {
-    if (submitted && Object.keys(answers).length > 0) {
-      setResult(evaluateScreeningAnswers(answers, isEn ? 'en' : 'th'));
-    }
-  }, [isEn, submitted, answers]);
 
   const handleSelectAnswer = (questionId: string, answer: boolean) => {
     setAnswers((prev) => ({
@@ -69,8 +66,6 @@ export default function ScreeningPage() {
   };
 
   const handleEvaluate = () => {
-    const evalResult = evaluateScreeningAnswers(answers, isEn ? 'en' : 'th');
-    setResult(evalResult);
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -79,7 +74,6 @@ export default function ScreeningPage() {
     setAnswers({});
     setCurrentCategoryIndex(0);
     setSubmitted(false);
-    setResult(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -89,8 +83,6 @@ export default function ScreeningPage() {
       perfectAnswers[q.id] = q.idealAnswer;
     }
     setAnswers(perfectAnswers);
-    const evalResult = evaluateScreeningAnswers(perfectAnswers, isEn ? 'en' : 'th');
-    setResult(evalResult);
     setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

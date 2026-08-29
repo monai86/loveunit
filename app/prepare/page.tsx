@@ -19,7 +19,7 @@ import {
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function PreparePage() {
-  const { isTh, isEn } = useLanguage();
+  const { isTh } = useLanguage();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-12">

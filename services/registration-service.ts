@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { registrations, timeSlots } from '@/db/schema';
 import { eq, and, ne, sql, ilike } from 'drizzle-orm';
-import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence } from '@/lib/utils/format';
+import { normalizePhoneNumber, generateRegistrationCode, generateQRToken } from '@/lib/utils/format';
 import { isMemoryBackendAllowed, registerDonorAtomic as memoryRegisterAtomic, inMemoryRegistrations, defaultSlots, defaultEvent } from '@/lib/db/store';
 import { ParticipantType, DonationExperience, RegistrationSource } from '@/lib/types/database';
 

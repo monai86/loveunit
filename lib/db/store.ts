@@ -15,7 +15,7 @@ import {
   StaffProfile,
   StaffRole
 } from '@/lib/types/database';
-import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence, isRegistrationEligibleForSouvenir, getSouvenirEligibilityDetails, isWalkInRecord } from '@/lib/utils/format';
+import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence, isRegistrationEligibleForSouvenir, getSouvenirEligibilityDetails, isWalkInRecord, type SouvenirEligibilityDetails } from '@/lib/utils/format';
 
 // Collision-safe id generator for in-memory records. Date.now() alone collides
 // when several records are created within the same millisecond (fast machines
@@ -501,7 +501,7 @@ export async function getRegistrationByQRToken(token: string): Promise<Registrat
   throw new Error('Database connection unconfigured in production environment.');
 }
 
-export async function searchRegistrations(query: string): Promise<(Registration & { souvenirEligible?: boolean; isWalkIn?: boolean; souvenirDetails?: any })[]> {
+export async function searchRegistrations(query: string): Promise<(Registration & { souvenirEligible?: boolean; isWalkIn?: boolean; souvenirDetails?: SouvenirEligibilityDetails })[]> {
   const q = query.trim().toLowerCase();
   if (!q) return [];
 
