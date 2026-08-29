@@ -17,18 +17,17 @@ async function runEmailTests() {
 
   assert.match(email.subject, /ยืนยันการลงทะเบียน/);
   assert.match(email.subject, /Registration Confirmation/);
-  assert.match(email.html, /ขอบคุณที่ร่วมลงทะเบียน/);
-  assert.match(email.html, /Thank you for registering/);
+  assert.match(email.html, /การลงทะเบียนของคุณเรียบร้อยแล้ว/);
+  assert.match(email.html, /Registration confirmed/);
   assert.match(email.html, /สมชาย ใจดี/);
   assert.match(email.html, /ห้องประชุม 217 อาคารสิริวิทยา/);
   assert.match(email.html, /LVU26-ABC123/);
-  assert.strictEqual(email.attachments.length, 2, 'email must include QR code and event poster attachments');
+  assert.match(email.html, /ข้อมูลการนัดหมาย/);
+  assert.match(email.html, /role="presentation"/);
+  assert.strictEqual(email.attachments.length, 1, 'email should attach only the check-in QR image');
   assert.strictEqual(email.attachments[0].cid, 'donor-qr-code');
-  assert.strictEqual(email.attachments[1].cid, 'event-poster');
   assert.match(email.html, /cid:donor-qr-code/);
-  assert.match(email.html, /cid:event-poster/);
   assert.ok(Buffer.isBuffer(email.attachments[0].content), 'QR attachment must be a binary image');
-  assert.ok(Buffer.isBuffer(email.attachments[1].content), 'poster attachment must be a binary image');
   console.log('✓ Thank-you email includes event details and donor QR code\n');
 
   const smtpVariables = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS'] as const;

@@ -17,10 +17,11 @@ async function runTests() {
     qrToken: 'LVU26_QR_LVU26-008_test',
   });
 
-  assert.match(email.html, /checklist-th/);
-  assert.match(email.html, /checklist-en/);
+  assert.match(email.html, /ข้อมูลการนัดหมาย/);
+  assert.match(email.html, /แสดง QR Code นี้เมื่อมาถึงจุดลงทะเบียน/);
+  assert.match(email.html, /role="presentation"/);
   assert.match(email.html, /table-layout:fixed/);
-  assert.match(email.html, /white-space:nowrap/);
+  assert.match(email.html, /max-width:600px/);
 
   console.log('✓ Registration sequence and mobile email layout are stable');
 }
