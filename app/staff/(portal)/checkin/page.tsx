@@ -13,12 +13,7 @@ import {
   UserPlus,
   Camera,
   Ban,
-  Sparkles,
   RotateCcw,
-  Clock,
-  Phone,
-  User,
-  ShieldCheck,
   AlertCircle,
   Volume2,
   VolumeX,
@@ -26,13 +21,9 @@ import {
   UploadCloud,
   History,
   Flashlight,
-  SlidersHorizontal,
-  ChevronRight,
-  Maximize2,
-  X,
   ArrowRight
 } from 'lucide-react';
-import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
+import { formatTimeRange, getRegistrationStatusBadge } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
 import { enqueueOfflineAction } from '@/lib/pwa/offline-queue';
 
@@ -161,7 +152,6 @@ export default function StaffCheckinPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [registration, setRegistration] = useState<RegistrationDetail | null>(null);
 
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; text: string } | null>(null);
@@ -170,22 +160,13 @@ export default function StaffCheckinPage() {
   // Camera & Scanner State
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [scanning, setScanning] = useState(false);
-  const [fullscreenScanner, setFullscreenScanner] = useState(false); // Mobile Payment-App Style Fullscreen
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
-  const [cameras, setCameras] = useState<Array<{ id: string; label: string }>>([]);
-  const [selectedCameraId, setSelectedCameraId] = useState<string>('');
+  const [selectedCameraId] = useState<string>('');
   const [torchOn, setTorchOn] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [fastTrackMode, setFastTrackMode] = useState(false);
   const [recentScans, setRecentScans] = useState<RecentScanItem[]>([]);
   const [uploadingImage, setUploadingImage] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then((res) => res.json())
-      .then((data) => setIsAdmin(data?.user?.profile?.role === 'ADMIN'))
-      .catch(() => setIsAdmin(false));
-  }, []);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const busyRef = useRef(false);
@@ -335,7 +316,7 @@ export default function StaffCheckinPage() {
     customCameraId?: string,
     targetContainerId?: string
   ) => {
-    const containerId = targetContainerId || (fullscreenScanner ? 'qr-reader-fullscreen' : 'qr-reader-region');
+    const containerId = targetContainerId || 'qr-reader-fullscreen';
     setMessage(null);
     try {
       if (scannerRef.current) {
@@ -434,35 +415,12 @@ export default function StaffCheckinPage() {
         setMessage({ type: 'error', text: 'ไม่สามารถเปิดกล้องได้ กรุณาตรวจสอบการอนุญาตสิทธิ์กล้อง หรือใช้ช่องค้นหาแทน' });
       }
     }
-  }, [facingMode, fullscreenScanner, handleLookupByToken]);
-
-  // Camera device discovery on mount
-  useEffect(() => {
-    Html5Qrcode.getCameras()
-      .then((devices) => {
-        if (devices && devices.length > 0) {
-          setCameras(devices.map((d) => ({ id: d.id, label: d.label || `Camera ${d.id.slice(0, 4)}` })));
-          const rear = devices.find((d) => 
-            d.label.toLowerCase().includes('back') || 
-            d.label.toLowerCase().includes('rear') || 
-            d.label.toLowerCase().includes('environment')
-          );
-          if (rear) {
-            setSelectedCameraId(rear.id);
-          } else {
-            setSelectedCameraId(devices[0].id);
-          }
-        }
-      })
-      .catch(() => {
-        // Ignored if camera permission not granted yet
-      });
-  }, []);
+  }, [facingMode, handleLookupByToken]);
 
   // Reactive camera startup when mode, camera device, or facing changes
   useEffect(() => {
     let unmounted = false;
-    const targetContainer = fullscreenScanner ? 'qr-reader-fullscreen' : 'qr-reader-region';
+    const targetContainer = 'qr-reader-fullscreen';
 
     const timer = setTimeout(() => {
       if (!unmounted) {
@@ -474,7 +432,7 @@ export default function StaffCheckinPage() {
       unmounted = true;
       clearTimeout(timer);
     };
-  }, [fullscreenScanner, facingMode, selectedCameraId, startScanner]);
+  }, [facingMode, selectedCameraId, startScanner]);
 
   // Keyboard wedge listener for USB/Bluetooth physical barcode scanners
   useEffect(() => {
@@ -632,10 +590,6 @@ export default function StaffCheckinPage() {
     setFacingMode(nextFacing);
   };
 
-  const handleCameraChange = async (deviceId: string) => {
-    setSelectedCameraId(deviceId);
-  };
-
   const toggleTorch = async () => {
     if (!scannerRef.current || !scanning) return;
     try {
@@ -657,7 +611,7 @@ export default function StaffCheckinPage() {
     setUploadingImage(true);
     setMessage(null);
 
-    const activeContainer = fullscreenScanner ? 'qr-reader-fullscreen' : 'qr-reader-region';
+    const activeContainer = 'qr-reader-fullscreen';
     try {
       const tempScanner = scannerRef.current || new Html5Qrcode(activeContainer);
       const decodedText = await tempScanner.scanFile(file, true);
@@ -676,791 +630,142 @@ export default function StaffCheckinPage() {
     }
   };
 
-  const openFullscreenScanner = async () => {
-    await stopScanner();
-    setFullscreenScanner(true);
-  };
-
-  const closeFullscreenScanner = async () => {
-    await stopScanner();
-    setFullscreenScanner(false);
-  };
-
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-8">
-      
-      {/* Top Header & Quick Mode Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--line)] pb-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-bold text-[var(--burgundy-700)]">
-              MUMT LoveUnit ครั้งที่ 9
-            </span>
-            <span className="px-2 py-0.5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] text-[11px] font-bold">
-              ห้อง 217 อาคารสิริวิทยา
-            </span>
+    <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:py-7 space-y-5">
+      <header className="flex flex-col gap-4 border-b border-[var(--line)] pb-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-bold text-[var(--burgundy-700)]">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
+            <span>MUMT LoveUnit · จุดสแกนหน้างาน</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] font-display">
-            ระบบเช็คอิน & จุดสแกน QR หน้างาน
-          </h1>
-          <p className="text-xs text-[var(--muted)] font-medium">
-            สแกน QR Code ตรวจสอบรายชื่อ และบันทึกการรับของที่ระลึก
-          </p>
+          <h1 className="mt-1 text-2xl font-black text-[var(--ink)] font-display">สแกน QR ผู้บริจาค</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">สแกนเพื่อเช็คอินและบันทึกผลการบริจาคในขั้นตอนเดียว</p>
+          <p className="mt-2 text-xs font-bold text-[var(--muted)]">วันนี้เช็คอินแล้ว {stats.checkedIn} จาก {stats.totalToday} คน · สำเร็จ {stats.completed} คน</p>
         </div>
-
-        {/* Action Controls & Fullscreen Scanner Trigger */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          {/* Fullscreen Scanner Button */}
-          <button
-            type="button"
-            onClick={openFullscreenScanner}
-            className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-black text-xs flex items-center gap-2 shadow-md hover:shadow-lg transition-all cursor-pointer transform active:scale-95"
-          >
-            <Maximize2 className="h-4 w-4 text-emerald-200" />
-            <span>📱 สแกน QR Code เต็มจอ</span>
-          </button>
-
-          {/* Sound Toggle */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            title={soundEnabled ? 'ปิดเสียง Beep' : 'เปิดเสียง Beep'}
-            className={`p-2.5 rounded-xl border transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer ${
-              soundEnabled 
-                ? 'bg-blue-50 border-blue-200 text-blue-800' 
-                : 'bg-gray-100 border-gray-200 text-gray-400'
-            }`}
+            aria-pressed={soundEnabled}
+            className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 text-xs font-bold transition-colors cursor-pointer ${soundEnabled ? 'border-blue-200 bg-blue-50 text-blue-800' : 'border-[var(--line)] bg-white text-[var(--muted)]'}`}
           >
             {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            <span className="hidden sm:inline">{soundEnabled ? 'เสียงเปิด' : 'เสียงปิด'}</span>
+            <span>{soundEnabled ? 'เสียงเปิด' : 'เสียงปิด'}</span>
           </button>
-
-          {/* Fast-Track Auto Check-in Toggle */}
           <button
             type="button"
             onClick={() => setFastTrackMode(!fastTrackMode)}
-            title="สลับโหมดเช็คอินด่วนอัตโนมัติ"
-            className={`px-3 py-2.5 rounded-xl border transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer ${
-              fastTrackMode 
-                ? 'bg-amber-500 border-amber-600 text-white shadow-xs' 
-                : 'bg-white border-[var(--line)] text-gray-600 hover:bg-gray-50'
-            }`}
+            aria-pressed={fastTrackMode}
+            className={`inline-flex min-h-11 items-center gap-2 rounded-xl border px-3.5 text-xs font-bold transition-colors cursor-pointer ${fastTrackMode ? 'border-amber-600 bg-amber-500 text-white' : 'border-[var(--line)] bg-white text-[var(--ink)] hover:bg-gray-50'}`}
           >
-            <Zap className={`h-4 w-4 ${fastTrackMode ? 'text-white' : 'text-amber-500'}`} />
-            <span>{fastTrackMode ? '⚡ โหมดด่วน (ON)' : 'โหมดตรวจละเอียด'}</span>
+            <Zap className="h-4 w-4" />
+            <span>{fastTrackMode ? 'โหมดด่วนเปิด' : 'โหมดตรวจละเอียด'}</span>
           </button>
-
-          <Link
-            href="/staff/walk-in"
-            className="editorial-btn-secondary text-xs flex items-center gap-2"
-          >
+          <Link href="/staff/walk-in" className="editorial-btn-secondary min-h-11 text-xs flex items-center gap-2">
             <UserPlus className="h-4 w-4" />
             <span>Walk-in</span>
           </Link>
         </div>
-      </div>
+      </header>
 
-      {/* 3 Core KPIs Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-[var(--line)] rounded-2xl p-5 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">
-              1. ผู้ลงทะเบียนทั้งหมด
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-black text-[var(--ink)]">
-                {stats.totalToday}
-              </span>
-              <span className="text-xs text-gray-400 font-bold">คน</span>
-            </div>
-            <span className="text-[11px] text-gray-500 block">ปริมาณผู้ที่สนใจล่วงหน้า</span>
-          </div>
-          <div className="p-3 rounded-2xl bg-blue-50 text-blue-700 border border-blue-100">
-            <User className="h-6 w-6" />
-          </div>
-        </div>
-
-        <div className="bg-white border border-[var(--line)] rounded-2xl p-5 shadow-xs flex items-center justify-between">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-sky-700 uppercase tracking-wide">
-              2. มาเช็คอินเข้างานแล้ว
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-black text-sky-900">
-                {stats.checkedIn}
-              </span>
-              <span className="text-xs text-sky-600 font-bold">คน</span>
-              {stats.totalToday > 0 && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold">
-                  {Math.round((stats.checkedIn / stats.totalToday) * 100)}%
-                </span>
-              )}
-            </div>
-            <span className="text-[11px] text-sky-600 block">มาจริงที่งาน (% Turnout)</span>
-          </div>
-          <div className="p-3 rounded-2xl bg-sky-50 text-sky-700 border border-sky-100">
-            <UserCheck className="h-6 w-6" />
-          </div>
-        </div>
-
-        <div className="bg-white border border-emerald-200 rounded-2xl p-5 shadow-xs flex items-center justify-between bg-emerald-50/40">
-          <div className="space-y-1">
-            <span className="text-xs font-bold text-emerald-800 uppercase tracking-wide">
-              3. บริจาคสำเร็จ & รับของที่ระลึก
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-2xl sm:text-3xl font-black text-emerald-950">
-                {stats.completed}
-              </span>
-              <span className="text-xs text-emerald-700 font-bold">คน / ยูนิต</span>
-            </div>
-            <span className="text-[11px] text-emerald-700 block">
-              สำเร็จ {stats.completed} ยูนิต · มอบของที่ระลึกแล้ว
-            </span>
-          </div>
-          <div className="p-3 rounded-2xl bg-emerald-100 text-emerald-800 border border-emerald-200">
-            <Gift className="h-6 w-6" />
-          </div>
-        </div>
-      </div>
-
-      {/* Alert Banner */}
       {message && (
         <div
-          className={`p-4 rounded-2xl border text-sm font-bold flex items-start gap-3 transition-all ${
-            message.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-              : message.type === 'error'
-              ? 'bg-red-50 border-red-200 text-red-800'
-              : message.type === 'warning'
-              ? 'bg-amber-50 border-amber-200 text-amber-800'
-              : 'bg-blue-50 border-blue-200 text-blue-900'
-          }`}
+          role="status"
+          className={`flex items-start gap-3 rounded-xl border p-3.5 text-sm font-bold ${message.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-900' : message.type === 'error' ? 'border-red-200 bg-red-50 text-red-800' : message.type === 'warning' ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-blue-200 bg-blue-50 text-blue-900'}`}
         >
-          {message.type === 'success' && <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />}
-          {message.type === 'error' && <XCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />}
-          {message.type === 'warning' && <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />}
-          {message.type === 'info' && <Sparkles className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />}
-          <div className="flex-1">{message.text}</div>
-          <button 
-            type="button" 
-            onClick={() => setMessage(null)}
-            className="text-xs opacity-60 hover:opacity-100 cursor-pointer"
-          >
-            ✕
-          </button>
+          {message.type === 'success' ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" /> : message.type === 'error' ? <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" /> : <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />}
+          <span className="flex-1">{message.text}</span>
+          <button type="button" onClick={() => setMessage(null)} aria-label="ปิดข้อความแจ้งเตือน" className="min-h-11 min-w-11 -my-2 -mr-2 inline-flex items-center justify-center opacity-60 hover:opacity-100 cursor-pointer">×</button>
         </div>
       )}
 
-      {/* Main Grid: Left Scanner & Search, Right Donor Review Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Column: Interactive QR Scanner & Practical Tools (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="editorial-card p-6 space-y-5">
-            <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
-              <div className="flex items-center gap-2">
-                <QrCode className="h-5 w-5 text-[var(--burgundy-700)]" />
-                <h2 className="text-base font-black text-[var(--ink)]">
-                  เครื่องสแกน QR Code หน้าโต๊ะ
-                </h2>
-              </div>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${scanning ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-500'}`}>
-                {scanning ? 'CAMERA ACTIVE' : 'STANDBY'}
-              </span>
-            </div>
-
-            {/* Hidden Input for Image File Upload */}
-            <input 
-              ref={fileInputRef}
-              type="file" 
-              accept="image/*" 
-              className="hidden" 
-              onChange={handleImageUpload} 
-            />
-
-            {/* Scanner Viewfinder Box */}
-            <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-gray-950 border border-gray-800 shadow-inner flex items-center justify-center">
-              
-              {/* html5-qrcode DOM Region */}
-              <div
-                id="qr-reader-region"
-                className="w-full h-full object-cover [&_video]:!w-full [&_video]:!h-full [&_video]:!object-cover [&_#qr-shaded-region]:!hidden [&_div]:!border-none"
-                style={{ minHeight: '280px' }}
-              />
-
-              {/* Laser Scanning Animation and Reticle Corners when camera is ON */}
-              {scanning && !fullscreenScanner && (
-                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                  <div className="absolute inset-0 bg-black/30" />
-                  <div className="relative w-64 h-64 border-2 border-emerald-400/80 rounded-2xl shadow-[0_0_25px_rgba(52,211,153,0.3)] flex flex-col justify-between p-2">
-                    <div className="absolute -top-1 -left-1 w-6 h-6 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg" />
-                    <div className="absolute -top-1 -right-1 w-6 h-6 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg" />
-                    <div className="absolute -bottom-1 -left-1 w-6 h-6 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg" />
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 border-b-4 border-r-4 border-emerald-400 rounded-br-lg" />
-                    <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-bounce" />
-                    <div className="text-center text-[10px] font-mono font-bold text-emerald-300 bg-black/60 py-1 px-2 rounded-full self-center">
-                      จัดวาง QR Code ให้อยู่ในกรอบ
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Standby Placeholder */}
-              {!scanning && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center text-gray-400 space-y-3 bg-gray-900">
-                  <div className="p-4 rounded-3xl bg-gray-800 text-gray-300 border border-gray-700">
-                    <Camera className="h-10 w-10" />
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-bold text-gray-200">กล้องพร้อมใช้งาน</p>
-                    <p className="text-xs text-gray-400 max-w-xs">
-                      กดปุ่ม &ldquo;เปิดกล้องสแกน QR&rdquo; หรือกด &ldquo;สแกน QR Code เต็มจอ&rdquo; ด้านบน
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Practical Camera & Image Controls */}
-            <div className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {!scanning ? (
-                  <button
-                    type="button"
-                    onClick={() => startScanner('environment')}
-                    className="flex-1 editorial-btn-primary py-3 text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs"
-                  >
-                    <Camera className="h-4 w-4" />
-                    <span>เปิดกล้องสแกน QR</span>
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      onClick={stopScanner}
-                      className="flex-1 py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition-all shadow-xs"
-                    >
-                      <Ban className="h-4 w-4" />
-                      <span>ปิดกล้อง</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={toggleCameraFacing}
-                      title="สลับกล้องหน้า/หลัง"
-                      className="py-3 px-4 rounded-xl border border-[var(--line)] bg-white hover:bg-gray-50 text-[var(--ink)] text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                      <span className="hidden sm:inline">สลับกล้อง</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={toggleTorch}
-                      title="เปิด/ปิดไฟฉาย"
-                      className={`py-3 px-4 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
-                        torchOn ? 'bg-amber-400 text-amber-950 border-amber-500' : 'bg-white border-[var(--line)] text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <Flashlight className="h-4 w-4" />
-                      <span className="hidden sm:inline">{torchOn ? 'ไฟฉาย ON' : 'ไฟฉาย'}</span>
-                    </button>
-                  </>
-                )}
-
-                {/* Upload Image Button */}
-                <button
-                  type="button"
-                  disabled={uploadingImage}
-                  onClick={() => fileInputRef.current?.click()}
-                  title="อัปโหลดภาพ QR Code จากอัลบั้มหรือไฟล์"
-                  className="py-3 px-4 rounded-xl border border-[var(--line)] bg-white hover:bg-gray-50 text-[var(--ink)] text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-xs disabled:opacity-50"
-                >
-                  <UploadCloud className="h-4 w-4 text-blue-600" />
-                  <span>{uploadingImage ? 'กำลังอ่าน...' : 'เลือกรูป QR'}</span>
-                </button>
-              </div>
-
-              {/* Camera Lens Selector if multiple cameras exist */}
-              {cameras.length > 1 && (
-                <div className="flex items-center gap-2 pt-1">
-                  <SlidersHorizontal className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                  <select
-                    value={selectedCameraId}
-                    onChange={(e) => handleCameraChange(e.target.value)}
-                    className="w-full text-xs py-1.5 px-2.5 rounded-lg border border-[var(--line)] bg-gray-50 text-gray-700 font-medium focus:outline-none focus:ring-1 focus:ring-[var(--burgundy-700)] cursor-pointer"
-                  >
-                    {cameras.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-
-            {/* Hardware Scanner & Keyboard Wedge Helper */}
-            <div className="rounded-xl bg-gray-50 border border-gray-200 p-3 text-[11px] text-gray-600 flex items-center gap-2.5">
-              <span className="px-2 py-0.5 rounded bg-gray-200 text-gray-800 font-mono font-bold text-[10px]">
-                USB / 2D GUN
-              </span>
-              <span>รองรับเครื่องยิงบาร์โค้ด USB/Bluetooth ยิงรหัสได้ทันทีโดยไม่ต้องแตะหน้าจอ</span>
-            </div>
-
-            {/* Manual Search Fallback */}
-            <form onSubmit={handleSearch} className="space-y-3 pt-3 border-t border-[var(--line)]">
-              <label htmlFor="ck-search" className="block text-xs font-bold text-[var(--ink)]">
-                ค้นหาด้วยชื่อ / เบอร์โทร / รหัสลงทะเบียน
-              </label>
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <input
-                    id="ck-search"
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="เช่น MBD26-XXXX หรือ 0812345678"
-                    className="editorial-input w-full pl-9 text-xs"
-                  />
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-                </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="editorial-btn-primary px-4 py-2 text-xs font-bold shrink-0 cursor-pointer disabled:opacity-50"
-                >
-                  {loading ? 'ค้นหา...' : 'ค้นหา'}
-                </button>
-              </div>
-            </form>
-          </div>
-
-          {/* Recent Scans History Card (5 items) */}
-          {recentScans.length > 0 && (
-            <div className="editorial-card p-5 space-y-3">
-              <div className="flex items-center justify-between border-b border-[var(--line)] pb-2">
-                <div className="flex items-center gap-2">
-                  <History className="h-4 w-4 text-[var(--burgundy-700)]" />
-                  <span className="text-xs font-bold text-[var(--ink)]">ประวัติการสแกนล่าสุด (5 ท่าน)</span>
-                </div>
-                <span className="text-[10px] font-bold text-gray-400">{recentScans.length} รายการ</span>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {recentScans.map((item) => (
-                  <div 
-                    key={item.id}
-                    onClick={() => handleLookupByToken(item.code)}
-                    className="py-2.5 flex items-center justify-between gap-2 hover:bg-gray-50 px-2 rounded-lg cursor-pointer transition-colors"
-                  >
-                    <div className="space-y-0.5 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[var(--ink)] truncate">{item.name}</span>
-                        <span className="font-mono text-[10px] text-gray-400">{item.code}</span>
-                      </div>
-                      <span className="text-[10px] text-gray-400 font-mono">{item.time}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        item.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {item.status === 'COMPLETED' ? 'รับของขวัญแล้ว 🎁' : 'เช็คอินแล้ว'}
-                      </span>
-                      <ChevronRight className="h-3.5 w-3.5 text-gray-300" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column: Donor Confirmation Card & Action Workflow (7 cols) */}
-        <div className="lg:col-span-7">
-          {registration ? (
-            <div className="editorial-card p-6 space-y-6 animate-in fade-in-50 duration-300">
-              
-              {/* Card Header & Status */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--line)] pb-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-black text-sm text-[var(--burgundy-700)] bg-[var(--rose-100)] px-2.5 py-0.5 rounded-md border border-[var(--line)]">
-                      {registration.registrationCode}
-                    </span>
-                    <span className="text-xs font-bold text-gray-500">
-                      {getParticipantTypeLabel(registration.participantType)}
-                    </span>
-                  </div>
-                  <h2 className="text-2xl font-black text-[var(--ink)]">
-                    คุณ{registration.firstName} {registration.lastName}
-                  </h2>
-                </div>
-
-                <div className="shrink-0">
-                  {(() => {
-                    const badge = getRegistrationStatusBadge(registration.status);
-                    return (
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black border ${badge.colorClass}`}>
-                        {badge.label}
-                      </span>
-                    );
-                  })()}
-                </div>
-              </div>
-
-              {/* Information Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50/70 p-4 rounded-2xl border border-gray-200/70">
-                <div className="space-y-1">
-                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
-                    รอบเวลาที่ลงทะเบียน
-                  </span>
-                  <p className="text-sm font-black text-[var(--ink)] font-mono">
-                    {registration.timeSlotText}
-                  </p>
-                </div>
-
-                <div className="space-y-1">
-                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Phone className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
-                    เบอร์โทรศัพท์ติดต่อ
-                  </span>
-                  <p className="text-sm font-black text-[var(--ink)] font-mono">
-                    {registration.phone}
-                  </p>
-                </div>
-
-                <div className="space-y-1 sm:col-span-2">
-                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <User className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
-                    สังกัด / คณะ / หน่วยงาน
-                  </span>
-                  <p className="text-sm font-bold text-[var(--ink)]">
-                    {registration.facultyName}
-                  </p>
-                </div>
-              </div>
-
-              {/* Status Guide & Instructions */}
-              <div className="p-4 rounded-2xl border space-y-2 bg-blue-50/40 border-blue-200/60">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-[var(--ink)] flex items-center gap-1.5">
-                    <ShieldCheck className="h-4 w-4 text-blue-700" />
-                    สถานะการเข้าร่วมงานและการรับของที่ระลึก
-                  </span>
-                  {registration.checkedInAt && (
-                    <span className="text-[11px] font-mono text-gray-600">
-                      เช็คอินเมื่อ: {new Date(registration.checkedInAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
-                    </span>
-                  )}
-                </div>
-
-                {registration.status === 'REGISTERED' && (
-                  <p className="text-xs text-gray-600">
-                    ผู้บริจาคลงทะเบียนแล้ว กรุณาตรวจสอบข้อมูลและกดปุ่ม <span className="font-bold text-blue-700">&ldquo;ยืนยันเช็คอินเข้างาน&rdquo;</span> ด้านล่าง
-                  </p>
-                )}
-
-                {registration.status === 'CHECKED_IN' && (
-                  <p className="text-xs text-emerald-800 font-bold">
-                    ✓ เช็คอินเข้างานแล้ว — เมื่อผู้บริจาคบริจาคโลหิตเสร็จสิ้น กดปุ่ม <span className="font-black text-emerald-900">&ldquo;บริจาคสำเร็จ &amp; มอบของที่ระลึก&rdquo;</span>
-                  </p>
-                )}
-
-                {registration.status === 'COMPLETED' && (
-                  <div className="flex items-center gap-2 text-emerald-900 text-xs font-black">
-                    <Gift className="h-5 w-5 text-emerald-600" />
-                    <span>🎉 บริจาคโลหิตสำเร็จ และรับของที่ระลึกสุดพิเศษเรียบร้อยแล้ว ✨</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-3 pt-2 border-t border-[var(--line)]">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  
-                  {/* Step 1 Button: Check-in */}
-                  {registration.status === 'REGISTERED' && (
-                    <button
-                      type="button"
-                      disabled={actionLoading}
-                      onClick={() => handleStatusChange('CHECKED_IN')}
-                      className="flex-1 py-3.5 px-5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-black text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer disabled:opacity-50"
-                    >
-                      <UserCheck className="h-5 w-5" />
-                      <span>1. ยืนยันการเช็คอินเข้างาน (CHECK-IN)</span>
-                    </button>
-                  )}
-
-                  {/* Step 2 Button: Completed & Souvenir */}
-                  {registration.status === 'CHECKED_IN' && (
-                    <button
-                      type="button"
-                      disabled={actionLoading}
-                      onClick={() => handleStatusChange('COMPLETED')}
-                      className="flex-1 py-3.5 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50 animate-pulse"
-                    >
-                      <Gift className="h-5 w-5" />
-                      <span>2. ยืนยันบริจาคสำเร็จ & มอบของที่ระลึก (COMPLETED)</span>
-                    </button>
-                  )}
-
-                  {/* Completed State Display */}
-                  {registration.status === 'COMPLETED' && (
-                    <div className="flex-1 py-3.5 px-5 rounded-2xl bg-emerald-100 text-emerald-900 font-black text-sm flex items-center justify-center gap-2 border border-emerald-300">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-700" />
-                      <span>เสร็จสิ้นกระบวนการและมอบของที่ระลึกแล้ว</span>
-                    </div>
-                  )}
-
-                  {/* Cancel / Failed Screening Button */}
-                  {isAdmin && registration.status !== 'COMPLETED' && registration.status !== 'CANCELLED' && (
-                    <button
-                      type="button"
-                      disabled={actionLoading}
-                      onClick={() => {
-                        if (confirm(`ยืนยันการยกเลิก / ไม่ผ่านการคัดกรอง สำหรับคุณ ${registration.firstName}?`)) {
-                          handleStatusChange('CANCELLED');
-                        }
-                      }}
-                      className="py-3.5 px-4 rounded-2xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shrink-0"
-                    >
-                      <Ban className="h-4 w-4 text-red-600" />
-                      <span>ยกเลิก / ไม่ผ่านคัดกรอง</span>
-                    </button>
-                  )}
-                </div>
-
-                {/* Reset / Scan Next Person */}
-                <div className="flex justify-between items-center pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRegistration(null);
-                      setSearchQuery('');
-                    }}
-                    className="text-xs font-bold text-gray-500 hover:text-[var(--ink)] flex items-center gap-1 cursor-pointer"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />
-                    <span>เคลียร์หน้าจอเพื่อสแกนคนถัดไป</span>
-                  </button>
-
-                  <span className="text-[11px] text-gray-400 font-mono">
-                    ID: {registration.id.slice(0, 8)}...
-                  </span>
-                </div>
-              </div>
-
-            </div>
-          ) : (
-            /* Empty State */
-            <div className="editorial-card p-12 text-center flex flex-col items-center justify-center space-y-4 min-h-[420px]">
-              <div className="p-4 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)]">
-                <QrCode className="h-12 w-12 stroke-[1.5]" />
-              </div>
-              <div className="space-y-1.5 max-w-sm">
-                <h3 className="text-lg font-black text-[var(--ink)]">
-                  พร้อมสำหรับการสแกน
-                </h3>
-                <p className="text-xs text-[var(--muted)] leading-relaxed">
-                  ส่องกล้องไปที่ QR Code ของผู้บริจาค หรือกดปุ่ม &ldquo;สแกน QR Code เต็มจอ&rdquo; เพื่อสแกนอย่างรวดเร็วและต่อเนื่อง
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 📱 FULLSCREEN MOBILE PAYMENT-APP STYLE SCANNER OVERLAY (PROMPTPAY / SCAN-PAY STYLE) */}
-      {/* ========================================================================= */}
-      {fullscreenScanner && (
-        <div className="fixed inset-0 z-50 bg-black flex flex-col animate-in fade-in-100 duration-200">
-          
-          {/* Top Floating Glassmorphic Header */}
-          <div className="absolute top-0 inset-x-0 z-20 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
-            
-            {/* Close / Back Button */}
-            <button
-              type="button"
-              onClick={closeFullscreenScanner}
-              className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 border border-white/20 transition-all cursor-pointer shadow-lg"
-            >
-              <X className="h-5 w-5" />
-            </button>
-
-            {/* Title / Badge */}
-            <div className="flex flex-col items-center">
-              <span className="text-xs font-mono font-black text-emerald-400 tracking-wider uppercase">
-                MUMT SCAN & CHECK-IN
-              </span>
-              <span className="text-[10px] text-white/70">
-                {fastTrackMode ? '⚡ โหมดเช็คอินด่วน' : 'โหมดตรวจละเอียด'}
-              </span>
-            </div>
-
-            {/* Quick Action Toggles */}
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
+        <section className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[#0d1524] text-white" aria-labelledby="scanner-title">
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
             <div className="flex items-center gap-2">
-              {/* Sound Toggle */}
-              <button
-                type="button"
-                onClick={() => setSoundEnabled(!soundEnabled)}
-                className={`p-3 rounded-full backdrop-blur-md border transition-all cursor-pointer shadow-lg ${
-                  soundEnabled ? 'bg-blue-600/80 border-blue-400 text-white' : 'bg-black/50 border-white/20 text-white/60'
-                }`}
-              >
-                {soundEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-              </button>
-
-              {/* Torch Toggle */}
-              <button
-                type="button"
-                onClick={toggleTorch}
-                className={`p-3 rounded-full backdrop-blur-md border transition-all cursor-pointer shadow-lg ${
-                  torchOn ? 'bg-amber-400 border-amber-300 text-amber-950' : 'bg-black/50 border-white/20 text-white'
-                }`}
-              >
-                <Flashlight className="h-5 w-5" />
-              </button>
-
-              {/* Camera Switch Toggle */}
-              <button
-                type="button"
-                onClick={toggleCameraFacing}
-                className="p-3 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70 border border-white/20 transition-all cursor-pointer shadow-lg"
-              >
-                <RotateCcw className="h-5 w-5" />
-              </button>
+              <QrCode className="h-5 w-5 text-emerald-300" />
+              <h2 id="scanner-title" className="text-sm font-black">กล้องสแกน QR</h2>
             </div>
+            <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${scanning ? 'bg-emerald-400/15 text-emerald-300' : 'bg-white/10 text-white/60'}`}>
+              {scanning ? 'กำลังสแกน' : 'พร้อมเปิดกล้อง'}
+            </span>
           </div>
 
-          {/* HTML5-QRCode Live Camera Viewport Container */}
-          <div
-            id="qr-reader-fullscreen"
-            className="absolute inset-0 w-full h-full object-cover overflow-hidden bg-black [&_video]:!w-full [&_video]:!h-full [&_video]:!object-cover [&_#qr-shaded-region]:!hidden [&_div]:!border-none"
-          />
-
-          {/* Center Immersive Viewfinder Box */}
-          <div className="relative flex-1 flex items-center justify-center overflow-hidden pointer-events-none z-10">
-            
-            {/* Viewfinder Target Frame */}
-            <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-3xl border-2 border-emerald-400/90 shadow-[0_0_50px_rgba(52,211,153,0.4)] flex flex-col justify-between p-3 pointer-events-none z-10">
-              {/* 4 Glowing Corner L-Brackets */}
-              <div className="absolute -top-1.5 -left-1.5 w-8 h-8 border-t-4 border-l-4 border-emerald-400 rounded-tl-xl shadow-[0_0_10px_#34d399]" />
-              <div className="absolute -top-1.5 -right-1.5 w-8 h-8 border-t-4 border-r-4 border-emerald-400 rounded-tr-xl shadow-[0_0_10px_#34d399]" />
-              <div className="absolute -bottom-1.5 -left-1.5 w-8 h-8 border-b-4 border-l-4 border-emerald-400 rounded-bl-xl shadow-[0_0_10px_#34d399]" />
-              <div className="absolute -bottom-1.5 -right-1.5 w-8 h-8 border-b-4 border-r-4 border-emerald-400 rounded-br-xl shadow-[0_0_10px_#34d399]" />
-
-              {/* Laser Scanning Line */}
-              <div className="w-full h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_16px_#34d399] animate-bounce" />
-
-              <div className="text-center text-xs font-bold text-white bg-black/60 backdrop-blur-md py-1.5 px-4 rounded-full self-center border border-white/20">
-                จัดวาง QR Code ให้อยู่ในกรอบ
-              </div>
-            </div>
-
-            {/* Instruction Tip */}
-            <div className="absolute bottom-28 inset-x-0 text-center text-white/90 text-xs z-10 font-semibold px-4 drop-shadow-md">
-              สแกน QR Code จากหน้าจอมือถือหรือบัตรลงทะเบียนของผู้บริจาค
-            </div>
-          </div>
-
-          {/* Slide-Up Bottom Action Drawer (Like Payment Apps Confirmation Sheet) */}
-          {registration && (
-            <div className="absolute bottom-0 inset-x-0 z-30 bg-white rounded-t-3xl p-6 space-y-4 shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[85vh] overflow-y-auto">
-              
-              {/* Drawer Drag Bar */}
-              <div className="w-12 h-1.5 bg-gray-300 rounded-full mx-auto" />
-
-              {/* Header Info & Status */}
-              <div className="flex items-center justify-between gap-3 border-b border-gray-100 pb-3">
-                <div>
-                  <span className="font-mono font-black text-xs text-[var(--burgundy-700)] bg-[var(--rose-100)] px-2 py-0.5 rounded border border-[var(--line)]">
-                    {registration.registrationCode}
-                  </span>
-                  <h3 className="text-xl font-black text-[var(--ink)] mt-1">
-                    คุณ{registration.firstName} {registration.lastName}
-                  </h3>
-                </div>
-                <div>
-                  {(() => {
-                    const badge = getRegistrationStatusBadge(registration.status);
-                    return (
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black border ${badge.colorClass}`}>
-                        {badge.label}
-                      </span>
-                    );
-                  })()}
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+          <div className="relative min-h-[54vh] sm:min-h-[560px]">
+            <div id="qr-reader-fullscreen" className="h-full min-h-[54vh] w-full [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover [&_#qr-shaded-region]:!hidden [&_div]:!border-none" />
+            {scanning && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
+                <div className="relative h-64 w-64 rounded-2xl border-2 border-emerald-300/90 sm:h-80 sm:w-80">
+                  <span className="absolute -left-1 -top-1 h-8 w-8 border-l-4 border-t-4 border-emerald-300" />
+                  <span className="absolute -right-1 -top-1 h-8 w-8 border-r-4 border-t-4 border-emerald-300" />
+                  <span className="absolute -bottom-1 -left-1 h-8 w-8 border-b-4 border-l-4 border-emerald-300" />
+                  <span className="absolute -bottom-1 -right-1 h-8 w-8 border-b-4 border-r-4 border-emerald-300" />
+                  <span className="absolute inset-x-3 top-1/2 h-0.5 bg-emerald-300 shadow-[0_0_14px_#6ee7b7]" />
+                  <span className="absolute -bottom-10 inset-x-0 text-center text-xs font-bold text-white">จัด QR ให้อยู่ในกรอบ</span>
                 </div>
               </div>
-
-              {/* Details Summary */}
-              <div className="grid grid-cols-2 gap-2 text-xs bg-gray-50 p-3 rounded-xl">
+            )}
+            {!scanning && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#0d1524] px-6 text-center">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-emerald-200"><Camera className="h-12 w-12" /></div>
                 <div>
-                  <span className="text-gray-400 font-bold block text-[10px]">รอบเวลา</span>
-                  <span className="font-black text-gray-800 font-mono">{registration.timeSlotText}</span>
+                  <p className="text-base font-black">พร้อมสำหรับการสแกน</p>
+                  <p className="mt-1 max-w-sm text-sm text-white/65">กดเปิดกล้องเพื่อเริ่ม หรือใช้ช่องค้นหาด้านข้างหากอุปกรณ์ไม่มีกล้อง</p>
                 </div>
-                <div>
-                  <span className="text-gray-400 font-bold block text-[10px]">เบอร์โทร</span>
-                  <span className="font-black text-gray-800 font-mono">{registration.phone}</span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-2 pt-1">
-                {registration.status === 'REGISTERED' && (
-                  <button
-                    type="button"
-                    disabled={actionLoading}
-                    onClick={() => handleStatusChange('CHECKED_IN')}
-                    className="w-full py-4 px-5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50"
-                  >
-                    <UserCheck className="h-5 w-5" />
-                    <span>ยืนยันเช็คอินเข้างาน (CHECK-IN)</span>
-                  </button>
-                )}
-
-                {registration.status === 'CHECKED_IN' && (
-                  <button
-                    type="button"
-                    disabled={actionLoading}
-                    onClick={() => handleStatusChange('COMPLETED')}
-                    className="w-full py-4 px-5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50 animate-pulse"
-                  >
-                    <Gift className="h-5 w-5" />
-                    <span>บริจาคสำเร็จ & มอบของที่ระลึก (COMPLETED)</span>
-                  </button>
-                )}
-
-                {registration.status === 'COMPLETED' && (
-                  <div className="w-full py-3.5 px-4 rounded-2xl bg-emerald-100 text-emerald-900 font-black text-sm flex items-center justify-center gap-2 border border-emerald-300">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-700" />
-                    <span>🎉 มอบของที่ระลึกเรียบร้อยแล้ว</span>
-                  </div>
-                )}
-
-                {/* Dismiss & Scan Next */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setRegistration(null);
-                  }}
-                  className="w-full py-3 text-xs font-bold text-gray-600 hover:text-gray-900 flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>สแกนคนถัดไป</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                <button type="button" onClick={() => startScanner('environment')} className="editorial-btn-primary min-h-11 px-5 text-sm flex items-center gap-2 cursor-pointer">
+                  <Camera className="h-4 w-4" /> เปิดกล้องสแกน
                 </button>
               </div>
+            )}
+          </div>
 
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-2 border-t border-white/10 p-4 sm:p-5">
+            {scanning ? (
+              <button type="button" onClick={stopScanner} className="min-h-11 rounded-xl bg-red-600 px-4 text-xs font-bold text-white hover:bg-red-700 cursor-pointer flex items-center gap-2"><Ban className="h-4 w-4" /> ปิดกล้อง</button>
+            ) : null}
+            <button type="button" onClick={toggleCameraFacing} className="min-h-11 rounded-xl border border-white/15 bg-white/5 px-4 text-xs font-bold text-white hover:bg-white/10 cursor-pointer flex items-center gap-2"><RotateCcw className="h-4 w-4" /> สลับกล้อง</button>
+            <button type="button" onClick={toggleTorch} disabled={!scanning} className={`min-h-11 rounded-xl border px-4 text-xs font-bold cursor-pointer flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-40 ${torchOn ? 'border-amber-400 bg-amber-400 text-amber-950' : 'border-white/15 bg-white/5 text-white hover:bg-white/10'}`}><Flashlight className="h-4 w-4" /> {torchOn ? 'ไฟฉายเปิด' : 'ไฟฉาย'}</button>
+            <button type="button" disabled={uploadingImage} onClick={() => fileInputRef.current?.click()} className="min-h-11 rounded-xl border border-white/15 bg-white/5 px-4 text-xs font-bold text-white hover:bg-white/10 cursor-pointer flex items-center gap-2 disabled:opacity-40"><UploadCloud className="h-4 w-4" /> {uploadingImage ? 'กำลังอ่าน...' : 'อัปโหลด QR'}</button>
+          </div>
+        </section>
 
-        </div>
-      )}
+        <aside className="space-y-5">
+          <section className="rounded-2xl border border-[var(--line)] bg-white p-5 shadow-xs" aria-labelledby="lookup-title">
+            <h2 id="lookup-title" className="text-base font-black text-[var(--ink)]">ค้นหาผู้บริจาค</h2>
+            <p className="mt-1 text-sm text-[var(--muted)]">ใช้ชื่อ เบอร์โทร หรือรหัสลงทะเบียนแทนการสแกน</p>
+            <form onSubmit={handleSearch} className="mt-4 space-y-2.5">
+              <label htmlFor="ck-search" className="sr-only">ชื่อ เบอร์โทร หรือรหัสลงทะเบียน</label>
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
+                <input id="ck-search" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="เช่น LVU26-0001 หรือ 0812345678" className="editorial-input pl-10" />
+              </div>
+              <button type="submit" disabled={loading} className="editorial-btn-primary min-h-11 w-full text-sm cursor-pointer disabled:opacity-50">{loading ? 'กำลังค้นหา...' : 'ค้นหา'}</button>
+            </form>
+          </section>
 
+          <section className="rounded-2xl border border-[var(--line)] bg-white p-5 shadow-xs" aria-live="polite">
+            {registration ? (
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] pb-3">
+                  <div><span className="font-mono text-xs font-bold text-[var(--burgundy-700)]">{registration.registrationCode}</span><h2 className="mt-1 text-xl font-black text-[var(--ink)]">คุณ{registration.firstName} {registration.lastName}</h2></div>
+                  <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold ${getRegistrationStatusBadge(registration.status).colorClass}`}>{getRegistrationStatusBadge(registration.status).label}</span>
+                </div>
+                <dl className="grid grid-cols-2 gap-3 rounded-xl bg-[var(--bg)] p-3 text-xs"><div><dt className="text-[var(--muted)]">รอบเวลา</dt><dd className="mt-1 font-bold text-[var(--ink)]">{registration.timeSlotText}</dd></div><div><dt className="text-[var(--muted)]">เบอร์โทร</dt><dd className="mt-1 font-mono font-bold text-[var(--ink)]">{registration.phone}</dd></div></dl>
+                {registration.status === 'REGISTERED' && <button type="button" disabled={actionLoading} onClick={() => handleStatusChange('CHECKED_IN')} className="min-h-12 w-full rounded-xl bg-blue-700 px-4 text-sm font-black text-white hover:bg-blue-800 cursor-pointer disabled:opacity-50"><UserCheck className="mr-2 inline h-5 w-5" />ยืนยันเช็คอิน</button>}
+                {registration.status === 'CHECKED_IN' && <button type="button" disabled={actionLoading} onClick={() => handleStatusChange('COMPLETED')} className="min-h-12 w-full rounded-xl bg-emerald-700 px-4 text-sm font-black text-white hover:bg-emerald-800 cursor-pointer disabled:opacity-50"><Gift className="mr-2 inline h-5 w-5" />บันทึกบริจาคสำเร็จและมอบของ</button>}
+                {registration.status === 'COMPLETED' && <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-center text-sm font-bold text-emerald-900"><CheckCircle2 className="mr-2 inline h-5 w-5" />ดำเนินการเรียบร้อยแล้ว</div>}
+                <button type="button" onClick={() => setRegistration(null)} className="min-h-11 w-full text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)] cursor-pointer">สแกนคนถัดไป <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></button>
+              </div>
+            ) : (
+              <div className="flex min-h-56 flex-col items-center justify-center text-center"><div className="rounded-full bg-[var(--rose-100)] p-4 text-[var(--burgundy-700)]"><QrCode className="h-8 w-8" /></div><h2 className="mt-4 text-lg font-black text-[var(--ink)]">รอผลการสแกน</h2><p className="mt-1 max-w-xs text-sm text-[var(--muted)]">เมื่อพบผู้บริจาค ข้อมูลและปุ่มดำเนินการจะแสดงที่นี่</p></div>
+            )}
+          </section>
+
+          {recentScans.length > 0 && <section className="rounded-2xl border border-[var(--line)] bg-white p-5 shadow-xs"><div className="flex items-center justify-between border-b border-[var(--line)] pb-3"><h2 className="flex items-center gap-2 text-sm font-black text-[var(--ink)]"><History className="h-4 w-4 text-[var(--burgundy-700)]" /> สแกนล่าสุด</h2><span className="text-xs text-[var(--muted)]">{recentScans.length} รายการ</span></div><div className="divide-y divide-[var(--line)]">{recentScans.map((item) => <button type="button" key={item.id} onClick={() => void handleLookupByToken(item.code)} className="flex min-h-12 w-full items-center justify-between gap-3 text-left text-xs cursor-pointer"><span className="min-w-0 truncate font-bold text-[var(--ink)]">{item.name}</span><span className="shrink-0 font-mono text-[var(--muted)]">{item.time}</span></button>)}</div></section>}
+        </aside>
+      </div>
     </div>
   );
+
 }

@@ -44,8 +44,10 @@ export function isStaffPortalRole(role: StaffRole): boolean {
   return role === 'ADMIN' || role === 'STAFF';
 }
 
-function toEffectiveRole(email: string, _storedRole: string): StaffRole {
-  if (isPrimaryAdminEmail(email)) return 'ADMIN';
+function toEffectiveRole(email: string, storedRole: string): StaffRole {
+  // The configured owner is always an Admin for bootstrap/recovery, while
+  // every explicitly assigned ADMIN profile keeps its database role.
+  if (isPrimaryAdminEmail(email) || storedRole === 'ADMIN') return 'ADMIN';
   return 'STAFF';
 }
 
@@ -131,13 +133,13 @@ export async function requireTeamLead(userOverride?: AuthenticatedUser | null): 
 
 export async function requireAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
   const user = userOverride !== undefined ? userOverride : await getAuthenticatedUser();
-  const authenticated = assertRole(user, ['ADMIN'], 'ADMIN');
+  return assertRole(user, ['ADMIN'], 'ADMIN');
+}
+
+export async function requireSuperAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
+  const authenticated = await requireAdmin(userOverride);
   if (!isPrimaryAdminEmail(authenticated.email)) {
     throw new Error('FORBIDDEN');
   }
   return authenticated;
-}
-
-export async function requireSuperAdmin(userOverride?: AuthenticatedUser | null): Promise<AuthenticatedUser> {
-  return requireAdmin(userOverride);
 }

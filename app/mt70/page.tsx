@@ -13,17 +13,14 @@ import {
   Download,
   GraduationCap
 } from 'lucide-react';
-import { getDashboardKPIs, getAllRegistrations, getAllStaffMembers } from '@/services/admin-service';
+import { getDashboardKPIs, getAllRegistrations } from '@/services/admin-service';
 import { getEventBySlug } from '@/services/event-service';
-import { getAuthenticatedUser } from '@/lib/auth/server';
-import { StaffRoleManagement } from '@/components/admin/StaffRoleManagement';
 import { getParticipantTypeLabel, getRegistrationStatusBadge, formatTimeRange } from '@/lib/utils/format';
 import { RegistrationStatus, ParticipantType } from '@/lib/types/database';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  const user = await getAuthenticatedUser();
   const event = await getEventBySlug('mumt-2026');
   const kpis = event
     ? await getDashboardKPIs(event.id)
@@ -47,8 +44,6 @@ export default async function AdminDashboardPage() {
 
   const allRegistrations = event ? await getAllRegistrations(event.id) : [];
   const recentRegistrations = allRegistrations.slice(0, 8);
-  const staffMembers = await getAllStaffMembers();
-
   const totalBooked = kpis.slotBreakdown.reduce((acc, s) => acc + s.bookedCount, 0);
 
   const kpiBlocks = [
@@ -479,15 +474,6 @@ export default async function AdminDashboardPage() {
             </div>
           </>
         )}
-      </section>
-
-      {/* ============ SECTION 4: STAFF & ADMIN MANAGEMENT ============ */}
-      <section className="pt-4 border-t border-[var(--line)]">
-        <StaffRoleManagement
-          currentUserRole={user?.profile.role}
-          currentUserEmail={user?.email}
-          initialStaffList={staffMembers}
-        />
       </section>
 
     </div>

@@ -4,11 +4,20 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { QrCode, UserPlus, BarChart3, LogOut, ListOrdered, Loader2, ArrowLeft } from 'lucide-react';
+import { QrCode, UserPlus, BarChart3, LogOut, Loader2, ArrowLeft } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 
 export function StaffHeader() {
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  React.useEffect(() => {
+    if (!pathname.startsWith('/staff/')) return;
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => setIsAdmin(data?.user?.profile?.role === 'ADMIN'))
+      .catch(() => setIsAdmin(false));
+  }, [pathname]);
 
   // Only render on operational staff routes (not on login, change-password, or admin which has its own layout)
   if (
@@ -22,10 +31,9 @@ export function StaffHeader() {
   }
 
   const tabs = [
-    { href: '/staff/checkin', label: 'จุดสแกน QR', icon: QrCode },
-    { href: '/staff/queue', label: 'คิวผู้บริจาค', icon: ListOrdered },
+    { href: '/staff/checkin', label: 'สแกน QR', icon: QrCode },
     { href: '/staff/walk-in', label: 'ลงทะเบียน Walk-in', icon: UserPlus },
-    { href: '/mt70', label: 'แดชบอร์ด (Admin)', icon: BarChart3 },
+    ...(isAdmin ? [{ href: '/mt70', label: 'แดชบอร์ด Admin', icon: BarChart3 }] : []),
   ];
 
   return (
@@ -59,6 +67,7 @@ export function StaffHeader() {
               <Link
                 key={tab.href}
                 href={tab.href}
+                aria-label={tab.href === '/staff/checkin' ? 'เปิดหน้าสแกน QR' : tab.label}
                 className={`flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
                   isActive
                     ? 'bg-[var(--burgundy-700)] text-white shadow-xs'
@@ -94,6 +103,7 @@ export function StaffHeader() {
             <Link
               key={tab.href}
               href={tab.href}
+              aria-label={tab.href === '/staff/checkin' ? 'เปิดหน้าสแกน QR' : tab.label}
               className={`flex flex-col items-center gap-0.5 py-1.5 px-3 rounded-lg text-[10px] font-bold ${
                 isActive ? 'bg-[var(--burgundy-700)] text-white font-black' : 'text-gray-600'
               }`}

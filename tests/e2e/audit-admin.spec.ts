@@ -1,4 +1,4 @@
-import { test, type APIRequestContext } from '@playwright/test';
+import { test, expect, type APIRequestContext } from '@playwright/test';
 
 const ADMIN_EMAIL = 'admin@mahidol.ac.th';
 const ADMIN_PASS = 'Admin@MUMT2026';
@@ -112,10 +112,19 @@ async function auditPage(page: import('@playwright/test').Page) {
 test('audit admin registrations', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
+  await expect(page.getByRole('link', { name: /จัดการ Staff/ })).toBeVisible();
   await page.goto('/mt70/registrations');
   await page.waitForTimeout(600);
   const out = await auditPage(page);
   console.log('\n[mt70/registrations]', JSON.stringify(out, null, 1));
+});
+
+test('retired queue URL returns staff to scan workspace', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await login(page);
+  await page.goto('/staff/queue');
+  await expect(page).toHaveURL(/\/staff\/checkin$/);
+  await expect(page.getByRole('heading', { name: 'สแกน QR ผู้บริจาค' })).toBeVisible();
 });
 
 test('audit admin content', async ({ page }) => {

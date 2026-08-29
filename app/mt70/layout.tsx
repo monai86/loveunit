@@ -69,6 +69,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               </Link>
 
               <Link
+                href="/mt70/staff"
+                className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
+              >
+                <Shield className="h-4 w-4 text-[var(--burgundy-600)]" />
+                <span>จัดการ Staff</span>
+              </Link>
+
+              <Link
                 href="/mt70/content"
                 className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
               >
@@ -122,6 +130,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
         </div>
       </header>
+
+      <nav aria-label="เมนูผู้ดูแลระบบบนมือถือ" className="flex gap-1 overflow-x-auto border-b border-[var(--line)] bg-white px-3 py-2 md:hidden">
+        {[
+          { href: '/mt70', label: 'Dashboard', icon: LayoutDashboard },
+          { href: '/mt70/registrations', label: 'ผู้บริจาค', icon: Users },
+          { href: '/mt70/staff', label: 'Staff', icon: Shield },
+          { href: '/staff/checkin', label: 'Scan', icon: QrCode },
+        ].map((item) => {
+          const Icon = item.icon;
+          return <Link key={item.href} href={item.href} className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-bold text-[var(--ink)] hover:bg-[var(--rose-100)]"><Icon className="h-4 w-4 text-[var(--burgundy-700)]" />{item.label}</Link>;
+        })}
+      </nav>
 
       {/* Main Admin Content */}
       <main className="flex-1">

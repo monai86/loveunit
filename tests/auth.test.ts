@@ -127,7 +127,7 @@ async function runAuthTests() {
   console.log('✓ Session lifecycle verified\n');
 
   // ---- Server Guards for unified ADMIN role ----
-  console.log('Test 5: Server Guards — primary Admin and Staff separation');
+  console.log('Test 5: Server Guards — role-based Admin and Staff separation');
   process.env.PRIMARY_ADMIN_EMAIL = 'primary-admin@test.local';
   const primaryAdmin = makeUser('ADMIN', { email: 'primary-admin@test.local' });
   const legacyAdmin = makeUser('ADMIN', { email: 'legacy-admin@test.local' });
@@ -140,7 +140,8 @@ async function runAuthTests() {
   assert.ok(await requireAdmin(primaryAdmin));
   assert.ok(await requireTeamLead(primaryAdmin));
   assert.ok(await requireSuperAdmin(primaryAdmin));
-  await assert.rejects(() => requireAdmin(legacyAdmin), /FORBIDDEN/, 'only PRIMARY_ADMIN_EMAIL may be admin');
+  assert.ok(await requireAdmin(legacyAdmin), 'any stored ADMIN role may access admin functions');
+  await assert.rejects(() => requireSuperAdmin(legacyAdmin), /FORBIDDEN/, 'only PRIMARY_ADMIN_EMAIL may use super-admin guard');
   await assert.rejects(() => requireAdmin(staff), /FORBIDDEN/, 'staff cannot access admin functions');
   await assert.rejects(() => requireStaff(null), /UNAUTHORIZED/, 'null user → 401');
   await assert.rejects(() => requireAdmin(null), /UNAUTHORIZED/, 'null user → 401');

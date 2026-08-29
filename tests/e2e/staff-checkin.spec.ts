@@ -119,7 +119,7 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
     await page.waitForLoadState('networkidle').catch(() => {});
   }
 
-  await expect(page.getByRole('heading', { name: /(ระบบเช็คอิน|เช็คอิน)/ })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: /(สแกน QR ผู้บริจาค|ระบบเช็คอิน|เช็คอิน)/ })).toBeVisible({ timeout: 10_000 });
 
   // 3) Search for the donor by code.
   const searchInput = page.locator('#ck-search');

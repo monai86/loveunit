@@ -280,7 +280,7 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
                   </div>
 
                   <div className="flex items-center justify-between pt-1 border-t border-gray-50 text-xs">
-                    <span className="text-gray-500 text-[11px]">ฝ่าย: {staff.team || 'Management'}</span>
+                    <span className="text-gray-500 text-[11px]">{staff.role === 'ADMIN' ? 'Admin' : 'Staff'} · ฝ่าย: {staff.team || 'Management'}</span>
                     <button
                       type="button"
                       onClick={() => handleOpenEdit(staff)}
@@ -324,8 +324,8 @@ export function StaffRoleManagement({ currentUserEmail, initialStaffList = [] }:
                         </div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[var(--rose-100)] text-[var(--burgundy-700)]">
-                          Staff
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${staff.role === 'ADMIN' ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'bg-gray-100 text-gray-700'}`}>
+                          {staff.role === 'ADMIN' ? 'Admin' : 'Staff'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-gray-600 font-medium whitespace-nowrap">
