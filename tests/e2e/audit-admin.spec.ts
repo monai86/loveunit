@@ -191,7 +191,7 @@ test('registration code reset uses an in-page safety dialog', async ({ page }) =
   await page.getByRole('button', { name: 'เริ่มเลข Registration Code ใหม่' }).click();
   const dialog = page.getByRole('dialog', { name: 'เริ่มเลข Registration Code ใหม่' });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByText(/ข้อมูลผู้ลงทะเบียนและ Waitlist/)).toBeVisible();
+  await expect(dialog.getByText(/การดำเนินการนี้จะล้างข้อมูลผู้ลงทะเบียนและ Waitlist/)).toBeVisible();
   await expect(dialog.getByRole('button', { name: 'ยืนยันและเริ่มเลขใหม่' })).toBeDisabled();
 });
 
