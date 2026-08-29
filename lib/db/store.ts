@@ -15,7 +15,7 @@ import {
   StaffProfile,
   StaffRole
 } from '@/lib/types/database';
-import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence, isRegistrationEligibleForSouvenir } from '@/lib/utils/format';
+import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence, isRegistrationEligibleForSouvenir, getSouvenirEligibilityDetails, isWalkInRecord } from '@/lib/utils/format';
 
 // Collision-safe id generator for in-memory records. Date.now() alone collides
 // when several records are created within the same millisecond (fast machines
@@ -439,9 +439,10 @@ export async function registerDonorAtomic(input: {
     const nextSeq = nextRegistrationSequence(
       inMemoryRegistrations
         .filter((r: Registration) => r.event_id === input.eventId)
-        .map((r: Registration) => r.registration_code)
+        .map((r: Registration) => r.registration_code),
+      source
     );
-    const code = generateRegistrationCode(nextSeq);
+    const code = generateRegistrationCode(nextSeq, source);
     const token = generateQRToken(code);
     const newReg: Registration = {
       id: nextMemoryId('reg'),
@@ -500,7 +501,7 @@ export async function getRegistrationByQRToken(token: string): Promise<Registrat
   throw new Error('Database connection unconfigured in production environment.');
 }
 
-export async function searchRegistrations(query: string): Promise<(Registration & { souvenirEligible?: boolean })[]> {
+export async function searchRegistrations(query: string): Promise<(Registration & { souvenirEligible?: boolean; isWalkIn?: boolean; souvenirDetails?: any })[]> {
   const q = query.trim().toLowerCase();
   if (!q) return [];
 
@@ -526,7 +527,9 @@ export async function searchRegistrations(query: string): Promise<(Registration 
         const slot = defaultSlots.find((s) => s.id === r.slot_id) || null;
         const candidate = { ...r, time_slot: slot };
         const souvenirEligible = isRegistrationEligibleForSouvenir(candidate, allCandidates, 100);
-        return { ...candidate, souvenirEligible };
+        const souvenirDetails = getSouvenirEligibilityDetails(candidate, allCandidates, 100, 100);
+        const isWalkIn = isWalkInRecord(candidate);
+        return { ...candidate, isWalkIn, souvenirEligible, souvenirDetails };
       });
   }
 

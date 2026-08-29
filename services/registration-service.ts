@@ -64,14 +64,26 @@ export async function registerDonorAtomic(input: {
           .where(eq(timeSlots.id, input.slotId));
       }
 
-      // 3. Create a monotonic event code. Lock per event so concurrent requests
-      // cannot receive the same number, and never reuse a deleted code.
+      // 3. Create a monotonic event code separated by source (Online vs Walk-in).
+      // Lock per event so concurrent requests cannot receive the same number.
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${input.eventId}))`);
-      const codeRows = await tx.execute(
-        sql`SELECT registration_code FROM registrations WHERE event_id = ${input.eventId}`
-      );
-      const nextSeq = nextRegistrationSequence(codeRows.rows.map((row) => String(row.registration_code)));
-      const code = generateRegistrationCode(nextSeq);
+      
+      let nextSeq = 1;
+      if (source === 'WALK_IN') {
+        const maxSeqResult = await tx.execute(
+          sql`SELECT COALESCE(MAX(CAST(NULLIF(regexp_replace(registration_code, '^LVU26-W', '', 'i'), '') AS integer)), 0) AS max_seq FROM registrations WHERE event_id = ${input.eventId} AND registration_code ILIKE 'LVU26-W%'`
+        );
+        const maxSeq = Number((maxSeqResult.rows[0] as { max_seq?: number | string })?.max_seq ?? 0);
+        nextSeq = maxSeq + 1;
+      } else {
+        const maxSeqResult = await tx.execute(
+          sql`SELECT COALESCE(MAX(CAST(NULLIF(regexp_replace(registration_code, '^LVU26-(?!W)', '', 'i'), '') AS integer)), 0) AS max_seq FROM registrations WHERE event_id = ${input.eventId} AND registration_code ~ '^LVU26-[0-9]+$'`
+        );
+        const maxSeq = Number((maxSeqResult.rows[0] as { max_seq?: number | string })?.max_seq ?? 0);
+        nextSeq = maxSeq + 1;
+      }
+
+      const code = generateRegistrationCode(nextSeq, source);
       const token = generateQRToken(code);
 
       const [newReg] = await tx

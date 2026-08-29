@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, integer, boolean, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, integer, boolean, pgEnum, index } from 'drizzle-orm/pg-core';
 
 export const eventStatusEnum = pgEnum('event_status_enum', [
   'DRAFT',
@@ -35,4 +35,6 @@ export const timeSlots = pgTable('time_slots', {
   bookedCount: integer('booked_count').default(0).notNull(),
   isActive: boolean('is_active').default(true).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (t) => [
+  index('idx_time_slots_event_active').on(t.eventId, t.isActive),
+]);

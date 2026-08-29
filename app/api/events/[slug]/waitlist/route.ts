@@ -16,8 +16,8 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    // Anti-abuse: waitlist joins are public POSTs too.
-    if (!checkRateLimit(request, { limit: 10, windowMs: 60 * 1000 })) {
+    // Anti-abuse: waitlist joins rate limiter adjusted for campus NAT
+    if (!checkRateLimit(request, { limit: 200, windowMs: 60 * 1000 })) {
       return rateLimitedResponse(60);
     }
 

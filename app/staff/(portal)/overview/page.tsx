@@ -48,26 +48,56 @@ export default function StaffOverviewPage() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<'ALL' | RegistrationStatus>('ALL');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (isBackground = false) => {
+    if (!isBackground) setLoading(true);
+    else setRefreshing(true);
     setError(null);
     try {
-      const response = await fetch('/api/staff/registrations', { cache: 'no-store' });
+      const response = await fetch('/api/staff/registrations', { 
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || 'ไม่สามารถโหลดข้อมูลได้');
       setRegistrations((data.registrations as RawRegistration[]).map(normalizeRegistration));
+      setLastUpdated(new Date());
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : 'ไม่สามารถโหลดข้อมูลได้');
+      if (!isBackground) {
+        setError(loadError instanceof Error ? loadError.message : 'ไม่สามารถโหลดข้อมูลได้');
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => { void load(); }, 0);
-    return () => window.clearTimeout(timer);
+    // Initial fetch
+    void load(false);
+
+    // Auto-polling interval: 5 seconds when tab is active/visible
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void load(true);
+      }
+    }, 5000);
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void load(true);
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, [load]);
 
   const summary = useMemo(() => summarizeStaffRegistrations(registrations), [registrations]);
@@ -91,13 +121,24 @@ export default function StaffOverviewPage() {
     <main className="mx-auto max-w-7xl space-y-5 px-4 py-5 pb-[calc(7.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:py-7 lg:pb-7">
       <header className="flex flex-col gap-4 border-b border-[var(--line)] pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="flex items-center gap-2 text-xs font-bold text-[var(--burgundy-700)]"><span className="h-2 w-2 rounded-full bg-emerald-500" />MUMT LoveUnit · หน้างาน</p>
+          <p className="flex items-center gap-2 text-xs font-bold text-[var(--burgundy-700)]">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span>MUMT LoveUnit · หน้างาน (Live Real-time)</span>
+          </p>
           <h1 className="mt-1 font-display text-2xl font-black text-[var(--ink)]">ภาพรวมผู้ลงทะเบียน</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">ดูรายชื่อ สถานะเช็กอิน และสถิติหน้างานแบบอ่านอย่างเดียว</p>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            ดูรายชื่อ สถานะเช็กอิน และสถิติหน้างานแบบเรียลไทม์ {lastUpdated && <span className="text-xs text-[var(--muted)]/80">· อัปเดตล่าสุด {lastUpdated.toLocaleTimeString('th-TH')}</span>}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-emerald-50 px-3 py-2 text-right text-xs font-bold text-emerald-800"><span className="block text-lg leading-none">{summary.attendanceRatePercent}%</span>อัตรามาถึงงาน</div>
-          <button type="button" onClick={() => void load()} disabled={loading} className="editorial-btn-secondary inline-flex min-h-11 items-center gap-2 text-xs disabled:opacity-50"><RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />รีเฟรช</button>
+          <button type="button" onClick={() => void load(false)} disabled={loading || refreshing} className="editorial-btn-secondary inline-flex min-h-11 items-center gap-2 text-xs disabled:opacity-50">
+            <RefreshCw className={`h-4 w-4 ${loading || refreshing ? 'animate-spin' : ''}`} />
+            <span>{refreshing ? 'กำลังซิงค์...' : 'รีเฟรช'}</span>
+          </button>
         </div>
       </header>
 

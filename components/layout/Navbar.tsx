@@ -14,8 +14,10 @@ import {
   ArrowRight,
   Image as ImageIcon,
   CheckSquare,
-  Microscope
+  Microscope,
+  Globe
 } from 'lucide-react';
+import { useLanguage, TRANSLATIONS } from '@/lib/i18n/LanguageContext';
 
 const emptySubscribe = () => () => {};
 
@@ -23,21 +25,55 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const pathname = usePathname();
+  const { language, setLanguage, isTh, isEn } = useLanguage();
 
-  // PUBLIC DONOR NAVIGATION LINKS ONLY
+  // PUBLIC DONOR NAVIGATION LINKS (DYNAMIC TRANSLATION)
   const navLinks = [
-    { href: '/', label: 'หน้าแรก', icon: Home },
-    { href: '/screening', label: 'ประเมินตนเอง', icon: CheckSquare },
-    { href: '/knowledge', label: 'ความรู้ & แล็บตรวจ', icon: Microscope },
-    { href: '/prepare', label: 'การเตรียมตัว', icon: BookOpen },
-    { href: '/poster', label: 'โปสเตอร์', icon: ImageIcon },
-    { href: '/location', label: 'สถานที่จัดงาน', icon: MapPin },
+    { href: '/', label: TRANSLATIONS.nav.home[language], icon: Home },
+    { href: '/screening', label: TRANSLATIONS.nav.screening[language], icon: CheckSquare },
+    { href: '/knowledge', label: TRANSLATIONS.nav.knowledge[language], icon: Microscope },
+    { href: '/prepare', label: TRANSLATIONS.nav.prepare[language], icon: BookOpen },
+    { href: '/poster', label: TRANSLATIONS.nav.poster[language], icon: ImageIcon },
+    { href: '/location', label: TRANSLATIONS.nav.location[language], icon: MapPin },
   ];
 
   // Do not render public navbar on staff/admin/mt70 routes (they use StaffHeader)
   if (pathname.startsWith('/staff') || pathname.startsWith('/admin') || pathname.startsWith('/mt70')) {
     return null;
   }
+
+  const langSwitcher = (
+    <div 
+      className="flex items-center rounded-xl bg-black/5 p-0.5 border border-[var(--line)] shadow-2xs" 
+      role="group" 
+      aria-label="Language selector"
+    >
+      <button
+        type="button"
+        onClick={() => setLanguage('th')}
+        className={`px-2 py-1 rounded-lg text-[11px] font-black transition-all cursor-pointer ${
+          isTh
+            ? 'bg-white text-[var(--burgundy-700)] shadow-xs scale-100'
+            : 'text-[var(--muted)] hover:text-[var(--ink)]'
+        }`}
+        aria-label="ภาษาไทย"
+      >
+        TH
+      </button>
+      <button
+        type="button"
+        onClick={() => setLanguage('en')}
+        className={`px-2 py-1 rounded-lg text-[11px] font-black transition-all cursor-pointer ${
+          isEn
+            ? 'bg-white text-[var(--burgundy-700)] shadow-xs scale-100'
+            : 'text-[var(--muted)] hover:text-[var(--ink)]'
+        }`}
+        aria-label="English"
+      >
+        EN
+      </button>
+    </div>
+  );
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[var(--bg)]/95 backdrop-blur-md select-none shadow-2xs" suppressHydrationWarning>
@@ -57,10 +93,10 @@ export function Navbar() {
           </div>
           <div className="shrink-0 flex flex-col justify-center">
             <span className="text-xs sm:text-sm font-bold text-[var(--ink)] tracking-normal whitespace-nowrap font-display">
-              MUMT LoveUnit <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
+              MUMT LoveUnit <span className="text-[var(--burgundy-600)] font-extrabold">{TRANSLATIONS.nav.eventBadge[language]}</span>
             </span>
             <span className="text-[10px] text-[var(--muted)] whitespace-nowrap hidden 2xl:block">
-              เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ
+              {TRANSLATIONS.nav.brandSub[language]}
             </span>
           </div>
         </Link>
@@ -87,32 +123,35 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* 3. Right: Desktop CTA Button (>= 1280px) */}
-        <div className="hidden xl:flex items-center shrink-0">
+        {/* 3. Right: Language Switcher & Desktop CTA Button (>= 1280px) */}
+        <div className="hidden xl:flex items-center gap-3 shrink-0">
+          {langSwitcher}
           <Link
             href="/register"
             className="inline-flex min-h-11 items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-4 py-2 rounded-xl text-xs 2xl:text-[13px] shadow-xs transition-all active:scale-95 whitespace-nowrap shrink-0"
           >
             <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
-            <span>ลงทะเบียนบริจาคโลหิต</span>
+            <span>{TRANSLATIONS.nav.register[language]}</span>
             <ArrowRight className="h-3 w-3 shrink-0" />
           </Link>
         </div>
 
         {/* Mobile & Tablet Action & Hamburger (< 1280px) */}
         <div className="flex items-center gap-2 shrink-0 xl:hidden">
+          {langSwitcher}
+
           <Link
             href="/register"
-            className="inline-flex min-h-11 items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-3 py-2 rounded-xl text-xs shadow-xs whitespace-nowrap shrink-0 transition-all active:scale-95"
+            className="inline-flex min-h-10 items-center gap-1 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-2.5 py-1.5 rounded-xl text-xs shadow-xs whitespace-nowrap shrink-0 transition-all active:scale-95"
           >
-            <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
-            <span className="whitespace-nowrap font-extrabold">ลงทะเบียน</span>
+            <Heart className="h-3 w-3 fill-white shrink-0" />
+            <span className="whitespace-nowrap font-extrabold">{isTh ? 'ลงทะเบียน' : 'Register'}</span>
           </Link>
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs"
-            aria-label="เปิดเมนูหลัก"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs"
+            aria-label={isTh ? 'เปิดเมนูหลัก' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
             aria-controls="public-mobile-menu"
           >
@@ -125,6 +164,14 @@ export function Navbar() {
       {mobileMenuOpen && (
         <div id="public-mobile-menu" className="border-t border-[var(--line)] bg-[var(--bg)] px-4 py-4 shadow-xl xl:hidden animate-in slide-in-from-top-2 duration-150">
           <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between pb-2 border-b border-[var(--line)] px-2">
+              <span className="text-xs font-bold text-[var(--muted)] flex items-center gap-1.5">
+                <Globe className="h-3.5 w-3.5" />
+                <span>{isTh ? 'ภาษา / Language' : 'Language / ภาษา'}</span>
+              </span>
+              {langSwitcher}
+            </div>
+
             {navLinks.map((item) => {
               const Icon = item.icon;
               const isActive = mounted && (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
@@ -155,7 +202,7 @@ export function Navbar() {
                 className="inline-flex items-center justify-center gap-2 bg-[var(--burgundy-600)] text-white font-extrabold w-full py-3 text-sm rounded-xl shadow-md"
               >
                 <Heart className="h-4 w-4 fill-white" />
-                <span>ลงทะเบียนบริจาคโลหิตออนไลน์</span>
+                <span>{TRANSLATIONS.nav.register[language]}</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>

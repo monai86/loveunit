@@ -6,9 +6,11 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 import { SocialLinks } from '@/components/common/SocialLinks';
+import { useLanguage, TRANSLATIONS } from '@/lib/i18n/LanguageContext';
 
 export function Footer() {
   const pathname = usePathname();
+  const { language, isTh } = useLanguage();
 
   // Hide footer on staff and admin portal routes
   if (pathname.startsWith('/staff') || pathname.startsWith('/admin') || pathname.startsWith('/mt70')) {
@@ -27,16 +29,20 @@ export function Footer() {
                 <Image src="/images/logo.png" alt="MUMT Logo" width={40} height={40} className="h-full w-auto object-contain rounded-full" />
               </div>
               <div>
-                <span className="text-sm font-black text-[var(--ink)] block font-display">MUMT LoveUnit <span className="text-[var(--burgundy-600)]">ครั้งที่ 9</span></span>
-                <span className="text-xs font-bold text-[var(--muted)]">“เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ”</span>
+                <span className="text-sm font-black text-[var(--ink)] block font-display">
+                  MUMT LoveUnit <span className="text-[var(--burgundy-600)]">{TRANSLATIONS.nav.eventBadge[language]}</span>
+                </span>
+                <span className="text-xs font-bold text-[var(--muted)]">
+                  “{TRANSLATIONS.nav.brandSub[language]}”
+                </span>
               </div>
             </div>
             <p className="text-sm leading-relaxed text-[var(--muted)] font-medium max-w-md">
-              โครงการบริจาคโลหิต จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี ณ อาคารสิริวิทยา มหาวิทยาลัยมหิดล ศาลายา
+              {TRANSLATIONS.footer.orgDesc[language]}
             </p>
             <div>
               <span className="px-3 py-1 rounded bg-[var(--rose-100)] text-[var(--burgundy-700)] text-xs font-bold border border-[var(--line)]">
-                16 กันยายน 2569 (09:00 - 14:00 น.)
+                {TRANSLATIONS.footer.eventDate[language]}
               </span>
             </div>
             {/* Social channels with clickable icon buttons */}
@@ -48,71 +54,73 @@ export function Footer() {
           {/* Quick Links for Donors (3 columns) */}
           <div className="md:col-span-3 space-y-3">
             <span className="text-sm font-black text-[var(--ink)] block border-b border-[var(--line)] pb-1">
-              สำหรับผู้บริจาค
+              {TRANSLATIONS.footer.donorLinksTitle[language]}
             </span>
             <ul className="text-sm font-bold text-[var(--ink)]">
               <li>
                 <Link href="/" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5">
-                  <span>หน้าหลัก</span>
+                  <span>{TRANSLATIONS.footer.linkHome[language]}</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-40" />
                 </Link>
               </li>
               <li>
                 <Link href="/register" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5 text-[var(--burgundy-600)]">
-                  <span>ลงทะเบียนออนไลน์</span>
+                  <span>{TRANSLATIONS.footer.linkRegister[language]}</span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </li>
               <li>
                 <Link href="/screening" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5 text-amber-800">
-                  <span>แบบคัดกรองตนเอง (Self-Screen)</span>
+                  <span>{TRANSLATIONS.footer.linkScreening[language]}</span>
                   <ArrowRight className="h-3.5 w-3.5 text-amber-700" />
                 </Link>
               </li>
               <li>
                 <Link href="/knowledge" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5">
-                  <span>ความรู้ & การตรวจแล็บ</span>
+                  <span>{TRANSLATIONS.footer.linkKnowledge[language]}</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-40" />
                 </Link>
               </li>
               <li>
                 <Link href="/prepare" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5">
-                  <span>ข้อปฏิบัติตัวก่อนบริจาค</span>
+                  <span>{TRANSLATIONS.footer.linkPrepare[language]}</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-40" />
                 </Link>
               </li>
               <li>
                 <Link href="/poster" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5">
-                  <span>โปสเตอร์ประชาสัมพันธ์</span>
+                  <span>{isTh ? 'โปสเตอร์ประชาสัมพันธ์' : 'Event Posters'}</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-40" />
                 </Link>
               </li>
               <li>
                 <Link href="/location" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5">
-                  <span>สถานที่และการเดินทาง</span>
+                  <span>{TRANSLATIONS.footer.linkLocation[language]}</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-40" />
                 </Link>
               </li>
               <li>
                 <Link href="/lookup" className="hover:text-[var(--burgundy-600)] hover:underline flex items-center justify-between py-1.5">
-                  <span>ลืม QR Code? ค้นหาที่นี่</span>
+                  <span>{TRANSLATIONS.footer.linkLookup[language]}</span>
                   <ArrowRight className="h-3.5 w-3.5 opacity-40" />
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Contact & Staff Login Portal Link (4 columns) */}
+          {/* Contact & Info (4 columns) */}
           <div className="md:col-span-4 space-y-3">
             <span className="text-sm font-black text-[var(--ink)] block border-b border-[var(--line)] pb-1">
-              ติดต่อ & เจ้าหน้าที่
+              {TRANSLATIONS.footer.contactTitle[language]}
             </span>
             <div className="space-y-3 text-sm text-[var(--ink)] font-medium">
               <div className="flex items-start gap-2.5">
                 <MapPin className="h-4 w-4 shrink-0 text-[var(--burgundy-500)] mt-0.5" />
                 <div className="space-y-1">
                   <span className="leading-relaxed block">
-                    ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา
+                    {isTh 
+                      ? 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา' 
+                      : 'Meeting Room 217, Sirividhaya Building, Mahidol University Salaya'}
                   </span>
                   <a
                     href="https://www.google.com/maps/search/?api=1&query=อาคารสิริวิทยา+คณะศิลปศาสตร์+มหาวิทยาลัยมหิดล+ศาลายา"
@@ -120,7 +128,7 @@ export function Footer() {
                     rel="noopener noreferrer"
                     className="text-xs text-[var(--burgundy-600)] font-bold hover:underline inline-flex items-center gap-1"
                   >
-                    <span>🗺️ เปิดดูแผนที่ Google Maps</span>
+                    <span>🗺️ {isTh ? 'เปิดดูแผนที่ Google Maps' : 'Open in Google Maps'}</span>
                     <ArrowRight className="h-3 w-3" />
                   </a>
                 </div>
@@ -129,8 +137,8 @@ export function Footer() {
               <div className="flex items-start gap-2.5">
                 <Phone className="h-4 w-4 shrink-0 text-[var(--burgundy-500)] mt-0.5" />
                 <div className="space-y-1 font-bold">
-                  <p>เปา: <a href="tel:0969866245" className="hover:underline text-[var(--burgundy-600)] inline-block py-0.5">09-6986-6245</a></p>
-                  <p>แตงโม: <a href="tel:0656274319" className="hover:underline text-[var(--burgundy-600)] inline-block py-0.5">06-5627-4319</a></p>
+                  <p>{isTh ? 'เปา' : 'Pao'}: <a href="tel:0969866245" className="hover:underline text-[var(--burgundy-600)] inline-block py-0.5">09-6986-6245</a></p>
+                  <p>{isTh ? 'แตงโม' : 'Tangmo'}: <a href="tel:0656274319" className="hover:underline text-[var(--burgundy-600)] inline-block py-0.5">06-5627-4319</a></p>
                 </div>
               </div>
 
@@ -147,8 +155,8 @@ export function Footer() {
 
         {/* Bottom Copyright Strip */}
         <div className="mt-12 pt-6 border-t border-[var(--line)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--muted)] font-bold">
-          <div>© 2026 Faculty of Medical Technology, Mahidol University (MUMT)</div>
-          <div className="font-mono">เติมรักให้เต็ม Unit ครั้งที่ 9</div>
+          <div>{TRANSLATIONS.footer.copyright[language]}</div>
+          <div className="font-mono">{isTh ? 'เติมรักให้เต็ม Unit ครั้งที่ 9' : 'MUMT LoveUnit 9th Edition'}</div>
         </div>
       </div>
     </footer>

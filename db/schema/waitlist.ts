@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, pgEnum, index } from 'drizzle-orm/pg-core';
 import { events } from './events';
 import { timeSlots } from './events';
 
@@ -16,4 +16,7 @@ export const waitlist = pgTable('waitlist', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   notifiedAt: timestamp('notified_at', { withTimezone: true }),
   promotedRegistrationId: uuid('promoted_registration_id'),
-});
+}, (t) => [
+  index('idx_waitlist_slot_status').on(t.slotId, t.status),
+  index('idx_waitlist_event_phone').on(t.eventId, t.phoneNormalized),
+]);

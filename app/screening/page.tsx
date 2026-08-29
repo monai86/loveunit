@@ -20,8 +20,10 @@ import {
   evaluateScreeningAnswers, 
   ScreeningEvaluationResult 
 } from '@/lib/constants/screening-rules';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function ScreeningPage() {
+  const { isTh, isEn } = useLanguage();
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
   const [currentCategoryIndex, setCurrentCategoryIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -74,7 +76,6 @@ export default function ScreeningPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Quick fill: "ฉันสุขภาพแข็งแรง ไม่มีข้อห้ามใดๆ" for fast-track simulation
   const handleQuickFillHealthy = () => {
     const perfectAnswers: Record<string, boolean> = {};
     for (const q of OFFICIAL_SCREENING_QUESTIONS) {
@@ -93,22 +94,26 @@ export default function ScreeningPage() {
       {/* Header */}
       <div className="pb-6 border-b border-[var(--line)]">
         <nav aria-label="Breadcrumb" className="mb-3 flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
-          <Link href="/" className="hover:text-[var(--burgundy-600)]">หน้าแรก</Link>
+          <Link href="/" className="hover:text-[var(--burgundy-600)]">{isTh ? 'หน้าแรก' : 'Home'}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-[var(--burgundy-700)]">แบบประเมินสุขภาพตนเองก่อนบริจาคโลหิต</span>
+          <span className="text-[var(--burgundy-700)]">
+            {isTh ? 'แบบประเมินสุขภาพตนเองก่อนบริจาคโลหิต' : 'Self-Screening Assessment'}
+          </span>
         </nav>
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-[var(--rose-100)] px-3 py-1 text-xs font-black text-[var(--burgundy-700)] border border-[var(--line)]">
               <ShieldCheck className="h-4 w-4 text-[var(--burgundy-700)]" />
-              <span>มาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (พ.ศ. 2564 & 2567)</span>
+              <span>{isTh ? 'มาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (2567)' : 'National Blood Centre Standard, Thai Red Cross (2024)'}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
-              แบบประเมินสุขภาพตนเอง (Self-Screening)
+              {isTh ? 'แบบประเมินสุขภาพตนเอง' : 'Donor Self-Screening'}
             </h1>
             <p className="text-[15px] leading-relaxed text-[var(--muted)] font-medium max-w-2xl">
-              ตรวจเช็กความพร้อมของร่างกาย โรคประจำตัว ยา และหัตถการต่างๆ ก่อนเดินทางมาบริจาค เพื่อความปลอดภัยสูงสุดของทั้งตัวท่านและผู้ป่วย
+              {isTh
+                ? 'ตรวจเช็กความพร้อมของร่างกาย โรคประจำตัว ยา และหัตถการต่างๆ ก่อนเดินทางมาบริจาค เพื่อความปลอดภัยสูงสุดของทั้งตัวท่านและผู้ป่วย'
+                : 'Evaluate your physical readiness, health history, medications, and risk factors before donating blood for maximum donor and patient safety.'}
             </p>
           </div>
 
@@ -116,11 +121,11 @@ export default function ScreeningPage() {
             <button
               type="button"
               onClick={handleQuickFillHealthy}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)] bg-[var(--rose-100)] hover:bg-[var(--rose-200)] border border-[var(--line)] px-3.5 py-2.5 rounded-xl transition-all self-start md:self-auto shrink-0"
-              title="ตอบตามเกณฑ์มาตรฐานกรณีผู้บริจาคสุขภาพสมบูรณ์"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)] bg-[var(--rose-100)] hover:bg-[var(--rose-200)] border border-[var(--line)] px-3.5 py-2.5 rounded-xl transition-all self-start md:self-auto shrink-0 cursor-pointer"
+              title={isTh ? 'ตอบตามเกณฑ์มาตรฐานกรณีผู้บริจาคสุขภาพสมบูรณ์' : 'Simulate fully eligible donor'}
             >
               <Sparkles className="h-3.5 w-3.5 fill-[var(--burgundy-700)]" />
-              <span>ทดลองตรวจด่วน (สุขภาพสมบูรณ์)</span>
+              <span>{isTh ? 'ทดลองตรวจด่วน (สุขภาพสมบูรณ์)' : 'Quick Test (All Clear)'}</span>
             </button>
           )}
         </div>
@@ -170,7 +175,7 @@ export default function ScreeningPage() {
             {result.earliestEligibleDate && (
               <div className="p-3.5 rounded-xl bg-white/90 border border-amber-200 text-xs font-bold text-amber-900 flex items-center gap-2">
                 <CalendarIcon className="h-4 w-4 text-amber-700 shrink-0" />
-                <span>วันที่คาดว่าจะสามารถกลับมาบริจาคได้: <strong>{result.earliestEligibleDate}</strong></span>
+                <span>{isTh ? 'วันที่คาดว่าจะสามารถกลับมาบริจาคได้:' : 'Estimated eligible return date:'} <strong>{result.earliestEligibleDate}</strong></span>
               </div>
             )}
 
@@ -182,7 +187,7 @@ export default function ScreeningPage() {
                   className="editorial-btn-primary py-3.5 px-8 text-xs flex items-center gap-2"
                 >
                   <Heart className="h-4 w-4 fill-white" />
-                  <span>ไปหน้าลงทะเบียนจองรอบเวลาทันที</span>
+                  <span>{isTh ? 'ไปหน้าลงทะเบียนจองรอบเวลาทันที' : 'Proceed to Register Time Slot'}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               ) : (
@@ -191,17 +196,17 @@ export default function ScreeningPage() {
                   className="editorial-btn-primary py-3.5 px-6 text-xs flex items-center gap-2"
                 >
                   <Info className="h-4 w-4" />
-                  <span>อ่านข้อปฏิบัติและการดูแลสุขภาพ</span>
+                  <span>{isTh ? 'อ่านข้อปฏิบัติและการดูแลสุขภาพ' : 'Read Preparation Guidelines'}</span>
                 </Link>
               )}
 
               <button
                 type="button"
                 onClick={handleReset}
-                className="editorial-btn-secondary py-3 px-5 text-xs flex items-center gap-2"
+                className="editorial-btn-secondary py-3 px-5 text-xs flex items-center gap-2 cursor-pointer"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
-                <span>ทำแบบประเมินใหม่อีกครั้ง</span>
+                <span>{isTh ? 'ทำแบบประเมินใหม่อีกครั้ง' : 'Retake Assessment'}</span>
               </button>
             </div>
           </div>
@@ -211,10 +216,10 @@ export default function ScreeningPage() {
             <div className="editorial-card p-6 sm:p-8 space-y-6">
               <div className="space-y-1 border-b border-[var(--line)] pb-3">
                 <h3 className="text-lg font-black text-[var(--ink)]">
-                  ข้อที่พบประวัติสุขภาพ / ข้อจำกัด ({result.flaggedQuestions.length} รายการ)
+                  {isTh ? `ข้อที่พบประวัติสุขภาพ / ข้อจำกัด (${result.flaggedQuestions.length} รายการ)` : `Flagged Health Considerations (${result.flaggedQuestions.length} items)`}
                 </h3>
                 <p className="text-xs text-[var(--muted)]">
-                  คำอธิบายตามคู่มือและเกณฑ์มาตรฐานทางการแพทย์
+                  {isTh ? 'คำอธิบายตามคู่มือและเกณฑ์มาตรฐานทางการแพทย์' : 'Clinical guidance based on Thai Red Cross Society standards'}
                 </p>
               </div>
 
@@ -232,27 +237,27 @@ export default function ScreeningPage() {
                           ? 'bg-amber-100 text-amber-800'
                           : 'bg-blue-100 text-blue-800'
                       }`}>
-                        {item.question.deferralType === 'PERMANENT' ? 'งดถาวร' : item.question.deferralType === 'TEMPORARY' ? 'งดชั่วคราว' : 'ข้อควรระวัง'}
+                        {item.question.deferralType === 'PERMANENT' ? (isTh ? 'งดถาวร' : 'Permanent Deferral') : item.question.deferralType === 'TEMPORARY' ? (isTh ? 'งดชั่วคราว' : 'Temporary Deferral') : (isTh ? 'ข้อควรระวัง' : 'Caution')}
                       </span>
                     </div>
 
                     <p className="text-[11px] text-red-700 font-bold">
-                      ⚠️ เหตุผล: {item.reason}
+                      ⚠️ {isTh ? 'เหตุผล:' : 'Reason:'} {item.reason}
                     </p>
 
                     {item.durationText && (
                       <p className="text-[11px] text-amber-800 font-bold">
-                        ⏳ ระยะเวลางด: {item.durationText}
+                        ⏳ {isTh ? 'ระยะเวลางด:' : 'Duration:'} {item.durationText}
                       </p>
                     )}
 
                     <p className="text-[11px] text-[var(--muted)] leading-relaxed">
-                      💡 คำแนะนำ: {item.guidance}
+                      💡 {isTh ? 'คำแนะนำ:' : 'Guidance:'} {item.guidance}
                     </p>
 
                     {item.question.officialReference && (
                       <p className="text-[10px] text-gray-400 font-mono">
-                        อ้างอิง: {item.question.officialReference}
+                        {isTh ? 'อ้างอิง:' : 'Reference:'} {item.question.officialReference}
                       </p>
                     )}
                   </div>
@@ -263,12 +268,16 @@ export default function ScreeningPage() {
 
           {/* Quick links to Knowledge Hub */}
           <div className="p-6 rounded-2xl bg-[var(--rose-100)]/60 border border-[var(--line)] flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="space-y-1 text-center sm:text-left">
-              <h4 className="text-sm font-black text-[var(--ink)]">ต้องการศึกษามาตรฐานการตรวจคัดกรองทางแล็บเพิ่มเติม?</h4>
-              <p className="text-xs text-[var(--muted)]">เรียนรู้เกี่ยวกับระบบ ABO, Rh, Antibody Screen และการตรวจ ID-NAT</p>
+            <div className="space-y-1 text-center sm:left">
+              <h4 className="text-sm font-black text-[var(--ink)]">
+                {isTh ? 'ต้องการศึกษามาตรฐานการตรวจคัดกรองทางแล็บเพิ่มเติม?' : 'Want to learn more about blood lab screening standards?'}
+              </h4>
+              <p className="text-xs text-[var(--muted)]">
+                {isTh ? 'เรียนรู้เกี่ยวกับระบบ ABO, Rh, Antibody Screen และการตรวจ ID-NAT' : 'Learn about ABO, Rh blood groups, Antibody Screen, and ID-NAT testing'}
+              </p>
             </div>
             <Link href="/knowledge" className="editorial-btn-secondary text-xs py-2.5 px-4 shrink-0">
-              <span>ศูนย์ความรู้ & การตรวจแล็บ →</span>
+              <span>{isTh ? 'ศูนย์ความรู้ & การตรวจแล็บ →' : 'Knowledge & Labs Hub →'}</span>
             </Link>
           </div>
 
@@ -280,8 +289,10 @@ export default function ScreeningPage() {
           {/* Progress Bar & Category Tabs */}
           <div className="space-y-3">
             <div className="flex items-center justify-between text-xs font-bold text-[var(--muted)]">
-              <span>ความคืบหน้าการตอบคำถาม</span>
-              <span className="font-mono text-[var(--burgundy-700)]">{answeredCount} / {totalQuestions} ข้อ ({progressPercent}%)</span>
+              <span>{isTh ? 'ความคืบหน้าการตอบคำถาม' : 'Question Progress'}</span>
+              <span className="font-mono text-[var(--burgundy-700)]">
+                {answeredCount} / {totalQuestions} {isTh ? 'ข้อ' : 'items'} ({progressPercent}%)
+              </span>
             </div>
             <div className="h-2 w-full rounded-full bg-gray-200 overflow-hidden">
               <div
@@ -303,7 +314,7 @@ export default function ScreeningPage() {
                     key={cat.id}
                     type="button"
                     onClick={() => setCurrentCategoryIndex(idx)}
-                    className={`p-3 rounded-xl border text-left text-xs font-bold transition-all flex flex-col justify-between ${
+                    className={`p-3 rounded-xl border text-left text-xs font-bold transition-all flex flex-col justify-between cursor-pointer ${
                       isActive
                         ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs ring-1 ring-[var(--burgundy-700)]'
                         : isDone
@@ -312,7 +323,9 @@ export default function ScreeningPage() {
                     }`}
                   >
                     <div className="flex items-center justify-between gap-1 mb-1">
-                      <span className="text-[10px] font-black uppercase text-gray-400 font-mono">หมวด {idx + 1}</span>
+                      <span className="text-[10px] font-black uppercase text-gray-400 font-mono">
+                        {isTh ? `หมวด ${idx + 1}` : `Part ${idx + 1}`}
+                      </span>
                       {isDone && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />}
                     </div>
                     <span className="font-black truncate">{cat.title.split('. ')[1]}</span>
@@ -374,24 +387,24 @@ export default function ScreeningPage() {
                         <button
                           type="button"
                           onClick={() => handleSelectAnswer(q.id, true)}
-                          className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all ${
+                          className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                             currentVal === true
                               ? 'bg-[var(--burgundy-700)] text-white shadow-md scale-105'
                               : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                           }`}
                         >
-                          ใช่
+                          {isTh ? 'ใช่' : 'Yes'}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleSelectAnswer(q.id, false)}
-                          className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all ${
+                          className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                             currentVal === false
                               ? 'bg-[var(--burgundy-700)] text-white shadow-md scale-105'
                               : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                           }`}
                         >
-                          ไม่ใช่
+                          {isTh ? 'ไม่ใช่' : 'No'}
                         </button>
                       </div>
                     </div>
@@ -406,9 +419,9 @@ export default function ScreeningPage() {
                 <button
                   type="button"
                   onClick={handlePrevCategory}
-                  className="editorial-btn-secondary text-xs py-2.5 px-4"
+                  className="editorial-btn-secondary text-xs py-2.5 px-4 cursor-pointer"
                 >
-                  <span>← หมวดก่อนหน้า</span>
+                  <span>{isTh ? '← หมวดก่อนหน้า' : '← Previous'}</span>
                 </button>
               ) : (
                 <div />
@@ -418,18 +431,18 @@ export default function ScreeningPage() {
                 <button
                   type="button"
                   onClick={handleNextCategory}
-                  className="editorial-btn-primary text-xs py-3 px-6 ml-auto"
+                  className="editorial-btn-primary text-xs py-3 px-6 ml-auto cursor-pointer"
                 >
-                  <span>หมวดถัดไป →</span>
+                  <span>{isTh ? 'หมวดถัดไป →' : 'Next Part →'}</span>
                 </button>
               ) : (
                 <button
                   type="button"
                   onClick={handleEvaluate}
-                  className="editorial-btn-primary text-xs py-3.5 px-8 ml-auto flex items-center gap-2"
+                  className="editorial-btn-primary text-xs py-3.5 px-8 ml-auto flex items-center gap-2 cursor-pointer"
                 >
                   <ShieldCheck className="h-4 w-4" />
-                  <span>สรุปผลการประเมินสุขภาพ</span>
+                  <span>{isTh ? 'สรุปผลการประเมินสุขภาพ' : 'Calculate Readiness'}</span>
                 </button>
               )}
             </div>
@@ -440,10 +453,12 @@ export default function ScreeningPage() {
           <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-amber-900 space-y-1.5">
             <div className="flex items-center gap-2 font-bold">
               <Info className="h-4 w-4 text-amber-700 shrink-0" />
-              <span>หมายเหตุสำคัญในการคัดกรอง</span>
+              <span>{isTh ? 'หมายเหตุสำคัญในการคัดกรอง' : 'Important Clinical Notice'}</span>
             </div>
             <p className="text-[11px] leading-relaxed text-amber-800">
-              แบบประเมินนี้เป็นการประเมินตนเองเบื้องต้นตามเกณฑ์ของศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย ในวันงานจริงแพทย์และเจ้าหน้าที่ประจำหน่วยจะทำการตรวจวัดความดันโลหิต ชีพจร ตรวจระดับความเข้มข้นโลหิต (Hemoglobin) และสัมภาษณ์ซักประวัติเพิ่มเติมก่อนเจาะเก็บโลหิต
+              {isTh
+                ? 'แบบประเมินนี้เป็นการประเมินตนเองเบื้องต้นตามเกณฑ์ของศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย ในวันงานจริงแพทย์และเจ้าหน้าที่ประจำหน่วยจะทำการตรวจวัดความดันโลหิต ชีพจร ตรวจระดับความเข้มข้นโลหิต (Hemoglobin) และสัมภาษณ์ซักประวัติเพิ่มเติมก่อนเจาะเก็บโลหิต'
+                : 'This self-assessment is an initial guideline following Thai Red Cross Society standards. On event day, medical staff will measure blood pressure, pulse, hemoglobin concentration, and conduct clinical interviews prior to donation.'}
             </p>
           </div>
 

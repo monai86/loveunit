@@ -1,12 +1,38 @@
 import { db } from '@/db';
 import { registrations, checkinEvents, timeSlots } from '@/db/schema';
-import { eq, and, or, ilike, sql } from 'drizzle-orm';
-import { normalizePhoneNumber, isRegistrationEligibleForSouvenir } from '@/lib/utils/format';
+import { eq, and, or, ne, ilike, sql } from 'drizzle-orm';
+import { normalizePhoneNumber, isRegistrationEligibleForSouvenir, getSouvenirEligibilityDetails, isWalkInRecord } from '@/lib/utils/format';
 import { isTransitionAllowed } from '@/lib/db/store';
 import { isMemoryBackendAllowed, searchRegistrations as memorySearch, updateRegistrationStatus as memoryUpdateStatus, cancelRegistration as memoryCancelRegistration } from '@/lib/db/store';
 import { resolveActorId } from '@/lib/auth/server';
 import { RegistrationStatus } from '@/lib/types/database';
 import { promoteFromWaitlist } from '@/services/waitlist-service';
+
+// Short TTL cache for souvenir ranking to avoid querying all records per scan keystroke
+let souvenirRankingCache: { eventId: string; expiresAt: number; regs: any[] } | null = null;
+
+export function invalidateSouvenirCache() {
+  souvenirRankingCache = null;
+}
+
+async function getAllCandidates(eventId: string) {
+  const now = Date.now();
+  if (souvenirRankingCache && souvenirRankingCache.eventId === eventId && now < souvenirRankingCache.expiresAt) {
+    return souvenirRankingCache.regs;
+  }
+  if (!db) return [];
+  const candidates = await db.query.registrations.findMany({
+    where: and(
+      eq(registrations.eventId, eventId),
+      ne(registrations.status, 'CANCELLED')
+    ),
+    with: {
+      timeSlot: true,
+    },
+  });
+  souvenirRankingCache = { eventId, expiresAt: now + 3000, regs: candidates };
+  return candidates;
+}
 
 export async function searchRegistrations(query: string) {
   const q = query.trim();
@@ -17,6 +43,7 @@ export async function searchRegistrations(query: string) {
     const matched = await db.query.registrations.findMany({
       where: or(
         eq(registrations.qrToken, q),
+        eq(registrations.registrationCode, q.toUpperCase()),
         ilike(registrations.registrationCode, `%${q}%`),
         ilike(registrations.firstName, `%${q}%`),
         ilike(registrations.lastName, `%${q}%`),
@@ -32,17 +59,18 @@ export async function searchRegistrations(query: string) {
     if (matched.length === 0) return [];
 
     const eventId = matched[0].eventId;
-    const allEventRegs = await db.query.registrations.findMany({
-      where: eq(registrations.eventId, eventId),
-      with: {
-        timeSlot: true,
-      },
-    });
+    const allCandidates = await getAllCandidates(eventId);
 
-    return matched.map((r) => ({
-      ...r,
-      souvenirEligible: isRegistrationEligibleForSouvenir(r, allEventRegs, 100),
-    }));
+    return matched.map((r) => {
+      const isEligible = isRegistrationEligibleForSouvenir(r, allCandidates, 100);
+      const souvenirDetails = getSouvenirEligibilityDetails(r, allCandidates, 100, 100);
+      return {
+        ...r,
+        isWalkIn: isWalkInRecord(r),
+        souvenirEligible: isEligible,
+        souvenirDetails,
+      };
+    });
   }
 
   if (isMemoryBackendAllowed()) {
@@ -57,6 +85,7 @@ export async function updateRegistrationStatus(
   targetStatus: RegistrationStatus,
   performedBy?: string
 ) {
+  invalidateSouvenirCache();
   if (db) {
     const [current] = await db
       .select({ status: registrations.status, eventId: registrations.eventId })

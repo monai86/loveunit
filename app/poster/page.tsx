@@ -20,6 +20,7 @@ import {
   Check
 } from 'lucide-react';
 import { SocialLinks } from '@/components/common/SocialLinks';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 const OFFICIAL_POSTERS = [
   {
@@ -27,83 +28,101 @@ const OFFICIAL_POSTERS = [
     label: 'ภาษาไทย (A4 Official)',
     badge: 'A4 ไทย',
     title: 'โปสเตอร์ประชาสัมพันธ์ทางการ (ภาษาไทย)',
+    titleEn: 'Official Event Poster (Thai)',
     alt: 'โปสเตอร์ประชาสัมพันธ์ MUMT Blood Donation 2026 ครั้งที่ 9 เวลา 09.00 - 14.00 น. (ภาษาไทย)',
     fileName: 'mumt-blood-donation-2026-poster-th.jpg',
     aspectRatio: '1655 / 2340',
     description: 'โปสเตอร์ทางการระบุเวลา 09.00 - 14.00 น., สถานที่ห้อง 217 อาคารสิริวิทยา, เบอร์ติดต่อ และรายละเอียดโครงการ',
+    descriptionEn: 'Official poster with updated time 09:00 - 14:00, Sirividhaya Room 217, contact info and event details.',
   },
   {
     src: '/images/poster-en.jpg',
     label: 'English (A4 Official)',
     badge: 'A4 EN',
-    title: 'Official Event Poster (English)',
+    title: 'โปสเตอร์ประชาสัมพันธ์ทางการ (English)',
+    titleEn: 'Official Event Poster (English)',
     alt: 'MUMT Blood Donation 2026 9th Event Poster 09.00 AM - 02.00 PM (English)',
     fileName: 'mumt-blood-donation-2026-poster-en.jpg',
     aspectRatio: '1655 / 2340',
-    description: 'Official English event poster with updated schedule (09:00 AM – 2:00 PM), venue, and volunteer hours.',
+    description: 'โปสเตอร์ภาษาอังกฤษทางการระบุเวลา 09:00 AM – 2:00 PM, สถานที่ และรายละเอียดการรับจิตอาสา',
+    descriptionEn: 'Official English event poster with updated schedule (09:00 AM – 2:00 PM), venue, and volunteer hours.',
   },
   {
     src: '/images/poster-a3-minimal.jpg',
     label: 'A3 Minimal Design',
     badge: 'A3 Minimal',
     title: 'โปสเตอร์แบบมินิมอล “Give Blood Give Love” (A3)',
+    titleEn: 'Minimalist Poster "Give Blood Give Love" (A3)',
     alt: 'โปสเตอร์ Love Unit 2 A3 มินิมอล Give Blood Give Love ครั้งที่ 9',
     fileName: 'mumt-loveunit-poster-a3-minimal.jpg',
     aspectRatio: '3307 / 2340',
     description: 'โปสเตอร์ขนาด A3 สไตล์มินิมอลโมเดิร์น สื่อถึงพลังแห่งความรักและการให้เพื่อต่อชีวิตผู้ป่วย',
+    descriptionEn: 'A3 minimalist modern poster depicting love and the life-saving impact of blood donation.',
   },
 ];
 
 const EDUCATIONAL_INFOGRAPHICS = [
   {
     src: '/images/education/blood-groups-part1.png',
-    title: 'โพสต์ความรู้เรื่องกรุ๊ปเลือด 1: เลือดกรุ๊ปไหน ให้ใครได้บ้าง?',
-    badge: 'ระบบหมู่เลือด ABO',
+    title: 'ความรู้กรุ๊ปเลือด: เลือดกรุ๊ปไหน ให้ใครได้บ้าง?',
+    titleEn: 'Blood Group Compatibility: Who can donate to whom?',
+    badge: 'ABO Group',
     desc: 'ตารางความเข้ากันได้ของเม็ดเลือดแดงระบบ ABO พร้อมสัดส่วนหมู่เลือดในประชากรไทย (O 38%, B 34%, A 24%, AB 8%)',
+    descEn: 'ABO red blood cell compatibility chart and Thai population distribution (O 38%, B 34%, A 24%, AB 8%)',
     fileName: 'blood-groups-part1-abo.png',
   },
   {
     src: '/images/education/blood-groups-part2.png',
-    title: 'โพสต์ความรู้เรื่องกรุ๊ปเลือด 2: Rh+ vs Rh-',
-    badge: 'ระบบหมู่เลือด Rh (Rare Blood)',
+    title: 'ความรู้เรื่องกรุ๊ปเลือด: Rh+ vs Rh-',
+    titleEn: 'Rh System: Rh Positive vs Rh Negative (Rare Blood)',
+    badge: 'Rh System',
     desc: 'เปรียบเทียบ Rh Positive (99.7% มีแอนติเจน D) และ Rh Negative (0.3% หมู่เลือดหายาก 3 ใน 1,000 คน) การให้และการรับโลหิตอย่างปลอดภัย',
+    descEn: 'Comparing Rh Positive (99.7%) and Rh Negative (0.3% rare group in Thailand) for transfusion safety.',
     fileName: 'blood-groups-part2-rh.png',
   },
   {
     src: '/images/education/benefits-5-reasons.png',
     title: '5 ข้อดีของการบริจาคโลหิต',
-    badge: 'ความรู้สุขภาพ',
+    titleEn: '5 Health Benefits of Blood Donation',
+    badge: 'Health Benefits',
     desc: 'ร่างกายแข็งแรง, ผิวพรรณเปล่งปลั่ง, ลดความเสี่ยงหลอดเลือดแดงตีบ, กระตุ้นไขกระดูกสร้างเม็ดเลือดใหม่ และรู้ข้อมูลสุขภาพเบื้องต้น',
+    descEn: 'Physical vitality, radiant complexion, cardiovascular benefits, bone marrow stimulation, and free health check.',
     fileName: '5-benefits-of-blood-donation.png',
   },
   {
     src: '/images/education/blood-components-1.png',
     title: 'เลือด 1 ถุง นำไปทำอะไรได้บ้าง?',
-    badge: 'ส่วนประกอบโลหิต',
+    titleEn: 'What is inside 1 unit of donated blood?',
+    badge: 'Blood Components',
     desc: 'การปั่นแยกส่วนประกอบโลหิต 3 ส่วน: พลาสมา 55%, เกล็ดเลือดและเม็ดเลือดขาว ~1%, เม็ดเลือดแดง 44%',
+    descEn: 'Separation of whole blood into Plasma (55%), Platelets/WBC (~1%), and Packed RBC (44%).',
     fileName: 'blood-components-separation.png',
   },
   {
     src: '/images/education/blood-components-2.png',
     title: 'โลหิต 1 ถุง ช่วยชีวิตใครได้บ้าง?',
-    badge: 'ผู้ป่วยที่ได้รับประโยชน์',
+    titleEn: 'How 1 blood donation saves multiple lives',
+    badge: 'Patient Support',
     desc: 'พลาสมาช่วยผู้ป่วยตับแข็ง/ฮีโมฟีเลีย/แผลไฟไหม้, เกล็ดเลือดช่วยไข้เลือดออก/มะเร็ง, เม็ดเลือดแดงช่วยธาลัสซีเมียและอุบัติเหตุ',
+    descEn: 'Plasma for liver disease & burns, Platelets for dengue & cancer, RBC for thalassemia & trauma surgery.',
     fileName: 'blood-components-lifesaving.png',
   },
   {
     src: '/images/education/why-blood-matters.png',
     title: 'ความสำคัญของการบริจาคเลือด',
-    badge: 'ความสำคัญ',
+    titleEn: 'Why Blood Donation Matters',
+    badge: 'Lifesaving Mission',
     desc: 'โลหิตไม่สามารถสังเคราะห์ได้ ต้องได้จากมนุษย์เท่านั้น และการสำรองโลหิตให้พร้อมทั้งในภาวะปกติและฉุกเฉิน',
+    descEn: 'Blood cannot be synthetically manufactured. Regular donor supply is vital for emergencies.',
     fileName: 'why-blood-donation-matters.png',
   },
 ];
 
 export default function PosterPage() {
+  const { isTh, isEn } = useLanguage();
   const [activePoster, setActivePoster] = useState<{ src: string; title: string; alt: string; fileName: string } | null>(null);
   const [copied, setCopied] = useState(false);
 
-  // Lock body scroll + close on Escape while the lightbox is open.
   useEffect(() => {
     if (!activePoster) return;
     const onKey = (e: KeyboardEvent) => {
@@ -121,8 +140,10 @@ export default function PosterPage() {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: 'MUMT Blood Donation 2026 ครั้งที่ 9',
-          text: 'ขอเชิญร่วมบริจาคโลหิต “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ” 16 ก.ย. 2569 เวลา 09.00 - 14.00 น. ณ อาคารสิริวิทยา ม.มหิดล ศาลายา',
+          title: isTh ? 'MUMT Blood Donation 2026 ครั้งที่ 9' : '9th MUMT Blood Donation 2026',
+          text: isTh 
+            ? 'ขอเชิญร่วมบริจาคโลหิต “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ” 16 ก.ย. 2569 เวลา 09.00 - 14.00 น. ณ อาคารสิริวิทยา ม.มหิดล ศาลายา'
+            : 'Join the 9th MUMT Blood Donation on Sep 16, 2026, 09:00 - 14:00 at Sirividhaya Building, Mahidol University.',
           url: window.location.href,
         });
       } else {
@@ -141,23 +162,24 @@ export default function PosterPage() {
       {/* Breadcrumb + Header */}
       <div>
         <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
-          <Link href="/" className="hover:text-[var(--burgundy-600)]">หน้าแรก</Link>
+          <Link href="/" className="hover:text-[var(--burgundy-600)]">{isTh ? 'หน้าแรก' : 'Home'}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-[var(--burgundy-700)]">โปสเตอร์ & สื่อประชาสัมพันธ์</span>
+          <span className="text-[var(--burgundy-700)]">{isTh ? 'โปสเตอร์ & สื่อประชาสัมพันธ์' : 'Posters & Media'}</span>
         </nav>
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[var(--line)]">
           <div className="max-w-2xl space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full bg-[var(--rose-100)] px-3 py-1 text-xs font-black text-[var(--burgundy-700)] border border-[var(--line)]">
               <Sparkles className="h-3.5 w-3.5 fill-[var(--burgundy-700)]" />
-              <span>อัปเดตเวลาจัดงานอย่างเป็นทางการ: 09.00 - 14.00 น.</span>
+              <span>{isTh ? 'อัปเดตเวลาจัดงานอย่างเป็นทางการ: 09.00 - 14.00 น.' : 'Official Event Time: 09:00 AM – 02:00 PM'}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
-              โปสเตอร์และสื่อประชาสัมพันธ์
+              {isTh ? 'โปสเตอร์และสื่อประชาสัมพันธ์' : 'Official Posters & Media'}
             </h1>
             <p className="text-[15px] leading-relaxed text-[var(--muted)] font-medium">
-              สื่อประชาสัมพันธ์อย่างเป็นทางการของงาน MUMT Blood Donation 2026 “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ” ครั้งที่ 9 
-              — แตะเพื่อดูภาพความละเอียดสูง หรือกดดาวน์โหลดเพื่อนำไปเผยแพร่และแชร์ต่อ
+              {isTh 
+                ? 'สื่อประชาสัมพันธ์อย่างเป็นทางการของงาน MUMT Blood Donation 2026 “เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ” ครั้งที่ 9 — แตะเพื่อดูภาพความละเอียดสูง หรือกดดาวน์โหลดเพื่อนำไปเผยแพร่และแชร์ต่อ'
+                : 'Official media and downloadable promotional assets for the 9th MUMT Blood Donation Event 2026. Click to inspect high-resolution posters or download them for distribution.'}
             </p>
           </div>
 
@@ -165,17 +187,17 @@ export default function PosterPage() {
             <button
               type="button"
               onClick={handleShare}
-              className="inline-flex items-center gap-2 rounded-xl bg-white border border-[var(--line)] px-4 py-2.5 text-xs font-extrabold text-[var(--ink)] shadow-xs hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all"
+              className="inline-flex items-center gap-2 rounded-xl bg-white border border-[var(--line)] px-4 py-2.5 text-xs font-extrabold text-[var(--ink)] shadow-xs hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all cursor-pointer"
             >
               {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Share2 className="h-4 w-4 text-[var(--burgundy-600)]" />}
-              <span>{copied ? 'คัดลอกลิงก์แล้ว' : 'แชร์หน้านี้'}</span>
+              <span>{copied ? (isTh ? 'คัดลอกลิงก์แล้ว' : 'Link Copied!') : (isTh ? 'แชร์หน้านี้' : 'Share Page')}</span>
             </button>
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--burgundy-600)] px-5 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-[var(--burgundy-700)] transition-all"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--burgundy-600)] px-5 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-[var(--burgundy-700)] transition-all cursor-pointer"
             >
               <Heart className="h-4 w-4 fill-white" />
-              <span>ลงทะเบียนออนไลน์</span>
+              <span>{isTh ? 'ลงทะเบียนออนไลน์' : 'Register Online'}</span>
             </Link>
           </div>
         </div>
@@ -188,8 +210,8 @@ export default function PosterPage() {
             <Calendar className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-[var(--muted)] block">วันที่จัดงาน</span>
-            <span className="text-sm font-black text-[var(--ink)]">วันพุธที่ 16 ก.ย. 2569</span>
+            <span className="text-[11px] font-bold text-[var(--muted)] block">{isTh ? 'วันที่จัดงาน' : 'Date'}</span>
+            <span className="text-sm font-black text-[var(--ink)]">{isTh ? 'วันพุธที่ 16 ก.ย. 2569' : 'Wed, Sep 16, 2026'}</span>
           </div>
         </div>
 
@@ -198,8 +220,8 @@ export default function PosterPage() {
             <Clock className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-[var(--muted)] block">เวลาจัดงาน (ปรับปรุงใหม่)</span>
-            <span className="text-sm font-black text-[var(--burgundy-700)]">09.00 – 14.00 น.</span>
+            <span className="text-[11px] font-bold text-[var(--muted)] block">{isTh ? 'เวลาจัดงาน' : 'Time'}</span>
+            <span className="text-sm font-black text-[var(--burgundy-700)]">09:00 – 14:00 น.</span>
           </div>
         </div>
 
@@ -208,8 +230,8 @@ export default function PosterPage() {
             <MapPin className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-[var(--muted)] block">สถานที่จัดงาน</span>
-            <span className="text-xs font-black text-[var(--ink)]">ห้อง 217-218 อาคารสิริวิทยา คณะศิลปศาสตร์</span>
+            <span className="text-[11px] font-bold text-[var(--muted)] block">{isTh ? 'สถานที่จัดงาน' : 'Venue'}</span>
+            <span className="text-xs font-black text-[var(--ink)]">{isTh ? 'ห้อง 217 อาคารสิริวิทยา' : 'Room 217, Sirividhaya'}</span>
           </div>
         </div>
 
@@ -218,8 +240,8 @@ export default function PosterPage() {
             <Gift className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-[var(--muted)] block">ของที่ระลึกพิเศษ</span>
-            <span className="text-xs font-black text-amber-900">รับของที่ระลึก Limited Edition</span>
+            <span className="text-[11px] font-bold text-[var(--muted)] block">{isTh ? 'ของที่ระลึก' : 'Donor Gift'}</span>
+            <span className="text-xs font-black text-amber-900">{isTh ? 'Limited Edition MUMT' : 'Limited Edition'}</span>
           </div>
         </div>
       </div>
@@ -229,10 +251,10 @@ export default function PosterPage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[var(--burgundy-600)]" />
-            <h2 className="text-xl sm:text-2xl font-black text-[var(--ink)]">โปสเตอร์ประชาสัมพันธ์หลัก (Official Posters)</h2>
+            <h2 className="text-xl sm:text-2xl font-black text-[var(--ink)]">{isTh ? 'โปสเตอร์ประชาสัมพันธ์หลัก' : 'Official Event Posters'}</h2>
           </div>
           <p className="mt-1 text-xs text-[var(--muted)] font-medium">
-            โปสเตอร์ขนาดมาตรฐานสำหรับงานพิมพ์และเผยแพร่บนสื่อดิจิทัล
+            {isTh ? 'โปสเตอร์ขนาดมาตรฐานสำหรับงานพิมพ์และเผยแพร่บนสื่อดิจิทัล' : 'High-resolution print and social media formats'}
           </p>
         </div>
 
@@ -242,8 +264,8 @@ export default function PosterPage() {
               <div className="space-y-3">
                 <button
                   type="button"
-                  onClick={() => setActivePoster(poster)}
-                  aria-label={`ขยายโปสเตอร์ ${poster.title}`}
+                  onClick={() => setActivePoster({ src: poster.src, title: isTh ? poster.title : poster.titleEn, alt: poster.alt, fileName: poster.fileName })}
+                  aria-label={isTh ? `ขยายโปสเตอร์ ${poster.title}` : `Zoom poster ${poster.titleEn}`}
                   className="relative w-full overflow-hidden rounded-xl bg-gray-50 border border-[var(--line)] cursor-zoom-in block"
                   style={{ aspectRatio: poster.aspectRatio }}
                 >
@@ -263,27 +285,27 @@ export default function PosterPage() {
                 </button>
 
                 <div className="space-y-1">
-                  <h3 className="text-sm font-extrabold text-[var(--ink)] leading-snug">{poster.title}</h3>
-                  <p className="text-xs text-[var(--muted)] line-clamp-2 leading-relaxed">{poster.description}</p>
+                  <h3 className="text-sm font-extrabold text-[var(--ink)] leading-snug">{isTh ? poster.title : poster.titleEn}</h3>
+                  <p className="text-xs text-[var(--muted)] line-clamp-2 leading-relaxed">{isTh ? poster.description : poster.descriptionEn}</p>
                 </div>
               </div>
 
               <div className="pt-4 mt-3 border-t border-[var(--line)] flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() => setActivePoster(poster)}
-                  className="text-xs font-bold text-[var(--burgundy-700)] hover:underline flex items-center gap-1"
+                  onClick={() => setActivePoster({ src: poster.src, title: isTh ? poster.title : poster.titleEn, alt: poster.alt, fileName: poster.fileName })}
+                  className="text-xs font-bold text-[var(--burgundy-700)] hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <ZoomIn className="h-3.5 w-3.5" />
-                  <span>ดูภาพขยาย</span>
+                  <span>{isTh ? 'ดูภาพขยาย' : 'Zoom In'}</span>
                 </button>
                 <a
                   href={poster.src}
                   download={poster.fileName}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rose-100)] hover:bg-[var(--rose-200)] text-[var(--burgundy-700)] px-3 py-1.5 text-xs font-extrabold border border-[var(--line)] transition-all"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rose-100)] hover:bg-[var(--rose-200)] text-[var(--burgundy-700)] px-3 py-1.5 text-xs font-extrabold border border-[var(--line)] transition-all cursor-pointer"
                 >
                   <Download className="h-3.5 w-3.5" />
-                  <span>ดาวน์โหลด</span>
+                  <span>{isTh ? 'ดาวน์โหลด' : 'Download'}</span>
                 </a>
               </div>
             </article>
@@ -297,17 +319,19 @@ export default function PosterPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-amber-500" />
-              <h2 className="text-xl sm:text-2xl font-black text-[var(--ink)]">ชุดภาพอินโฟกราฟิกให้ความรู้ (Educational Infographics)</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-[var(--ink)]">{isTh ? 'ชุดภาพอินโฟกราฟิกให้ความรู้' : 'Educational Infographics'}</h2>
             </div>
             <p className="mt-1 text-xs text-[var(--muted)] font-medium">
-              เผยแพร่จากแคมเปญ Instagram & TikTok <strong className="text-[var(--burgundy-700)]">@mumt_loveunit</strong> อ้างอิงศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย
+              {isTh 
+                ? 'เผยแพร่จากแคมเปญ Instagram & TikTok @mumt_loveunit อ้างอิงศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย'
+                : 'From Instagram & TikTok @mumt_loveunit campaigns, based on Thai Red Cross Society standards.'}
             </p>
           </div>
           <Link
             href="/knowledge"
-            className="text-xs font-extrabold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1"
+            className="text-xs font-extrabold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
           >
-            <span>อ่านบทความวิชาการ & แล็บตรวจ →</span>
+            <span>{isTh ? 'อ่านบทความวิชาการ & แล็บตรวจ →' : 'Read Lab Science Articles →'}</span>
           </Link>
         </div>
 
@@ -317,8 +341,8 @@ export default function PosterPage() {
               <div className="space-y-3">
                 <button
                   type="button"
-                  onClick={() => setActivePoster({ src: item.src, title: item.title, alt: item.title, fileName: item.fileName })}
-                  aria-label={`ขยายภาพ ${item.title}`}
+                  onClick={() => setActivePoster({ src: item.src, title: isTh ? item.title : item.titleEn, alt: isTh ? item.title : item.titleEn, fileName: item.fileName })}
+                  aria-label={isTh ? `ขยายภาพ ${item.title}` : `Zoom image ${item.titleEn}`}
                   className="relative w-full aspect-[4/5] overflow-hidden rounded-xl bg-white border border-[var(--line)] cursor-zoom-in block"
                 >
                   <Image
@@ -337,27 +361,27 @@ export default function PosterPage() {
                 </button>
 
                 <div className="space-y-1">
-                  <h3 className="text-sm font-extrabold text-[var(--ink)] leading-snug">{item.title}</h3>
-                  <p className="text-xs text-[var(--muted)] line-clamp-3 leading-relaxed">{item.desc}</p>
+                  <h3 className="text-sm font-extrabold text-[var(--ink)] leading-snug">{isTh ? item.title : item.titleEn}</h3>
+                  <p className="text-xs text-[var(--muted)] line-clamp-3 leading-relaxed">{isTh ? item.desc : item.descEn}</p>
                 </div>
               </div>
 
               <div className="pt-4 mt-3 border-t border-[var(--line)] flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() => setActivePoster({ src: item.src, title: item.title, alt: item.title, fileName: item.fileName })}
-                  className="text-xs font-bold text-[var(--burgundy-700)] hover:underline flex items-center gap-1"
+                  onClick={() => setActivePoster({ src: item.src, title: isTh ? item.title : item.titleEn, alt: isTh ? item.title : item.titleEn, fileName: item.fileName })}
+                  className="text-xs font-bold text-[var(--burgundy-700)] hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <ZoomIn className="h-3.5 w-3.5" />
-                  <span>ดูภาพขนาดเต็ม</span>
+                  <span>{isTh ? 'ดูภาพขนาดเต็ม' : 'Full Image'}</span>
                 </button>
                 <a
                   href={item.src}
                   download={item.fileName}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rose-100)] hover:bg-[var(--rose-200)] text-[var(--burgundy-700)] px-3 py-1.5 text-xs font-extrabold border border-[var(--line)] transition-all"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rose-100)] hover:bg-[var(--rose-200)] text-[var(--burgundy-700)] px-3 py-1.5 text-xs font-extrabold border border-[var(--line)] transition-all cursor-pointer"
                 >
                   <Download className="h-3.5 w-3.5" />
-                  <span>ดาวน์โหลด</span>
+                  <span>{isTh ? 'ดาวน์โหลด' : 'Download'}</span>
                 </a>
               </div>
             </article>
@@ -371,20 +395,20 @@ export default function PosterPage() {
           <div className="space-y-4">
             <h3 className="text-base font-black text-[var(--burgundy-700)] uppercase tracking-wider flex items-center gap-2">
               <IdCard className="h-5 w-5" />
-              <span>สิ่งที่ต้องเตรียมและข้อควรทราบ</span>
+              <span>{isTh ? 'สิ่งที่ต้องเตรียมและข้อควรทราบ' : 'Checklist & Requirements'}</span>
             </h3>
             <ul className="space-y-2.5 text-xs font-bold text-editorial-ink">
               <li className="flex items-start gap-2">
                 <span className="h-5 w-5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center shrink-0 text-[10px]">1</span>
-                <span><strong>โปรดแสดงบัตรประจำตัวประชาชน</strong> หรือบัตรประจำตัวผู้บริจาคโลหิตสภากาชาดไทย</span>
+                <span>{isTh ? <strong>โปรดแสดงบัตรประจำตัวประชาชน</strong> : <strong>Bring Original National ID Card</strong>} {isTh ? 'หรือบัตรประจำตัวผู้บริจาคโลหิตสภากาชาดไทย' : 'or Red Cross donor card.'}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="h-5 w-5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center shrink-0 text-[10px]">2</span>
-                <span><strong>ตรวจคัดกรองสุขภาพและหมู่โลหิต:</strong> ตรวจความเข้มข้นเลือด (Hb), ความดันโลหิต และตรวจแล็บมาตรฐานสภากาชาดไทย</span>
+                <span>{isTh ? <strong>ตรวจคัดกรองสุขภาพและหมู่โลหิต:</strong> : <strong>Health & Blood Screening:</strong>} {isTh ? 'ตรวจความเข้มข้นเลือด (Hb), ความดันโลหิต และตรวจแล็บมาตรฐาน' : 'Hb level, vital signs, and safety protocols.'}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="h-5 w-5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center shrink-0 text-[10px]">3</span>
-                <span><strong>ลุ้นรับของที่ระลึกสุดพิเศษ!!</strong> สำหรับผู้เข้าร่วมกิจกรรมและผู้บริจาคโลหิต</span>
+                <span>{isTh ? <strong>รับของที่ระลึกสุดพิเศษ!</strong> : <strong>Special Souvenirs!</strong>} {isTh ? 'สำหรับผู้เข้าร่วมกิจกรรมและผู้บริจาคโลหิตทุกท่าน' : 'For all participating blood donors.'}</span>
               </li>
             </ul>
           </div>
@@ -392,15 +416,15 @@ export default function PosterPage() {
           <div className="space-y-4">
             <h3 className="text-base font-black text-[var(--burgundy-700)] uppercase tracking-wider flex items-center gap-2">
               <Phone className="h-5 w-5" />
-              <span>ติดต่อสอบถามข้อมูลเพิ่มเติม</span>
+              <span>{isTh ? 'ติดต่อสอบถามข้อมูลเพิ่มเติม' : 'Contact Staff'}</span>
             </h3>
             <div className="p-4 rounded-xl bg-[var(--rose-100)]/50 border border-[var(--line)] space-y-2 text-xs font-bold text-[var(--ink)]">
               <div className="flex items-center justify-between">
-                <span>เปา</span>
+                <span>{isTh ? 'เปา' : 'Pao'}</span>
                 <a href="tel:0969866245" className="font-mono text-sm text-[var(--burgundy-700)] hover:underline">09-6986-6245</a>
               </div>
               <div className="flex items-center justify-between border-t border-[var(--line)] pt-2">
-                <span>แตงโม</span>
+                <span>{isTh ? 'แตงโม' : 'Tangmo'}</span>
                 <a href="tel:0656274319" className="font-mono text-sm text-[var(--burgundy-700)] hover:underline">06-5627-4319</a>
               </div>
               <div className="border-t border-[var(--line)] pt-2.5">
@@ -423,8 +447,8 @@ export default function PosterPage() {
           <button
             type="button"
             onClick={() => setActivePoster(null)}
-            aria-label="ปิด"
-            className="absolute right-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40 focus:outline-none"
+            aria-label={isTh ? "ปิด" : "Close"}
+            className="absolute right-4 top-4 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/40 focus:outline-none cursor-pointer"
           >
             <X className="h-6 w-6" />
           </button>
@@ -443,10 +467,10 @@ export default function PosterPage() {
               <a
                 href={activePoster.src}
                 download={activePoster.fileName}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-white px-5 py-2 text-xs font-black text-[var(--burgundy-700)] shadow-lg hover:scale-105 active:scale-95 transition-all"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-white px-5 py-2 text-xs font-black text-[var(--burgundy-700)] shadow-lg hover:scale-105 active:scale-95 transition-all cursor-pointer"
               >
                 <Download className="h-4 w-4" />
-                <span>ดาวน์โหลดภาพต้นฉบับ</span>
+                <span>{isTh ? 'ดาวน์โหลดภาพต้นฉบับ' : 'Download Image'}</span>
               </a>
             </figcaption>
           </figure>

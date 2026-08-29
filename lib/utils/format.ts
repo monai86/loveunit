@@ -33,36 +33,57 @@ export function normalizePhoneNumber(phone: string): string {
 
 /**
  * Generates a sequential running registration code.
- * Format: LVU26-XXX (e.g. LVU26-001, LVU26-002, LVU26-100)
+ * Format:
+ * - Online: LVU26-XXX (e.g. LVU26-001, LVU26-002, LVU26-100)
+ * - Walk-in: LVU26-WXXX (e.g. LVU26-W001, LVU26-W002, LVU26-W100)
  */
-export function generateRegistrationCode(seq?: number): string {
+export function generateRegistrationCode(seq?: number, source?: 'ONLINE' | 'WALK_IN' | 'ADMIN' | string): string {
+  const isWalkIn = source === 'WALK_IN';
+  const prefix = isWalkIn ? 'LVU26-W' : 'LVU26-';
   if (typeof seq === 'number' && seq > 0) {
     const padded = String(seq).padStart(3, '0');
-    return `LVU26-${padded}`;
+    return `${prefix}${padded}`;
   }
   // Fallback if no seq provided: generate random 3-digit number
   const randomNum = Math.floor(1 + Math.random() * 999);
-  return `LVU26-${String(randomNum).padStart(3, '0')}`;
+  return `${prefix}${String(randomNum).padStart(3, '0')}`;
 }
 
-/** Returns the next sequence after the largest existing event registration code. */
-export function nextRegistrationSequence(codes: string[]): number {
+/** Returns the next sequence after the largest existing event registration code for the given source. */
+export function nextRegistrationSequence(codes: string[], source: 'ONLINE' | 'WALK_IN' | 'ADMIN' | string = 'ONLINE'): number {
+  const isWalkIn = source === 'WALK_IN';
+  const regex = isWalkIn ? /^LVU26-W(\d+)$/i : /^LVU26-(?!W)(\d+)$/i;
   const largest = codes.reduce((max, code) => {
-    const match = code.match(/^LVU26-(\d+)$/i);
+    const match = code.match(regex);
     return match ? Math.max(max, Number(match[1])) : max;
   }, 0);
   return largest + 1;
 }
 
 /**
- * Extracts numeric queue number from a registration code (e.g. "LVU26-042" -> 42).
+ * Extracts numeric queue number from a registration code (e.g. "LVU26-042" -> 42, "LVU26-W005" -> 5).
  */
 export function extractQueueNumber(code: string): number | null {
-  const match = code.match(/LVU26-(\d+)/i) || code.match(/MBD26-(\d+)/i);
+  const match = code.match(/LVU26-W?(\d+)/i) || code.match(/MBD26-(\d+)/i);
   if (match && match[1]) {
     return parseInt(match[1], 10);
   }
   return null;
+}
+
+/**
+ * Checks if a code or record represents a Walk-in donor.
+ */
+export function isWalkInRecord(input?: { source?: string; registrationCode?: string; registration_code?: string } | string | null): boolean {
+  if (!input) return false;
+  if (typeof input === 'string') {
+    return input.toUpperCase().includes('LVU26-W') || input.toUpperCase() === 'WALK_IN';
+  }
+  return (
+    input.source === 'WALK_IN' ||
+    (input.registrationCode?.toUpperCase().includes('LVU26-W') ?? false) ||
+    (input.registration_code?.toUpperCase().includes('LVU26-W') ?? false)
+  );
 }
 
 /**
@@ -162,19 +183,40 @@ export interface SouvenirCandidate {
   status?: string;
   checkedInAt?: string | Date | null;
   checked_in_at?: string | Date | null;
+  completedAt?: string | Date | null;
+  completed_at?: string | Date | null;
   slotEndAt?: string | Date | null;
   slot_end_at?: string | Date | null;
   timeSlot?: { endAt?: string | Date; end_at?: string | Date } | null;
   time_slot?: { endAt?: string | Date; end_at?: string | Date } | null;
 }
 
+export interface SouvenirEligibilityDetails {
+  eligible: boolean;
+  quotaType: 'ONLINE' | 'WALK_IN' | 'NONE';
+  isPending?: boolean;
+  rank?: number;
+  quotaLimit: number;
+  badgeText: string;
+  subText: string;
+  colorClass: string;
+}
+
 /**
- * Evaluates whether a given registration is eligible for the souvenir (default quota: 100).
- * Rule:
- * 1. source === 'ONLINE' (registered online)
- * 2. status !== 'CANCELLED'
- * 3. Checked in on-time (checkedInAt <= slot.endAt) or if not yet checked in, slot end time has not passed yet.
- * 4. Ranked in top 100 on-time online registrations by sequence code.
+ * Evaluates whether a given registration is eligible for the souvenir (default quota: 100 for online, 100 for walk-in).
+ * 
+ * Rules:
+ * 1. ONLINE Donors (Quota: 100):
+ *    - source === 'ONLINE'
+ *    - status !== 'CANCELLED'
+ *    - Checked in on-time (checkedInAt <= slot.endAt) or if not yet checked in, slot end time has not passed.
+ *    - Ranked in top 100 on-time online registrations by sequence code.
+ * 
+ * 2. WALK-IN Donors (Quota: 100):
+ *    - source === 'WALK_IN'
+ *    - Sequence code does NOT determine priority.
+ *    - Determined strictly by who completes donation first (status === 'COMPLETED').
+ *    - Top 100 walk-ins with status === 'COMPLETED' sorted chronologically by completedAt.
  */
 export function isRegistrationEligibleForSouvenir(
   targetReg: SouvenirCandidate,
@@ -182,9 +224,10 @@ export function isRegistrationEligibleForSouvenir(
   quotaLimit = 100
 ): boolean {
   const getCode = (r: SouvenirCandidate) => r.registrationCode || r.registration_code || '';
-  const getSource = (r: SouvenirCandidate) => r.source || 'ONLINE';
+  const getSource = (r: SouvenirCandidate) => r.source || (isWalkInRecord(getCode(r)) ? 'WALK_IN' : 'ONLINE');
   const getStatus = (r: SouvenirCandidate) => r.status || 'REGISTERED';
   const getCheckin = (r: SouvenirCandidate) => r.checkedInAt || r.checked_in_at || null;
+  const getCompleted = (r: SouvenirCandidate) => r.completedAt || r.completed_at || r.checkedInAt || r.checked_in_at || null;
   const getSlotEnd = (r: SouvenirCandidate): string | Date | null => {
     if (r.slotEndAt) return r.slotEndAt;
     if (r.slot_end_at) return r.slot_end_at;
@@ -192,11 +235,43 @@ export function isRegistrationEligibleForSouvenir(
     return slot ? (slot.endAt || slot.end_at || null) : null;
   };
 
-  const isEligibleCandidate = (r: SouvenirCandidate): boolean => {
+  const isWalkIn = getSource(targetReg) === 'WALK_IN' || isWalkInRecord(getCode(targetReg));
+
+  // --- Case A: Walk-in Donor Evaluation ---
+  if (isWalkIn) {
+    const targetStatus = getStatus(targetReg);
+    // Walk-in souvenir is strictly awarded to donors who complete donation (COMPLETED)
+    if (targetStatus !== 'COMPLETED') {
+      return false;
+    }
+
+    // Filter all completed walk-in candidates and sort chronologically by completedAt
+    const completedWalkIns = allCandidates.filter((r) => {
+      const s = getSource(r);
+      const isW = s === 'WALK_IN' || isWalkInRecord(getCode(r));
+      return isW && getStatus(r) === 'COMPLETED';
+    });
+
+    completedWalkIns.sort((a, b) => {
+      const timeA = new Date(getCompleted(a) || 0).getTime();
+      const timeB = new Date(getCompleted(b) || 0).getTime();
+      if (timeA !== timeB) return timeA - timeB;
+      const seqA = extractQueueNumber(getCode(a)) ?? 999999;
+      const seqB = extractQueueNumber(getCode(b)) ?? 999999;
+      return seqA - seqB;
+    });
+
+    const targetIndex = completedWalkIns.findIndex((r) => r.id === targetReg.id);
+    if (targetIndex === -1) return false;
+    return targetIndex < quotaLimit;
+  }
+
+  // --- Case B: Online Donor Evaluation ---
+  const isEligibleOnlineCandidate = (r: SouvenirCandidate): boolean => {
     const status = getStatus(r);
     if (status === 'CANCELLED') return false;
     const source = getSource(r);
-    if (source !== 'ONLINE') return false;
+    if (source !== 'ONLINE' && isWalkInRecord(getCode(r))) return false;
 
     const checkin = getCheckin(r);
     const slotEnd = getSlotEnd(r);
@@ -220,22 +295,114 @@ export function isRegistrationEligibleForSouvenir(
     return false;
   };
 
-  if (!isEligibleCandidate(targetReg)) {
+  if (!isEligibleOnlineCandidate(targetReg)) {
     return false;
   }
 
-  // Filter all candidates that are eligible, sort by queue number or sequence
-  const eligibleList = allCandidates.filter(isEligibleCandidate);
-  eligibleList.sort((a, b) => {
+  // Filter all online candidates that are eligible, sort by queue number or sequence
+  const eligibleOnlineList = allCandidates.filter(isEligibleOnlineCandidate);
+  eligibleOnlineList.sort((a, b) => {
     const seqA = extractQueueNumber(getCode(a)) ?? 999999;
     const seqB = extractQueueNumber(getCode(b)) ?? 999999;
     return seqA - seqB;
   });
 
-  const targetIndex = eligibleList.findIndex((r) => r.id === targetReg.id);
+  const targetIndex = eligibleOnlineList.findIndex((r) => r.id === targetReg.id);
   if (targetIndex === -1) return false;
 
   return targetIndex < quotaLimit;
+}
+
+/**
+ * Returns rich display metadata regarding souvenir eligibility for staff UI.
+ */
+export function getSouvenirEligibilityDetails(
+  targetReg: SouvenirCandidate,
+  allCandidates: SouvenirCandidate[],
+  onlineQuota = 100,
+  walkInQuota = 100
+): SouvenirEligibilityDetails {
+  const getCode = (r: SouvenirCandidate) => r.registrationCode || r.registration_code || '';
+  const getSource = (r: SouvenirCandidate) => r.source || (isWalkInRecord(getCode(r)) ? 'WALK_IN' : 'ONLINE');
+  const getStatus = (r: SouvenirCandidate) => r.status || 'REGISTERED';
+  const getCompleted = (r: SouvenirCandidate) => r.completedAt || r.completed_at || r.checkedInAt || r.checked_in_at || null;
+
+  const isWalkIn = getSource(targetReg) === 'WALK_IN' || isWalkInRecord(getCode(targetReg));
+
+  if (isWalkIn) {
+    const targetStatus = getStatus(targetReg);
+    const completedWalkIns = allCandidates.filter((r) => {
+      const isW = getSource(r) === 'WALK_IN' || isWalkInRecord(getCode(r));
+      return isW && getStatus(r) === 'COMPLETED';
+    });
+
+    completedWalkIns.sort((a, b) => {
+      const timeA = new Date(getCompleted(a) || 0).getTime();
+      const timeB = new Date(getCompleted(b) || 0).getTime();
+      if (timeA !== timeB) return timeA - timeB;
+      const seqA = extractQueueNumber(getCode(a)) ?? 999999;
+      const seqB = extractQueueNumber(getCode(b)) ?? 999999;
+      return seqA - seqB;
+    });
+
+    const targetIndex = completedWalkIns.findIndex((r) => r.id === targetReg.id);
+
+    if (targetStatus === 'COMPLETED') {
+      if (targetIndex !== -1 && targetIndex < walkInQuota) {
+        return {
+          eligible: true,
+          quotaType: 'WALK_IN',
+          rank: targetIndex + 1,
+          quotaLimit: walkInQuota,
+          badgeText: `ได้รับของที่ระลึก Walk-in (ลำดับบริจาคเสร็จที่ #${targetIndex + 1}/${walkInQuota})`,
+          subText: 'ผู้บริจาค Walk-in ที่บริจาคสำเร็จ 100 ท่านแรก',
+          colorClass: 'from-purple-50 to-pink-50/40 border-purple-200 text-purple-950',
+        };
+      }
+      return {
+        eligible: false,
+        quotaType: 'WALK_IN',
+        rank: targetIndex !== -1 ? targetIndex + 1 : undefined,
+        quotaLimit: walkInQuota,
+        badgeText: `บริจาคสำเร็จ (เกินโควตา Walk-in ${walkInQuota} สิทธิ์แรก)`,
+        subText: 'ครบโควตาของที่ระลึก Walk-in แล้ว',
+        colorClass: 'from-gray-50 to-slate-50 border-gray-200 text-gray-700',
+      };
+    }
+
+    // Not yet completed
+    return {
+      eligible: false,
+      isPending: true,
+      quotaType: 'WALK_IN',
+      quotaLimit: walkInQuota,
+      badgeText: `ผู้บริจาค Walk-in (โควตาของที่ระลึก 100 ท่านแรกที่บริจาคเสร็จ)`,
+      subText: 'ตัดสินสิทธิ์ตามลำดับที่บริจาคเสร็จสมบูรณ์ (ไม่ใช่ลำดับรหัสลงทะเบียน)',
+      colorClass: 'from-amber-50 to-orange-50/40 border-amber-200 text-amber-950',
+    };
+  }
+
+  // Online Donor
+  const isEligible = isRegistrationEligibleForSouvenir(targetReg, allCandidates, onlineQuota);
+  if (isEligible) {
+    return {
+      eligible: true,
+      quotaType: 'ONLINE',
+      quotaLimit: onlineQuota,
+      badgeText: `ได้รับของที่ระลึกออนไลน์ (100 สิทธิ์แรก)`,
+      subText: 'ผู้บริจาคลงทะเบียนออนไลน์และเช็กอินตรงเวลาตามรอบนัดหมาย',
+      colorClass: 'from-amber-50 to-orange-50/40 border-amber-200/80 text-amber-950',
+    };
+  }
+
+  return {
+    eligible: false,
+    quotaType: 'ONLINE',
+    quotaLimit: onlineQuota,
+    badgeText: 'ไม่มีสิทธิ์รับของที่ระลึกออนไลน์',
+    subText: 'ลงทะเบียนเกิน 100 สิทธิ์แรก หรือมาไม่ตรงรอบเวลา',
+    colorClass: 'from-gray-50 to-slate-50 border-gray-200 text-gray-700',
+  };
 }
 
 /**

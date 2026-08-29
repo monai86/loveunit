@@ -1,36 +1,11 @@
 'use client';
 
-import React, { useSyncExternalStore } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, Calendar, Clock, MapPin, ArrowRight } from 'lucide-react';
 import { formatThaiDate, formatTimeRange } from '@/lib/utils/format';
-
-type Lang = 'th' | 'en';
-
-const STORAGE_KEY = 'mumt_home_lang';
-
-// Language preference lives in localStorage. useSyncExternalStore lets React
-// hydrate with the Thai (server) snapshot and then swap to the visitor's saved
-// choice without a hydration mismatch error.
-function readLang(): Lang {
-  if (typeof window === 'undefined') return 'th';
-  try {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    return saved === 'en' ? 'en' : 'th';
-  } catch {
-    return 'th';
-  }
-}
-
-function subscribeLang(cb: () => void): () => void {
-  window.addEventListener('storage', cb);
-  return () => window.removeEventListener('storage', cb);
-}
-
-function serverLang(): Lang {
-  return 'th';
-}
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // Official caption (EN) from the event poster — Regional Blood Centre 4, Ratchaburi.
 const EN_DESCRIPTION =
@@ -55,17 +30,7 @@ export function HeroClient({
   startAt: string;
   endAt: string;
 }) {
-  const lang = useSyncExternalStore(subscribeLang, readLang, serverLang);
-
-  const setAndSave = (next: Lang) => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, next);
-      // Notify this tab (the browser only fires 'storage' in other tabs).
-      window.dispatchEvent(new Event('storage'));
-    } catch {
-      // storage unavailable — the toggle still works for this visit
-    }
-  };
+  const { language, setLanguage, isEn } = useLanguage();
 
   const start = startAt ? new Date(startAt) : null;
   const end = endAt ? new Date(endAt) : null;
@@ -73,8 +38,6 @@ export function HeroClient({
   const thTime = formatTimeRange(startAt, endAt);
   const enDate = start ? EN_DATE_FMT.format(start) : '';
   const enTime = start && end ? `${formatEnTime(start)} – ${formatEnTime(end)}` : '';
-
-  const isEn = lang === 'en';
 
   const copy = {
     badge: isEn ? '9th · MUMT Blood Donation 2026' : 'ครั้งที่ 9 · MUMT Blood Donation 2026',
@@ -88,30 +51,27 @@ export function HeroClient({
     venue: isEn ? 'Meeting Room 217, Sirividhaya Building' : 'ห้องประชุม 217 อาคารสิริวิทยา',
     ctaRegister: isEn ? 'Register to donate blood' : 'ลงทะเบียนบริจาคโลหิต',
     ctaPrepare: isEn ? 'Prepare before donating' : 'ดูการเตรียมตัวก่อนบริจาค',
-    stubName: isEn ? 'Sirividhaya Blood Donor' : 'ผู้บริจาคโลหิตศิริวิทยา',
-    stubTime: isEn ? '09:00 AM - 2:00 PM' : '09:00 - 14:00 น.',
-    stubVenue: isEn ? 'LA 217 Sirividhaya Building' : 'LA 217 อาคารสิริวิทยา',
   };
 
   const toggle = (
     <div
       className="flex items-center gap-1 rounded-full border border-[var(--cream)]/25 bg-white/10 p-1 text-xs font-black"
       role="group"
-      aria-label="Language / ภาษา"
+      aria-label="Language selector"
     >
       <button
         type="button"
-        onClick={() => setAndSave('th')}
+        onClick={() => setLanguage('th')}
         aria-pressed={!isEn}
-        className={`rounded-full px-3 py-1.5 transition-colors ${!isEn ? 'bg-[var(--cream)] text-[var(--burgundy-700)]' : 'text-[var(--cream)] hover:bg-white/10'}`}
+        className={`rounded-full px-3 py-1.5 transition-colors cursor-pointer ${!isEn ? 'bg-[var(--cream)] text-[var(--burgundy-700)]' : 'text-[var(--cream)] hover:bg-white/10'}`}
       >
         ไทย
       </button>
       <button
         type="button"
-        onClick={() => setAndSave('en')}
+        onClick={() => setLanguage('en')}
         aria-pressed={isEn}
-        className={`rounded-full px-3 py-1.5 transition-colors ${isEn ? 'bg-[var(--cream)] text-[var(--burgundy-700)]' : 'text-[var(--cream)] hover:bg-white/10'}`}
+        className={`rounded-full px-3 py-1.5 transition-colors cursor-pointer ${isEn ? 'bg-[var(--cream)] text-[var(--burgundy-700)]' : 'text-[var(--cream)] hover:bg-white/10'}`}
       >
         EN
       </button>
@@ -216,7 +176,7 @@ export function HeroClient({
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-4">
                     <span className="text-xs font-bold text-white bg-[var(--burgundy-700)] px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5">
-                      <span>คลิกเพื่อดูโปสเตอร์เต็ม</span>
+                      <span>{isEn ? 'Click to view full poster' : 'คลิกเพื่อดูโปสเตอร์เต็ม'}</span>
                       <ArrowRight className="h-3.5 w-3.5" />
                     </span>
                   </div>

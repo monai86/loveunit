@@ -4,9 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Heart, MapPin, BookOpen, CheckSquare } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const { isTh } = useLanguage();
 
   // Do not render public mobile bottom nav on staff or admin or mt70 pages
   if (pathname.startsWith('/staff') || pathname.startsWith('/admin') || pathname.startsWith('/mt70')) {
@@ -14,16 +16,16 @@ export function MobileBottomNav() {
   }
 
   const navItems = [
-    { href: '/', label: 'หน้าแรก', icon: Home, isPrimary: false },
-    { href: '/screening', label: 'คัดกรอง', icon: CheckSquare, isPrimary: false },
-    { href: '/prepare', label: 'เตรียมตัว', icon: BookOpen, isPrimary: false },
-    { href: '/location', label: 'สถานที่', icon: MapPin, isPrimary: false },
-    { href: '/register', label: 'ลงทะเบียน', icon: Heart, isPrimary: true },
+    { href: '/', label: isTh ? 'หน้าแรก' : 'Home', icon: Home, isPrimary: false },
+    { href: '/screening', label: isTh ? 'คัดกรอง' : 'Screen', icon: CheckSquare, isPrimary: false },
+    { href: '/prepare', label: isTh ? 'เตรียมตัว' : 'Prepare', icon: BookOpen, isPrimary: false },
+    { href: '/location', label: isTh ? 'สถานที่' : 'Location', icon: MapPin, isPrimary: false },
+    { href: '/register', label: isTh ? 'ลงทะเบียน' : 'Register', icon: Heart, isPrimary: true },
   ];
 
   return (
     <nav 
-      aria-label="เมนูหลักบนมือถือ"
+      aria-label={isTh ? 'เมนูหลักบนมือถือ' : 'Mobile navigation'}
       className="fixed bottom-0 left-0 right-0 z-40 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden pointer-events-none select-none"
     >
       <div className="mx-auto max-w-md bg-[var(--burgundy-700)]/95 text-white rounded-2xl p-1 shadow-2xl border border-white/20 grid grid-cols-5 items-stretch pointer-events-auto backdrop-blur-xl">

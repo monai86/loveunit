@@ -3,6 +3,8 @@ import { getEventBySlug } from '@/services/event-service';
 import { getDashboardKPIs } from '@/services/admin-service';
 import { requireStaff } from '@/lib/auth/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     try {
@@ -19,7 +21,11 @@ export async function GET() {
 
     const kpis = await getDashboardKPIs(event.id);
 
-    return NextResponse.json({ success: true, kpis });
+    return NextResponse.json({ success: true, kpis }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      },
+    });
   } catch (error) {
     console.error('Error fetching staff stats:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });

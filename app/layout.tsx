@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Prompt, Noto_Sans_Thai } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { StaffHeader } from "@/components/layout/StaffHeader";
 import { Footer } from "@/components/layout/Footer";
@@ -37,19 +38,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="th" className={`h-full antialiased ${prompt.variable} ${notoSansThai.variable}`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col bg-[var(--bg)] text-[var(--ink)] pb-16 lg:pb-0" suppressHydrationWarning>
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-[var(--burgundy-700)] focus:px-4 focus:py-2.5 focus:text-sm focus:font-bold focus:text-white focus:shadow-lg"
-        >
-          ข้ามไปยังเนื้อหาหลัก
-        </a>
-        <Navbar />
-        <StaffHeader />
-        <OfflineBanner />
-        <main id="main-content" className="flex-1">{children}</main>
-        <Footer />
-        <MobileBottomNav />
-        <ServiceWorkerRegister />
+        <LanguageProvider>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-[var(--burgundy-700)] focus:px-4 focus:py-2.5 focus:text-sm focus:font-bold focus:text-white focus:shadow-lg"
+          >
+            ข้ามไปยังเนื้อหาหลัก
+          </a>
+          <Navbar />
+          <StaffHeader />
+          <OfflineBanner />
+          <main id="main-content" className="flex-1">{children}</main>
+          <Footer />
+          <MobileBottomNav />
+          <ServiceWorkerRegister />
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -29,6 +29,26 @@ function isSmtpConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
 
+let sharedTransporter: nodemailer.Transporter | null = null;
+
+function getTransporter(): nodemailer.Transporter {
+  if (!sharedTransporter) {
+    sharedTransporter = nodemailer.createTransport({
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  }
+  return sharedTransporter;
+}
+
 function getPublicAppUrl(): string {
   if (process.env.NEXT_PUBLIC_APP_URL && !process.env.NEXT_PUBLIC_APP_URL.includes('localhost')) {
     return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '');
@@ -52,12 +72,7 @@ export async function sendStaffInvitation(input: { to: string; displayName: stri
 
   const appUrl = getPublicAppUrl();
   const invitationUrl = `${appUrl}/staff/invite/${encodeURIComponent(input.token)}`;
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-  });
+  const transporter = getTransporter();
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM || 'MUMT Blood Donation 2026 <noreply@loveunit.local>',
@@ -531,16 +546,7 @@ export async function sendRegistrationConfirmation(input: ConfirmationInput): Pr
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
+    const transporter = getTransporter();
     const email = await buildDonorConfirmationEmail(input);
     await transporter.sendMail({
       from: process.env.SMTP_FROM || 'MUMT Blood Donation 2026 <noreply@loveunit.local>',
@@ -569,16 +575,7 @@ export async function sendDonorPreparationReminder(input: ConfirmationInput): Pr
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT || 587),
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
+    const transporter = getTransporter();
     const email = await buildDonorPreparationReminderEmail(input);
     await transporter.sendMail({
       from: process.env.SMTP_FROM || 'MUMT Blood Donation 2026 <noreply@loveunit.local>',

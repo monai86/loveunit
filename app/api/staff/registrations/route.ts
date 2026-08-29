@@ -3,6 +3,8 @@ import { requireStaff } from '@/lib/auth/server';
 import { getEventBySlug } from '@/services/event-service';
 import { getAllRegistrations } from '@/services/admin-service';
 
+export const dynamic = 'force-dynamic';
+
 /** Read-only operational list for staff. Mutations remain guarded by admin APIs. */
 export async function GET() {
   try {
@@ -17,7 +19,11 @@ export async function GET() {
     if (!event) return NextResponse.json({ success: false, message: 'ไม่พบกิจกรรม' }, { status: 404 });
 
     const registrations = await getAllRegistrations(event.id);
-    return NextResponse.json({ success: true, registrations });
+    return NextResponse.json({ success: true, registrations }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      },
+    });
   } catch (error) {
     console.error('Error fetching staff registrations:', error);
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });

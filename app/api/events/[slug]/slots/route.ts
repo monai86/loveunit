@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getEventBySlug, getTimeSlots } from '@/services/event-service';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ slug: string }> }
@@ -14,7 +16,11 @@ export async function GET(
     }
 
     const slots = await getTimeSlots(event.id);
-    return NextResponse.json({ event, slots });
+    return NextResponse.json({ event, slots }, {
+      headers: {
+        'Cache-Control': 'public, max-age=5, s-maxage=5, stale-while-revalidate=10',
+      },
+    });
 
   } catch (error) {
     console.error('Error fetching slots:', error);

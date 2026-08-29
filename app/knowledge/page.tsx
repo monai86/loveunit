@@ -7,7 +7,7 @@ import {
   Microscope, 
   ShieldCheck, 
   Activity, 
-  Heart,
+  Heart, 
   Layers, 
   Sparkles, 
   ChevronRight, 
@@ -17,19 +17,21 @@ import {
   Check,
   AlertTriangle
 } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 type TabType = 'LAB_TESTING' | 'COMPONENTS' | 'ABO_RH_SYSTEM' | 'BENEFITS';
 
 export default function KnowledgePage() {
+  const { isTh, isEn } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabType>('LAB_TESTING');
   const [selectedBloodGroup, setSelectedBloodGroup] = useState<'O' | 'A' | 'B' | 'AB'>('O');
   const [copied, setCopied] = useState(false);
 
   const bloodGroupStats = [
-    { group: 'O', percent: 38, role: 'ผู้ให้เม็ดเลือดแดงสากล (Universal RBC Donor)', desc: 'ให้เม็ดเลือดแดงแก่ทุกกรุ๊ปได้ แต่รับเม็ดเลือดแดงได้เฉพาะกรุ๊ป O เท่านั้น' },
-    { group: 'B', percent: 34, role: 'หมู่เลือดที่พบมากเป็นอันดับสองในไทย', desc: 'ให้เม็ดเลือดแดงแก่กรุ๊ป B และ AB / รับเม็ดเลือดแดงจากกรุ๊ป B และ O' },
-    { group: 'A', percent: 24, role: 'หมู่เลือดสำคัญ', desc: 'ให้เม็ดเลือดแดงแก่กรุ๊ป A และ AB / รับเม็ดเลือดแดงจากกรุ๊ป A และ O' },
-    { group: 'AB', percent: 8, role: 'ผู้รับเม็ดเลือดแดงสากล & ผู้ให้พลาสมาสากล', desc: 'รับเม็ดเลือดแดงได้ทุกกรุ๊ป / เป็นผู้ให้พลาสมาสากล (Universal Plasma Donor)' },
+    { group: 'O', percent: 38, role: isTh ? 'ผู้ให้เม็ดเลือดแดงสากล (Universal RBC Donor)' : 'Universal RBC Donor', desc: isTh ? 'ให้เม็ดเลือดแดงแก่ทุกกรุ๊ปได้ แต่รับเม็ดเลือดแดงได้เฉพาะกรุ๊ป O เท่านั้น' : 'Can donate red blood cells to any ABO group; receives only group O RBCs.' },
+    { group: 'B', percent: 34, role: isTh ? 'หมู่เลือดที่พบมากเป็นอันดับสองในไทย' : 'Second most common group in Thailand', desc: isTh ? 'ให้เม็ดเลือดแดงแก่กรุ๊ป B และ AB / รับเม็ดเลือดแดงจากกรุ๊ป B และ O' : 'Can donate RBCs to B and AB; receives RBCs from B and O.' },
+    { group: 'A', percent: 24, role: isTh ? 'หมู่เลือดสำคัญ' : 'Essential blood group', desc: isTh ? 'ให้เม็ดเลือดแดงแก่กรุ๊ป A และ AB / รับเม็ดเลือดแดงจากกรุ๊ป A และ O' : 'Can donate RBCs to A and AB; receives RBCs from A and O.' },
+    { group: 'AB', percent: 8, role: isTh ? 'ผู้รับเม็ดเลือดแดงสากล & ผู้ให้พลาสมาสากล' : 'Universal RBC Recipient & Universal Plasma Donor', desc: isTh ? 'รับเม็ดเลือดแดงได้ทุกกรุ๊ป / เป็นผู้ให้พลาสมาสากล (Universal Plasma Donor)' : 'Can receive any ABO RBC; plasma can be safely given to any ABO patient.' },
   ];
 
   const compatibilityMap = {
@@ -65,8 +67,10 @@ export default function KnowledgePage() {
     try {
       if (navigator.share) {
         await navigator.share({
-          title: 'ศูนย์ความรู้และมาตรฐานการตรวจคัดกรองโลหิต MUMT 2026',
-          text: 'ศึกษามาตรฐานการตรวจคัดกรองทางห้องปฏิบัติการ และความรู้การบริจาคโลหิตตามมาตรฐานสภากาชาดไทย',
+          title: isTh ? 'ศูนย์ความรู้และมาตรฐานการตรวจคัดกรองโลหิต MUMT 2026' : 'MUMT 2026 Blood Knowledge & Lab Standards',
+          text: isTh 
+            ? 'ศึกษามาตรฐานการตรวจคัดกรองทางห้องปฏิบัติการ และความรู้การบริจาคโลหิตตามมาตรฐานสภากาชาดไทย'
+            : 'Explore blood screening standards, ABO/Rh grouping, and clinical transfusion guidelines.',
           url: window.location.href,
         });
       } else {
@@ -85,22 +89,24 @@ export default function KnowledgePage() {
       {/* Breadcrumb & Header */}
       <div>
         <nav aria-label="Breadcrumb" className="mb-3 flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
-          <Link href="/" className="hover:text-[var(--burgundy-600)]">หน้าแรก</Link>
+          <Link href="/" className="hover:text-[var(--burgundy-600)]">{isTh ? 'หน้าแรก' : 'Home'}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-[var(--burgundy-700)]">ศูนย์ความรู้และมาตรฐานห้องปฏิบัติการ</span>
+          <span className="text-[var(--burgundy-700)]">{isTh ? 'ศูนย์ความรู้และมาตรฐานห้องปฏิบัติการ' : 'Blood Knowledge & Lab Hub'}</span>
         </nav>
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[var(--line)]">
           <div className="max-w-3xl space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-[var(--rose-100)] px-3 py-1 text-xs font-black text-[var(--burgundy-700)] border border-[var(--line)]">
               <Microscope className="h-4 w-4 text-[var(--burgundy-700)]" />
-              <span>มาตรฐานวิชาการเทคนิคการแพทย์และศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย 2567 & 2568</span>
+              <span>{isTh ? 'มาตรฐานวิชาการเทคนิคการแพทย์และศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (2567-2568)' : 'Medical Technology & Thai Red Cross Society Standards (2024-2025)'}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
-              ศูนย์ความรู้ & การตรวจคัดกรองทางห้องปฏิบัติการ
+              {isTh ? 'ศูนย์ความรู้ & การตรวจคัดกรองทางห้องปฏิบัติการ' : 'Blood Science & Laboratory Screening Hub'}
             </h1>
             <p className="text-[15px] leading-relaxed text-[var(--muted)] font-medium">
-              เจาะลึกมาตรฐานความปลอดภัยระดับสากลของโลหิตบริจาค การทดสอบทางอณูชีววิทยา (ID-NAT), การตรวจแอนติบอดี 3-Cell, ระบบ ABO & Rh (Rh+ vs Rh-) และการแยกส่วนประกอบโลหิต
+              {isTh 
+                ? 'เจาะลึกมาตรฐานความปลอดภัยระดับสากลของโลหิตบริจาค การทดสอบทางอณูชีววิทยา (ID-NAT), การตรวจแอนติบอดี 3-Cell, ระบบ ABO & Rh (Rh+ vs Rh-) และการแยกส่วนประกอบโลหิต'
+                : 'In-depth guide to international blood safety standards: Nucleic Acid Testing (ID-NAT), 3-cell antibody screening, ABO & Rh compatibility, and blood component separation.'}
             </p>
           </div>
 
@@ -108,17 +114,17 @@ export default function KnowledgePage() {
             <button
               type="button"
               onClick={handleShare}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-white border border-[var(--line)] px-4 py-2.5 text-xs font-extrabold text-[var(--ink)] shadow-xs hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white border border-[var(--line)] px-4 py-2.5 text-xs font-extrabold text-[var(--ink)] shadow-xs hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all cursor-pointer"
             >
               {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Share2 className="h-4 w-4 text-[var(--burgundy-600)]" />}
-              <span>{copied ? 'คัดลอกแล้ว' : 'แชร์หน้านี้'}</span>
+              <span>{copied ? (isTh ? 'คัดลอกแล้ว' : 'Copied!') : (isTh ? 'แชร์หน้านี้' : 'Share Page')}</span>
             </button>
             <Link
               href="/screening"
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--burgundy-600)] px-5 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-[var(--burgundy-700)] transition-all"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--burgundy-600)] px-5 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-[var(--burgundy-700)] transition-all cursor-pointer"
             >
               <ShieldCheck className="h-4 w-4" />
-              <span>ทำแบบประเมินตนเอง</span>
+              <span>{isTh ? 'ทำแบบประเมินตนเอง' : 'Self-Screening'}</span>
             </Link>
           </div>
         </div>
@@ -127,10 +133,10 @@ export default function KnowledgePage() {
       {/* Main Tabs Navigation */}
       <div className="flex overflow-x-auto no-scrollbar gap-2 p-1.5 rounded-2xl bg-[var(--rose-100)]/60 border border-[var(--line)]">
         {[
-          { id: 'LAB_TESTING', label: '1. มาตรฐานการตรวจแล็บ (Chapter 4 2568)', icon: Microscope },
-          { id: 'ABO_RH_SYSTEM', label: '2. กรุ๊ปเลือด ABO & Rh (Rh+ vs Rh-)', icon: Droplets },
-          { id: 'COMPONENTS', label: '3. การแยกส่วนประกอบโลหิต (Components)', icon: Layers },
-          { id: 'BENEFITS', label: '4. ข้อดี 5 ประการของการบริจาค', icon: Sparkles },
+          { id: 'LAB_TESTING', label: isTh ? '1. มาตรฐานการตรวจแล็บ (Chapter 4 2568)' : '1. Lab Testing Standards (ID-NAT)', icon: Microscope },
+          { id: 'ABO_RH_SYSTEM', label: isTh ? '2. กรุ๊ปเลือด ABO & Rh (Rh+ vs Rh-)' : '2. ABO & Rh Blood Grouping', icon: Droplets },
+          { id: 'COMPONENTS', label: isTh ? '3. การแยกส่วนประกอบโลหิต (Components)' : '3. Blood Components Separation', icon: Layers },
+          { id: 'BENEFITS', label: isTh ? '4. ข้อดี 5 ประการของการบริจาค' : '4. 5 Health Benefits of Donation', icon: Sparkles },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -139,7 +145,7 @@ export default function KnowledgePage() {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as TabType)}
-              className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-black whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs sm:text-sm font-black whitespace-nowrap transition-all cursor-pointer ${
                 isActive
                   ? 'bg-white text-[var(--burgundy-700)] shadow-md ring-1 ring-black/5'
                   : 'text-[var(--muted)] hover:text-[var(--ink)] hover:bg-white/50'
@@ -877,12 +883,16 @@ export default function KnowledgePage() {
             {/* Bottom Callout */}
             <div className="p-5 rounded-2xl bg-[var(--rose-100)]/60 border border-[var(--line)] flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="space-y-1 text-center sm:text-left">
-                <h4 className="text-sm font-black text-[var(--burgundy-700)]">พร้อมที่จะส่งต่อความรักและต่อชีวิตผู้ป่วยแล้วหรือยัง?</h4>
-                <p className="text-xs text-[var(--muted)]">ร่วมลงทะเบียนจองรอบเวลากิจกรรม MUMT Blood Donation 2026 ครั้งที่ 9 ได้แล้ววันนี้</p>
+                <h4 className="text-sm font-black text-[var(--burgundy-700)]">
+                  {isTh ? 'พร้อมที่จะส่งต่อความรักและต่อชีวิตผู้ป่วยแล้วหรือยัง?' : 'Ready to save lives and make a difference?'}
+                </h4>
+                <p className="text-xs text-[var(--muted)]">
+                  {isTh ? 'ร่วมลงทะเบียนจองรอบเวลากิจกรรม MUMT Blood Donation 2026 ครั้งที่ 9 ได้แล้ววันนี้' : 'Book your preferred arrival time slot for the 9th MUMT Blood Donation today.'}
+                </p>
               </div>
-              <Link href="/register" className="editorial-btn-primary py-3 px-6 text-xs flex items-center gap-2 shrink-0">
+              <Link href="/register" className="editorial-btn-primary py-3 px-6 text-xs flex items-center gap-2 shrink-0 cursor-pointer">
                 <Heart className="h-4 w-4 fill-white" />
-                <span>ลงทะเบียนออนไลน์</span>
+                <span>{isTh ? 'ลงทะเบียนออนไลน์' : 'Register Online'}</span>
               </Link>
             </div>
 

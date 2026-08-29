@@ -20,7 +20,7 @@ import {
   AlertCircle,
   AlertTriangle
 } from 'lucide-react';
-import { formatTimeRange, formatBangkokTime, getRegistrationStatusBadge } from '@/lib/utils/format';
+import { formatTimeRange, formatBangkokTime, getRegistrationStatusBadge, isWalkInRecord } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
 import { enqueueOfflineAction } from '@/lib/pwa/offline-queue';
 import { LoadingOverlay } from '@/components/common/LoadingOverlay';
@@ -29,6 +29,7 @@ interface ApiRegistration {
   id: string;
   registrationCode?: string;
   registration_code?: string;
+  source?: string;
   firstName?: string;
   first_name?: string;
   lastName?: string;
@@ -44,6 +45,8 @@ interface ApiRegistration {
   completed_at?: string;
   souvenirEligible?: boolean;
   souvenir_eligible?: boolean;
+  souvenirDetails?: any;
+  souvenir_details?: any;
   timeSlot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
   time_slot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
 }
@@ -58,13 +61,16 @@ interface RegistrationDetail {
   facultyName: string;
   timeSlotText: string;
   status: RegistrationStatus;
+  isWalkIn: boolean;
   checkedInAt?: string;
   completedAt?: string;
   souvenirEligible: boolean;
+  souvenirDetails?: any;
 }
 
 function mapRegistration(r: ApiRegistration): RegistrationDetail {
   const slot = r.timeSlot || r.time_slot;
+  const isWalkIn = isWalkInRecord(r.source || r.registrationCode || r.registration_code);
   return {
     id: r.id,
     registrationCode: r.registrationCode || r.registration_code || '',
@@ -73,11 +79,13 @@ function mapRegistration(r: ApiRegistration): RegistrationDetail {
     phone: r.phone || '',
     participantType: (r.participantType || r.participant_type || 'GENERAL_PUBLIC') as ParticipantType,
     facultyName: r.faculty || 'บุคคลทั่วไป',
-    timeSlotText: slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 – 14:00 น.',
+    timeSlotText: slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : (isWalkIn ? 'Walk-in (หน้างาน)' : '09:00 – 14:00 น.'),
     status: r.status || 'REGISTERED',
+    isWalkIn,
     checkedInAt: r.checkedInAt || r.checked_in_at || undefined,
     completedAt: r.completedAt || r.completed_at || undefined,
     souvenirEligible: Boolean(r.souvenirEligible ?? r.souvenir_eligible),
+    souvenirDetails: r.souvenirDetails || r.souvenir_details,
   };
 }
 
@@ -727,12 +735,17 @@ export default function StaffCheckinPage() {
             {/* Grab Handle for Mobile */}
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-slate-200 sm:hidden" />
 
-            {/* Header: Code + Status Badge + Close Button */}
+            {/* Header: Code + Status Badge + Walk-in Badge + Close Button */}
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-xs font-bold text-[#7A1222] bg-[#FDF2F3] border border-[#F8D7DA] px-2.5 py-1 rounded-lg">
                   {registration.registrationCode}
                 </span>
+                {registration.isWalkIn && (
+                  <span className="rounded-full border border-emerald-300 bg-emerald-100 px-2.5 py-0.5 text-[11px] font-black text-emerald-900">
+                    Walk-in
+                  </span>
+                )}
                 <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${getRegistrationStatusBadge(registration.status).colorClass}`}>
                   {getRegistrationStatusBadge(registration.status).label}
                 </span>
@@ -778,8 +791,18 @@ export default function StaffCheckinPage() {
               </div>
             </div>
 
-            {/* Souvenir Eligibility Banner: ONLY shown when eligible */}
-            {registration.souvenirEligible && (
+            {/* Souvenir Eligibility Banner */}
+            {registration.souvenirDetails ? (
+              <div className={`mt-3 rounded-xl bg-gradient-to-r border p-3 flex items-center gap-3 ${registration.souvenirDetails.colorClass}`}>
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/80 shadow-2xs shrink-0">
+                  <Gift className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-black">{registration.souvenirDetails.badgeText}</p>
+                  <p className="text-[11px] opacity-85 mt-0.5">{registration.souvenirDetails.subText}</p>
+                </div>
+              </div>
+            ) : registration.souvenirEligible ? (
               <div className="mt-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50/40 border border-amber-200/80 p-3 flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-800 shrink-0">
                   <Gift className="h-5 w-5" />
@@ -789,7 +812,7 @@ export default function StaffCheckinPage() {
                   <p className="text-[11px] text-amber-800/80 mt-0.5">ผู้บริจาคเช็คอินตรงเวลาตามรอบนัดหมาย</p>
                 </div>
               </div>
-            )}
+            ) : null}
 
             {/* Action Buttons */}
             <div className="mt-5 space-y-2">

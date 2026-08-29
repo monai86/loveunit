@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Building2,
   Calendar,
+  CalendarPlus,
   Check,
   CheckCircle2,
   Clock,
@@ -18,10 +19,12 @@ import {
   MapPin,
   Moon,
   Phone,
+  Share2,
   ShieldCheck,
   User,
   Utensils,
 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export interface DonorTicketPassProps {
   registrationCode: string;
@@ -49,12 +52,17 @@ export function DonorTicketPass({
   qrToken,
   isConfirmed = true,
   onReset,
-  resetLabel = "ค้นหาใหม่",
+  resetLabel,
   primaryAction,
 }: DonorTicketPassProps) {
+  const { isTh, isEn } = useLanguage();
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
+
+  const defaultDate = isEn ? "Wednesday, September 16, 2026" : date;
+  const defaultVenue = isEn ? "Meeting Room 217, Sirividhaya Building, Mahidol University Salaya" : venue;
+  const effectiveResetLabel = resetLabel || (isTh ? "ค้นหาใหม่" : "New Search");
 
   const copyCode = async () => {
     try {
@@ -62,6 +70,67 @@ export function DonorTicketPass({
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {}
+  };
+
+  const getGoogleCalendarUrl = () => {
+    const title = encodeURIComponent(isTh ? "บริจาคโลหิต MUMT LoveUnit ครั้งที่ 9" : "9th MUMT LoveUnit Blood Donation");
+    const details = encodeURIComponent(
+      isTh
+        ? `รหัสลงทะเบียน: ${registrationCode}\nชื่อผู้บริจาค: ${name}\nรอบเวลานัดหมาย: ${timeSlot}\nสถานที่: ${defaultVenue}\n\n* กรุณานำบัตรประชาชนตัวจริงมาแสดงต่อเจ้าหน้าที่`
+        : `Registration Code: ${registrationCode}\nDonor Name: ${name}\nAppointment: ${timeSlot}\nVenue: ${defaultVenue}\n\n* Please bring original National ID Card`
+    );
+    const location = encodeURIComponent(defaultVenue);
+    const dates = "20260916T020000Z/20260916T070000Z";
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${location}`;
+  };
+
+  const downloadIcs = () => {
+    const icsData = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//MUMT LoveUnit//Blood Donation 2026//TH",
+      "CALSCALE:GREGORIAN",
+      "METHOD:PUBLISH",
+      "BEGIN:VEVENT",
+      `SUMMARY:${isTh ? 'บริจาคโลหิต MUMT LoveUnit ครั้งที่ 9' : '9th MUMT LoveUnit Blood Donation'} (${registrationCode})`,
+      `DESCRIPTION:${isTh ? `รหัสลงทะเบียน: ${registrationCode}\\nชื่อผู้บริจาค: ${name}\\nรอบเวลา: ${timeSlot}\\nสถานที่: ${defaultVenue}\\nกรุณานำบัตรประชาชนมาแสดง` : `Registration Code: ${registrationCode}\\nDonor: ${name}\\nTime: ${timeSlot}\\nVenue: ${defaultVenue}\\nPlease bring ID Card`}`,
+      `LOCATION:${defaultVenue}`,
+      "DTSTART:20260916T020000Z",
+      "DTEND:20260916T070000Z",
+      "STATUS:CONFIRMED",
+      "BEGIN:VALARM",
+      "TRIGGER:-PT2H",
+      `DESCRIPTION:${isTh ? 'เตรียมตัวไปบริจาคโลหิต ดื่มน้ำ 3-4 แก้ว' : 'Prepare for blood donation: Drink 3-4 glasses of water'}`,
+      "ACTION:DISPLAY",
+      "END:VALARM",
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    const blob = new Blob([icsData], { type: "text/calendar;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `MUMT-LoveUnit-${registrationCode}.ics`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
+  const shareTicket = async () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: isTh ? "ตั๋วลงทะเบียนบริจาคโลหิต MUMT LoveUnit" : "MUMT LoveUnit Blood Donor Pass",
+          text: isTh 
+            ? `ฉันลงทะเบียนบริจาคโลหิต MUMT LoveUnit ครั้งที่ 9 แล้ว รหัส: ${registrationCode} (${timeSlot})`
+            : `I have registered for the 9th MUMT LoveUnit Blood Donation! Code: ${registrationCode} (${timeSlot})`,
+          url: window.location.href,
+        });
+      } catch {
+        // User dismissed share dialog
+      }
+    } else {
+      await copyCode();
+    }
   };
 
   const downloadTicket = async () => {
@@ -88,12 +157,12 @@ export function DonorTicketPass({
       context.lineWidth = 1.5 * scale;
       context.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
 
-      // Deep Crimson Header (Refined & Balanced Red)
+      // Deep Crimson Header
       const headerHeight = 130 * scale;
       const grad = context.createLinearGradient(inset, inset, width - inset, inset + headerHeight);
-      grad.addColorStop(0, "#C5222F"); // Rich Crimson
-      grad.addColorStop(0.5, "#A6192E"); // Deep Ruby
-      grad.addColorStop(1, "#7A1222"); // Royal Burgundy Crimson
+      grad.addColorStop(0, "#C5222F");
+      grad.addColorStop(0.5, "#A6192E");
+      grad.addColorStop(1, "#7A1222");
       context.fillStyle = grad;
       context.fillRect(inset, inset, width - inset * 2, headerHeight);
 
@@ -101,15 +170,15 @@ export function DonorTicketPass({
       context.fillStyle = "#FDE8EA";
       context.textAlign = "left";
       context.font = `700 ${11 * scale}px sans-serif`;
-      context.fillText("MUMT LOVEUNIT 2026 · คณะเทคนิคการแพทย์ ม.มหิดล", inset + 24 * scale, inset + 32 * scale);
+      context.fillText(isTh ? "MUMT LOVEUNIT 2026 · คณะเทคนิคการแพทย์ ม.มหิดล" : "MUMT LOVEUNIT 2026 · Faculty of Medical Technology, Mahidol University", inset + 24 * scale, inset + 32 * scale);
 
       context.fillStyle = "#FFFFFF";
       context.font = `800 ${22 * scale}px sans-serif`;
-      context.fillText("ตั๋วลงทะเบียนบริจาคโลหิต", inset + 24 * scale, inset + 68 * scale);
+      context.fillText(isTh ? "ตั๋วลงทะเบียนบริจาคโลหิต" : "Blood Donation Donor Pass", inset + 24 * scale, inset + 68 * scale);
 
       context.fillStyle = "#FDE8EA";
       context.font = `700 ${11 * scale}px sans-serif`;
-      context.fillText("OFFICIAL BLOOD DONOR DIGITAL PASS", inset + 24 * scale, inset + 96 * scale);
+      context.fillText(isTh ? "บัตรยืนยันสิทธิ์บริจาคโลหิตทางการ" : "OFFICIAL BLOOD DONOR DIGITAL PASS", inset + 24 * scale, inset + 96 * scale);
 
       // Registration Number Box
       const contentWidth = width - inset * 2 - 48 * scale;
@@ -124,7 +193,7 @@ export function DonorTicketPass({
 
       context.fillStyle = "#A6192E";
       context.font = `800 ${10.5 * scale}px sans-serif`;
-      context.fillText("หมายเลขลงทะเบียน / REGISTRATION NO.", x + 16 * scale, y + 6 * scale);
+      context.fillText(isTh ? "หมายเลขลงทะเบียน" : "REGISTRATION NO.", x + 16 * scale, y + 6 * scale);
 
       context.font = `900 ${26 * scale}px monospace`;
       context.fillText(registrationCode, x + 16 * scale, y + 36 * scale);
@@ -137,39 +206,39 @@ export function DonorTicketPass({
       // Row 1
       context.fillStyle = "#64748B";
       context.font = `700 ${9.5 * scale}px sans-serif`;
-      context.fillText("ผู้ลงทะเบียน / DONOR NAME", col1X, y);
-      context.fillText("วันจัดกิจกรรม / EVENT DATE", col2X, y);
+      context.fillText(isTh ? "ผู้ลงทะเบียน" : "DONOR NAME", col1X, y);
+      context.fillText(isTh ? "วันจัดกิจกรรม" : "EVENT DATE", col2X, y);
 
       context.fillStyle = "#0F172A";
       context.font = `700 ${12 * scale}px sans-serif`;
       context.fillText(name.slice(0, 24), col1X, y + 18 * scale);
-      context.fillText(date.slice(0, 24), col2X, y + 18 * scale);
+      context.fillText(defaultDate.slice(0, 24), col2X, y + 18 * scale);
 
       // Row 2
       y += 42 * scale;
       context.fillStyle = "#64748B";
       context.font = `700 ${9.5 * scale}px sans-serif`;
-      context.fillText("รอบเวลาที่นัดหมาย / TIME SLOT", col1X, y);
-      context.fillText("สถานที่จัดกิจกรรม / VENUE", col2X, y);
+      context.fillText(isTh ? "รอบเวลาที่นัดหมาย" : "APPOINTMENT TIME", col1X, y);
+      context.fillText(isTh ? "สถานที่จัดกิจกรรม" : "VENUE", col2X, y);
 
       context.fillStyle = "#A6192E";
       context.font = `800 ${12 * scale}px sans-serif`;
       context.fillText(timeSlot, col1X, y + 18 * scale);
       context.fillStyle = "#0F172A";
       context.font = `600 ${11 * scale}px sans-serif`;
-      context.fillText(venue.slice(0, 28), col2X, y + 18 * scale);
+      context.fillText(defaultVenue.slice(0, 28), col2X, y + 18 * scale);
 
       // Row 3
       y += 42 * scale;
       context.fillStyle = "#64748B";
       context.font = `700 ${9.5 * scale}px sans-serif`;
-      context.fillText("เบอร์โทรศัพท์ / PHONE", col1X, y);
-      context.fillText("คณะ / สังกัด / FACULTY", col2X, y);
+      context.fillText(isTh ? "เบอร์โทรศัพท์" : "PHONE", col1X, y);
+      context.fillText(isTh ? "สังกัด / คณะ" : "FACULTY / ORG", col2X, y);
 
       context.fillStyle = "#0F172A";
       context.font = `600 ${11.5 * scale}px sans-serif`;
       context.fillText(phone || "—", col1X, y + 18 * scale);
-      context.fillText((faculty || "บุคคลทั่วไป").slice(0, 28), col2X, y + 18 * scale);
+      context.fillText((faculty || (isTh ? "บุคคลทั่วไป" : "General Public")).slice(0, 28), col2X, y + 18 * scale);
 
       // QR Code Box (Centered)
       const svg = qrRef.current?.querySelector("svg");
@@ -203,7 +272,7 @@ export function DonorTicketPass({
       context.textAlign = "center";
       context.font = `600 ${9.5 * scale}px sans-serif`;
       context.fillText(
-        "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน (Please present this QR at the venue)",
+        isTh ? "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน" : "Please present this QR Code to staff at the registration desk",
         width / 2,
         height - inset - 24 * scale,
       );
@@ -241,10 +310,10 @@ export function DonorTicketPass({
               </div>
               <div>
                 <p className="text-[11px] font-extrabold tracking-wider text-rose-100 uppercase">
-                  MUMT LoveUnit ครั้งที่ 9
+                  {isTh ? "MUMT LoveUnit ครั้งที่ 9" : "9th MUMT LoveUnit"}
                 </p>
                 <p className="text-[11px] text-white/90 font-medium">
-                  คณะเทคนิคการแพทย์ ม.มหิดล
+                  {isTh ? "คณะเทคนิคการแพทย์ ม.มหิดล" : "Faculty of Medical Technology, Mahidol University"}
                 </p>
               </div>
             </div>
@@ -252,17 +321,17 @@ export function DonorTicketPass({
             {isConfirmed && (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/40 bg-emerald-500/25 px-3 py-1 text-xs font-bold text-emerald-100 backdrop-blur-xs">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
-                <span>ยืนยันสิทธิ์แล้ว / Confirmed</span>
+                <span>{isTh ? "ยืนยันสิทธิ์แล้ว" : "Confirmed"}</span>
               </span>
             )}
           </div>
 
           <div className="mt-4">
             <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl font-display">
-              ตั๋วลงทะเบียนบริจาคโลหิต
+              {isTh ? "ตั๋วลงทะเบียนบริจาคโลหิต" : "Blood Donation Donor Pass"}
             </h2>
             <p className="text-[11px] font-semibold tracking-wider text-rose-100 uppercase mt-0.5">
-              Official Blood Donation Pass
+              {isTh ? "บัตรยืนยันสิทธิ์เข้าร่วมกิจกรรม" : "Official Blood Donor Digital Pass"}
             </p>
           </div>
         </header>
@@ -282,7 +351,7 @@ export function DonorTicketPass({
             <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
               <div className="text-center sm:text-left">
                 <p className="text-xs font-black tracking-wider text-[#A6192E] uppercase">
-                  หมายเลขลงทะเบียน <span className="text-[10px] font-bold text-gray-500">/ Registration No.</span>
+                  {isTh ? "หมายเลขลงทะเบียน" : "Registration Number"}
                 </p>
                 <p className="mt-1 font-mono text-2xl font-black tracking-wider text-[#7A1222] sm:text-3xl">
                   {registrationCode}
@@ -292,18 +361,18 @@ export function DonorTicketPass({
               <button
                 type="button"
                 onClick={copyCode}
-                aria-label="คัดลอกหมายเลขลงทะเบียน"
-                className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-white px-4 text-xs font-bold text-[#A6192E] shadow-xs transition-all hover:bg-red-50 hover:border-red-300 active:scale-98"
+                aria-label={isTh ? "คัดลอกหมายเลขลงทะเบียน" : "Copy registration code"}
+                className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-white px-4 text-xs font-bold text-[#A6192E] shadow-xs transition-all hover:bg-red-50 hover:border-red-300 active:scale-98 cursor-pointer"
               >
                 {copied ? (
                   <>
                     <Check className="h-4 w-4 text-emerald-600" />
-                    <span>คัดลอกแล้ว (Copied)</span>
+                    <span>{isTh ? "คัดลอกแล้ว" : "Copied!"}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="h-4 w-4" />
-                    <span>คัดลอกรหัส (Copy)</span>
+                    <span>{isTh ? "คัดลอกรหัส" : "Copy Code"}</span>
                   </>
                 )}
               </button>
@@ -317,8 +386,7 @@ export function DonorTicketPass({
                 id="appointment-details"
                 className="text-sm font-black text-gray-900 flex items-center gap-1.5 font-display"
               >
-                <span>รายละเอียดการนัดหมาย</span>
-                <span className="text-xs font-normal text-gray-500">/ Appointment Details</span>
+                <span>{isTh ? "รายละเอียดการนัดหมาย" : "Appointment Details"}</span>
               </h3>
             </div>
 
@@ -327,7 +395,7 @@ export function DonorTicketPass({
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
                   <User className="h-3.5 w-3.5 text-[#A6192E]" />
-                  <span>ผู้ลงทะเบียน / Donor Name</span>
+                  <span>{isTh ? "ผู้ลงทะเบียน" : "Donor Name"}</span>
                 </div>
                 <p className="text-sm font-black text-gray-900">{name}</p>
               </div>
@@ -336,16 +404,16 @@ export function DonorTicketPass({
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
                   <Calendar className="h-3.5 w-3.5 text-[#A6192E]" />
-                  <span>วันจัดกิจกรรม / Event Date</span>
+                  <span>{isTh ? "วันจัดกิจกรรม" : "Event Date"}</span>
                 </div>
-                <p className="text-sm font-black text-gray-900">{date}</p>
+                <p className="text-sm font-black text-gray-900">{defaultDate}</p>
               </div>
 
               {/* Time Slot */}
               <div className="rounded-xl border border-red-100 bg-[#FDF2F3]/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-[#A6192E]">
                   <Clock className="h-3.5 w-3.5" />
-                  <span>รอบเวลาที่นัดหมาย / Time Slot</span>
+                  <span>{isTh ? "รอบเวลาที่นัดหมาย" : "Appointment Time"}</span>
                 </div>
                 <p className="text-base font-black text-[#7A1222]">{timeSlot}</p>
               </div>
@@ -354,16 +422,16 @@ export function DonorTicketPass({
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
                   <MapPin className="h-3.5 w-3.5 text-[#A6192E]" />
-                  <span>สถานที่จัดกิจกรรม / Venue</span>
+                  <span>{isTh ? "สถานที่จัดกิจกรรม" : "Event Venue"}</span>
                 </div>
-                <p className="text-xs font-bold text-gray-900 leading-snug">{venue}</p>
+                <p className="text-xs font-bold text-gray-900 leading-snug">{defaultVenue}</p>
               </div>
 
               {/* Phone */}
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
                   <Phone className="h-3.5 w-3.5 text-[#A6192E]" />
-                  <span>เบอร์โทรศัพท์ / Phone</span>
+                  <span>{isTh ? "เบอร์โทรศัพท์" : "Phone Number"}</span>
                 </div>
                 <p className="text-xs font-bold text-gray-900">{phone || "—"}</p>
               </div>
@@ -372,9 +440,9 @@ export function DonorTicketPass({
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
                   <Building2 className="h-3.5 w-3.5 text-[#A6192E]" />
-                  <span>คณะ / สังกัด / Faculty or Org</span>
+                  <span>{isTh ? "คณะ / สังกัด" : "Affiliation / Faculty"}</span>
                 </div>
-                <p className="text-xs font-bold text-gray-900 leading-snug">{faculty || "บุคคลทั่วไป"}</p>
+                <p className="text-xs font-bold text-gray-900 leading-snug">{faculty || (isTh ? "บุคคลทั่วไป" : "General Public")}</p>
               </div>
             </div>
           </section>
@@ -386,10 +454,10 @@ export function DonorTicketPass({
           >
             <div>
               <h3 id="ticket-qr-heading" className="text-sm font-black text-gray-900 font-display">
-                QR Code สำหรับเช็กอิน / Check-in QR Code
+                {isTh ? "QR Code สำหรับเช็กอิน" : "Check-in QR Code"}
               </h3>
               <p className="text-xs text-gray-500 mt-0.5">
-                แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน (Please present this QR Code at the registration desk)
+                {isTh ? "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียนในวันงาน" : "Please present this QR Code to staff at the venue on event day"}
               </p>
             </div>
 
@@ -403,7 +471,7 @@ export function DonorTicketPass({
                     value={qrToken}
                     size={160}
                     level="M"
-                    title="QR Code สำหรับเช็กอิน"
+                    title={isTh ? "QR Code สำหรับเช็กอิน" : "Check-in QR Code"}
                     imageSettings={{
                       src: "/images/logo.png",
                       height: 28,
@@ -413,21 +481,49 @@ export function DonorTicketPass({
                   />
                 ) : (
                   <div className="flex h-40 w-40 items-center justify-center bg-gray-50 text-xs font-bold text-gray-400">
-                    กำลังสร้าง QR Code...
+                    {isTh ? "กำลังสร้าง QR Code..." : "Generating QR..."}
                   </div>
                 )}
               </div>
             </div>
 
-            <div>
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
               <button
                 type="button"
                 onClick={downloadTicket}
                 disabled={downloading}
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[#C5222F] to-[#A6192E] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-red-900/15 transition-all hover:from-[#B01B27] hover:to-[#911426] active:scale-98 disabled:opacity-60"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[#C5222F] to-[#A6192E] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-red-900/15 transition-all hover:from-[#B01B27] hover:to-[#911426] active:scale-98 disabled:opacity-60 cursor-pointer"
               >
                 <Download className="h-4 w-4" />
-                <span>{downloading ? "กำลังบันทึกภาพ... (Saving...)" : "บันทึกตั๋วเป็นรูปภาพ / Save Ticket PNG"}</span>
+                <span>{downloading ? (isTh ? "กำลังบันทึกภาพ..." : "Saving...") : (isTh ? "บันทึกภาพตั๋ว" : "Download Pass")}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={shareTicket}
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-[#A6192E] transition-all hover:bg-rose-100 active:scale-98 cursor-pointer"
+              >
+                <Share2 className="h-4 w-4" />
+                <span>{isTh ? "แชร์ตั๋ว" : "Share"}</span>
+              </button>
+
+              <a
+                href={getGoogleCalendarUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98"
+              >
+                <CalendarPlus className="h-4 w-4 text-blue-600" />
+                <span>Google Calendar</span>
+              </a>
+
+              <button
+                type="button"
+                onClick={downloadIcs}
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98 cursor-pointer"
+              >
+                <Calendar className="h-4 w-4 text-indigo-600" />
+                <span>Apple Calendar (.ics)</span>
               </button>
             </div>
           </section>
@@ -437,7 +533,7 @@ export function DonorTicketPass({
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="h-4 w-4 text-[#A6192E]" />
               <p className="text-xs font-black text-gray-900">
-                ข้อแนะนำการเตรียมความพร้อม / Preparation Tips
+                {isTh ? "ข้อแนะนำการเตรียมความพร้อม" : "Donor Preparation Tips"}
               </p>
             </div>
 
@@ -447,9 +543,13 @@ export function DonorTicketPass({
                 <ShieldCheck className="h-4 w-4 text-[#A6192E] mt-0.5 shrink-0" />
                 <div>
                   <p className="font-bold text-gray-900">
-                    <strong className="text-[#A6192E]">อย่าลืมนำบัตรประชาชนมาด้วย</strong>
+                    <strong className="text-[#A6192E]">
+                      {isTh ? "อย่าลืมนำบัตรประชาชนมาด้วย" : "Bring National ID Card"}
+                    </strong>
                   </p>
-                  <p className="text-[11px] text-gray-500">หรือบัตรผู้บริจาคโลหิตตัวจริง (National ID Required)</p>
+                  <p className="text-[11px] text-gray-500">
+                    {isTh ? "หรือบัตรผู้บริจาคโลหิตตัวจริง" : "Or original donor passport"}
+                  </p>
                 </div>
               </div>
 
@@ -457,8 +557,12 @@ export function DonorTicketPass({
               <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
                 <Droplets className="h-4 w-4 text-sky-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-gray-900">ดื่มน้ำ 3–4 แก้วก่อนมา</p>
-                  <p className="text-[11px] text-gray-500">ช่วยระบบไหลเวียนโลหิต (Drink 3–4 glasses of water)</p>
+                  <p className="font-bold text-gray-900">
+                    {isTh ? "ดื่มน้ำ 3–4 แก้วก่อนมา" : "Drink 3-4 glasses of water"}
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    {isTh ? "ช่วยให้ระบบไหลเวียนโลหิตดีขึ้น" : "30 mins before donating"}
+                  </p>
                 </div>
               </div>
 
@@ -466,8 +570,12 @@ export function DonorTicketPass({
               <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
                 <Moon className="h-4 w-4 text-indigo-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-gray-900">นอนหลับพักผ่อน 6–8 ชม.</p>
-                  <p className="text-[11px] text-gray-500">ไม่อดนอนในคืนก่อนวันบริจาค (Get 6–8 hours of sleep)</p>
+                  <p className="font-bold text-gray-900">
+                    {isTh ? "นอนหลับพักผ่อน 6–8 ชม." : "Sleep 6-8 hours"}
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    {isTh ? "ไม่อดนอนในคืนก่อนวันบริจาค" : "At least 5 hours prior"}
+                  </p>
                 </div>
               </div>
 
@@ -475,8 +583,12 @@ export function DonorTicketPass({
               <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
                 <Utensils className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-gray-900">งดอาหารไขมันสูง & แอลกอฮอล์</p>
-                  <p className="text-[11px] text-gray-500">ทานอาหารมื้อหลักล่วงหน้า (Avoid fatty food & alcohol)</p>
+                  <p className="font-bold text-gray-900">
+                    {isTh ? "งดอาหารไขมันสูง & แอลกอฮอล์" : "Avoid high-fat food & alcohol"}
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    {isTh ? "ทานอาหารมื้อหลักล่วงหน้า" : "At least 6 hours before"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -491,17 +603,17 @@ export function DonorTicketPass({
           <button
             type="button"
             onClick={onReset}
-            className="editorial-btn-secondary min-h-11 flex-1 py-3 text-xs font-bold"
+            className="editorial-btn-secondary min-h-11 flex-1 py-3 text-xs font-bold cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>{resetLabel}</span>
+            <span>{effectiveResetLabel}</span>
           </button>
         )}
         <Link
           href={primaryAction?.href || "/"}
           className="editorial-btn-primary min-h-11 flex-1 py-3 text-xs font-bold"
         >
-          <span>{primaryAction?.label || "กลับสู่หน้าแรก"}</span>
+          <span>{primaryAction?.label || (isTh ? "กลับสู่หน้าแรก" : "Back to Home")}</span>
           {primaryAction?.icon || <ArrowRight className="h-4 w-4" />}
         </Link>
       </div>

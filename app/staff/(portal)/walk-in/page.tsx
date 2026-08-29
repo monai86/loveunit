@@ -108,13 +108,13 @@ export default function StaffWalkInPage() {
           ลงทะเบียน Walk-in หน้างาน
         </h1>
         <p className="text-xs text-[var(--muted)] font-medium">
-          สำหรับผู้ที่ไม่ได้ลงทะเบียนออนไลน์ล่วงหน้า (ระบบจะบันทึกและเช็คอินให้อัตโนมัติ)
+          สำหรับผู้ที่ไม่ได้ลงทะเบียนออนไลน์ล่วงหน้า (ระบบจะออกรหัส LVU26-W... และเช็กอินให้อัตโนมัติ)
         </p>
       </div>
 
       {/* Alert Banner */}
       {alertMsg && (
-        <div className={`mt-6 flex items-center justify-between rounded-2xl border p-4 text-xs font-bold ${
+        <div className={`mt-4 flex items-center justify-between rounded-2xl border p-4 text-xs font-bold ${
           alertMsg.type === 'success' ? 'border-emerald-200 bg-emerald-50 text-emerald-900' : 'border-red-200 bg-red-50 text-red-900'
         }`}>
           <div className="flex items-center gap-2">
@@ -125,7 +125,7 @@ export default function StaffWalkInPage() {
       )}
 
       {/* Ultra Fast Form */}
-      <div className="mt-6 rounded-3xl border border-[var(--rose-100)] bg-white p-6 shadow-sm sm:p-8">
+      <div className="mt-5 rounded-3xl border border-[var(--rose-100)] bg-white p-6 shadow-sm sm:p-8">
         <form onSubmit={handleSubmit} className="space-y-4">
           
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

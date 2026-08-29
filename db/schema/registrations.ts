@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, boolean, pgEnum, uniqueIndex } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, boolean, pgEnum, uniqueIndex, index } from 'drizzle-orm/pg-core';
 import { events, timeSlots } from './events';
 
 export const participantTypeEnum = pgEnum('participant_type_enum', ['STUDENT', 'STAFF', 'GENERAL_PUBLIC']);
@@ -38,4 +38,9 @@ export const registrations = pgTable('registrations', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [
   uniqueIndex('idx_registrations_event_phone').on(t.eventId, t.phoneNormalized),
+  index('idx_registrations_event_id').on(t.eventId),
+  index('idx_registrations_event_status').on(t.eventId, t.status),
+  index('idx_registrations_event_source').on(t.eventId, t.source),
+  index('idx_registrations_slot_id').on(t.slotId),
+  index('idx_registrations_registered_at').on(t.registeredAt),
 ]);
