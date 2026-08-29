@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { CheckCircle2, ArrowLeft, Phone, Loader2 } from 'lucide-react';
 import { ParticipantType, DonationExperience } from '@/lib/types/database';
 import { MAHIDOL_FACULTIES } from '@/lib/constants/mahidol';
+import { LoadingOverlay } from '@/components/common/LoadingOverlay';
 
 export default function StaffWalkInPage() {
   const [submitting, setSubmitting] = useState(false);
@@ -77,6 +78,16 @@ export default function StaffWalkInPage() {
   };
 
   return (
+    <>
+    {submitting && (
+      <LoadingOverlay
+        variant="donor-register"
+        title="MUMT LoveUnit"
+        badge="Walk-in"
+        statusText="กำลังบันทึกและเช็กอิน Walk-in..."
+        hint="ระบบกำลังออกรหัสลงทะเบียนและบันทึกข้อมูลหน้างานทันที"
+      />
+    )}
     <div className="mx-auto max-w-2xl px-4 pt-6 pb-[calc(7.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:pb-12">
       
       {/* Top Navigation */}
@@ -243,5 +254,6 @@ export default function StaffWalkInPage() {
       </div>
 
     </div>
+    </>
   );
 }

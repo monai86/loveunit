@@ -23,6 +23,7 @@ import {
 import { formatTimeRange, formatBangkokTime, getRegistrationStatusBadge } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
 import { enqueueOfflineAction } from '@/lib/pwa/offline-queue';
+import { LoadingOverlay } from '@/components/common/LoadingOverlay';
 
 interface ApiRegistration {
   id: string;
@@ -637,15 +638,16 @@ export default function StaffCheckinPage() {
         </div>
       )}
 
-      {/* Non-intrusive Floating Loading Capsule (Ultra-sleek top pill) */}
-      {searching && (
-        <div className="pointer-events-none absolute top-16 inset-x-0 z-30 flex justify-center px-4 animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-slate-950/85 px-4 py-2 text-white shadow-2xl backdrop-blur-xl">
-            <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-400" />
-            <span className="text-xs font-medium tracking-wide">กำลังอ่านข้อมูล QR Code...</span>
-          </div>
-        </div>
+      {/* Themed Loading Overlays for Scanner & Check-in */}
+      {searching && <LoadingOverlay variant="staff-scan" />}
+      {uploadingImage && (
+        <LoadingOverlay
+          variant="staff-scan"
+          statusText="กำลังประมวลผลภาพถ่าย QR Code..."
+          hint="ระบบกำลังอ่านและตรวจสอบข้อมูล QR Code จากรูปภาพ"
+        />
       )}
+      {actionLoading && <LoadingOverlay variant="staff-checkin" />}
 
       {/* Floating Top Notification Toast */}
       {message && !registration && (

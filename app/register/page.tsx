@@ -7,6 +7,7 @@ import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle } f
 import { MAHIDOL_FACULTIES, ACADEMIC_YEARS } from '@/lib/constants/mahidol';
 import { formatTimeRange } from '@/lib/utils/format';
 import { isTimeSlotSelectable } from '@/lib/registration/slot-availability';
+import { LoadingOverlay } from '@/components/common/LoadingOverlay';
 
 const PARTICIPANT_TYPES = [
   { id: 'STUDENT', name: 'นักศึกษา ม.มหิดล', enName: 'Mahidol Student' },
@@ -225,6 +226,8 @@ export default function RegisterPage() {
   };
 
   return (
+    <>
+    {loading && <LoadingOverlay variant="donor-register" />}
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       
       {/* Header */}
@@ -660,6 +663,7 @@ export default function RegisterPage() {
       )}
 
     </div>
+    </>
   );
 }
 
