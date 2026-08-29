@@ -70,19 +70,19 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
         <td align="center" style="padding:28px 12px;">
           <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border-radius:20px;overflow:hidden;border:1px solid #E2E8F0;box-shadow:0 8px 24px rgba(15,23,42,0.06);">
             
-            <!-- Vibrant Red Gradient Header -->
+            <!-- Rich Crimson Gradient Header -->
             <tr>
-              <td style="background:linear-gradient(135deg, #E11D48 0%, #DC2626 45%, #991B1B 100%);background-color:#DC2626;padding:32px 28px;color:#FFFFFF;">
+              <td style="background:linear-gradient(135deg, #C5222F 0%, #A6192E 50%, #7A1222 100%);background-color:#A6192E;padding:32px 28px;color:#FFFFFF;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                   <tr>
                     <td>
-                      <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#FFE4E6;text-transform:uppercase;">
+                      <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#FDE8EA;text-transform:uppercase;">
                         MUMT LOVEUNIT 2026 &middot; คณะเทคนิคการแพทย์ ม.มหิดล
                       </p>
                       <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:900;color:#FFFFFF;">
                         ยืนยันการลงทะเบียนบริจาคโลหิต
                       </h1>
-                      <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:#FFE4E6;font-weight:600;">
+                      <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:#FDE8EA;font-weight:600;">
                         Registration confirmed &middot; MUMT LoveUnit ครั้งที่ 9 (9th Edition)
                       </p>
                     </td>
@@ -104,13 +104,13 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                 </p>
 
                 <!-- Registration Code Highlight Box -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;background:#FFF1F2;border:1px solid #FECDD3;border-radius:14px;margin-bottom:24px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;background:#FDF2F3;border:1px solid #F5C2C7;border-radius:14px;margin-bottom:24px;">
                   <tr>
                     <td style="padding:18px 20px;text-align:center;">
-                      <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#BE123C;text-transform:uppercase;">
+                      <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#A6192E;text-transform:uppercase;">
                         หมายเลขลงทะเบียน / Registration Code
                       </p>
-                      <p style="margin:6px 0 0;font-family:monospace,'Courier New',Courier;font-size:28px;font-weight:900;letter-spacing:.06em;color:#9F1239;">
+                      <p style="margin:6px 0 0;font-family:monospace,'Courier New',Courier;font-size:28px;font-weight:900;letter-spacing:.06em;color:#7A1222;">
                         ${escapeHtml(input.registrationCode)}
                       </p>
                     </td>
@@ -134,7 +134,7 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                     <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E2E8F0;color:#64748B;font-weight:700;vertical-align:top;">
                       เวลามาถึง <span style="font-size:11px;font-weight:normal;color:#94A3B8;">(Time Slot)</span>
                     </td>
-                    <td style="padding:11px 0;border-bottom:1px solid #E2E8F0;font-weight:900;color:#BE123C;word-break:break-word;font-size:15px;">
+                    <td style="padding:11px 0;border-bottom:1px solid #E2E8F0;font-weight:900;color:#A6192E;word-break:break-word;font-size:15px;">
                       ${timeSlot}
                     </td>
                   </tr>
@@ -167,26 +167,26 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                   </p>
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 8px;">
                     <tr>
-                      <td style="background:#FFF1F2;border:1px solid #FFE4E6;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#9F1239;">1. อย่าลืมนำบัตรประชาชนมาด้วย (National ID Required)</strong><br />
+                      <td style="background:#FDF2F3;border:1px solid #F8D7DA;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#7A1222;">1. อย่าลืมนำบัตรประชาชนมาด้วย (National ID Required)</strong><br />
                         <span style="color:#64748B;font-size:12px;">หรือใช้บัตรผู้บริจาคโลหิตตัวจริง เพื่อยืนยันตัวตนหน้างาน</span>
                       </td>
                     </tr>
                     <tr>
-                      <td style="background:#FFF1F2;border:1px solid #FFE4E6;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#9F1239;">2. ดื่มน้ำล่วงหน้า 3–4 แก้ว (Hydration)</strong><br />
+                      <td style="background:#FDF2F3;border:1px solid #F8D7DA;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#7A1222;">2. ดื่มน้ำล่วงหน้า 3–4 แก้ว (Hydration)</strong><br />
                         <span style="color:#64748B;font-size:12px;">ช่วยให้ระบบไหลเวียนโลหิตพร้อมและลดอาการวิงเวียน</span>
                       </td>
                     </tr>
                     <tr>
-                      <td style="background:#FFF1F2;border:1px solid #FFE4E6;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#9F1239;">3. นอนหลับพักผ่อนให้พอ 6–8 ชม. (Sound Sleep)</strong><br />
+                      <td style="background:#FDF2F3;border:1px solid #F8D7DA;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#7A1222;">3. นอนหลับพักผ่อนให้พอ 6–8 ชม. (Sound Sleep)</strong><br />
                         <span style="color:#64748B;font-size:12px;">ไม่อดนอนในคืนก่อนวันบริจาค และงดเครื่องดื่มแอลกอฮอล์</span>
                       </td>
                     </tr>
                     <tr>
-                      <td style="background:#FFF1F2;border:1px solid #FFE4E6;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#9F1239;">4. รับประทานอาหารมื้อหลัก (Healthy Meal)</strong><br />
+                      <td style="background:#FDF2F3;border:1px solid #F8D7DA;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#7A1222;">4. รับประทานอาหารมื้อหลัก (Healthy Meal)</strong><br />
                         <span style="color:#64748B;font-size:12px;">ทานอาหารล่วงหน้า 1–2 ชม. หลีกเลี่ยงอาหารที่มีไขมันสูง</span>
                       </td>
                     </tr>
@@ -195,7 +195,7 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
 
                 <!-- Action Button -->
                 <div style="margin:28px 0 0;text-align:center;">
-                  <a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:linear-gradient(135deg, #E11D48 0%, #DC2626 100%);background-color:#DC2626;color:#FFFFFF;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:800;letter-spacing:.02em;box-shadow:0 4px 12px rgba(220,38,38,0.25);">
+                  <a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:linear-gradient(135deg, #C5222F 0%, #A6192E 100%);background-color:#A6192E;color:#FFFFFF;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:800;letter-spacing:.02em;box-shadow:0 4px 12px rgba(166,25,46,0.25);">
                     เปิดตั๋วลงทะเบียนออนไลน์ / View Digital Pass &rarr;
                   </a>
                 </div>
@@ -251,16 +251,16 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
         <td align="center" style="padding:28px 12px;">
           <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border-radius:20px;overflow:hidden;border:1px solid #E2E8F0;box-shadow:0 8px 24px rgba(15,23,42,0.06);">
             
-            <!-- Vibrant Red Gradient Hero Header -->
+            <!-- Rich Crimson Gradient Hero Header -->
             <tr>
-              <td style="background:linear-gradient(135deg, #E11D48 0%, #DC2626 45%, #991B1B 100%);background-color:#DC2626;padding:32px 28px;color:#FFFFFF;">
-                <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#FFE4E6;text-transform:uppercase;">
+              <td style="background:linear-gradient(135deg, #C5222F 0%, #A6192E 50%, #7A1222 100%);background-color:#A6192E;padding:32px 28px;color:#FFFFFF;">
+                <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#FDE8EA;text-transform:uppercase;">
                   MUMT LOVEUNIT 2026 &middot; 2 Days to Go!
                 </p>
                 <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:900;color:#FFFFFF;">
                   เตือนความพร้อมก่อนวันบริจาคโลหิต
                 </h1>
-                <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:#FFE4E6;font-weight:600;">
+                <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:#FDE8EA;font-weight:600;">
                   Preparation Reminder &middot; อีก 2 วันพบกันที่จุดลงทะเบียน
                 </p>
               </td>
@@ -292,7 +292,7 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
                     <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E2E8F0;color:#64748B;font-weight:700;vertical-align:top;">
                       เวลามาถึง <span style="font-size:11px;font-weight:normal;color:#94A3B8;">(Time Slot)</span>
                     </td>
-                    <td style="padding:11px 0;border-bottom:1px solid #E2E8F0;font-weight:900;color:#BE123C;word-break:break-word;font-size:15px;">
+                    <td style="padding:11px 0;border-bottom:1px solid #E2E8F0;font-weight:900;color:#A6192E;word-break:break-word;font-size:15px;">
                       ${timeSlot}
                     </td>
                   </tr>
@@ -308,7 +308,7 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
                     <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E2E8F0;color:#64748B;font-weight:700;vertical-align:top;">
                       หมายเลขลงทะเบียน <span style="font-size:11px;font-weight:normal;color:#94A3B8;">(Code)</span>
                     </td>
-                    <td style="padding:11px 0;border-bottom:1px solid #E2E8F0;font-family:monospace,'Courier New',Courier;font-weight:900;color:#9F1239;font-size:16px;word-break:break-word;">
+                    <td style="padding:11px 0;border-bottom:1px solid #E2E8F0;font-family:monospace,'Courier New',Courier;font-weight:900;color:#7A1222;font-size:16px;word-break:break-word;">
                       ${escapeHtml(input.registrationCode)}
                     </td>
                   </tr>
@@ -321,26 +321,26 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
                   </p>
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 8px;">
                     <tr>
-                      <td style="background:#FFF1F2;border-left:4px solid #E11D48;border-top:1px solid #FFE4E6;border-right:1px solid #FFE4E6;border-bottom:1px solid #FFE4E6;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#9F1239;">1. อย่าลืมนำบัตรประชาชนมาด้วย (National ID Required)</strong><br />
+                      <td style="background:#FDF2F3;border-left:4px solid #A6192E;border-top:1px solid #F8D7DA;border-right:1px solid #F8D7DA;border-bottom:1px solid #F8D7DA;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#7A1222;">1. อย่าลืมนำบัตรประชาชนมาด้วย (National ID Required)</strong><br />
                         <span style="color:#64748B;font-size:12px;">หรือใช้บัตรผู้บริจาคโลหิตตัวจริง เพื่อยืนยันตัวตน</span>
                       </td>
                     </tr>
                     <tr>
-                      <td style="background:#FFF1F2;border-left:4px solid #E11D48;border-top:1px solid #FFE4E6;border-right:1px solid #FFE4E6;border-bottom:1px solid #FFE4E6;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#9F1239;">2. นอนหลับพักผ่อน 6–8 ชั่วโมง (Good Sleep)</strong><br />
+                      <td style="background:#FDF2F3;border-left:4px solid #A6192E;border-top:1px solid #F8D7DA;border-right:1px solid #F8D7DA;border-bottom:1px solid #F8D7DA;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#7A1222;">2. นอนหลับพักผ่อน 6–8 ชั่วโมง (Good Sleep)</strong><br />
                         <span style="color:#64748B;font-size:12px;">ไม่อดนอนในคืนก่อนวันบริจาค เพื่อความพร้อมของร่างกาย</span>
                       </td>
                     </tr>
                     <tr>
-                      <td style="background:#FFF1F2;border-left:4px solid #E11D48;border-top:1px solid #FFE4E6;border-right:1px solid #FFE4E6;border-bottom:1px solid #FFE4E6;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#9F1239;">3. รับประทานอาหารมื้อหลัก (Healthy Meal)</strong><br />
+                      <td style="background:#FDF2F3;border-left:4px solid #A6192E;border-top:1px solid #F8D7DA;border-right:1px solid #F8D7DA;border-bottom:1px solid #F8D7DA;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#7A1222;">3. รับประทานอาหารมื้อหลัก (Healthy Meal)</strong><br />
                         <span style="color:#64748B;font-size:12px;">ทานอาหารล่วงหน้า 1–2 ชม. หลีกเลี่ยงอาหารมันจัดและหวานจัด</span>
                       </td>
                     </tr>
                     <tr>
-                      <td style="background:#FFF1F2;border-left:4px solid #E11D48;border-top:1px solid #FFE4E6;border-right:1px solid #FFE4E6;border-bottom:1px solid #FFE4E6;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#9F1239;">4. ดื่มน้ำ 3–4 แก้วก่อนมาถึง (Drink Plenty of Water)</strong><br />
+                      <td style="background:#FDF2F3;border-left:4px solid #A6192E;border-top:1px solid #F8D7DA;border-right:1px solid #F8D7DA;border-bottom:1px solid #F8D7DA;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#7A1222;">4. ดื่มน้ำ 3–4 แก้วก่อนมาถึง (Drink Plenty of Water)</strong><br />
                         <span style="color:#64748B;font-size:12px;">ช่วยให้ระบบไหลเวียนโลหิตดีขึ้นและลดอาการอ่อนเพลีย</span>
                       </td>
                     </tr>
@@ -361,7 +361,7 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
 
                 <!-- Action Button -->
                 <div style="margin:28px 0 0;text-align:center;">
-                  <a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:linear-gradient(135deg, #E11D48 0%, #DC2626 100%);background-color:#DC2626;color:#FFFFFF;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:800;letter-spacing:.02em;box-shadow:0 4px 12px rgba(220,38,38,0.25);">
+                  <a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:linear-gradient(135deg, #C5222F 0%, #A6192E 100%);background-color:#A6192E;color:#FFFFFF;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:800;letter-spacing:.02em;box-shadow:0 4px 12px rgba(166,25,46,0.25);">
                     เปิดตั๋วลงทะเบียนของฉัน / Open My Pass &rarr;
                   </a>
                 </div>

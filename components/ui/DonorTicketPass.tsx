@@ -88,17 +88,17 @@ export function DonorTicketPass({
       context.lineWidth = 1.5 * scale;
       context.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
 
-      // Vibrant Red Gradient Header
+      // Deep Crimson Header (Refined & Balanced Red)
       const headerHeight = 130 * scale;
       const grad = context.createLinearGradient(inset, inset, width - inset, inset + headerHeight);
-      grad.addColorStop(0, "#E11D48"); // Vibrant Rose Red
-      grad.addColorStop(0.45, "#DC2626"); // Bright Crimson
-      grad.addColorStop(1, "#991B1B"); // Deep Crimson Red
+      grad.addColorStop(0, "#C5222F"); // Rich Crimson
+      grad.addColorStop(0.5, "#A6192E"); // Deep Ruby
+      grad.addColorStop(1, "#7A1222"); // Royal Burgundy Crimson
       context.fillStyle = grad;
       context.fillRect(inset, inset, width - inset * 2, headerHeight);
 
       // Header Text
-      context.fillStyle = "#FFE4E6";
+      context.fillStyle = "#FDE8EA";
       context.textAlign = "left";
       context.font = `700 ${11 * scale}px sans-serif`;
       context.fillText("MUMT LOVEUNIT 2026 · คณะเทคนิคการแพทย์ ม.มหิดล", inset + 24 * scale, inset + 32 * scale);
@@ -107,7 +107,7 @@ export function DonorTicketPass({
       context.font = `800 ${22 * scale}px sans-serif`;
       context.fillText("ตั๋วลงทะเบียนบริจาคโลหิต", inset + 24 * scale, inset + 68 * scale);
 
-      context.fillStyle = "#FFE4E6";
+      context.fillStyle = "#FDE8EA";
       context.font = `700 ${11 * scale}px sans-serif`;
       context.fillText("OFFICIAL BLOOD DONOR DIGITAL PASS", inset + 24 * scale, inset + 96 * scale);
 
@@ -116,13 +116,13 @@ export function DonorTicketPass({
       const x = inset + 24 * scale;
       let y = inset + headerHeight + 32 * scale;
 
-      context.fillStyle = "#FFF1F2";
+      context.fillStyle = "#FDF2F3";
       context.fillRect(x, y - 16 * scale, contentWidth, 68 * scale);
-      context.strokeStyle = "#FECDD3";
+      context.strokeStyle = "#F5C2C7";
       context.lineWidth = 1 * scale;
       context.strokeRect(x, y - 16 * scale, contentWidth, 68 * scale);
 
-      context.fillStyle = "#BE123C";
+      context.fillStyle = "#A6192E";
       context.font = `800 ${10.5 * scale}px sans-serif`;
       context.fillText("หมายเลขลงทะเบียน / REGISTRATION NO.", x + 16 * scale, y + 6 * scale);
 
@@ -152,7 +152,7 @@ export function DonorTicketPass({
       context.fillText("รอบเวลาที่นัดหมาย / TIME SLOT", col1X, y);
       context.fillText("สถานที่จัดกิจกรรม / VENUE", col2X, y);
 
-      context.fillStyle = "#BE123C";
+      context.fillStyle = "#A6192E";
       context.font = `800 ${12 * scale}px sans-serif`;
       context.fillText(timeSlot, col1X, y + 18 * scale);
       context.fillStyle = "#0F172A";
@@ -224,10 +224,10 @@ export function DonorTicketPass({
       {/* Symmetrical Boarding Pass Card */}
       <article
         data-testid="donor-ticket"
-        className="relative overflow-hidden rounded-3xl border border-rose-100 bg-white shadow-xl shadow-rose-950/5 transition-all"
+        className="relative overflow-hidden rounded-3xl border border-red-100 bg-white shadow-xl shadow-red-950/5 transition-all"
       >
-        {/* Vibrant Red Gradient Header */}
-        <header className="relative bg-gradient-to-r from-rose-600 via-red-600 to-rose-800 px-6 py-6 text-white sm:px-8">
+        {/* Rich Crimson Gradient Header */}
+        <header className="relative bg-gradient-to-r from-[#C5222F] via-[#A6192E] to-[#7A1222] px-6 py-6 text-white sm:px-8">
           <div className="flex items-center justify-between gap-4 border-b border-white/20 pb-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white p-1 shadow-sm">
@@ -269,22 +269,22 @@ export function DonorTicketPass({
 
         {/* Crisp Ticket Notch Divider */}
         <div className="relative flex items-center justify-between px-3 bg-white">
-          <div className="-ml-6 h-6 w-6 rounded-full bg-[var(--bg)] border-r border-rose-100" />
-          <div className="flex-1 border-b-2 border-dashed border-rose-200 mx-2" />
-          <div className="-mr-6 h-6 w-6 rounded-full bg-[var(--bg)] border-l border-rose-100" />
+          <div className="-ml-6 h-6 w-6 rounded-full bg-[var(--bg)] border-r border-red-100" />
+          <div className="flex-1 border-b-2 border-dashed border-red-200 mx-2" />
+          <div className="-mr-6 h-6 w-6 rounded-full bg-[var(--bg)] border-l border-red-100" />
         </div>
 
         {/* Ticket Body */}
         <div className="px-6 py-6 sm:px-8 space-y-6">
           
           {/* Registration Code Block */}
-          <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-4 sm:p-5">
+          <div className="rounded-2xl border border-red-100 bg-[#FDF2F3] p-4 sm:p-5">
             <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
               <div className="text-center sm:text-left">
-                <p className="text-xs font-black tracking-wider text-rose-700 uppercase">
+                <p className="text-xs font-black tracking-wider text-[#A6192E] uppercase">
                   หมายเลขลงทะเบียน <span className="text-[10px] font-bold text-gray-500">/ Registration No.</span>
                 </p>
-                <p className="mt-1 font-mono text-2xl font-black tracking-wider text-rose-800 sm:text-3xl">
+                <p className="mt-1 font-mono text-2xl font-black tracking-wider text-[#7A1222] sm:text-3xl">
                   {registrationCode}
                 </p>
               </div>
@@ -293,7 +293,7 @@ export function DonorTicketPass({
                 type="button"
                 onClick={copyCode}
                 aria-label="คัดลอกหมายเลขลงทะเบียน"
-                className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-white px-4 text-xs font-bold text-rose-700 shadow-xs transition-all hover:bg-rose-50 hover:border-rose-300 active:scale-98"
+                className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-white px-4 text-xs font-bold text-[#A6192E] shadow-xs transition-all hover:bg-red-50 hover:border-red-300 active:scale-98"
               >
                 {copied ? (
                   <>
@@ -326,7 +326,7 @@ export function DonorTicketPass({
               {/* Donor Name */}
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <User className="h-3.5 w-3.5 text-rose-600" />
+                  <User className="h-3.5 w-3.5 text-[#A6192E]" />
                   <span>ผู้ลงทะเบียน / Donor Name</span>
                 </div>
                 <p className="text-sm font-black text-gray-900">{name}</p>
@@ -335,25 +335,25 @@ export function DonorTicketPass({
               {/* Event Date */}
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <Calendar className="h-3.5 w-3.5 text-rose-600" />
+                  <Calendar className="h-3.5 w-3.5 text-[#A6192E]" />
                   <span>วันจัดกิจกรรม / Event Date</span>
                 </div>
                 <p className="text-sm font-black text-gray-900">{date}</p>
               </div>
 
               {/* Time Slot */}
-              <div className="rounded-xl border border-rose-100 bg-rose-50/40 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700">
+              <div className="rounded-xl border border-red-100 bg-[#FDF2F3]/70 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#A6192E]">
                   <Clock className="h-3.5 w-3.5" />
                   <span>รอบเวลาที่นัดหมาย / Time Slot</span>
                 </div>
-                <p className="text-base font-black text-rose-800">{timeSlot}</p>
+                <p className="text-base font-black text-[#7A1222]">{timeSlot}</p>
               </div>
 
               {/* Venue */}
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <MapPin className="h-3.5 w-3.5 text-rose-600" />
+                  <MapPin className="h-3.5 w-3.5 text-[#A6192E]" />
                   <span>สถานที่จัดกิจกรรม / Venue</span>
                 </div>
                 <p className="text-xs font-bold text-gray-900 leading-snug">{venue}</p>
@@ -362,7 +362,7 @@ export function DonorTicketPass({
               {/* Phone */}
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <Phone className="h-3.5 w-3.5 text-rose-600" />
+                  <Phone className="h-3.5 w-3.5 text-[#A6192E]" />
                   <span>เบอร์โทรศัพท์ / Phone</span>
                 </div>
                 <p className="text-xs font-bold text-gray-900">{phone || "—"}</p>
@@ -371,7 +371,7 @@ export function DonorTicketPass({
               {/* Faculty */}
               <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <Building2 className="h-3.5 w-3.5 text-rose-600" />
+                  <Building2 className="h-3.5 w-3.5 text-[#A6192E]" />
                   <span>คณะ / สังกัด / Faculty or Org</span>
                 </div>
                 <p className="text-xs font-bold text-gray-900 leading-snug">{faculty || "บุคคลทั่วไป"}</p>
@@ -424,7 +424,7 @@ export function DonorTicketPass({
                 type="button"
                 onClick={downloadTicket}
                 disabled={downloading}
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-rose-600/20 transition-all hover:from-rose-700 hover:to-red-700 active:scale-98 disabled:opacity-60"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[#C5222F] to-[#A6192E] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-red-900/15 transition-all hover:from-[#B01B27] hover:to-[#911426] active:scale-98 disabled:opacity-60"
               >
                 <Download className="h-4 w-4" />
                 <span>{downloading ? "กำลังบันทึกภาพ... (Saving...)" : "บันทึกตั๋วเป็นรูปภาพ / Save Ticket PNG"}</span>
@@ -432,10 +432,10 @@ export function DonorTicketPass({
             </div>
           </section>
 
-          {/* Symmetrical 2x2 Preparation Tips Grid (Clean Icons) */}
+          {/* Symmetrical 2x2 Preparation Tips Grid */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-rose-600" />
+              <ShieldCheck className="h-4 w-4 text-[#A6192E]" />
               <p className="text-xs font-black text-gray-900">
                 ข้อแนะนำการเตรียมความพร้อม / Preparation Tips
               </p>
@@ -443,18 +443,18 @@ export function DonorTicketPass({
 
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 text-xs">
               {/* ID Card */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-white p-3 shadow-2xs">
-                <ShieldCheck className="h-4 w-4 text-rose-600 mt-0.5 shrink-0" />
+              <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
+                <ShieldCheck className="h-4 w-4 text-[#A6192E] mt-0.5 shrink-0" />
                 <div>
                   <p className="font-bold text-gray-900">
-                    <strong className="text-rose-700">อย่าลืมนำบัตรประชาชนมาด้วย</strong>
+                    <strong className="text-[#A6192E]">อย่าลืมนำบัตรประชาชนมาด้วย</strong>
                   </p>
                   <p className="text-[11px] text-gray-500">หรือบัตรผู้บริจาคโลหิตตัวจริง (National ID Required)</p>
                 </div>
               </div>
 
               {/* Water */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-white p-3 shadow-2xs">
+              <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
                 <Droplets className="h-4 w-4 text-sky-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="font-bold text-gray-900">ดื่มน้ำ 3–4 แก้วก่อนมา</p>
@@ -463,7 +463,7 @@ export function DonorTicketPass({
               </div>
 
               {/* Sleep */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-white p-3 shadow-2xs">
+              <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
                 <Moon className="h-4 w-4 text-indigo-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="font-bold text-gray-900">นอนหลับพักผ่อน 6–8 ชม.</p>
@@ -472,7 +472,7 @@ export function DonorTicketPass({
               </div>
 
               {/* Food */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-white p-3 shadow-2xs">
+              <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
                 <Utensils className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="font-bold text-gray-900">งดอาหารไขมันสูง & แอลกอฮอล์</p>
