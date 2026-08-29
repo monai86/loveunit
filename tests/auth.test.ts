@@ -16,6 +16,7 @@ import {
   requireSuperAdmin,
   requireReadOnlyAdmin,
   canDeleteManagedAccount,
+  isPrimaryAdminEmail,
   isStaffPortalRole,
 } from '../lib/auth/server';
 import type { AuthenticatedUser } from '../lib/auth/server';
@@ -131,6 +132,14 @@ async function runAuthTests() {
   // ---- Server Guards for unified ADMIN role ----
   console.log('Test 5: Server Guards — role-based Admin and Staff separation');
   process.env.PRIMARY_ADMIN_EMAIL = 'monai.yut@student.mahidol.edu';
+  const configuredPrimaryEmail = process.env.PRIMARY_ADMIN_EMAIL;
+  delete process.env.PRIMARY_ADMIN_EMAIL;
+  assert.strictEqual(
+    isPrimaryAdminEmail('monai.yut@student.mahidol.edu'),
+    true,
+    'the designated Super Admin must keep its privilege even when production configuration is missing'
+  );
+  process.env.PRIMARY_ADMIN_EMAIL = configuredPrimaryEmail;
   assert.strictEqual(isLegacyPlaceholderStaffEmail('monai.yut@student.mahidol.edu'), false, 'primary admin must not be treated as a demo account');
   assert.strictEqual(isLegacyPlaceholderStaffEmail('staff@mahidol.ac.th'), true, 'legacy demo staff account must be identified for cleanup');
   assert.ok(LEGACY_PLACEHOLDER_STAFF_EMAILS.length >= 5, 'all known demo accounts must be covered by cleanup policy');

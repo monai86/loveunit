@@ -31,9 +31,12 @@ const devProfiles: Record<string, StaffProfile> = {
   'monai.yut@student.mahidol.edu': { user_id: 'u-primary-admin', display_name: 'Super Admin', role: 'SUPER_ADMIN', team: 'Management', is_active: true, created_at: '', updated_at: '' },
 };
 
+export const PRIMARY_ADMIN_EMAIL = 'monai.yut@student.mahidol.edu';
+
 export function isPrimaryAdminEmail(email: string): boolean {
   const configuredEmail = process.env.PRIMARY_ADMIN_EMAIL?.trim().toLowerCase();
-  return Boolean(configuredEmail && email.trim().toLowerCase() === configuredEmail);
+  const primaryEmail = configuredEmail || PRIMARY_ADMIN_EMAIL;
+  return email.trim().toLowerCase() === primaryEmail;
 }
 
 export function canDeleteManagedAccount(actor: AuthenticatedUser, target: { id: string; email: string }): boolean {

@@ -32,10 +32,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Top Admin Navigation Header */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[var(--line)] shadow-2xs">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex h-16 items-center justify-between gap-4">
+          <div className="grid h-20 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
             
             {/* Brand Logo & Title */}
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center gap-3">
               <Link href="/mt70" className="flex items-center gap-2.5 group">
                 <div className="h-9 w-9 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs overflow-hidden">
                   <Image src="/images/logo.png" alt="MUMT Logo" width={28} height={28} className="h-6 w-6 object-contain rounded-full" />
@@ -51,10 +51,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-1 text-xs font-black">
+            <nav className="hidden min-w-0 items-center justify-center gap-1 overflow-x-auto text-xs font-black md:flex">
               <Link
                 href="/mt70"
-                className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
+                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
               >
                 <LayoutDashboard className="h-4 w-4 text-[var(--burgundy-600)]" />
                 <span>แดชบอร์ด</span>
@@ -62,7 +62,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
               <Link
                 href="/mt70/registrations"
-                className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
+                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
               >
                 <Users className="h-4 w-4 text-blue-600" />
                 <span>รายชื่อผู้ลงทะเบียน</span>
@@ -70,7 +70,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
               <Link
                 href="/mt70/staff"
-                className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
+                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
               >
                 <Shield className="h-4 w-4 text-[var(--burgundy-600)]" />
                 <span>จัดการ Staff</span>
@@ -78,7 +78,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
               <Link
                 href="/mt70/content"
-                className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
+                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
               >
                 <FileText className="h-4 w-4 text-amber-600" />
                 <span>สื่อ & โปสเตอร์</span>
@@ -86,7 +86,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
               <Link
                 href="/mt70/audit-logs"
-                className="px-3.5 py-2 rounded-xl text-[var(--ink)] hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)] transition-all flex items-center gap-1.5"
+                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
               >
                 <ScrollText className="h-4 w-4 text-gray-600" />
                 <span>Audit Log</span>
@@ -94,7 +94,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </nav>
 
             {/* Right Side: Quick Portal Links & User Profile */}
-            <div className="flex items-center gap-2.5">
+            <div className="flex shrink-0 items-center gap-2.5">
               
               <Link
                 href="/staff/checkin"
@@ -114,7 +114,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                     <span className="text-xs font-black text-[var(--ink)] block leading-tight truncate max-w-[130px]">
                       {user.profile.display_name}
                     </span>
-                    <span className="text-[10px] font-bold text-[var(--muted)]">Admin</span>
+                    <span className="text-[10px] font-bold text-[var(--muted)]">{user.profile.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}</span>
                   </div>
 
                   <div className="h-7 w-7 rounded-lg bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center">
