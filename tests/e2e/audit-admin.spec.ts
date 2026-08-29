@@ -13,9 +13,10 @@ async function signIn(request: APIRequestContext, email: string, password: strin
 }
 
 async function login(page: import('@playwright/test').Page) {
-  await page.goto('/staff/login');
-  await page.waitForLoadState('networkidle').catch(() => {});
-  if (!page.url().includes('/mt70') && !page.url().includes('/admin') && !page.url().includes('/staff/change-password')) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    await page.goto('/staff/login');
+    await page.waitForLoadState('networkidle').catch(() => {});
+    if (page.url().includes('/mt70') || page.url().includes('/admin') || page.url().includes('/staff/change-password')) break;
     const emailInput = page.locator('#staff-email');
     if (await emailInput.isVisible({ timeout: 2000 }).catch(() => false)) {
       await emailInput.fill(ADMIN_EMAIL);
@@ -23,7 +24,10 @@ async function login(page: import('@playwright/test').Page) {
       await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
       await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 15_000 }).catch(() => {});
     }
+    if (!page.url().includes('/staff/login')) break;
+    await page.waitForTimeout(300);
   }
+  await expect(page).not.toHaveURL(/\/staff\/login$/);
   if (page.url().includes('/staff/change-password')) {
     await page.getByPlaceholder('รหัสที่ระบบแจกให้ครั้งแรก').fill(ADMIN_PASS);
     await page.getByPlaceholder('อย่างน้อย 8 ตัวอักษร').first().fill(NEW_PASS);
