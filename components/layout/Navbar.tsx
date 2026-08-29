@@ -91,7 +91,7 @@ export function Navbar() {
         <div className="hidden xl:flex items-center shrink-0">
           <Link
             href="/register"
-            className="inline-flex items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-4 py-2 rounded-xl text-xs 2xl:text-[13px] shadow-xs transition-all active:scale-95 whitespace-nowrap shrink-0"
+            className="inline-flex min-h-11 items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-4 py-2 rounded-xl text-xs 2xl:text-[13px] shadow-xs transition-all active:scale-95 whitespace-nowrap shrink-0"
           >
             <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
             <span>ลงทะเบียนบริจาคโลหิต</span>
@@ -103,7 +103,7 @@ export function Navbar() {
         <div className="flex items-center gap-2 shrink-0 xl:hidden">
           <Link
             href="/register"
-            className="inline-flex items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-3 py-2 rounded-xl text-xs shadow-xs whitespace-nowrap shrink-0 transition-all active:scale-95"
+            className="inline-flex min-h-11 items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-3 py-2 rounded-xl text-xs shadow-xs whitespace-nowrap shrink-0 transition-all active:scale-95"
           >
             <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
             <span className="whitespace-nowrap font-extrabold">ลงทะเบียน</span>
@@ -111,8 +111,10 @@ export function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs"
-            aria-label="Toggle menu"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs"
+            aria-label="เปิดเมนูหลัก"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="public-mobile-menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -121,7 +123,7 @@ export function Navbar() {
 
       {/* Mobile / Tablet Drawer */}
       {mobileMenuOpen && (
-        <div className="border-t border-[var(--line)] bg-[var(--bg)] px-4 py-4 shadow-xl xl:hidden animate-in slide-in-from-top-2 duration-150">
+        <div id="public-mobile-menu" className="border-t border-[var(--line)] bg-[var(--bg)] px-4 py-4 shadow-xl xl:hidden animate-in slide-in-from-top-2 duration-150">
           <div className="flex flex-col gap-2">
             {navLinks.map((item) => {
               const Icon = item.icon;

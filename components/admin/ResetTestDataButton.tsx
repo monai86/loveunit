@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Loader2, RotateCcw, X } from 'lucide-react';
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
 
 export function ResetTestDataButton({ label = 'เริ่มเลข Registration Code ใหม่' }: { label?: string }) {
   const [open, setOpen] = useState(false);
@@ -10,14 +11,17 @@ export function ResetTestDataButton({ label = 'เริ่มเลข Registra
   const [error, setError] = useState('');
   const [result, setResult] = useState<{ registrations: number; waitlist: number } | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLElement | null>(null);
 
-  const close = () => {
+  const close = useCallback(() => {
     if (loading) return;
     setOpen(false);
     setAcknowledged(false);
     setError('');
     setResult(null);
-  };
+  }, [loading]);
+
+  useFocusTrap(open, dialogRef, close);
 
   useEffect(() => {
     if (!open) return;
@@ -50,7 +54,7 @@ export function ResetTestDataButton({ label = 'เริ่มเลข Registra
     <button ref={triggerRef} type="button" onClick={() => setOpen(true)} disabled={loading} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-xs font-bold text-red-800 transition-colors hover:bg-red-100 disabled:opacity-60" title="ล้างข้อมูลทดสอบและเริ่ม Registration Code ใหม่ที่ 001"><RotateCcw className="h-4 w-4" />{label}</button>
 
     {open && <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4 backdrop-blur-[1px]" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
-      <section role="dialog" aria-modal="true" aria-labelledby="reset-registration-title" className="w-full max-w-md overflow-hidden rounded-2xl border border-red-100 bg-white shadow-2xl">
+      <section ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="reset-registration-title" tabIndex={-1} className="w-full max-w-md overflow-hidden rounded-2xl border border-red-100 bg-white shadow-2xl">
         {result ? <div className="px-5 py-6 text-center sm:px-6">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"><CheckCircle2 className="h-6 w-6" /></div>
           <h2 id="reset-registration-title" className="mt-3 text-xl font-black text-[var(--ink)]">เริ่มเลข Registration Code ใหม่แล้ว</h2>

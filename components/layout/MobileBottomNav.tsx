@@ -23,7 +23,7 @@ export function MobileBottomNav() {
 
   return (
     <nav 
-      aria-label="Mobile Navigation"
+      aria-label="เมนูหลักบนมือถือ"
       className="fixed bottom-0 left-0 right-0 z-40 p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden pointer-events-none select-none"
     >
       <div className="mx-auto max-w-md bg-[var(--burgundy-700)]/95 text-white rounded-2xl p-1 shadow-2xl border border-white/20 grid grid-cols-5 items-stretch pointer-events-auto backdrop-blur-xl">
@@ -34,7 +34,7 @@ export function MobileBottomNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all ${
+              className={`flex min-h-11 min-w-11 flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all ${
                 item.isPrimary
                   ? 'bg-gradient-to-r from-red-500 to-[var(--burgundy-400)] text-white shadow-md font-black'
                   : isActive

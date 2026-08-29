@@ -167,34 +167,21 @@ export default function StaffWalkInPage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-[var(--ink)] mb-2">
-              ประเภทผู้บริจาค <span className="text-red-500">*</span>
-            </label>
+          <fieldset>
+            <legend className="mb-2 block text-xs font-bold text-[var(--ink)]">ประเภทผู้บริจาค <span className="text-red-500">*</span></legend>
             <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, participantType: 'GENERAL_PUBLIC' }))}
-                className={`rounded-xl border p-2.5 text-center text-xs font-bold ${formData.participantType === 'GENERAL_PUBLIC' ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700'}`}
-              >
-                บุคคลทั่วไป
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, participantType: 'STUDENT' }))}
-                className={`rounded-xl border p-2.5 text-center text-xs font-bold ${formData.participantType === 'STUDENT' ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700'}`}
-              >
-                นักศึกษามหิดล
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, participantType: 'STAFF' }))}
-                className={`rounded-xl border p-2.5 text-center text-xs font-bold ${formData.participantType === 'STAFF' ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700'}`}
-              >
-                บุคลากรมหิดล
-              </button>
+              {([
+                ['GENERAL_PUBLIC', 'บุคคลทั่วไป'],
+                ['STUDENT', 'นักศึกษามหิดล'],
+                ['STAFF', 'บุคลากรมหิดล'],
+              ] as const).map(([value, label]) => (
+                <label key={value} className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-2 py-2.5 text-center text-xs font-bold transition-colors ${formData.participantType === value ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                  <input type="radio" name="participant-type" value={value} checked={formData.participantType === value} onChange={() => setFormData((previous) => ({ ...previous, participantType: value }))} className="sr-only" />
+                  <span>{label}</span>
+                </label>
+              ))}
             </div>
-          </div>
+          </fieldset>
 
           {formData.participantType !== 'GENERAL_PUBLIC' && (
             <div>
@@ -217,27 +204,20 @@ export default function StaffWalkInPage() {
             </div>
           )}
 
-          <div>
-            <label className="block text-xs font-bold text-[var(--ink)] mb-2">
-              ประสบการณ์การบริจาค <span className="text-red-500">*</span>
-            </label>
+          <fieldset>
+            <legend className="mb-2 block text-xs font-bold text-[var(--ink)]">ประสบการณ์การบริจาค <span className="text-red-500">*</span></legend>
             <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, donationExperience: 'FIRST_TIME' }))}
-                className={`rounded-xl border p-2.5 text-center text-xs font-bold ${formData.donationExperience === 'FIRST_TIME' ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700'}`}
-              >
-                บริจาคครั้งแรก
-              </button>
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, donationExperience: 'RETURNING' }))}
-                className={`rounded-xl border p-2.5 text-center text-xs font-bold ${formData.donationExperience === 'RETURNING' ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700'}`}
-              >
-                เคยบริจาคแล้ว
-              </button>
+              {([
+                ['FIRST_TIME', 'บริจาคครั้งแรก'],
+                ['RETURNING', 'เคยบริจาคแล้ว'],
+              ] as const).map(([value, label]) => (
+                <label key={value} className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-2 py-2.5 text-center text-xs font-bold transition-colors ${formData.donationExperience === value ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                  <input type="radio" name="donation-experience" value={value} checked={formData.donationExperience === value} onChange={() => setFormData((previous) => ({ ...previous, donationExperience: value }))} className="sr-only" />
+                  <span>{label}</span>
+                </label>
+              ))}
             </div>
-          </div>
+          </fieldset>
 
           <div className="pt-4">
             <button

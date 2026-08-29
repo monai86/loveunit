@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   ShieldCheck, 
   UserPlus, 
@@ -18,6 +18,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { StaffListItem } from '@/services/admin-service';
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
 
 interface Props {
   currentUserRole?: string;
@@ -35,6 +36,7 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffListItem | null>(null);
+  const modalRef = useRef<HTMLElement | null>(null);
 
   // Form State
   const [formEmail, setFormEmail] = useState('');
@@ -50,6 +52,12 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
   const [reviewPassword, setReviewPassword] = useState<Record<string, string>>({});
   const [reviewReason, setReviewReason] = useState<Record<string, string>>({});
   const [reviewError, setReviewError] = useState('');
+
+  const closeModal = useCallback(() => {
+    if (!submitting) setModalOpen(false);
+  }, [submitting]);
+
+  useFocusTrap(modalOpen, modalRef, closeModal);
 
   const fetchStaff = useCallback(async () => {
     setLoading(true);
@@ -237,7 +245,7 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
             type="button"
             onClick={fetchStaff}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[var(--line)] text-xs font-bold text-[var(--ink)] hover:bg-gray-50 transition-all shadow-2xs"
+            className="inline-flex min-h-11 items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[var(--line)] text-xs font-bold text-[var(--ink)] hover:bg-gray-50 transition-all shadow-2xs"
             title="รีเฟรชรายชื่อ"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -247,7 +255,7 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
           {canManage && <button
             type="button"
             onClick={handleOpenCreate}
-            className="editorial-btn-primary py-2 px-3.5 text-xs flex items-center gap-1.5 shadow-2xs"
+            className="editorial-btn-primary min-h-11 py-2 px-3.5 text-xs flex items-center gap-1.5 shadow-2xs"
           >
             <UserPlus className="h-4 w-4" />
             <span>เชิญ Staff</span>
@@ -418,21 +426,22 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
       {/* Create / Edit Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-[var(--line)] shadow-2xl p-5 sm:p-6 space-y-4">
+          <section ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="staff-dialog-title" tabIndex={-1} className="w-full max-w-md bg-white rounded-2xl border border-[var(--line)] shadow-2xl p-5 sm:p-6 space-y-4">
             
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
               <div className="flex items-center gap-2">
                 <div className="p-1 rounded-lg bg-[var(--rose-100)] text-[var(--burgundy-700)]">
                   <ShieldCheck className="h-4 w-4" />
                 </div>
-                <h3 className="text-sm sm:text-base font-bold text-[var(--ink)]">
+                <h3 id="staff-dialog-title" className="text-sm sm:text-base font-bold text-[var(--ink)]">
                   {editingStaff ? 'แก้ไขข้อมูล Staff' : 'เชิญ Staff ใหม่'}
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                onClick={closeModal}
+                aria-label="ปิดหน้าต่างเชิญ Staff"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -456,10 +465,11 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
               
               {/* Email */}
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-[var(--ink)]">
+                <label htmlFor="staff-email" className="block text-xs font-bold text-[var(--ink)]">
                   อีเมล
                 </label>
                 <input
+                  id="staff-email"
                   type="email"
                   required
                   disabled={!!editingStaff}
@@ -472,10 +482,11 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
 
               {/* Display Name */}
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-[var(--ink)]">
+                <label htmlFor="staff-display-name" className="block text-xs font-bold text-[var(--ink)]">
                   ชื่อ-นามสกุล
                 </label>
                 <input
+                  id="staff-display-name"
                   type="text"
                   required
                   placeholder="เช่น สมชาย ใจดี"
@@ -487,10 +498,11 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
 
               {/* Team / Department */}
               <div className="space-y-1">
-                <label className="block text-xs font-bold text-[var(--ink)]">
+                <label htmlFor="staff-team" className="block text-xs font-bold text-[var(--ink)]">
                   ฝ่าย / ทีม
                 </label>
                 <input
+                  id="staff-team"
                   type="text"
                   placeholder="เช่น คณะเทคนิคการแพทย์"
                   value={formTeam}
@@ -535,6 +547,8 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
                   <button
                     type="button"
                     onClick={() => setFormIsActive(!formIsActive)}
+                    aria-pressed={formIsActive}
+                    aria-label="เปิดใช้งานบัญชี"
                     className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
                       formIsActive ? 'bg-emerald-600' : 'bg-gray-300'
                     }`}
@@ -552,8 +566,8 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
               <div className="pt-2 flex items-center justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-3 py-2 rounded-xl border border-[var(--line)] bg-white text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+                  onClick={closeModal}
+                  className="min-h-11 px-3 py-2 rounded-xl border border-[var(--line)] bg-white text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   ยกเลิก
                 </button>
@@ -568,7 +582,7 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
 
             </form>
 
-          </div>
+          </section>
         </div>
       )}
 

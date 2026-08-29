@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { 
   Search, 
@@ -18,6 +18,7 @@ import { Registration, TimeSlot } from '@/lib/types/database';
 import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
 import { adminRegistrationUpdateSchema } from '@/lib/validation/schemas';
 import { ResetTestDataButton } from '@/components/admin/ResetTestDataButton';
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
 
 interface ApiRegistration {
   id: string;
@@ -84,10 +85,12 @@ export default function AdminRegistrationsPage() {
   const [editError, setEditError] = useState('');
   const [editSubmitting, setEditSubmitting] = useState(false);
   const editTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const editDialogRef = useRef<HTMLDivElement | null>(null);
   const [deletingRow, setDeletingRow] = useState<Registration | null>(null);
   const [deleteError, setDeleteError] = useState('');
   const [deleteSubmitting, setDeleteSubmitting] = useState(false);
   const deleteTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const deleteDialogRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     fetch('/api/auth/me').then((res) => res.json()).then((data) => {
@@ -145,11 +148,13 @@ export default function AdminRegistrationsPage() {
     };
   }, [editingRow]);
 
-  const closeEditModal = () => {
+  const closeEditModal = useCallback(() => {
     if (editSubmitting) return;
     setEditingRow(null);
     setEditError('');
-  };
+  }, [editSubmitting]);
+
+  useFocusTrap(Boolean(editingRow), editDialogRef, closeEditModal);
 
   const saveEditDonor = async () => {
     if (!editingRow) return;
@@ -202,11 +207,13 @@ export default function AdminRegistrationsPage() {
     setDeleteError('');
   };
 
-  const closeDeleteModal = () => {
+  const closeDeleteModal = useCallback(() => {
     if (deleteSubmitting) return;
     setDeletingRow(null);
     setDeleteError('');
-  };
+  }, [deleteSubmitting]);
+
+  useFocusTrap(Boolean(deletingRow), deleteDialogRef, closeDeleteModal);
 
   useEffect(() => {
     if (!deletingRow) return;
@@ -479,9 +486,11 @@ export default function AdminRegistrationsPage() {
           onKeyDown={(event) => { if (event.key === 'Escape') closeEditModal(); }}
         >
           <div
+            ref={editDialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-registration-title"
+            tabIndex={-1}
             className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-2xl"
           >
             <div className="flex items-start justify-between border-b border-[var(--line)] px-5 py-4 sm:px-6">
@@ -545,10 +554,12 @@ export default function AdminRegistrationsPage() {
           onKeyDown={(event) => { if (event.key === 'Escape') closeDeleteModal(); }}
         >
           <section
+            ref={deleteDialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-registration-title"
             aria-describedby="delete-registration-description"
+            tabIndex={-1}
             className="w-full max-w-md overflow-hidden rounded-2xl border border-red-100 bg-white shadow-2xl"
           >
             <div className="border-b border-red-100 bg-red-50 px-5 py-4 sm:px-6">

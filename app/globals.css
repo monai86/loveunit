@@ -207,6 +207,21 @@ a, button, input, select, textarea, label {
   touch-action: manipulation;
 }
 
+/* WCAG 2.2 AA: every keyboard-reachable control keeps a high-contrast focus
+   indicator, including legacy controls that previously opted out with
+   Tailwind's `focus:outline-none`. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--burgundy-700) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 5px var(--burgundy-700) !important;
+}
+
 input,
 select,
 textarea {
