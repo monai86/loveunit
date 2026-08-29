@@ -23,7 +23,9 @@ async function runEmailTests() {
   assert.match(email.html, /ห้องประชุม 217 อาคารสิริวิทยา/);
   assert.match(email.html, /LVU26-ABC123/);
   assert.match(email.html, /ข้อมูลการนัดหมาย/);
+  assert.match(email.html, /Appointment Details/);
   assert.match(email.html, /อย่าลืมนำบัตรประชาชนมาด้วย/);
+  assert.match(email.html, /Preparation Tips/);
   assert.match(email.html, /role="presentation"/);
   assert.strictEqual(email.attachments.length, 1, 'email should attach only the check-in QR image');
   assert.strictEqual(email.attachments[0].cid, 'donor-qr-code');
@@ -45,6 +47,8 @@ async function runEmailTests() {
   assert.match(reminder.html, /อย่าลืมนำบัตรประชาชนมาด้วย/);
   assert.match(reminder.html, /LVU26-ABC123/);
   assert.match(reminder.html, /พุธ 16 กันยายน 2569/);
+  assert.match(reminder.html, /2 Days to Go/);
+  assert.match(reminder.html, /4-Step Readiness Checklist/);
   assert.match(reminder.html, /cid:donor-reminder-qr-code/);
   assert.strictEqual(reminder.attachments.length, 1, 'reminder should attach the donor QR image');
   console.log('✓ Preparation reminder includes the appointment and required identity document\n');

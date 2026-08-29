@@ -44,7 +44,7 @@ export async function sendStaffInvitation(input: { to: string; displayName: stri
   await transporter.sendMail({
     from: process.env.SMTP_FROM || 'MUMT Blood Donation 2026 <noreply@loveunit.local>',
     to: input.to,
-    subject: 'คำเชิญเข้าใช้งานระบบเจ้าหน้าที่ MUMT LoveUnit',
+    subject: 'คำเชิญเข้าใช้งานระบบเจ้าหน้าที่ MUMT LoveUnit (Staff Invitation)',
     html: `<p>สวัสดีคุณ ${input.displayName}</p><p>คุณได้รับคำเชิญให้เข้าใช้งานระบบเจ้าหน้าที่ MUMT LoveUnit</p><p><a href="${invitationUrl}">ตั้งรหัสผ่านและเปิดใช้งานบัญชี</a></p><p>ลิงก์นี้ใช้ได้ครั้งเดียวภายใน 72 ชั่วโมง หากไม่ได้คาดหวังอีเมลนี้ โปรดเพิกเฉย</p>`,
   });
 }
@@ -60,38 +60,159 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
 
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || 'http://localhost:3000').replace(/\/$/, '');
   const eventDate = escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569');
-  const venue = escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา ศาลายา');
+  const venue = escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา');
   const recipient = escapeHtml(`${input.firstName} ${input.lastName}`);
 
   return `
-  <div style="margin:0;padding:0;background:#F6F4F4;font-family:'Noto Sans Thai','Segoe UI',Arial,sans-serif;color:#241B1D;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;background:#F6F4F4;"><tr><td align="center" style="padding:28px 14px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border:1px solid #E8DCD8;">
-        <tr><td style="background:#560D19;padding:24px 28px;color:#FDF6F1;">
-          <p style="margin:0;font-size:13px;font-weight:700;letter-spacing:.04em;">MUMT LoveUnit ครั้งที่ 9</p>
-          <p style="margin:8px 0 0;font-size:22px;line-height:1.35;font-weight:800;">ยืนยันการลงทะเบียนบริจาคโลหิต</p>
-          <p style="margin:6px 0 0;font-size:13px;line-height:1.55;color:#EFDCD6;">Registration confirmed · กรุณาเก็บอีเมลนี้ไว้สำหรับวันงาน</p>
-        </td></tr>
-        <tr><td style="padding:28px;">
-          <p style="margin:0;font-size:16px;line-height:1.6;">สวัสดีคุณ <strong>${recipient}</strong></p>
-          <p style="margin:8px 0 24px;font-size:14px;line-height:1.7;color:#5F5558;">การลงทะเบียนของคุณเรียบร้อยแล้ว โปรดมาถึงตามรอบเวลาที่เลือกและแสดง QR Code นี้ต่อเจ้าหน้าที่</p>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border:1px solid #E8DCD8;"><tr><td style="padding:16px 18px;background:#FBE9EC;">
-            <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#6E101E;">หมายเลขลงทะเบียน</p>
-            <p style="margin:5px 0 0;font-family:monospace;font-size:24px;font-weight:800;letter-spacing:.04em;color:#560D19;">${escapeHtml(input.registrationCode)}</p>
-          </td></tr></table>
-          <p style="margin:26px 0 10px;font-size:15px;font-weight:800;">ข้อมูลการนัดหมาย</p>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-top:1px solid #E8DCD8;font-size:14px;line-height:1.55;">
-            <tr><td style="width:32%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;vertical-align:top;">วันจัดงาน</td><td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:700;word-break:break-word;">${eventDate}</td></tr>
-            <tr><td style="width:32%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;vertical-align:top;">เวลามาถึง</td><td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:800;color:#6E101E;word-break:break-word;">${timeSlot}</td></tr>
-            <tr><td style="width:32%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;vertical-align:top;">สถานที่</td><td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:700;word-break:break-word;">${venue}</td></tr>
+  <div style="margin:0;padding:0;background:#F8F6F6;font-family:'Noto Sans Thai','Prompt','Segoe UI',Helvetica,Arial,sans-serif;color:#241B1D;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;background:#F8F6F6;">
+      <tr>
+        <td align="center" style="padding:28px 12px;">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border-radius:18px;overflow:hidden;border:1px solid #E8DCD8;box-shadow:0 6px 20px rgba(56,6,15,0.06);">
+            
+            <!-- Red Gradient Hero Header -->
+            <tr>
+              <td style="background:linear-gradient(135deg, #9C1528 0%, #6E101E 50%, #38060F 100%);background-color:#6E101E;padding:32px 28px;color:#FDF6F1;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td>
+                      <p style="margin:0;font-size:12px;font-weight:800;letter-spacing:.08em;color:#EFDCD6;text-transform:uppercase;">
+                        MUMT LoveUnit ครั้งที่ 9 &middot; (9th Edition)
+                      </p>
+                      <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:900;color:#FFFFFF;">
+                        ยืนยันการลงทะเบียนบริจาคโลหิต ❤️
+                      </h1>
+                      <p style="margin:6px 0 0;font-size:14px;line-height:1.5;color:#FBE9EC;">
+                        Registration confirmed &middot; ขอบคุณที่ร่วมส่งต่อพลังชีวิตไปด้วยกัน
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Content Area -->
+            <tr>
+              <td style="padding:28px 28px 24px;">
+                
+                <!-- Greeting -->
+                <p style="margin:0;font-size:16px;line-height:1.6;color:#241B1D;">
+                  สวัสดีคุณ <strong>${recipient}</strong> 🩸
+                </p>
+                <p style="margin:8px 0 22px;font-size:14px;line-height:1.65;color:#5F5558;">
+                  การลงทะเบียนของคุณเรียบร้อยแล้ว! ข้อมูลและบัตรลงทะเบียนของคุณพร้อมใช้งาน โปรดแสดง QR Code หรือหมายเลขลงทะเบียนนี้เมื่อมาถึงจุดลงทะเบียนในวันงาน
+                </p>
+
+                <!-- Registration Code Highlight Box -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;background:linear-gradient(135deg, #FFF5F6 0%, #FFFFFF 100%);border:2px dashed #E8DCD8;border-radius:14px;margin-bottom:24px;">
+                  <tr>
+                    <td style="padding:18px 20px;text-align:center;">
+                      <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#6E101E;text-transform:uppercase;">
+                        หมายเลขลงทะเบียน / Registration Code
+                      </p>
+                      <p style="margin:6px 0 0;font-family:monospace,'Courier New',Courier;font-size:28px;font-weight:900;letter-spacing:.06em;color:#560D19;">
+                        ${escapeHtml(input.registrationCode)}
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Appointment Details Table -->
+                <p style="margin:0 0 10px;font-size:15px;font-weight:800;color:#241B1D;">
+                  ข้อมูลการนัดหมาย / Appointment Details
+                </p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-top:1px solid #E8DCD8;font-size:14px;line-height:1.55;">
+                  <tr>
+                    <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;font-weight:700;vertical-align:top;">
+                      วันจัดงาน <span style="font-size:11px;font-weight:normal;color:#7A6E71;">(Date)</span>
+                    </td>
+                    <td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:800;color:#241B1D;word-break:break-word;">
+                      ${eventDate}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;font-weight:700;vertical-align:top;">
+                      เวลามาถึง <span style="font-size:11px;font-weight:normal;color:#7A6E71;">(Time Slot)</span>
+                    </td>
+                    <td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:900;color:#6E101E;word-break:break-word;font-size:15px;">
+                      ${timeSlot}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;font-weight:700;vertical-align:top;">
+                      สถานที่ <span style="font-size:11px;font-weight:normal;color:#7A6E71;">(Venue)</span>
+                    </td>
+                    <td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:700;color:#241B1D;word-break:break-word;">
+                      ${venue}
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- QR Code Section -->
+                ${hasQrCode ? `
+                <div style="margin:26px 0 0;text-align:center;background:#FFF9FA;border:1px solid #F1D3D9;border-radius:14px;padding:22px;">
+                  <img src="cid:donor-qr-code" width="180" height="180" alt="QR Code สำหรับเช็กอิน" style="display:inline-block;background:#FFFFFF;border:4px solid #FFFFFF;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);" />
+                  <p style="margin:12px 0 0;font-size:14px;line-height:1.5;font-weight:800;color:#241B1D;">
+                    แสดง QR Code นี้เมื่อมาถึงจุดลงทะเบียน
+                  </p>
+                  <p style="margin:4px 0 0;font-size:12px;line-height:1.5;color:#5F5558;">
+                    Present this QR Code to staff upon arrival
+                  </p>
+                </div>` : ''}
+
+                <!-- Playful Preparation Tips Grid -->
+                <div style="margin:26px 0 0;">
+                  <p style="margin:0 0 10px;font-size:14px;font-weight:800;color:#241B1D;">
+                    💡 ข้อแนะนำการเตรียมตัว / Preparation Tips
+                  </p>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 8px;">
+                    <tr>
+                      <td style="background:#FDF6F7;border:1px solid #F8DFE3;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#560D19;">🪪 1. อย่าลืมนำบัตรประชาชนมาด้วย (ID Card)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">หรือใช้บัตรผู้บริจาคโลหิต เพื่อยืนยันตัวตนหน้างาน</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="background:#FDF6F7;border:1px solid #F8DFE3;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#560D19;">💧 2. ดื่มน้ำล่วงหน้า 3–4 แก้ว (Stay Hydrated)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">ช่วยให้ระบบไหลเวียนโลหิตพร้อมและลดอาการวิงเวียน</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="background:#FDF6F7;border:1px solid #F8DFE3;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#560D19;">😴 3. นอนหลับพักผ่อนให้พอ 6–8 ชม. (Good Rest)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">ไม่อดนอน และงดเครื่องดื่มแอลกอฮอล์ก่อนบริจาค</span>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+                <!-- Action Button -->
+                <div style="margin:28px 0 0;text-align:center;">
+                  <a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:linear-gradient(135deg, #6E101E 0%, #560D19 100%);background-color:#6E101E;color:#FFFFFF;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:800;letter-spacing:.02em;box-shadow:0 4px 12px rgba(110,16,30,0.25);">
+                    เปิดตั๋วลงทะเบียนออนไลน์ / View Digital Pass &rarr;
+                  </a>
+                </div>
+
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="background:#FAF7F7;border-top:1px solid #E8DCD8;padding:18px 28px;text-align:center;">
+                <p style="margin:0;font-size:12px;font-weight:700;color:#5F5558;">
+                  MUMT LoveUnit ครั้งที่ 9 &middot; คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล
+                </p>
+                <p style="margin:4px 0 0;font-size:11px;line-height:1.5;color:#7A6E71;">
+                  Faculty of Medical Technology, Mahidol University &middot; หากไม่ได้ลงทะเบียนด้วยอีเมลนี้ กรุณาเพิกเฉยอีเมลฉบับนี้
+                </p>
+              </td>
+            </tr>
+
           </table>
-          ${hasQrCode ? `<div style="margin:26px 0 0;text-align:center;"><img src="cid:donor-qr-code" width="190" height="190" alt="QR Code สำหรับยืนยันการลงทะเบียน" style="display:inline-block;background:#FFFFFF;border:8px solid #FBE9EC;" /><p style="margin:12px 0 0;font-size:13px;line-height:1.6;font-weight:700;color:#241B1D;">แสดง QR Code นี้เมื่อมาถึงจุดลงทะเบียน</p><p style="margin:4px 0 0;font-size:12px;line-height:1.55;color:#5F5558;">หากเปิดภาพไม่ได้ ใช้หมายเลขลงทะเบียนด้านบนได้</p></div>` : ''}
-          <div style="margin:28px 0 0;text-align:center;"><a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:#6E101E;color:#FFFFFF;text-decoration:none;padding:13px 20px;font-size:14px;font-weight:800;">เปิดตั๋วลงทะเบียนของฉัน</a></div>
-          <p style="margin:28px 0 0;padding-top:16px;border-top:1px solid #E8DCD8;font-size:12px;line-height:1.65;color:#5F5558;"><strong style="color:#560D19;">อย่าลืมนำบัตรประชาชนมาด้วย</strong> หรือใช้บัตรผู้บริจาคโลหิต และพักผ่อนให้เพียงพอก่อนมาร่วมกิจกรรม</p>
-        </td></tr>
-      </table>
-      <p style="max-width:600px;margin:14px 0 0;font-size:11px;line-height:1.6;color:#6F6668;">หากไม่ได้ลงทะเบียนด้วยอีเมลนี้ กรุณาเพิกเฉยอีเมลฉบับนี้</p>
-    </td></tr></table>
+        </td>
+      </tr>
+    </table>
   </div>`;
 }
 
@@ -114,22 +235,150 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
     : '09:00 – 14:00 น.';
   const appUrl = (process.env.NEXT_PUBLIC_APP_URL || process.env.BETTER_AUTH_URL || 'http://localhost:3000').replace(/\/$/, '');
   const eventDate = escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569');
-  const venue = escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา ศาลายา');
+  const venue = escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา');
   const recipient = escapeHtml(`${input.firstName} ${input.lastName}`);
 
   return `
-  <div style="margin:0;padding:0;background:#F6F4F4;font-family:'Noto Sans Thai','Segoe UI',Arial,sans-serif;color:#241B1D;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;background:#F6F4F4;"><tr><td align="center" style="padding:28px 14px;">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border:1px solid #E8DCD8;">
-        <tr><td style="background:#560D19;padding:24px 28px;color:#FDF6F1;"><p style="margin:0;font-size:13px;font-weight:700;letter-spacing:.04em;">MUMT LoveUnit ครั้งที่ 9</p><p style="margin:8px 0 0;font-size:22px;line-height:1.35;font-weight:800;">เตือนความพร้อมก่อนวันบริจาคโลหิต</p><p style="margin:6px 0 0;font-size:13px;line-height:1.55;color:#EFDCD6;">Preparation reminder · อีก 2 วันพบกันที่จุดลงทะเบียน</p></td></tr>
-        <tr><td style="padding:28px;"><p style="margin:0;font-size:16px;line-height:1.6;">สวัสดีคุณ <strong>${recipient}</strong></p><p style="margin:8px 0 24px;font-size:14px;line-height:1.7;color:#5F5558;">ขอเตือนรายละเอียดการนัดหมายของคุณ โปรดมาถึงตามรอบเวลาที่เลือกและแสดง QR Code ต่อเจ้าหน้าที่</p>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-top:1px solid #E8DCD8;font-size:14px;line-height:1.55;"><tr><td style="width:32%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;vertical-align:top;">วันจัดงาน</td><td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:700;word-break:break-word;">${eventDate}</td></tr><tr><td style="width:32%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;vertical-align:top;">เวลามาถึง</td><td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:800;color:#6E101E;word-break:break-word;">${timeSlot}</td></tr><tr><td style="width:32%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;vertical-align:top;">สถานที่</td><td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:700;word-break:break-word;">${venue}</td></tr><tr><td style="width:32%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;vertical-align:top;">หมายเลขลงทะเบียน</td><td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-family:monospace;font-weight:800;color:#560D19;word-break:break-word;">${escapeHtml(input.registrationCode)}</td></tr></table>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;margin-top:22px;table-layout:fixed;background:#FBE9EC;border-left:4px solid #6E101E;"><tr><td style="padding:16px 18px;"><p style="margin:0;font-size:14px;line-height:1.65;color:#560D19;"><strong>อย่าลืมนำบัตรประชาชนมาด้วย</strong><br />หรือใช้บัตรผู้บริจาคโลหิต และพักผ่อนให้เพียงพอก่อนมาร่วมกิจกรรม</p></td></tr></table>
-          ${hasQrCode ? `<div style="margin:26px 0 0;text-align:center;"><img src="cid:donor-reminder-qr-code" width="176" height="176" alt="QR Code สำหรับเช็กอิน" style="display:inline-block;background:#FFFFFF;border:8px solid #FBE9EC;" /><p style="margin:12px 0 0;font-size:13px;line-height:1.6;font-weight:700;color:#241B1D;">แสดง QR Code นี้เมื่อมาถึงจุดลงทะเบียน</p></div>` : ''}
-          <div style="margin:28px 0 0;text-align:center;"><a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:#6E101E;color:#FFFFFF;text-decoration:none;padding:13px 20px;font-size:14px;font-weight:800;">เปิดตั๋วลงทะเบียนของฉัน</a></div>
-        </td></tr>
-      </table>
-    </td></tr></table>
+  <div style="margin:0;padding:0;background:#F8F6F6;font-family:'Noto Sans Thai','Prompt','Segoe UI',Helvetica,Arial,sans-serif;color:#241B1D;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;background:#F8F6F6;">
+      <tr>
+        <td align="center" style="padding:28px 12px;">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border-radius:18px;overflow:hidden;border:1px solid #E8DCD8;box-shadow:0 6px 20px rgba(56,6,15,0.06);">
+            
+            <!-- Red Gradient Hero Header -->
+            <tr>
+              <td style="background:linear-gradient(135deg, #9C1528 0%, #6E101E 50%, #38060F 100%);background-color:#6E101E;padding:32px 28px;color:#FDF6F1;">
+                <p style="margin:0;font-size:12px;font-weight:800;letter-spacing:.08em;color:#EFDCD6;text-transform:uppercase;">
+                  MUMT LoveUnit ครั้งที่ 9 &middot; 2 Days to Go!
+                </p>
+                <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:900;color:#FFFFFF;">
+                  ⏰ อีก 2 วันพบกันนะ! เตือนความพร้อมก่อนวันบริจาคโลหิต
+                </h1>
+                <p style="margin:6px 0 0;font-size:14px;line-height:1.5;color:#FBE9EC;">
+                  Preparation reminder &middot; อีก 2 วันพบกันที่จุดลงทะเบียน
+                </p>
+              </td>
+            </tr>
+
+            <!-- Content Area -->
+            <tr>
+              <td style="padding:28px 28px 24px;">
+                
+                <!-- Greeting -->
+                <p style="margin:0;font-size:16px;line-height:1.6;color:#241B1D;">
+                  สวัสดีคุณ <strong>${recipient}</strong> ❤️
+                </p>
+                <p style="margin:8px 0 22px;font-size:14px;line-height:1.65;color:#5F5558;">
+                  ขอเตือนรายละเอียดการนัดหมายของคุณ อีกเพียง 2 วันเท่านั้น! เตรียมร่างกายให้พร้อมแล้วมาพบกันตามรอบเวลาที่ท่านได้เลือกไว้
+                </p>
+
+                <!-- Appointment Details Table -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-top:1px solid #E8DCD8;font-size:14px;line-height:1.55;margin-bottom:24px;">
+                  <tr>
+                    <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;font-weight:700;vertical-align:top;">
+                      วันจัดงาน <span style="font-size:11px;font-weight:normal;color:#7A6E71;">(Date)</span>
+                    </td>
+                    <td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:800;color:#241B1D;word-break:break-word;">
+                      ${eventDate}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;font-weight:700;vertical-align:top;">
+                      เวลามาถึง <span style="font-size:11px;font-weight:normal;color:#7A6E71;">(Time Slot)</span>
+                    </td>
+                    <td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:900;color:#6E101E;word-break:break-word;font-size:15px;">
+                      ${timeSlot}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;font-weight:700;vertical-align:top;">
+                      สถานที่ <span style="font-size:11px;font-weight:normal;color:#7A6E71;">(Venue)</span>
+                    </td>
+                    <td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-weight:700;color:#241B1D;word-break:break-word;">
+                      ${venue}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="width:36%;padding:11px 12px 11px 0;border-bottom:1px solid #E8DCD8;color:#5F5558;font-weight:700;vertical-align:top;">
+                      หมายเลขลงทะเบียน <span style="font-size:11px;font-weight:normal;color:#7A6E71;">(Code)</span>
+                    </td>
+                    <td style="padding:11px 0;border-bottom:1px solid #E8DCD8;font-family:monospace,'Courier New',Courier;font-weight:900;color:#560D19;font-size:16px;word-break:break-word;">
+                      ${escapeHtml(input.registrationCode)}
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- 4-Step Checklist Cards -->
+                <div style="margin:20px 0 0;">
+                  <p style="margin:0 0 10px;font-size:15px;font-weight:800;color:#241B1D;">
+                    🎯 เช็กลิสต์เตรียมความพร้อม 4 ข้อ / 4-Step Readiness Checklist
+                  </p>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 8px;">
+                    <tr>
+                      <td style="background:#FFF5F6;border-left:4px solid #6E101E;border-top:1px solid #F8DFE3;border-right:1px solid #F8DFE3;border-bottom:1px solid #F8DFE3;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#560D19;">🪪 1. อย่าลืมนำบัตรประชาชนมาด้วย (ID Card Required)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">หรือใช้บัตรผู้บริจาคโลหิต จำเป็นต้องใช้ยืนยันตัวตน</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="background:#FFF5F6;border-left:4px solid #6E101E;border-top:1px solid #F8DFE3;border-right:1px solid #F8DFE3;border-bottom:1px solid #F8DFE3;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#560D19;">😴 2. นอนหลับพักผ่อน 6–8 ชั่วโมง (Good Sleep)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">ไม่อดนอนในคืนก่อนวันบริจาค เพื่อความพร้อมของร่างกาย</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="background:#FFF5F6;border-left:4px solid #6E101E;border-top:1px solid #F8DFE3;border-right:1px solid #F8DFE3;border-bottom:1px solid #F8DFE3;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#560D19;">🍳 3. ทานอาหารมื้อหลักก่อนมา (Eat a Healthy Meal)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">รับประทานอาหารล่วงหน้า 1–2 ชม. หลีกเลี่ยงอาหารมันจัดและหวานจัด</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="background:#FFF5F6;border-left:4px solid #6E101E;border-top:1px solid #F8DFE3;border-right:1px solid #F8DFE3;border-bottom:1px solid #F8DFE3;border-radius:0 10px 10px 0;padding:12px 16px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#560D19;">💧 4. ดื่มน้ำ 3–4 แก้วก่อนมาถึง (Drink Plenty of Water)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">ช่วยให้ระบบไหลเวียนโลหิตดีขึ้นและลดอาการอ่อนเพลีย</span>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+                <!-- QR Code Preview -->
+                ${hasQrCode ? `
+                <div style="margin:26px 0 0;text-align:center;background:#FFF9FA;border:1px solid #F1D3D9;border-radius:14px;padding:22px;">
+                  <img src="cid:donor-reminder-qr-code" width="176" height="176" alt="QR Code สำหรับเช็กอิน" style="display:inline-block;background:#FFFFFF;border:4px solid #FFFFFF;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);" />
+                  <p style="margin:12px 0 0;font-size:14px;line-height:1.5;font-weight:800;color:#241B1D;">
+                    แสดง QR Code นี้เมื่อมาถึงจุดลงทะเบียน
+                  </p>
+                  <p style="margin:4px 0 0;font-size:12px;line-height:1.5;color:#5F5558;">
+                    Present this QR Code to staff upon arrival
+                  </p>
+                </div>` : ''}
+
+                <!-- Action Button -->
+                <div style="margin:28px 0 0;text-align:center;">
+                  <a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:linear-gradient(135deg, #6E101E 0%, #560D19 100%);background-color:#6E101E;color:#FFFFFF;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:14px;font-weight:800;letter-spacing:.02em;box-shadow:0 4px 12px rgba(110,16,30,0.25);">
+                    เปิดตั๋วลงทะเบียนของฉัน / Open My Pass &rarr;
+                  </a>
+                </div>
+
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td style="background:#FAF7F7;border-top:1px solid #E8DCD8;padding:18px 28px;text-align:center;">
+                <p style="margin:0;font-size:12px;font-weight:700;color:#5F5558;">
+                  MUMT LoveUnit ครั้งที่ 9 &middot; คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล
+                </p>
+                <p style="margin:4px 0 0;font-size:11px;line-height:1.5;color:#7A6E71;">
+                  Faculty of Medical Technology, Mahidol University &middot; แล้วพบกันในวันงานนะครับ ❤️
+                </p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
   </div>`;
 }
 
