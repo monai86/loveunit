@@ -17,10 +17,13 @@ import { getDashboardKPIs, getAllRegistrations } from '@/services/admin-service'
 import { getEventBySlug } from '@/services/event-service';
 import { getParticipantTypeLabel, getRegistrationStatusBadge, formatTimeRange } from '@/lib/utils/format';
 import { RegistrationStatus, ParticipantType } from '@/lib/types/database';
+import { getAuthenticatedUser } from '@/lib/auth/server';
+import { ResetTestDataButton } from '@/components/admin/ResetTestDataButton';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
+  const currentUser = await getAuthenticatedUser();
   const event = await getEventBySlug('mumt-2026');
   const kpis = event
     ? await getDashboardKPIs(event.id)
@@ -143,6 +146,7 @@ export default async function AdminDashboardPage() {
             <Download className="h-4 w-4 text-emerald-600" />
             <span>Export ข้อมูล</span>
           </a>
+          {currentUser?.profile.role === 'SUPER_ADMIN' && <ResetTestDataButton />}
         </div>
       </div>
 
