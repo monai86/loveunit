@@ -30,7 +30,7 @@ export function HeroClient({
   startAt: string;
   endAt: string;
 }) {
-  const { language, setLanguage, isEn } = useLanguage();
+  const { isEn } = useLanguage();
 
   const start = startAt ? new Date(startAt) : null;
   const end = endAt ? new Date(endAt) : null;
@@ -53,44 +53,18 @@ export function HeroClient({
     ctaPrepare: isEn ? 'Prepare before donating' : 'ดูการเตรียมตัวก่อนบริจาค',
   };
 
-  const toggle = (
-    <div
-      className="flex items-center gap-1 rounded-full border border-[var(--cream)]/25 bg-white/10 p-1 text-xs font-black"
-      role="group"
-      aria-label="Language selector"
-    >
-      <button
-        type="button"
-        onClick={() => setLanguage('th')}
-        aria-pressed={!isEn}
-        className={`rounded-full px-3 py-1.5 transition-colors cursor-pointer ${!isEn ? 'bg-[var(--cream)] text-[var(--burgundy-700)]' : 'text-[var(--cream)] hover:bg-white/10'}`}
-      >
-        ไทย
-      </button>
-      <button
-        type="button"
-        onClick={() => setLanguage('en')}
-        aria-pressed={isEn}
-        className={`rounded-full px-3 py-1.5 transition-colors cursor-pointer ${isEn ? 'bg-[var(--cream)] text-[var(--burgundy-700)]' : 'text-[var(--cream)] hover:bg-white/10'}`}
-      >
-        EN
-      </button>
-    </div>
-  );
-
   return (
     <>
       {/* ============ HERO — full-bleed red field ============ */}
       <section className="hero-field relative overflow-hidden">
         <div className="mx-auto max-w-6xl px-4 pt-6 pb-12 sm:px-6 sm:pt-10 sm:pb-16 lg:px-8 lg:pt-12 lg:pb-16">
           
-          {/* Top Bar: Event Badge on left, Language Switcher on right (Balanced & Symmetrical Single Row) */}
-          <div className="flex items-center justify-between gap-3 mb-6 sm:mb-8">
+          {/* Top Bar: Event Badge (Clean & focused, language switch handled on Navbar) */}
+          <div className="flex items-center justify-start gap-3 mb-6 sm:mb-8">
             <span className="brand-chip rise-in whitespace-nowrap text-xs font-bold shadow-2xs">
               <Heart className="h-3.5 w-3.5 fill-current shrink-0 text-[var(--burgundy-300)]" />
               <span>{copy.badge}</span>
             </span>
-            <div className="shrink-0">{toggle}</div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center">

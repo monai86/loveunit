@@ -42,19 +42,20 @@ export function Navbar() {
     return null;
   }
 
+  // Symmetrical & Elegant Pill Switcher
   const langSwitcher = (
     <div 
-      className="flex items-center rounded-xl bg-black/5 p-0.5 border border-[var(--line)] shadow-2xs" 
+      className="inline-flex items-center rounded-full bg-black/[0.04] p-1 border border-[var(--line)] shadow-2xs" 
       role="group" 
       aria-label="Language selector"
     >
       <button
         type="button"
         onClick={() => setLanguage('th')}
-        className={`px-2 py-1 rounded-lg text-[11px] font-black transition-all cursor-pointer ${
+        className={`min-w-[34px] h-7 px-2.5 flex items-center justify-center rounded-full text-xs tracking-wider transition-all duration-200 cursor-pointer ${
           isTh
-            ? 'bg-white text-[var(--burgundy-700)] shadow-xs scale-100'
-            : 'text-[var(--muted)] hover:text-[var(--ink)]'
+            ? 'bg-white text-[#A6192E] font-black shadow-xs ring-1 ring-black/5'
+            : 'text-[var(--muted)] hover:text-[var(--ink)] font-bold'
         }`}
         aria-label="ภาษาไทย"
       >
@@ -63,10 +64,10 @@ export function Navbar() {
       <button
         type="button"
         onClick={() => setLanguage('en')}
-        className={`px-2 py-1 rounded-lg text-[11px] font-black transition-all cursor-pointer ${
+        className={`min-w-[34px] h-7 px-2.5 flex items-center justify-center rounded-full text-xs tracking-wider transition-all duration-200 cursor-pointer ${
           isEn
-            ? 'bg-white text-[var(--burgundy-700)] shadow-xs scale-100'
-            : 'text-[var(--muted)] hover:text-[var(--ink)]'
+            ? 'bg-white text-[#A6192E] font-black shadow-xs ring-1 ring-black/5'
+            : 'text-[var(--muted)] hover:text-[var(--ink)] font-bold'
         }`}
         aria-label="English"
       >
@@ -123,16 +124,16 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* 3. Right: Language Switcher & Desktop CTA Button (>= 1280px) */}
+        {/* 3. Right: Symmetrical Language Switcher & Red Gradient CTA Button (>= 1280px) */}
         <div className="hidden xl:flex items-center gap-3 shrink-0">
           {langSwitcher}
           <Link
             href="/register"
-            className="inline-flex min-h-11 items-center gap-1.5 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-4 py-2 rounded-xl text-xs 2xl:text-[13px] shadow-xs transition-all active:scale-95 whitespace-nowrap shrink-0"
+            className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-4.5 py-2.5 text-xs 2xl:text-[13px] font-extrabold text-white shadow-md shadow-red-950/20 hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] hover:shadow-lg hover:shadow-red-950/30 active:scale-95 transition-all whitespace-nowrap shrink-0 cursor-pointer"
           >
             <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
             <span>{TRANSLATIONS.nav.register[language]}</span>
-            <ArrowRight className="h-3 w-3 shrink-0" />
+            <ArrowRight className="h-3.5 w-3.5 shrink-0" />
           </Link>
         </div>
 
@@ -142,7 +143,7 @@ export function Navbar() {
 
           <Link
             href="/register"
-            className="inline-flex min-h-10 items-center gap-1 bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-bold px-2.5 py-1.5 rounded-xl text-xs shadow-xs whitespace-nowrap shrink-0 transition-all active:scale-95"
+            className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3 py-1.5 text-xs font-extrabold text-white shadow-sm shadow-red-950/20 hover:from-[#C51D2C] hover:to-[#6E0F1D] active:scale-95 transition-all whitespace-nowrap shrink-0"
           >
             <Heart className="h-3 w-3 fill-white shrink-0" />
             <span className="whitespace-nowrap font-extrabold">{isTh ? 'ลงทะเบียน' : 'Register'}</span>
@@ -199,7 +200,7 @@ export function Navbar() {
               <Link
                 href="/register"
                 onClick={() => setMobileMenuOpen(false)}
-                className="inline-flex items-center justify-center gap-2 bg-[var(--burgundy-600)] text-white font-extrabold w-full py-3 text-sm rounded-xl shadow-md"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] py-3 text-sm font-extrabold text-white shadow-md shadow-red-950/20 hover:from-[#C51D2C] hover:to-[#6E0F1D] active:scale-95 transition-all w-full"
               >
                 <Heart className="h-4 w-4 fill-white" />
                 <span>{TRANSLATIONS.nav.register[language]}</span>
