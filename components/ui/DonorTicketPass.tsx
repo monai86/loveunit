@@ -73,12 +73,12 @@ export function DonorTicketPass({
       const scale = 2;
       const width = 540 * scale;
       const height = 780 * scale;
-      const inset = 20 * scale;
+      const inset = 18 * scale;
       canvas.width = width;
       canvas.height = height;
 
       // Outer background
-      context.fillStyle = "#F6F4F4";
+      context.fillStyle = "#F8F6F6";
       context.fillRect(0, 0, width, height);
 
       // White card surface
@@ -88,88 +88,85 @@ export function DonorTicketPass({
       context.lineWidth = 1.5 * scale;
       context.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
 
-      // Red Gradient Header
-      const headerHeight = 125 * scale;
+      // Vibrant Red Gradient Header
+      const headerHeight = 130 * scale;
       const grad = context.createLinearGradient(inset, inset, width - inset, inset + headerHeight);
-      grad.addColorStop(0, "#7E0E1D");
-      grad.addColorStop(0.5, "#6E101E");
-      grad.addColorStop(1, "#560D19");
+      grad.addColorStop(0, "#E11D48"); // Vibrant Rose Red
+      grad.addColorStop(0.45, "#DC2626"); // Bright Crimson
+      grad.addColorStop(1, "#991B1B"); // Deep Crimson Red
       context.fillStyle = grad;
       context.fillRect(inset, inset, width - inset * 2, headerHeight);
 
-      // Header Text (Symmetrical & Editorial)
-      context.fillStyle = "#EFDCD6";
+      // Header Text
+      context.fillStyle = "#FFE4E6";
       context.textAlign = "left";
       context.font = `700 ${11 * scale}px sans-serif`;
-      context.fillText("MUMT BLOOD DONATION 2026 · คณะเทคนิคการแพทย์ ม.มหิดล", inset + 24 * scale, inset + 32 * scale);
+      context.fillText("MUMT LOVEUNIT 2026 · คณะเทคนิคการแพทย์ ม.มหิดล", inset + 24 * scale, inset + 32 * scale);
 
       context.fillStyle = "#FFFFFF";
       context.font = `800 ${22 * scale}px sans-serif`;
-      context.fillText("ตั๋วลงทะเบียนบริจาคโลหิต", inset + 24 * scale, inset + 66 * scale);
+      context.fillText("ตั๋วลงทะเบียนบริจาคโลหิต", inset + 24 * scale, inset + 68 * scale);
 
-      context.fillStyle = "#FBE9EC";
+      context.fillStyle = "#FFE4E6";
       context.font = `700 ${11 * scale}px sans-serif`;
-      context.fillText("OFFICIAL BLOOD DONOR DIGITAL PASS", inset + 24 * scale, inset + 92 * scale);
+      context.fillText("OFFICIAL BLOOD DONOR DIGITAL PASS", inset + 24 * scale, inset + 96 * scale);
 
       // Registration Number Box
       const contentWidth = width - inset * 2 - 48 * scale;
       const x = inset + 24 * scale;
       let y = inset + headerHeight + 32 * scale;
 
-      context.fillStyle = "#FFF5F6";
+      context.fillStyle = "#FFF1F2";
       context.fillRect(x, y - 16 * scale, contentWidth, 68 * scale);
-      context.strokeStyle = "#F1D3D9";
+      context.strokeStyle = "#FECDD3";
       context.lineWidth = 1 * scale;
       context.strokeRect(x, y - 16 * scale, contentWidth, 68 * scale);
 
-      context.fillStyle = "#6E101E";
-      context.font = `800 ${10 * scale}px sans-serif`;
+      context.fillStyle = "#BE123C";
+      context.font = `800 ${10.5 * scale}px sans-serif`;
       context.fillText("หมายเลขลงทะเบียน / REGISTRATION NO.", x + 16 * scale, y + 6 * scale);
 
       context.font = `900 ${26 * scale}px monospace`;
       context.fillText(registrationCode, x + 16 * scale, y + 36 * scale);
 
-      // Symmetrical 2-Column Appointment Details
+      // 2-Column Appointment Details
       y += 84 * scale;
-      context.fillStyle = "#241B1D";
-      context.font = `600 ${11.5 * scale}px sans-serif`;
-
       const col1X = x;
       const col2X = x + (contentWidth / 2) + 8 * scale;
 
       // Row 1
-      context.fillStyle = "#7A6E71";
+      context.fillStyle = "#64748B";
       context.font = `700 ${9.5 * scale}px sans-serif`;
       context.fillText("ผู้ลงทะเบียน / DONOR NAME", col1X, y);
       context.fillText("วันจัดกิจกรรม / EVENT DATE", col2X, y);
 
-      context.fillStyle = "#241B1D";
+      context.fillStyle = "#0F172A";
       context.font = `700 ${12 * scale}px sans-serif`;
       context.fillText(name.slice(0, 24), col1X, y + 18 * scale);
       context.fillText(date.slice(0, 24), col2X, y + 18 * scale);
 
       // Row 2
       y += 42 * scale;
-      context.fillStyle = "#7A6E71";
+      context.fillStyle = "#64748B";
       context.font = `700 ${9.5 * scale}px sans-serif`;
       context.fillText("รอบเวลาที่นัดหมาย / TIME SLOT", col1X, y);
       context.fillText("สถานที่จัดกิจกรรม / VENUE", col2X, y);
 
-      context.fillStyle = "#6E101E";
+      context.fillStyle = "#BE123C";
       context.font = `800 ${12 * scale}px sans-serif`;
       context.fillText(timeSlot, col1X, y + 18 * scale);
-      context.fillStyle = "#241B1D";
+      context.fillStyle = "#0F172A";
       context.font = `600 ${11 * scale}px sans-serif`;
       context.fillText(venue.slice(0, 28), col2X, y + 18 * scale);
 
       // Row 3
       y += 42 * scale;
-      context.fillStyle = "#7A6E71";
+      context.fillStyle = "#64748B";
       context.font = `700 ${9.5 * scale}px sans-serif`;
       context.fillText("เบอร์โทรศัพท์ / PHONE", col1X, y);
       context.fillText("คณะ / สังกัด / FACULTY", col2X, y);
 
-      context.fillStyle = "#241B1D";
+      context.fillStyle = "#0F172A";
       context.font = `600 ${11.5 * scale}px sans-serif`;
       context.fillText(phone || "—", col1X, y + 18 * scale);
       context.fillText((faculty || "บุคคลทั่วไป").slice(0, 28), col2X, y + 18 * scale);
@@ -190,7 +187,7 @@ export function DonorTicketPass({
             const qrY = height - inset - size - 64 * scale;
             context.fillStyle = "#FFFFFF";
             context.fillRect(qrX - 10 * scale, qrY - 10 * scale, size + 20 * scale, size + 20 * scale);
-            context.strokeStyle = "#E8DCD8";
+            context.strokeStyle = "#E2E8F0";
             context.lineWidth = 1.5 * scale;
             context.strokeRect(qrX - 10 * scale, qrY - 10 * scale, size + 20 * scale, size + 20 * scale);
             context.drawImage(image, qrX, qrY, size, size);
@@ -201,8 +198,8 @@ export function DonorTicketPass({
         });
       }
 
-      // Footer note (Symmetrical)
-      context.fillStyle = "#5F5558";
+      // Footer note
+      context.fillStyle = "#64748B";
       context.textAlign = "center";
       context.font = `600 ${9.5 * scale}px sans-serif`;
       context.fillText(
@@ -227,11 +224,11 @@ export function DonorTicketPass({
       {/* Symmetrical Boarding Pass Card */}
       <article
         data-testid="donor-ticket"
-        className="relative overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-xl shadow-[var(--burgundy-950)]/8 transition-all"
+        className="relative overflow-hidden rounded-3xl border border-rose-100 bg-white shadow-xl shadow-rose-950/5 transition-all"
       >
-        {/* Editorial Crimson Header */}
-        <header className="relative bg-gradient-to-r from-[#7E0E1D] via-[#6E101E] to-[#560D19] px-6 py-6 text-[var(--cream)] sm:px-8">
-          <div className="flex items-center justify-between gap-4 border-b border-white/15 pb-4">
+        {/* Vibrant Red Gradient Header */}
+        <header className="relative bg-gradient-to-r from-rose-600 via-red-600 to-rose-800 px-6 py-6 text-white sm:px-8">
+          <div className="flex items-center justify-between gap-4 border-b border-white/20 pb-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white p-1 shadow-sm">
                 <Image
@@ -243,17 +240,17 @@ export function DonorTicketPass({
                 />
               </div>
               <div>
-                <p className="text-[11px] font-extrabold tracking-wider text-[var(--cream-dim)] uppercase">
+                <p className="text-[11px] font-extrabold tracking-wider text-rose-100 uppercase">
                   MUMT LoveUnit ครั้งที่ 9
                 </p>
-                <p className="text-[11px] text-white/80 font-medium">
+                <p className="text-[11px] text-white/90 font-medium">
                   คณะเทคนิคการแพทย์ ม.มหิดล
                 </p>
               </div>
             </div>
 
             {isConfirmed && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-100 backdrop-blur-xs">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/40 bg-emerald-500/25 px-3 py-1 text-xs font-bold text-emerald-100 backdrop-blur-xs">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
                 <span>ยืนยันสิทธิ์แล้ว / Confirmed</span>
               </span>
@@ -264,30 +261,30 @@ export function DonorTicketPass({
             <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl font-display">
               ตั๋วลงทะเบียนบริจาคโลหิต
             </h2>
-            <p className="text-[11px] font-semibold tracking-wider text-[var(--cream-dim)] uppercase mt-0.5">
+            <p className="text-[11px] font-semibold tracking-wider text-rose-100 uppercase mt-0.5">
               Official Blood Donation Pass
             </p>
           </div>
         </header>
 
-        {/* Crisp Symmetrical Perforation Line with Ticket Notches */}
+        {/* Crisp Ticket Notch Divider */}
         <div className="relative flex items-center justify-between px-3 bg-white">
-          <div className="-ml-6 h-6 w-6 rounded-full bg-[var(--bg)] border-r border-[var(--line)] shadow-inner" />
-          <div className="flex-1 border-b-2 border-dashed border-[var(--line)] mx-2" />
-          <div className="-mr-6 h-6 w-6 rounded-full bg-[var(--bg)] border-l border-[var(--line)] shadow-inner" />
+          <div className="-ml-6 h-6 w-6 rounded-full bg-[var(--bg)] border-r border-rose-100" />
+          <div className="flex-1 border-b-2 border-dashed border-rose-200 mx-2" />
+          <div className="-mr-6 h-6 w-6 rounded-full bg-[var(--bg)] border-l border-rose-100" />
         </div>
 
         {/* Ticket Body */}
         <div className="px-6 py-6 sm:px-8 space-y-6">
           
-          {/* Symmetrical Registration Code Block */}
-          <div className="rounded-xl border border-[var(--rose-100)] bg-[#FFF8F9] p-4 sm:p-5">
+          {/* Registration Code Block */}
+          <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-4 sm:p-5">
             <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
               <div className="text-center sm:text-left">
-                <p className="text-xs font-black tracking-wider text-[var(--burgundy-700)] uppercase">
-                  หมายเลขลงทะเบียน <span className="text-[10px] font-bold text-[var(--muted)]">/ Registration No.</span>
+                <p className="text-xs font-black tracking-wider text-rose-700 uppercase">
+                  หมายเลขลงทะเบียน <span className="text-[10px] font-bold text-gray-500">/ Registration No.</span>
                 </p>
-                <p className="mt-1 font-mono text-2xl font-black tracking-wider text-[var(--burgundy-800)] sm:text-3xl">
+                <p className="mt-1 font-mono text-2xl font-black tracking-wider text-rose-800 sm:text-3xl">
                   {registrationCode}
                 </p>
               </div>
@@ -296,11 +293,11 @@ export function DonorTicketPass({
                 type="button"
                 onClick={copyCode}
                 aria-label="คัดลอกหมายเลขลงทะเบียน"
-                className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-[var(--line)] bg-white px-4 text-xs font-bold text-[var(--burgundy-700)] shadow-2xs transition-all hover:bg-[var(--rose-100)] active:scale-98"
+                className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-rose-200 bg-white px-4 text-xs font-bold text-rose-700 shadow-xs transition-all hover:bg-rose-50 hover:border-rose-300 active:scale-98"
               >
                 {copied ? (
                   <>
-                    <Check className="h-4 w-4 text-[var(--ok)]" />
+                    <Check className="h-4 w-4 text-emerald-600" />
                     <span>คัดลอกแล้ว (Copied)</span>
                   </>
                 ) : (
@@ -315,69 +312,69 @@ export function DonorTicketPass({
 
           {/* Symmetrical 2-Column Details Grid */}
           <section aria-labelledby="appointment-details" className="space-y-3">
-            <div className="border-b border-[var(--line)] pb-2.5">
+            <div className="border-b border-gray-100 pb-2.5">
               <h3
                 id="appointment-details"
-                className="text-sm font-black text-[var(--ink)] flex items-center gap-1.5 font-display"
+                className="text-sm font-black text-gray-900 flex items-center gap-1.5 font-display"
               >
                 <span>รายละเอียดการนัดหมาย</span>
-                <span className="text-xs font-normal text-[var(--muted)]">/ Appointment Details</span>
+                <span className="text-xs font-normal text-gray-500">/ Appointment Details</span>
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {/* Donor Name */}
-              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
-                  <User className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
+                  <User className="h-3.5 w-3.5 text-rose-600" />
                   <span>ผู้ลงทะเบียน / Donor Name</span>
                 </div>
-                <p className="text-sm font-black text-[var(--ink)]">{name}</p>
+                <p className="text-sm font-black text-gray-900">{name}</p>
               </div>
 
               {/* Event Date */}
-              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
-                  <Calendar className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
+                  <Calendar className="h-3.5 w-3.5 text-rose-600" />
                   <span>วันจัดกิจกรรม / Event Date</span>
                 </div>
-                <p className="text-sm font-black text-[var(--ink)]">{date}</p>
+                <p className="text-sm font-black text-gray-900">{date}</p>
               </div>
 
               {/* Time Slot */}
-              <div className="rounded-xl border border-[var(--rose-100)] bg-[var(--rose-100)]/30 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)]">
+              <div className="rounded-xl border border-rose-100 bg-rose-50/40 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700">
                   <Clock className="h-3.5 w-3.5" />
                   <span>รอบเวลาที่นัดหมาย / Time Slot</span>
                 </div>
-                <p className="text-base font-black text-[var(--burgundy-800)]">{timeSlot}</p>
+                <p className="text-base font-black text-rose-800">{timeSlot}</p>
               </div>
 
               {/* Venue */}
-              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
-                  <MapPin className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
+                  <MapPin className="h-3.5 w-3.5 text-rose-600" />
                   <span>สถานที่จัดกิจกรรม / Venue</span>
                 </div>
-                <p className="text-xs font-bold text-[var(--ink)] leading-snug">{venue}</p>
+                <p className="text-xs font-bold text-gray-900 leading-snug">{venue}</p>
               </div>
 
               {/* Phone */}
-              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
-                  <Phone className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
+                  <Phone className="h-3.5 w-3.5 text-rose-600" />
                   <span>เบอร์โทรศัพท์ / Phone</span>
                 </div>
-                <p className="text-xs font-bold text-[var(--ink)]">{phone || "—"}</p>
+                <p className="text-xs font-bold text-gray-900">{phone || "—"}</p>
               </div>
 
               {/* Faculty */}
-              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
-                  <Building2 className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
+                  <Building2 className="h-3.5 w-3.5 text-rose-600" />
                   <span>คณะ / สังกัด / Faculty or Org</span>
                 </div>
-                <p className="text-xs font-bold text-[var(--ink)] leading-snug">{faculty || "บุคคลทั่วไป"}</p>
+                <p className="text-xs font-bold text-gray-900 leading-snug">{faculty || "บุคคลทั่วไป"}</p>
               </div>
             </div>
           </section>
@@ -385,13 +382,13 @@ export function DonorTicketPass({
           {/* Symmetrical QR Check-in Center Box */}
           <section
             aria-labelledby="ticket-qr-heading"
-            className="rounded-xl border border-[var(--line)] bg-gray-50/60 p-5 text-center space-y-4"
+            className="rounded-2xl border border-gray-100 bg-gray-50/70 p-6 text-center space-y-4"
           >
             <div>
-              <h3 id="ticket-qr-heading" className="text-sm font-black text-[var(--ink)] font-display">
+              <h3 id="ticket-qr-heading" className="text-sm font-black text-gray-900 font-display">
                 QR Code สำหรับเช็กอิน / Check-in QR Code
               </h3>
-              <p className="text-xs text-[var(--muted)] mt-0.5">
+              <p className="text-xs text-gray-500 mt-0.5">
                 แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน (Please present this QR Code at the registration desk)
               </p>
             </div>
@@ -399,7 +396,7 @@ export function DonorTicketPass({
             <div className="flex justify-center">
               <div
                 ref={qrRef}
-                className="rounded-xl border border-[var(--line)] bg-white p-3.5 shadow-sm"
+                className="rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm"
               >
                 {qrToken ? (
                   <QRCodeSVG
@@ -415,7 +412,7 @@ export function DonorTicketPass({
                     }}
                   />
                 ) : (
-                  <div className="flex h-40 w-40 items-center justify-center bg-gray-50 text-xs font-bold text-[var(--muted)]">
+                  <div className="flex h-40 w-40 items-center justify-center bg-gray-50 text-xs font-bold text-gray-400">
                     กำลังสร้าง QR Code...
                   </div>
                 )}
@@ -427,7 +424,7 @@ export function DonorTicketPass({
                 type="button"
                 onClick={downloadTicket}
                 disabled={downloading}
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--burgundy-700)] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-[var(--burgundy-900)] active:scale-98 disabled:opacity-60"
+                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-rose-600/20 transition-all hover:from-rose-700 hover:to-red-700 active:scale-98 disabled:opacity-60"
               >
                 <Download className="h-4 w-4" />
                 <span>{downloading ? "กำลังบันทึกภาพ... (Saving...)" : "บันทึกตั๋วเป็นรูปภาพ / Save Ticket PNG"}</span>
@@ -435,51 +432,51 @@ export function DonorTicketPass({
             </div>
           </section>
 
-          {/* Symmetrical 2x2 Preparation Tips Grid */}
+          {/* Symmetrical 2x2 Preparation Tips Grid (Clean Icons) */}
           <div className="space-y-2.5">
             <div className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-[var(--burgundy-700)]" />
-              <p className="text-xs font-black text-[var(--ink)]">
+              <ShieldCheck className="h-4 w-4 text-rose-600" />
+              <p className="text-xs font-black text-gray-900">
                 ข้อแนะนำการเตรียมความพร้อม / Preparation Tips
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 text-xs">
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 text-xs">
               {/* ID Card */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100/70 bg-white p-3 shadow-2xs">
-                <span className="text-base leading-none">🪪</span>
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-white p-3 shadow-2xs">
+                <ShieldCheck className="h-4 w-4 text-rose-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-[var(--ink)]">
-                    <strong className="text-[var(--burgundy-800)]">อย่าลืมนำบัตรประชาชนมาด้วย</strong>
+                  <p className="font-bold text-gray-900">
+                    <strong className="text-rose-700">อย่าลืมนำบัตรประชาชนมาด้วย</strong>
                   </p>
-                  <p className="text-[11px] text-[var(--muted)]">หรือบัตรผู้บริจาคโลหิตตัวจริง (National ID Required)</p>
+                  <p className="text-[11px] text-gray-500">หรือบัตรผู้บริจาคโลหิตตัวจริง (National ID Required)</p>
                 </div>
               </div>
 
               {/* Water */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100/70 bg-white p-3 shadow-2xs">
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-white p-3 shadow-2xs">
                 <Droplets className="h-4 w-4 text-sky-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-[var(--ink)]">ดื่มน้ำ 3–4 แก้วก่อนมา</p>
-                  <p className="text-[11px] text-[var(--muted)]">ช่วยระบบไหลเวียนโลหิต (Drink 3–4 glasses of water)</p>
+                  <p className="font-bold text-gray-900">ดื่มน้ำ 3–4 แก้วก่อนมา</p>
+                  <p className="text-[11px] text-gray-500">ช่วยระบบไหลเวียนโลหิต (Drink 3–4 glasses of water)</p>
                 </div>
               </div>
 
               {/* Sleep */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100/70 bg-white p-3 shadow-2xs">
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-white p-3 shadow-2xs">
                 <Moon className="h-4 w-4 text-indigo-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-[var(--ink)]">นอนหลับพักผ่อน 6–8 ชม.</p>
-                  <p className="text-[11px] text-[var(--muted)]">ไม่อดนอนในคืนก่อนวันบริจาค (Get 6–8 hours of sleep)</p>
+                  <p className="font-bold text-gray-900">นอนหลับพักผ่อน 6–8 ชม.</p>
+                  <p className="text-[11px] text-gray-500">ไม่อดนอนในคืนก่อนวันบริจาค (Get 6–8 hours of sleep)</p>
                 </div>
               </div>
 
               {/* Food */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100/70 bg-white p-3 shadow-2xs">
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100 bg-white p-3 shadow-2xs">
                 <Utensils className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-[var(--ink)]">งดอาหารไขมันสูง & แอลกอฮอล์</p>
-                  <p className="text-[11px] text-[var(--muted)]">ทานอาหารมื้อหลักล่วงหน้า (Avoid fatty food & alcohol)</p>
+                  <p className="font-bold text-gray-900">งดอาหารไขมันสูง & แอลกอฮอล์</p>
+                  <p className="text-[11px] text-gray-500">ทานอาหารมื้อหลักล่วงหน้า (Avoid fatty food & alcohol)</p>
                 </div>
               </div>
             </div>
