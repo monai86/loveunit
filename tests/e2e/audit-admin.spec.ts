@@ -135,6 +135,19 @@ test('admin donor edit uses an accessible in-page dialog', async ({ page }) => {
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
+test('admin donor deletion uses an in-page confirmation dialog', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await login(page);
+  await page.goto('/mt70/registrations');
+  await page.waitForTimeout(600);
+  await page.getByRole('button', { name: /ลบ/ }).first().click();
+  const dialog = page.getByRole('dialog', { name: /ยืนยันการลบข้อมูลผู้ลงทะเบียน/ });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByText(/การลบไม่สามารถกู้คืนได้/)).toBeVisible();
+  await dialog.getByRole('button', { name: 'ยกเลิก' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+
 test('admin header actions share a balanced height and baseline', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
