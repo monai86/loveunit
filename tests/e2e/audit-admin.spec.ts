@@ -101,6 +101,35 @@ async function auditPage(page: import('@playwright/test').Page) {
   });
 }
 
+async function createRegistrationForAdminAction(request: APIRequestContext) {
+  const slotsResponse = await request.get('/api/events/mumt-2026/slots');
+  expect(slotsResponse.status()).toBe(200);
+  const slotsBody = await slotsResponse.json();
+  const slot = (slotsBody.slots as Array<{ id: string; capacity?: number; bookedCount?: number }>).find(
+    (candidate) => (candidate.capacity ?? 0) > (candidate.bookedCount ?? 0),
+  );
+  expect(slot, 'an available E2E slot is required for admin action tests').toBeTruthy();
+
+  const suffix = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+  const registrationResponse = await request.post('/api/events/mumt-2026/register', {
+    data: {
+      firstName: 'อีทูอี',
+      lastName: `แอดมิน${suffix}`,
+      phone: `089${suffix.slice(-7).padStart(7, '0')}`,
+      email: '',
+      participantType: 'GENERAL_PUBLIC',
+      faculty: '',
+      academicYear: '',
+      donationExperience: 'FIRST_TIME',
+      slotId: slot!.id,
+      privacyAccepted: true,
+    },
+  });
+  expect(registrationResponse.status(), await registrationResponse.text()).toBe(200);
+  const registrationBody = await registrationResponse.json();
+  return registrationBody.registration.registrationCode ?? registrationBody.registration.registration_code;
+}
+
 test('audit admin registrations', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
@@ -111,12 +140,14 @@ test('audit admin registrations', async ({ page }) => {
   console.log('\n[mt70/registrations]', JSON.stringify(out, null, 1));
 });
 
-test('admin donor edit uses an accessible in-page dialog', async ({ page }) => {
+test('admin donor edit uses an accessible in-page dialog', async ({ page, request }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
+  const registrationCode = await createRegistrationForAdminAction(request);
   await page.goto('/mt70/registrations');
-  await page.waitForTimeout(600);
-  await page.getByRole('button', { name: /แก้ไข/ }).first().click();
+  const row = page.getByRole('row', { name: new RegExp(registrationCode) });
+  await expect(row).toBeVisible();
+  await row.getByRole('button', { name: /แก้ไข/ }).click();
   const dialog = page.getByRole('dialog', { name: /แก้ไขข้อมูลผู้ลงทะเบียน/ });
   await expect(dialog).toBeVisible();
   await expect(page.locator('#edit-first-name')).toBeVisible();
@@ -127,12 +158,14 @@ test('admin donor edit uses an accessible in-page dialog', async ({ page }) => {
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
-test('admin donor deletion uses an in-page confirmation dialog', async ({ page }) => {
+test('admin donor deletion uses an in-page confirmation dialog', async ({ page, request }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
+  const registrationCode = await createRegistrationForAdminAction(request);
   await page.goto('/mt70/registrations');
-  await page.waitForTimeout(600);
-  await page.getByRole('button', { name: /ลบ/ }).first().click();
+  const row = page.getByRole('row', { name: new RegExp(registrationCode) });
+  await expect(row).toBeVisible();
+  await row.getByRole('button', { name: /ลบ/ }).click();
   const dialog = page.getByRole('dialog', { name: /ยืนยันการลบข้อมูลผู้ลงทะเบียน/ });
   await expect(dialog).toBeVisible();
   await expect(dialog.getByText(/การลบไม่สามารถกู้คืนได้/)).toBeVisible();
