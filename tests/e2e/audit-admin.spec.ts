@@ -155,6 +155,17 @@ test('super admin can find the registration code reset control on registrations'
   await expect(page.getByRole('button', { name: 'เริ่มเลข Registration Code ใหม่' })).toBeVisible();
 });
 
+test('registration code reset uses an in-page safety dialog', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await login(page);
+  await page.goto('/mt70/registrations');
+  await page.getByRole('button', { name: 'เริ่มเลข Registration Code ใหม่' }).click();
+  const dialog = page.getByRole('dialog', { name: 'เริ่มเลข Registration Code ใหม่' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByText(/ข้อมูลผู้ลงทะเบียนและ Waitlist/)).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'ยืนยันและเริ่มเลขใหม่' })).toBeDisabled();
+});
+
 test('admin header actions share a balanced height and baseline', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
