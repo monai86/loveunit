@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { 
   Search, 
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Registration, TimeSlot } from '@/lib/types/database';
 import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
+import { adminRegistrationUpdateSchema } from '@/lib/validation/schemas';
 
 interface ApiRegistration {
   id: string;
@@ -74,6 +75,11 @@ export default function AdminRegistrationsPage() {
   const [filterType, setFilterType] = useState<string>('ALL');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [filterExperience, setFilterExperience] = useState<string>('ALL');
+  const [editingRow, setEditingRow] = useState<Registration | null>(null);
+  const [editForm, setEditForm] = useState({ firstName: '', lastName: '', phone: '', email: '' });
+  const [editError, setEditError] = useState('');
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const editTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -101,26 +107,74 @@ export default function AdminRegistrationsPage() {
     return true;
   });
 
-  const editDonor = async (row: Registration) => {
-    const firstName = window.prompt('ชื่อ', row.first_name);
-    if (firstName === null) return;
-    const lastName = window.prompt('นามสกุล', row.last_name);
-    if (lastName === null) return;
-    const phone = window.prompt('เบอร์โทรศัพท์', row.phone);
-    if (phone === null) return;
-    const email = window.prompt('อีเมล (เว้นว่างได้)', row.email || '');
-    if (email === null) return;
+  const openEditModal = (row: Registration, trigger?: HTMLButtonElement) => {
+    editTriggerRef.current = trigger || null;
+    setEditingRow(row);
+    setEditForm({ firstName: row.first_name, lastName: row.last_name, phone: row.phone, email: row.email || '' });
+    setEditError('');
+  };
+
+  useEffect(() => {
+    if (!editingRow) return;
+    const frame = requestAnimationFrame(() => document.getElementById('edit-first-name')?.focus());
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      cancelAnimationFrame(frame);
+      document.body.style.overflow = previousOverflow;
+      editTriggerRef.current?.focus();
+    };
+  }, [editingRow]);
+
+  const closeEditModal = () => {
+    if (editSubmitting) return;
+    setEditingRow(null);
+    setEditError('');
+  };
+
+  const saveEditDonor = async () => {
+    if (!editingRow) return;
+    const payload = {
+      registrationId: editingRow.id,
+      firstName: editForm.firstName.trim(),
+      lastName: editForm.lastName.trim(),
+      phone: editForm.phone.trim(),
+      email: editForm.email.trim() || null,
+      participantType: editingRow.participant_type,
+      faculty: editingRow.faculty || undefined,
+      academicYear: editingRow.academic_year || undefined,
+      donationExperience: editingRow.donation_experience,
+    };
+    const parsed = adminRegistrationUpdateSchema.safeParse(payload);
+    if (!parsed.success) {
+      setEditError(parsed.error.issues[0]?.message || 'กรุณาตรวจสอบข้อมูล');
+      return;
+    }
+    setEditSubmitting(true);
+    setEditError('');
+    try {
     const res = await fetch('/api/admin/registrations', {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        registrationId: row.id, firstName, lastName, phone, email: email || null,
-        participantType: row.participant_type, faculty: row.faculty || undefined, academicYear: row.academic_year || undefined,
-        donationExperience: row.donation_experience,
-      }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
-    if (!res.ok || !data.success) return window.alert(data.message || 'ไม่สามารถบันทึกข้อมูลได้');
-    setRegistrations((current) => current.map((item) => item.id === row.id ? { ...item, first_name: firstName, last_name: lastName, phone, email: email || null } : item));
+      if (!res.ok || !data.success) {
+        setEditError(data.message || 'ไม่สามารถบันทึกข้อมูลได้');
+        return;
+      }
+      setRegistrations((current) => current.map((item) => item.id === editingRow.id ? {
+        ...item,
+        first_name: payload.firstName,
+        last_name: payload.lastName,
+        phone: payload.phone,
+        email: payload.email,
+      } : item));
+      setEditingRow(null);
+    } catch {
+      setEditError('ไม่สามารถเชื่อมต่อเพื่อบันทึกข้อมูลได้');
+    } finally {
+      setEditSubmitting(false);
+    }
   };
 
   const deleteDonor = async (row: Registration) => {
@@ -280,7 +334,7 @@ export default function AdminRegistrationsPage() {
                         <Eye className="h-3.5 w-3.5" />
                         <span>ดูบัตร</span>
                       </Link>
-                      <button type="button" onClick={() => editDonor(row)} className="inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
+                      <button type="button" onClick={(event) => openEditModal(row, event.currentTarget)} className="inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
                         <Edit2 className="h-3.5 w-3.5" /><span>แก้ไข</span>
                       </button>
                       <button type="button" onClick={() => deleteDonor(row)} className="inline-flex items-center gap-1 font-bold text-red-700 hover:underline">
@@ -345,7 +399,7 @@ export default function AdminRegistrationsPage() {
                             <Eye className="h-3.5 w-3.5" />
                             <span>ดูบัตร</span>
                           </Link>
-                          <button type="button" onClick={() => editDonor(row)} className="ml-3 inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
+                          <button type="button" onClick={(event) => openEditModal(row, event.currentTarget)} className="ml-3 inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
                             <Edit2 className="h-3.5 w-3.5" /><span>แก้ไข</span>
                           </button>
                           <button type="button" onClick={() => deleteDonor(row)} className="ml-3 inline-flex items-center gap-1 font-bold text-red-700 hover:underline">
@@ -361,6 +415,72 @@ export default function AdminRegistrationsPage() {
           </>
         )}
       </div>
+
+      {editingRow && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/45 p-4"
+          onMouseDown={(event) => { if (event.target === event.currentTarget) closeEditModal(); }}
+          onKeyDown={(event) => { if (event.key === 'Escape') closeEditModal(); }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-registration-title"
+            className="w-full max-w-2xl overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-2xl"
+          >
+            <div className="flex items-start justify-between border-b border-[var(--line)] px-5 py-4 sm:px-6">
+              <div>
+                <div className="flex items-center gap-2 text-[var(--burgundy-700)]">
+                  <Edit2 className="h-4 w-4" />
+                  <span className="text-xs font-bold uppercase tracking-[0.14em]">แก้ไขข้อมูล</span>
+                </div>
+                <h2 id="edit-registration-title" className="mt-1 text-xl font-black text-[var(--ink)]">แก้ไขข้อมูลผู้ลงทะเบียน</h2>
+                <p className="mt-1 font-mono text-xs text-gray-500">{editingRow.registration_code}</p>
+              </div>
+              <button type="button" onClick={closeEditModal} aria-label="ปิดหน้าต่างแก้ไข" className="rounded-lg p-2 text-gray-500 hover:bg-gray-100" disabled={editSubmitting}>×</button>
+            </div>
+
+            <form onSubmit={(event) => { event.preventDefault(); void saveEditDonor(); }} className="space-y-5 px-5 py-5 sm:px-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                {([
+                  ['firstName', 'ชื่อ', 'edit-first-name'],
+                  ['lastName', 'นามสกุล', 'edit-last-name'],
+                  ['phone', 'เบอร์โทรศัพท์', 'edit-phone'],
+                  ['email', 'อีเมล (เว้นว่างได้)', 'edit-email'],
+                ] as const).map(([key, label, id]) => (
+                  <label key={key} htmlFor={id} className="space-y-1.5">
+                    <span className="text-sm font-bold text-[var(--ink)]">{label}</span>
+                    <input
+                      id={id}
+                      type={key === 'email' ? 'email' : key === 'phone' ? 'tel' : 'text'}
+                      value={editForm[key]}
+                      onChange={(event) => setEditForm((current) => ({ ...current, [key]: event.target.value }))}
+                      className="editorial-input w-full"
+                      autoComplete={key === 'firstName' ? 'given-name' : key === 'lastName' ? 'family-name' : key}
+                      disabled={editSubmitting}
+                    />
+                  </label>
+                ))}
+              </div>
+
+              <div className="grid gap-3 rounded-xl border border-[var(--line)] bg-[var(--paper)] p-4 text-sm sm:grid-cols-3">
+                <div><span className="block text-xs text-gray-500">ประเภท</span><span className="font-bold">{getParticipantTypeLabel(editingRow.participant_type)}</span></div>
+                <div><span className="block text-xs text-gray-500">คณะ/หน่วยงาน</span><span className="font-bold">{editingRow.faculty || '—'}</span></div>
+                <div><span className="block text-xs text-gray-500">รอบเวลา</span><span className="font-bold">{editingRow.time_slot ? formatTimeRange(editingRow.time_slot.start_at, editingRow.time_slot.end_at) : '—'}</span></div>
+              </div>
+
+              {editError && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{editError}</p>}
+
+              <div className="flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
+                <button type="button" onClick={closeEditModal} disabled={editSubmitting} className="editorial-btn-secondary min-h-11 px-5">ยกเลิก</button>
+                <button type="submit" disabled={editSubmitting} className="editorial-btn-primary min-h-11 px-5">
+                  {editSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" /> กำลังบันทึก...</> : 'บันทึกการแก้ไข'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

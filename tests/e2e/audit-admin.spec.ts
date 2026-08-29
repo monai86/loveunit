@@ -119,6 +119,22 @@ test('audit admin registrations', async ({ page }) => {
   console.log('\n[mt70/registrations]', JSON.stringify(out, null, 1));
 });
 
+test('admin donor edit uses an accessible in-page dialog', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await login(page);
+  await page.goto('/mt70/registrations');
+  await page.waitForTimeout(600);
+  await page.getByRole('button', { name: /แก้ไข/ }).first().click();
+  const dialog = page.getByRole('dialog', { name: /แก้ไขข้อมูลผู้ลงทะเบียน/ });
+  await expect(dialog).toBeVisible();
+  await expect(page.locator('#edit-first-name')).toBeVisible();
+  await expect(page.locator('#edit-last-name')).toBeVisible();
+  await expect(page.locator('#edit-phone')).toBeVisible();
+  await expect(page.locator('#edit-email')).toBeVisible();
+  await page.getByRole('button', { name: 'ยกเลิก' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+
 test('retired queue URL returns staff to scan workspace', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
