@@ -81,4 +81,25 @@ test.describe('WCAG 2.2 AA baseline', () => {
     await expect(dialog.getByLabel('ชื่อ-นามสกุล')).toBeVisible();
     await expect(dialog.getByLabel('ฝ่าย / ทีม')).toBeVisible();
   });
+
+  test('staff scan opens as a non-scrolling full-screen camera workspace', async ({ page, request }) => {
+    const response = await request.post('/api/auth/sign-in/email', {
+      data: { email: 'monai.yut@student.mahidol.edu', password: 'loveunit2026' },
+    });
+    const cookie = response.headers()['set-cookie']?.split(';')[0];
+    expect(cookie).toBeTruthy();
+    const [name, value] = cookie!.split('=');
+    await page.context().addCookies([{ name, value, url: 'http://localhost:3000' }]);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/staff/checkin');
+
+    const cameraWorkspace = page.getByTestId('fullscreen-scanner');
+    await expect(cameraWorkspace).toBeVisible();
+    const viewportSize = page.viewportSize();
+    const cameraBox = await cameraWorkspace.boundingBox();
+    expect(cameraBox?.height).toBeGreaterThanOrEqual(viewportSize!.height);
+    expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true);
+    await expect(page.getByRole('heading', { name: 'ค้นหาผู้บริจาค' })).toHaveCount(0);
+  });
 });
