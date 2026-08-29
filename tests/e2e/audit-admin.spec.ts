@@ -200,7 +200,7 @@ test('admin header actions share a balanced height and baseline', async ({ page 
   await login(page);
   await page.goto('/mt70');
   const actions = [
-    page.getByRole('link', { name: 'จุดสแกน QR' }),
+    page.getByRole('link', { name: 'จุดสแกน QR', description: 'เปิดหน้าระบบสแกน QR Code หน้างาน' }),
     page.getByRole('button', { name: 'ออกจากระบบ' }),
   ];
   const boxes = await Promise.all(actions.map((locator) => locator.boundingBox()));
