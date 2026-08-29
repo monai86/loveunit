@@ -220,12 +220,12 @@ test('admin header presents the current account as one compact control', async (
   expect(accountBox?.height).toBe(logoutBox?.height);
 });
 
-test('retired queue URL returns staff to scan workspace', async ({ page }) => {
+test('retired queue URL returns staff to staff workspace', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
   await page.goto('/staff/queue');
-  await expect(page).toHaveURL(/\/staff\/checkin$/);
-  await expect(page.getByRole('heading', { name: 'สแกน QR ผู้บริจาค' })).toBeVisible();
+  await expect(page).toHaveURL(/\/staff\/overview$/);
+  await expect(page.getByRole('heading', { name: 'ภาพรวมผู้ลงทะเบียน' })).toBeVisible();
 });
 
 test('audit admin content', async ({ page }) => {

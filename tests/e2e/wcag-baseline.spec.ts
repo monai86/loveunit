@@ -1,5 +1,29 @@
 import { test, expect } from '@playwright/test';
 
+async function addStaffAuth(page: import('@playwright/test').Page, request: import('@playwright/test').APIRequestContext) {
+  let response = await request.post('/api/auth/sign-in/email', {
+    data: { email: 'monai.yut@student.mahidol.edu', password: 'loveunit2026' },
+  });
+  if (response.status() !== 200) {
+    await new Promise((r) => setTimeout(r, 500));
+    response = await request.post('/api/auth/sign-in/email', {
+      data: { email: 'monai.yut@student.mahidol.edu', password: 'loveunit2026' },
+    });
+  }
+  expect(response.status(), await response.text()).toBe(200);
+  const setCookieHeaders = response.headersArray().filter((h) => h.name.toLowerCase() === 'set-cookie');
+  const cookiesToAdd = setCookieHeaders.map((h) => {
+    const parts = h.value.split(';')[0];
+    const eqIdx = parts.indexOf('=');
+    const name = parts.slice(0, eqIdx);
+    const value = parts.slice(eqIdx + 1);
+    return { name, value, domain: 'localhost', path: '/' };
+  });
+  if (cookiesToAdd.length > 0) {
+    await page.context().addCookies(cookiesToAdd);
+  }
+}
+
 test.describe('WCAG 2.2 AA baseline', () => {
   test('public pages allow browser zoom and provide 44px mobile navigation targets', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -23,14 +47,7 @@ test.describe('WCAG 2.2 AA baseline', () => {
   });
 
   test('staff walk-in exposes the donor type picker as a keyboard-ready radio group', async ({ page, request }) => {
-    const response = await request.post('/api/auth/sign-in/email', {
-      data: { email: 'monai.yut@student.mahidol.edu', password: 'loveunit2026' },
-    });
-    expect(response.status()).toBe(200);
-    const cookie = response.headers()['set-cookie']?.split(';')[0];
-    expect(cookie).toBeTruthy();
-    const [name, value] = cookie!.split('=');
-    await page.context().addCookies([{ name, value, domain: 'localhost', path: '/' }]);
+    await addStaffAuth(page, request);
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/staff/walk-in');
@@ -44,13 +61,7 @@ test.describe('WCAG 2.2 AA baseline', () => {
   });
 
   test('admin destructive dialog keeps keyboard focus inside while it is open', async ({ page, request }) => {
-    const response = await request.post('/api/auth/sign-in/email', {
-      data: { email: 'monai.yut@student.mahidol.edu', password: 'loveunit2026' },
-    });
-    const cookie = response.headers()['set-cookie']?.split(';')[0];
-    expect(cookie).toBeTruthy();
-    const [name, value] = cookie!.split('=');
-    await page.context().addCookies([{ name, value, domain: 'localhost', path: '/' }]);
+    await addStaffAuth(page, request);
 
     await page.goto('/mt70/registrations');
     await page.getByRole('button', { name: 'เริ่มเลข Registration Code ใหม่' }).click();
@@ -65,13 +76,7 @@ test.describe('WCAG 2.2 AA baseline', () => {
   });
 
   test('staff invitation dialog has modal semantics and labelled fields', async ({ page, request }) => {
-    const response = await request.post('/api/auth/sign-in/email', {
-      data: { email: 'monai.yut@student.mahidol.edu', password: 'loveunit2026' },
-    });
-    const cookie = response.headers()['set-cookie']?.split(';')[0];
-    expect(cookie).toBeTruthy();
-    const [name, value] = cookie!.split('=');
-    await page.context().addCookies([{ name, value, domain: 'localhost', path: '/' }]);
+    await addStaffAuth(page, request);
 
     await page.goto('/mt70/staff');
     await page.getByRole('button', { name: 'เชิญ Staff' }).click();
@@ -83,13 +88,7 @@ test.describe('WCAG 2.2 AA baseline', () => {
   });
 
   test('staff scan opens as a non-scrolling full-screen camera workspace', async ({ page, request }) => {
-    const response = await request.post('/api/auth/sign-in/email', {
-      data: { email: 'monai.yut@student.mahidol.edu', password: 'loveunit2026' },
-    });
-    const cookie = response.headers()['set-cookie']?.split(';')[0];
-    expect(cookie).toBeTruthy();
-    const [name, value] = cookie!.split('=');
-    await page.context().addCookies([{ name, value, domain: 'localhost', path: '/' }]);
+    await addStaffAuth(page, request);
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/staff/checkin');

@@ -175,8 +175,8 @@ export default function StaffWalkInPage() {
                 ['STUDENT', 'นักศึกษามหิดล'],
                 ['STAFF', 'บุคลากรมหิดล'],
               ] as const).map(([value, label]) => (
-                <label key={value} className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-2 py-2.5 text-center text-xs font-bold transition-colors ${formData.participantType === value ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
-                  <input type="radio" name="participant-type" value={value} checked={formData.participantType === value} onChange={() => setFormData((previous) => ({ ...previous, participantType: value }))} className="sr-only" />
+                <label htmlFor={`wi-pt-${value}`} key={value} className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-2 py-2.5 text-center text-xs font-bold transition-colors ${formData.participantType === value ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                  <input id={`wi-pt-${value}`} aria-label={label} type="radio" name="participant-type" value={value} checked={formData.participantType === value} onChange={() => setFormData((previous) => ({ ...previous, participantType: value }))} className="sr-only" />
                   <span>{label}</span>
                 </label>
               ))}
@@ -211,8 +211,8 @@ export default function StaffWalkInPage() {
                 ['FIRST_TIME', 'บริจาคครั้งแรก'],
                 ['RETURNING', 'เคยบริจาคแล้ว'],
               ] as const).map(([value, label]) => (
-                <label key={value} className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-2 py-2.5 text-center text-xs font-bold transition-colors ${formData.donationExperience === value ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
-                  <input type="radio" name="donation-experience" value={value} checked={formData.donationExperience === value} onChange={() => setFormData((previous) => ({ ...previous, donationExperience: value }))} className="sr-only" />
+                <label htmlFor={`wi-exp-${value}`} key={value} className={`flex min-h-11 cursor-pointer items-center justify-center rounded-xl border px-2 py-2.5 text-center text-xs font-bold transition-colors ${formData.donationExperience === value ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+                  <input id={`wi-exp-${value}`} aria-label={label} type="radio" name="donation-experience" value={value} checked={formData.donationExperience === value} onChange={() => setFormData((previous) => ({ ...previous, donationExperience: value }))} className="sr-only" />
                   <span>{label}</span>
                 </label>
               ))}

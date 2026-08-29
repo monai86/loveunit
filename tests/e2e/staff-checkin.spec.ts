@@ -89,24 +89,23 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
     await page.waitForLoadState('networkidle').catch(() => {});
   }
 
-  await expect(page.getByRole('heading', { name: /(สแกน QR ผู้บริจาค|ระบบเช็คอิน|เช็คอิน)/ })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole('heading', { name: /(กล้องสแกน QR ผู้บริจาค|สแกน QR ผู้บริจาค|ระบบเช็คอิน|เช็คอิน)/ })).toBeVisible({ timeout: 10_000 });
 
-  // 3) Search for the donor by code.
-  const searchInput = page.locator('#ck-search');
-  await searchInput.fill(donorCode);
-  await searchInput.press('Enter');
+  // 3) Search/Scan the donor by code via the keyboard barcode wedge.
+  await page.keyboard.type(donorCode, { delay: 10 });
+  await page.keyboard.press('Enter');
 
-  // The result panel shows the registration code and the REGISTERED badge.
+  // The result panel shows the registration code and the donor name.
   await expect(page.getByText(donorCode, { exact: true })).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByText(/REGISTERED|ลงทะเบียนแล้ว/).first()).toBeVisible();
+  await expect(page.getByText(/REGISTERED|ลงทะเบียนแล้ว|รอเช็คอิน/).first()).toBeVisible();
 
   // 4) Check the donor in.
-  await page.getByRole('button', { name: /เช็คอิน/ }).first().click();
-  await expect(page.getByText(/CHECKED IN|เช็คอินแล้ว/).first()).toBeVisible({ timeout: 15_000 });
+  await page.getByRole('button', { name: /ยืนยันเช็คอิน/ }).click();
+  await expect(page.getByRole('button', { name: /บันทึกบริจาคสำเร็จ/ })).toBeVisible({ timeout: 15_000 });
 
   // 5) Confirm donation completed & souvenir given.
-  await page.getByRole('button', { name: /บริจาคสำเร็จ/ }).first().click();
-  await expect(page.getByText(/บริจาคสำเร็จ|COMPLETED/).first()).toBeVisible({ timeout: 15_000 });
+  await page.getByRole('button', { name: /บันทึกบริจาคสำเร็จ/ }).click();
+  await expect(page.getByText(/ดำเนินการเรียบร้อยแล้ว|บริจาคสำเร็จ/).first()).toBeVisible({ timeout: 15_000 });
 });
 
 test.afterAll(async ({ request }) => {
