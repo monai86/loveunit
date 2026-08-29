@@ -15,6 +15,7 @@ import { StaffRole } from '@/lib/types/database';
 import { normalizePhoneNumber } from '@/lib/utils/format';
 import type { AdminRegistrationUpdateInput } from '@/lib/validation/schemas';
 import { promoteFromWaitlist } from '@/services/waitlist-service';
+import { isLegacyPlaceholderStaffEmail } from '@/lib/auth/staff-account-policy';
 
 export async function getAllRegistrations(eventId: string) {
   if (db) {
@@ -239,7 +240,7 @@ export async function getAllStaffMembers(): Promise<StaffListItem[]> {
       .innerJoin(user, eq(staffProfiles.userId, user.id))
       .orderBy(desc(staffProfiles.createdAt));
 
-    return rows.map((r) => ({
+    return rows.filter((r) => !isLegacyPlaceholderStaffEmail(r.email)).map((r) => ({
       userId: r.userId,
       email: r.email,
       displayName: r.displayName,
@@ -253,7 +254,7 @@ export async function getAllStaffMembers(): Promise<StaffListItem[]> {
 
   if (isMemoryBackendAllowed()) {
     const inMem = await getInMemoryStaffProfiles();
-    return inMem.map((m) => ({
+    return inMem.filter((m) => !isLegacyPlaceholderStaffEmail(m.email)).map((m) => ({
       userId: m.user_id,
       email: m.email,
       displayName: m.display_name,

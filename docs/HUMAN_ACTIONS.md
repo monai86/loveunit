@@ -50,14 +50,14 @@
 #### วิธีที่ 1: ใช้สคริปต์ CLI สะดวกและกำหนดรหัสผ่านได้เอง (แนะนำ)
 ```bash
 # รูปแบบ: npx tsx scripts/create-admin.ts <อีเมล> <รหัสผ่าน> <ชื่อ-นามสกุล> [ระดับสิทธิ์: STAFF|TEAM_LEAD|ADMIN|SUPER_ADMIN] [ทีม]
-npx tsx scripts/create-admin.ts admin@mahidol.ac.th "AdminPass@2026" "ผู้ดูแลระบบ MUMT" SUPER_ADMIN Management
+npx tsx scripts/create-admin.ts monai.yut@student.mahidol.edu "<ตั้งรหัสผ่านของ Super Admin>" "Super Admin" SUPER_ADMIN Management
 ```
 
 #### วิธีที่ 2: ใช้สคริปต์ Seed เริ่มต้น
 ```bash
 npx tsx scripts/seed-staff.ts
 ```
-*(บัญชีเริ่มต้น: `admin@mahidol.ac.th` รหัสผ่าน `Admin@MUMT2026` โดยระบบจะบังคับให้เปลี่ยนรหัสผ่านในการเข้าใช้งานครั้งแรก)*
+*(บัญชีหลักเพียงบัญชีเดียวคือ `monai.yut@student.mahidol.edu` ส่วน Staff ให้เชิญจากหน้า Staff Management หลังเข้าสู่ระบบ)*
 
 ---
 

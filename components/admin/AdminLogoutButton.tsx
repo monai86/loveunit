@@ -25,7 +25,7 @@ export function AdminLogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={loading}
-      className="inline-flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 hover:text-red-800 border border-red-200/80 text-xs font-bold transition-all active:scale-95 cursor-pointer"
+      className="inline-flex h-11 items-center gap-1.5 rounded-xl border border-red-200/80 bg-red-50 p-1.5 text-xs font-bold text-red-700 transition-all hover:bg-red-100 hover:text-red-800 active:scale-95 sm:px-3"
       title="ออกจากระบบ"
     >
       {loading ? (

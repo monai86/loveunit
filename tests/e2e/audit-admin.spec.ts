@@ -135,6 +135,20 @@ test('admin donor edit uses an accessible in-page dialog', async ({ page }) => {
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
+test('admin header actions share a balanced height and baseline', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await login(page);
+  await page.goto('/mt70');
+  const actions = [
+    page.getByRole('link', { name: 'จุดสแกน QR' }),
+    page.getByRole('button', { name: 'ออกจากระบบ' }),
+  ];
+  const boxes = await Promise.all(actions.map((locator) => locator.boundingBox()));
+  expect(boxes.every(Boolean)).toBe(true);
+  const heights = boxes.map((box) => box?.height || 0);
+  expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(2);
+});
+
 test('retired queue URL returns staff to scan workspace', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);

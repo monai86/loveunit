@@ -98,18 +98,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               
               <Link
                 href="/staff/checkin"
-                className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200 transition-all"
+                className="hidden h-11 lg:inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 text-xs font-bold text-emerald-800 transition-all hover:bg-emerald-100"
                 title="เปิดหน้าระบบสแกน QR Code หน้างาน"
               >
                 <QrCode className="h-3.5 w-3.5 text-emerald-700" />
                 <span>จุดสแกน QR</span>
               </Link>
 
-              <div className="h-4 w-px bg-gray-200 hidden sm:block" />
+              <div className="hidden h-6 w-px bg-gray-200 sm:block" />
 
               {/* User & Logout */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 p-1.5 pl-3 rounded-xl bg-gray-50 border border-[var(--line)]">
+                <div className="flex h-11 items-center gap-2 rounded-xl border border-[var(--line)] bg-gray-50 pl-3 pr-1.5">
                   <div className="text-right hidden sm:block">
                     <span className="text-xs font-black text-[var(--ink)] block leading-tight truncate max-w-[130px]">
                       {user.profile.display_name}

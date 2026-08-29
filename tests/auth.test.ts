@@ -19,6 +19,7 @@ import {
   isStaffPortalRole,
 } from '../lib/auth/server';
 import type { AuthenticatedUser } from '../lib/auth/server';
+import { isLegacyPlaceholderStaffEmail, LEGACY_PLACEHOLDER_STAFF_EMAILS } from '../lib/auth/staff-account-policy';
 
 const BASE = 'http://localhost:3000';
 
@@ -130,6 +131,9 @@ async function runAuthTests() {
   // ---- Server Guards for unified ADMIN role ----
   console.log('Test 5: Server Guards — role-based Admin and Staff separation');
   process.env.PRIMARY_ADMIN_EMAIL = 'monai.yut@student.mahidol.edu';
+  assert.strictEqual(isLegacyPlaceholderStaffEmail('monai.yut@student.mahidol.edu'), false, 'primary admin must not be treated as a demo account');
+  assert.strictEqual(isLegacyPlaceholderStaffEmail('staff@mahidol.ac.th'), true, 'legacy demo staff account must be identified for cleanup');
+  assert.ok(LEGACY_PLACEHOLDER_STAFF_EMAILS.length >= 5, 'all known demo accounts must be covered by cleanup policy');
   const primaryAdmin = makeUser('SUPER_ADMIN', { email: 'monai.yut@student.mahidol.edu' });
   const legacyAdmin = makeUser('ADMIN', { email: 'legacy-admin@test.local' });
   const staff = makeUser('STAFF');
