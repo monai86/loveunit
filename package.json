@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "npx tsx tests/registration.test.ts && npx tsx tests/production_hardening.test.ts && npx tsx tests/cancel.test.ts && npx tsx tests/auth.test.ts && npx tsx tests/staff-applications.test.ts && npx tsx tests/reset-test-data.test.ts && npx tsx tests/email.test.ts && npx tsx tests/loading.test.ts && npx tsx tests/slots.test.ts && npx tsx tests/registration-code-email-layout.test.ts",
+    "test": "npx tsx tests/registration.test.ts && npx tsx tests/production_hardening.test.ts && npx tsx tests/cancel.test.ts && npx tsx tests/auth.test.ts && npx tsx tests/staff-applications.test.ts && npx tsx tests/reset-test-data.test.ts && npx tsx tests/email.test.ts && npx tsx tests/loading.test.ts && npx tsx tests/slots.test.ts && npx tsx tests/registration-code-email-layout.test.ts && npx tsx tests/staff-portal.test.ts",
     "test:db": "npx tsx tests/db.integration.test.ts",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",

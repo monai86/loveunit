@@ -27,14 +27,14 @@ export default function StaffLoginPage() {
   const redirectForRole = async () => {
     const me = await fetch('/api/auth/me');
     const data = await me.json();
-    window.location.href = ['SUPER_ADMIN', 'ADMIN'].includes(data?.user?.profile?.role) ? '/mt70' : '/staff/checkin';
+    window.location.href = ['SUPER_ADMIN', 'ADMIN'].includes(data?.user?.profile?.role) ? '/mt70' : '/staff/overview';
   };
 
   // Already signed in? Redirect to the matching portal.
   useEffect(() => {
     authClient.getSession().then((res) => {
       if (res?.data?.session) {
-        redirectForRole().catch(() => router.replace('/staff/checkin'));
+        redirectForRole().catch(() => router.replace('/staff/overview'));
       }
     }).catch(() => {});
   }, [router]);

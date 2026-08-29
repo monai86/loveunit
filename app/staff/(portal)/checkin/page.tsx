@@ -631,16 +631,17 @@ export default function StaffCheckinPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:py-7 space-y-5">
-      <header className="flex flex-col gap-4 border-b border-[var(--line)] pb-5 sm:flex-row sm:items-center sm:justify-between">
+    <div className="min-h-[100dvh] bg-[#0d1524] px-4 py-5 text-white sm:px-6 lg:py-7 space-y-5">
+      <header className="mx-auto flex max-w-7xl flex-col gap-4 border-b border-white/15 pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-xs font-bold text-[var(--burgundy-700)]">
+          <Link href="/staff/overview" className="mb-3 inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-white/15 px-2.5 text-xs font-bold text-white/75 hover:bg-white/10"><ArrowRight className="h-3.5 w-3.5 rotate-180" />กลับหน้าภาพรวม</Link>
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
             <span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
             <span>MUMT LoveUnit · จุดสแกนหน้างาน</span>
           </div>
-          <h1 className="mt-1 text-2xl font-black text-[var(--ink)] font-display">สแกน QR ผู้บริจาค</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">สแกนเพื่อเช็คอินและบันทึกผลการบริจาคในขั้นตอนเดียว</p>
-          <p className="mt-2 text-xs font-bold text-[var(--muted)]">วันนี้เช็คอินแล้ว {stats.checkedIn} จาก {stats.totalToday} คน · สำเร็จ {stats.completed} คน</p>
+          <h1 className="mt-1 text-2xl font-black text-white font-display">สแกน QR ผู้บริจาค</h1>
+          <p className="mt-1 text-sm text-white/65">จัด QR ให้อยู่ในกรอบเพื่อเช็กอินและบันทึกผลในขั้นตอนเดียว</p>
+          <p className="mt-2 text-xs font-bold text-white/60">วันนี้เช็คอินแล้ว {stats.checkedIn} จาก {stats.totalToday} คน · สำเร็จ {stats.completed} คน</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <button
@@ -679,8 +680,8 @@ export default function StaffCheckinPage() {
         </div>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.8fr)]">
-        <section className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[#0d1524] text-white" aria-labelledby="scanner-title">
+      <div className="mx-auto grid max-w-7xl gap-5">
+        <section className="overflow-hidden rounded-3xl border border-white/15 bg-[#070d18] text-white shadow-2xl" aria-labelledby="scanner-title">
           <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
             <div className="flex items-center gap-2">
               <QrCode className="h-5 w-5 text-emerald-300" />
@@ -692,8 +693,8 @@ export default function StaffCheckinPage() {
           </div>
 
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-          <div className="relative min-h-[54vh] sm:min-h-[560px]">
-            <div id="qr-reader-fullscreen" className="h-full min-h-[54vh] w-full [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover [&_#qr-shaded-region]:!hidden [&_div]:!border-none" />
+          <div className="relative min-h-[66dvh] sm:min-h-[680px]">
+            <div id="qr-reader-fullscreen" className="h-full min-h-[66dvh] w-full [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover [&_#qr-shaded-region]:!hidden [&_div]:!border-none" />
             {scanning && (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
                 <div className="relative h-64 w-64 rounded-2xl border-2 border-emerald-300/90 sm:h-80 sm:w-80">
@@ -730,7 +731,7 @@ export default function StaffCheckinPage() {
           </div>
         </section>
 
-        <aside className="space-y-5">
+        <aside className="grid gap-5 lg:grid-cols-2">
           <section className="rounded-2xl border border-[var(--line)] bg-white p-5 shadow-xs" aria-labelledby="lookup-title">
             <h2 id="lookup-title" className="text-base font-black text-[var(--ink)]">ค้นหาผู้บริจาค</h2>
             <p className="mt-1 text-sm text-[var(--muted)]">ใช้ชื่อ เบอร์โทร หรือรหัสลงทะเบียนแทนการสแกน</p>
