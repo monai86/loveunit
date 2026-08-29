@@ -30,7 +30,7 @@ test.describe('WCAG 2.2 AA baseline', () => {
     const cookie = response.headers()['set-cookie']?.split(';')[0];
     expect(cookie).toBeTruthy();
     const [name, value] = cookie!.split('=');
-    await page.context().addCookies([{ name, value, url: 'http://localhost:3000' }]);
+    await page.context().addCookies([{ name, value, domain: 'localhost', path: '/' }]);
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/staff/walk-in');
@@ -50,7 +50,7 @@ test.describe('WCAG 2.2 AA baseline', () => {
     const cookie = response.headers()['set-cookie']?.split(';')[0];
     expect(cookie).toBeTruthy();
     const [name, value] = cookie!.split('=');
-    await page.context().addCookies([{ name, value, url: 'http://localhost:3000' }]);
+    await page.context().addCookies([{ name, value, domain: 'localhost', path: '/' }]);
 
     await page.goto('/mt70/registrations');
     await page.getByRole('button', { name: 'เริ่มเลข Registration Code ใหม่' }).click();
@@ -71,7 +71,7 @@ test.describe('WCAG 2.2 AA baseline', () => {
     const cookie = response.headers()['set-cookie']?.split(';')[0];
     expect(cookie).toBeTruthy();
     const [name, value] = cookie!.split('=');
-    await page.context().addCookies([{ name, value, url: 'http://localhost:3000' }]);
+    await page.context().addCookies([{ name, value, domain: 'localhost', path: '/' }]);
 
     await page.goto('/mt70/staff');
     await page.getByRole('button', { name: 'เชิญ Staff' }).click();
@@ -89,7 +89,7 @@ test.describe('WCAG 2.2 AA baseline', () => {
     const cookie = response.headers()['set-cookie']?.split(';')[0];
     expect(cookie).toBeTruthy();
     const [name, value] = cookie!.split('=');
-    await page.context().addCookies([{ name, value, url: 'http://localhost:3000' }]);
+    await page.context().addCookies([{ name, value, domain: 'localhost', path: '/' }]);
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/staff/checkin');

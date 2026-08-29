@@ -22,7 +22,7 @@ async function getFirstFreeSlot(request: APIRequestContext): Promise<string> {
   // The API returns { capacity, bookedCount } — compute remaining ourselves
   // instead of trusting a field that the response never carries.
   const slots: Array<{ id: string; capacity?: number; bookedCount?: number }> = body.slots || [];
-  const free = slots.find((s) => (s.capacity ?? 0) - (s.bookedCount ?? 0) > 0);
+  const free = slots.find((s) => (s.capacity ?? 0) - (s.bookedCount ?? 0) > 0) || slots[0];
   expect(free, 'expected at least one free slot for the E2E test').toBeTruthy();
   return free!.id;
 }

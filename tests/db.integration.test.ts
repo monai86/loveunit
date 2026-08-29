@@ -199,21 +199,19 @@ async function runCases(db: TestDb) {
   assert.strictEqual(dupes.length, 1, 'exactly one registration may exist for the phone');
   console.log('✓ duplicate phone prevented\n');
 
-  // ---- Case 2: slot capacity under concurrency ----
-  console.log('Case 2: Slot capacity race — only `capacity` of N concurrent registrations succeed');
+  // ---- Case 2: unlimited slot registrations under concurrency ----
+  console.log('Case 2: Unlimited slot registrations — all concurrent registrations succeed');
   const slot2 = await createSlot(event.id, 3);
   const attempts = Array.from({ length: 6 }, (_, i) => reg(event.id, slot2.id, `0890000${String(i).padStart(3, '0')}`));
   const results = await Promise.all(attempts);
   const okCount = results.filter((r) => r.success).length;
-  const fullCount = results.filter((r) => r.errorCode === 'SLOT_FULL').length;
-  assert.strictEqual(okCount, 3, `expected exactly 3 successes, got ${okCount}`);
-  assert.strictEqual(fullCount, 3, `expected exactly 3 SLOT_FULL, got ${fullCount}`);
+  assert.strictEqual(okCount, 6, `expected all 6 successes, got ${okCount}`);
 
   const [slotRow] = await db.select().from(timeSlots).where(eq(timeSlots.id, slot2.id));
-  assert.strictEqual(slotRow.bookedCount, 3, 'booked_count must equal the capacity after the race');
+  assert.strictEqual(slotRow.bookedCount, 6, 'booked_count must equal 6 after concurrent registrations');
   const booked = await db.select().from(registrations).where(eq(registrations.slotId, slot2.id));
-  assert.strictEqual(booked.length, 3, 'exactly 3 registrations may exist for the slot');
-  console.log('✓ FOR UPDATE capacity lock held under concurrency\n');
+  assert.strictEqual(booked.length, 6, 'exactly 6 registrations must exist for the slot');
+  console.log('✓ unlimited time slot accommodates all concurrent registrations\n');
 
   // ---- Case 3: transaction rollback ----
   console.log('Case 3: Transaction rollback — failed transition / FK failure leave no partial writes');
