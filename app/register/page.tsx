@@ -9,9 +9,9 @@ import { formatTimeRange } from '@/lib/utils/format';
 import { isTimeSlotSelectable } from '@/lib/registration/slot-availability';
 
 const PARTICIPANT_TYPES = [
-  { id: 'STUDENT', name: 'นักศึกษา ม.มหิดล' },
-  { id: 'STAFF', name: 'บุคลากร ม.มหิดล' },
-  { id: 'GENERAL_PUBLIC', name: 'บุคคลทั่วไป' },
+  { id: 'STUDENT', name: 'นักศึกษา ม.มหิดล', enName: 'Mahidol Student' },
+  { id: 'STAFF', name: 'บุคลากร ม.มหิดล', enName: 'Mahidol Staff' },
+  { id: 'GENERAL_PUBLIC', name: 'บุคคลทั่วไป', enName: 'General Public' },
 ];
 
 interface TimeSlot {
@@ -99,10 +99,10 @@ export default function RegisterPage() {
           });
           setTimeSlots(slots);
         } else {
-          setErrorMessage('ไม่สามารถโหลดข้อมูลช่วงเวลาได้ กรุณาลองใหม่อีกครั้ง');
+          setErrorMessage('ไม่สามารถโหลดข้อมูลช่วงเวลาได้ กรุณาลองใหม่อีกครั้ง (Unable to load time slots)');
         }
       } catch {
-        setErrorMessage('เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย');
+        setErrorMessage('เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย (Network connection error)');
       } finally {
         setSlotsLoading(false);
       }
@@ -112,33 +112,33 @@ export default function RegisterPage() {
 
   // Validation
   const validateStep1 = () => {
-    if (!formData.firstName.trim()) return 'กรุณากรอกชื่อจริง';
-    if (!formData.lastName.trim()) return 'กรุณากรอกนามสกุล';
-    if (!formData.phone.trim()) return 'กรุณากรอกเบอร์โทรศัพท์';
+    if (!formData.firstName.trim()) return 'กรุณากรอกชื่อจริง (Please enter first name)';
+    if (!formData.lastName.trim()) return 'กรุณากรอกนามสกุล (Please enter last name)';
+    if (!formData.phone.trim()) return 'กรุณากรอกเบอร์โทรศัพท์ (Please enter phone number)';
     const cleanPhone = formData.phone.replace(/[^0-9]/g, '');
-    if (cleanPhone.length < 9 || cleanPhone.length > 10) return 'กรุณากรอกเบอร์โทรศัพท์ 9-10 หลักให้ถูกต้อง';
+    if (cleanPhone.length < 9 || cleanPhone.length > 10) return 'กรุณากรอกเบอร์โทรศัพท์ 9-10 หลักให้ถูกต้อง (Please enter valid 9-10 digit phone number)';
     if (formData.email.trim()) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email.trim())) return 'กรุณากรอกอีเมลให้ถูกต้อง (หรือเว้นว่างไว้)';
+      if (!emailRegex.test(formData.email.trim())) return 'กรุณากรอกอีเมลให้ถูกต้อง หรือเว้นว่างไว้ (Please enter valid email)';
     }
     return null;
   };
 
   const validateStep2 = () => {
-    if (!formData.participantType) return 'กรุณาเลือกประเภทผู้เข้าร่วม';
+    if (!formData.participantType) return 'กรุณาเลือกประเภทผู้เข้าร่วม (Please select participant type)';
     if (formData.participantType !== 'GENERAL_PUBLIC' && (!formData.faculty || formData.faculty === '')) {
-      return 'กรุณาเลือกคณะ / หน่วยงาน';
+      return 'กรุณาเลือกคณะ / หน่วยงาน (Please select faculty or organization)';
     }
     if (formData.participantType === 'STUDENT' && !formData.academicYear) {
-      return 'กรุณาเลือกระดับชั้นปีการศึกษา';
+      return 'กรุณาเลือกระดับชั้นปีการศึกษา (Please select academic year)';
     }
-    if (!formData.donationExperience) return 'กรุณาเลือกประสบการณ์การบริจาค';
+    if (!formData.donationExperience) return 'กรุณาเลือกประสบการณ์การบริจาค (Please select donation experience)';
     return null;
   };
 
   const validateStep3 = () => {
-    if (!formData.timeSlotId) return 'กรุณาเลือกรอบเวลาที่ต้องการเดินทางมาถึง';
-    if (!formData.privacyAccepted) return 'กรุณายอมรับประกาศความเป็นส่วนตัวเพื่อดำเนินการต่อ';
+    if (!formData.timeSlotId) return 'กรุณาเลือกรอบเวลาที่ต้องการเดินทางมาถึง (Please select arrival time slot)';
+    if (!formData.privacyAccepted) return 'กรุณายอมรับประกาศความเป็นส่วนตัวเพื่อดำเนินการต่อ (Please accept privacy notice)';
     return null;
   };
 
@@ -229,11 +229,13 @@ export default function RegisterPage() {
       
       {/* Header */}
       <div className="mb-8 pb-6 border-b border-[var(--line)]">
-        <h1 className="text-3xl font-black text-[var(--ink)] sm:text-4xl">
-          ลงทะเบียนบริจาคโลหิตออนไลน์
+        <h1 className="text-2xl font-black text-[var(--ink)] sm:text-4xl flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span>ลงทะเบียนบริจาคโลหิตออนไลน์</span>
+          <span className="text-base sm:text-xl font-bold text-gray-500 font-sans">/ Online Blood Donation Registration</span>
         </h1>
-        <p className="mt-2 text-[15px] text-[var(--muted)] font-medium leading-relaxed">
+        <p className="mt-2 text-sm text-[var(--muted)] font-medium leading-relaxed">
           กรอกข้อมูลและเลือกรอบเวลาเดินทาง เพื่อรับ QR Code สำหรับแสดงในวันงาน
+          <span className="block text-xs text-gray-400 mt-0.5">(Fill in your details and choose an arrival time slot to receive your check-in QR Code)</span>
         </p>
       </div>
 
@@ -246,35 +248,44 @@ export default function RegisterPage() {
             <span className="text-[11px] font-mono font-bold text-[var(--burgundy-700)] uppercase block">
               STEP {step} OF 3
             </span>
-            <h2 className="text-lg font-black text-editorial-ink">
-              {step === 1 && 'ข้อมูลส่วนตัว'}
-              {step === 2 && 'สังกัดและคณะ'}
-              {step === 3 && 'รอบเวลาเดินทาง'}
+            <h2 className="text-base sm:text-lg font-black text-editorial-ink">
+              {step === 1 && 'ข้อมูลส่วนตัว / Personal Info'}
+              {step === 2 && 'สังกัดและคณะ / Affiliation'}
+              {step === 3 && 'รอบเวลาเดินทาง / Time Slot'}
             </h2>
-            <p className="text-xs text-editorial-muted">ใช้เวลาลงทะเบียนประมาณ 2 นาที</p>
+            <p className="text-xs text-editorial-muted">ใช้เวลาลงทะเบียนประมาณ 2 นาที (Takes ~2 mins)</p>
           </div>
 
           {/* Step Progress Indicators */}
           <div className="space-y-3 pt-2">
-            <div className={`p-3 rounded-lg border text-sm font-bold transition-all flex items-center gap-3 ${
-              step === 1 ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : step > 1 ? 'border-gray-200 bg-gray-50 text-gray-700' : 'border-gray-100 text-gray-400'
+            <div className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center gap-3 ${
+              step === 1 ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs' : step > 1 ? 'border-gray-200 bg-gray-50 text-gray-700' : 'border-gray-100 text-gray-400'
             }`}>
-              <span className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center text-[11px] font-mono font-bold">01</span>
-              <span>1. ข้อมูลส่วนตัว</span>
+              <span className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center text-[11px] font-mono font-bold shrink-0">01</span>
+              <div>
+                <p className="font-black text-gray-900">1. ข้อมูลส่วนตัว</p>
+                <p className="text-[10px] text-gray-500 font-normal">Personal Information</p>
+              </div>
             </div>
 
-            <div className={`p-3 rounded-lg border text-sm font-bold transition-all flex items-center gap-3 ${
-              step === 2 ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : step > 2 ? 'border-gray-200 bg-gray-50 text-gray-700' : 'border-gray-100 text-gray-400'
+            <div className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center gap-3 ${
+              step === 2 ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs' : step > 2 ? 'border-gray-200 bg-gray-50 text-gray-700' : 'border-gray-100 text-gray-400'
             }`}>
-              <span className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center text-[11px] font-mono font-bold">02</span>
-              <span>2. สังกัดและคณะ</span>
+              <span className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center text-[11px] font-mono font-bold shrink-0">02</span>
+              <div>
+                <p className="font-black text-gray-900">2. สังกัดและคณะ</p>
+                <p className="text-[10px] text-gray-500 font-normal">Affiliation & Faculty</p>
+              </div>
             </div>
 
-            <div className={`p-3 rounded-lg border text-sm font-bold transition-all flex items-center gap-3 ${
-              step === 3 ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'border-gray-100 text-gray-400'
+            <div className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center gap-3 ${
+              step === 3 ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs' : 'border-gray-100 text-gray-400'
             }`}>
-              <span className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center text-[11px] font-mono font-bold">03</span>
-              <span>3. รอบเวลาเดินทาง</span>
+              <span className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center text-[11px] font-mono font-bold shrink-0">03</span>
+              <div>
+                <p className="font-black text-gray-900">3. รอบเวลาเดินทาง</p>
+                <p className="text-[10px] text-gray-500 font-normal">Arrival Time Slot</p>
+              </div>
             </div>
           </div>
         </div>
@@ -283,7 +294,7 @@ export default function RegisterPage() {
         <div className="md:col-span-8 editorial-card p-6 sm:p-8">
           
           {errorMessage && (
-            <div className="mb-6 p-4 rounded-lg bg-[var(--danger-bg)] border border-[#E8B9C1] text-sm font-bold text-[var(--danger)] flex items-start gap-2.5">
+            <div className="mb-6 p-4 rounded-xl bg-[var(--danger-bg)] border border-[#E8B9C1] text-sm font-bold text-[var(--danger)] flex items-start gap-2.5 shadow-xs">
               <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
               <span>{errorMessage}</span>
             </div>
@@ -294,45 +305,47 @@ export default function RegisterPage() {
             {/* STEP 1: PERSONAL INFO */}
             {step === 1 && (
               <div className="space-y-5">
-                <h3 className="text-sm font-black text-[var(--burgundy-700)] uppercase tracking-wider border-b border-[var(--rose-100)] pb-2">
-                  01. ข้อมูลผู้ลงทะเบียน
-                </h3>
+                <div className="border-b border-[var(--rose-100)] pb-2 flex items-baseline justify-between">
+                  <h3 className="text-sm font-black text-[var(--burgundy-700)] uppercase tracking-wider">
+                    01. ข้อมูลผู้ลงทะเบียน <span className="text-xs text-gray-500 font-normal">/ Personal Information</span>
+                  </h3>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="reg-firstName" className="block text-xs font-bold text-editorial-ink mb-1.5">
-                      ชื่อจริง <span className="text-red-600">*</span>
+                      ชื่อจริง <span className="text-gray-500 font-normal">/ First Name</span> <span className="text-red-600">*</span>
                     </label>
                     <input
                       id="reg-firstName"
                       type="text"
                       required
-                      placeholder="เช่น สมชาย"
+                      placeholder="เช่น สมชาย (e.g. Somchai)"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="editorial-input"
+                      className="editorial-input text-sm"
                     />
                   </div>
 
                   <div>
                     <label htmlFor="reg-lastName" className="block text-xs font-bold text-editorial-ink mb-1.5">
-                      นามสกุล <span className="text-red-600">*</span>
+                      นามสกุล <span className="text-gray-500 font-normal">/ Last Name</span> <span className="text-red-600">*</span>
                     </label>
                     <input
                       id="reg-lastName"
                       type="text"
                       required
-                      placeholder="เช่น ใจดี"
+                      placeholder="เช่น ใจดี (e.g. Jaidee)"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="editorial-input"
+                      className="editorial-input text-sm"
                     />
                   </div>
                 </div>
 
                 <div>
                   <label htmlFor="reg-phone" className="block text-xs font-bold text-editorial-ink mb-1.5">
-                    เบอร์โทรศัพท์มือถือ <span className="text-red-600">*</span>
+                    เบอร์โทรศัพท์มือถือ <span className="text-gray-500 font-normal">/ Mobile Phone</span> <span className="text-red-600">*</span>
                   </label>
                   <input
                     id="reg-phone"
@@ -341,19 +354,19 @@ export default function RegisterPage() {
                     placeholder="เช่น 0812345678"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="editorial-input"
+                    className="editorial-input text-sm font-mono"
                   />
-                  <p className="mt-1 text-[11px] text-editorial-muted font-medium">
+                  <p className="mt-1.5 text-[11px] text-editorial-muted font-medium">
                     * ใช้สำหรับค้นหาประวัติการลงทะเบียนกรณีลืม QR Code{" "}
-                    <Link href="/lookup" className="font-bold text-[var(--burgundy-700)] hover:underline">
-                      (ลืม QR Code? ค้นหาที่นี่)
+                    <Link href="/lookup" className="font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-0.5">
+                      (ลืม QR Code? ค้นหาที่นี่ / Forgot Pass?)
                     </Link>
                   </p>
                 </div>
 
                 <div>
                   <label htmlFor="reg-email" className="block text-xs font-bold text-editorial-ink mb-1.5">
-                    อีเมล <span className="text-gray-400 font-medium">(ไม่บังคับ)</span>
+                    อีเมล <span className="text-gray-500 font-normal">/ Email Address</span> <span className="text-gray-400 font-medium text-[11px]">(ไม่บังคับ / Optional)</span>
                   </label>
                   <input
                     id="reg-email"
@@ -361,10 +374,10 @@ export default function RegisterPage() {
                     placeholder="เช่น somchai@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="editorial-input"
+                    className="editorial-input text-sm"
                   />
-                  <p className="mt-1 text-[11px] text-editorial-muted font-medium">
-                    * ระบบจะส่งอีเมลยืนยันพร้อม QR Code ให้ที่อีเมลนี้ (ถ้าระบุ)
+                  <p className="mt-1.5 text-[11px] text-editorial-muted font-medium">
+                    * ระบบจะส่งอีเมลยืนยันพร้อม QR Code ให้ที่อีเมลนี้ (ถ้าระบุ) / Confirmation email with pass will be sent here
                   </p>
                 </div>
               </div>
@@ -373,15 +386,17 @@ export default function RegisterPage() {
             {/* STEP 2: FACULTY & AFFILIATION */}
             {step === 2 && (
               <div className="space-y-5">
-                <h3 className="text-sm font-black text-[var(--burgundy-700)] uppercase tracking-wider border-b border-[var(--rose-100)] pb-2">
-                  02. สังกัดและสถานภาพ
-                </h3>
+                <div className="border-b border-[var(--rose-100)] pb-2 flex items-baseline justify-between">
+                  <h3 className="text-sm font-black text-[var(--burgundy-700)] uppercase tracking-wider">
+                    02. สังกัดและสถานภาพ <span className="text-xs text-gray-500 font-normal">/ Affiliation & Status</span>
+                  </h3>
+                </div>
 
                 <div>
                   <label className="block text-xs font-bold text-editorial-ink mb-1.5">
-                    ประเภทผู้เข้าร่วม <span className="text-red-600">*</span>
+                    ประเภทผู้เข้าร่วม <span className="text-gray-500 font-normal">/ Participant Type</span> <span className="text-red-600">*</span>
                   </label>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {PARTICIPANT_TYPES.map((type) => (
                       <button
                         key={type.id}
@@ -395,13 +410,14 @@ export default function RegisterPage() {
                             academicYear: isGeneral ? '' : formData.academicYear
                           });
                         }}
-                        className={`p-3 rounded-lg border text-left text-xs font-bold transition-all cursor-pointer ${
+                        className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
                           formData.participantType === type.id
-                            ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1 ring-[var(--burgundy-700)]'
-                            : 'border-gray-200 hover:border-gray-300 text-editorial-ink'
+                            ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1 ring-[var(--burgundy-700)] shadow-xs'
+                            : 'border-gray-200 hover:border-gray-300 text-editorial-ink bg-white'
                         }`}
                       >
-                        {type.name}
+                        <p className="text-xs font-black">{type.name}</p>
+                        <p className="text-[10px] text-gray-500 font-medium mt-0.5">{type.enName}</p>
                       </button>
                     ))}
                   </div>
@@ -411,15 +427,15 @@ export default function RegisterPage() {
                 {formData.participantType !== 'GENERAL_PUBLIC' && (
                   <div>
                     <label htmlFor="reg-faculty" className="block text-xs font-bold text-editorial-ink mb-1.5">
-                      คณะ / หน่วยงาน <span className="text-red-600">*</span>
+                      คณะ / หน่วยงาน <span className="text-gray-500 font-normal">/ Faculty or Organization</span> <span className="text-red-600">*</span>
                     </label>
                     <select
                       id="reg-faculty"
                       value={formData.faculty}
                       onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
-                      className="editorial-input"
+                      className="editorial-input text-sm"
                     >
-                      <option value="">-- กรุณาเลือกคณะ / หน่วยงาน --</option>
+                      <option value="">-- กรุณาเลือกคณะ / หน่วยงาน (Select Faculty/Org) --</option>
                       {MAHIDOL_FACULTIES.map((fac) => (
                         <option key={fac.code} value={fac.name}>
                           {fac.label}
@@ -432,15 +448,15 @@ export default function RegisterPage() {
                 {formData.participantType === 'STUDENT' && (
                   <div>
                     <label htmlFor="reg-academicYear" className="block text-xs font-bold text-editorial-ink mb-1.5">
-                      ชั้นปีการศึกษา <span className="text-red-600">*</span>
+                      ชั้นปีการศึกษา <span className="text-gray-500 font-normal">/ Academic Year</span> <span className="text-red-600">*</span>
                     </label>
                     <select
                       id="reg-academicYear"
                       value={formData.academicYear}
                       onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
-                      className="editorial-input"
+                      className="editorial-input text-sm"
                     >
-                      <option value="">-- กรุณาเลือกระดับชั้นปี --</option>
+                      <option value="">-- กรุณาเลือกระดับชั้นปี (Select Year) --</option>
                       {ACADEMIC_YEARS.map((yr) => (
                         <option key={yr.value} value={yr.value}>
                           {yr.label}
@@ -452,12 +468,12 @@ export default function RegisterPage() {
 
                 <div>
                   <label className="block text-xs font-bold text-editorial-ink mb-1.5">
-                    ประสบการณ์การบริจาค <span className="text-red-600">*</span>
+                    ประสบการณ์การบริจาคโลหิต <span className="text-gray-500 font-normal">/ Donation Experience</span> <span className="text-red-600">*</span>
                   </label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2.5">
                     {[
-                      { id: 'FIRST_TIME', label: 'บริจาคครั้งแรก', icon: Sparkles },
-                      { id: 'RETURNING', label: 'เคยบริจาคแล้ว', icon: Heart },
+                      { id: 'FIRST_TIME', label: 'บริจาคครั้งแรก', enLabel: 'First-time Donor', icon: Sparkles },
+                      { id: 'RETURNING', label: 'เคยบริจาคแล้ว', enLabel: 'Returning Donor', icon: Heart },
                     ].map((exp) => {
                       const ExpIcon = exp.icon;
                       return (
@@ -465,14 +481,17 @@ export default function RegisterPage() {
                           key={exp.id}
                           type="button"
                           onClick={() => setFormData({ ...formData, donationExperience: exp.id })}
-                          className={`p-3 rounded-lg border text-center text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          className={`p-3.5 rounded-xl border text-center transition-all flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer ${
                             formData.donationExperience === exp.id
-                              ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1 ring-[var(--burgundy-700)]'
-                              : 'border-gray-200 hover:border-gray-300 text-[var(--ink)]'
+                              ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1 ring-[var(--burgundy-700)] shadow-xs'
+                              : 'border-gray-200 hover:border-gray-300 text-[var(--ink)] bg-white'
                           }`}
                         >
-                          <ExpIcon className="h-4 w-4" />
-                          {exp.label}
+                          <ExpIcon className="h-4 w-4 shrink-0" />
+                          <div>
+                            <span className="text-xs font-black block">{exp.label}</span>
+                            <span className="text-[10px] text-gray-500 block font-normal">{exp.enLabel}</span>
+                          </div>
                         </button>
                       );
                     })}
@@ -484,12 +503,13 @@ export default function RegisterPage() {
             {/* STEP 3: TIME SLOT SELECTION (TIMETABLE LIST) */}
             {step === 3 && (
               <div className="space-y-5">
-                <div className="space-y-2 border-b border-[var(--rose-100)] pb-2">
+                <div className="space-y-1.5 border-b border-[var(--rose-100)] pb-2">
                   <h3 className="text-sm font-black text-[var(--burgundy-700)] uppercase tracking-wider">
-                    03. เลือกรอบเวลาแนะนำเดินทางมาถึง (16 ก.ย. 2569)
+                    03. เลือกรอบเวลาแนะนำเดินทางมาถึง <span className="text-xs text-gray-500 font-normal">/ Arrival Time (16 Sep 2026)</span>
                   </h3>
                   <p className="text-xs text-[var(--muted)]">
                     เลือกช่วงเวลาที่ท่านสะดวก เพื่อให้เจ้าหน้าที่จัดเตรียมและดูแลท่านได้อย่างรวดเร็ว
+                    <span className="block text-[11px] text-gray-400 mt-0.5">(Choose your preferred arrival window to help us serve you smoothly)</span>
                   </p>
                 </div>
 
@@ -497,16 +517,16 @@ export default function RegisterPage() {
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-200/80 space-y-1.5 shadow-xs">
                   <div className="flex items-center gap-2 font-black text-amber-950 text-xs">
                     <Sparkles className="h-4 w-4 text-amber-600 shrink-0" />
-                    <span>สิทธิพิเศษ: 100 ท่านแรกที่ลงทะเบียน เช็กอินภายในรอบเวลาที่เลือก และบริจาคโลหิตสำเร็จ จะได้รับของที่ระลึกสุดพิเศษ</span>
+                    <span>🎁 สิทธิพิเศษ: 100 ท่านแรกที่ลงทะเบียน เช็กอินภายในรอบเวลา และบริจาคสำเร็จ จะได้รับของที่ระลึกสุดพิเศษ</span>
                   </div>
                   <p className="text-[11px] text-amber-900 leading-relaxed font-medium">
-                    โปรดเลือกช่วงเวลาที่สะดวก และมาถึงเพื่อเช็กอินภายในรอบเวลาที่ลงทะเบียนไว้
+                    โปรดเลือกช่วงเวลาที่สะดวก และมาถึงเพื่อเช็กอินภายในรอบเวลาที่ลงทะเบียนไว้ (Exclusive souvenirs for the first 100 on-time donors!)
                   </p>
                 </div>
 
                 {slotsLoading ? (
                   <div className="py-8 text-center text-xs font-bold text-editorial-muted">
-                    กำลังโหลดข้อมูลช่วงเวลา...
+                    กำลังโหลดข้อมูลช่วงเวลา... (Loading time slots...)
                   </div>
                 ) : (
                   <div className="space-y-2.5">
@@ -535,19 +555,19 @@ export default function RegisterPage() {
                             <Clock className={`h-4.5 w-4.5 ${isSelected ? 'text-[var(--burgundy-700)]' : 'text-gray-400'}`} />
                             <div>
                               <span className="text-sm font-black block font-mono">{slot.timeSlot}</span>
-                              <span className="text-[11px] font-normal text-gray-500">รอบเวลาแนะนำเดินทางมาถึง</span>
+                              <span className="text-[11px] font-normal text-gray-500">รอบเวลาแนะนำเดินทางมาถึง (Arrival Window)</span>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-2">
                             {!isSelectable ? (
-                              <span className="text-[11px] font-bold text-gray-400">เต็มแล้ว</span>
+                              <span className="text-[11px] font-bold text-gray-400">เต็มแล้ว (Full)</span>
                             ) : isSelected ? (
                               <div className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs">
                                 <Check className="h-3.5 w-3.5" />
                               </div>
                             ) : (
-                              <span className="text-[11px] font-bold text-gray-400">เลือกช่วงเวลานี้</span>
+                              <span className="text-[11px] font-bold text-gray-400">เลือกช่วงเวลานี้ (Select)</span>
                             )}
                           </div>
                         </button>
@@ -557,7 +577,7 @@ export default function RegisterPage() {
                 )}
 
                 {/* PRIVACY CONSENT (required — matches server-side Zod schema) */}
-                <label className="mt-4 flex items-start gap-2.5 p-3.5 rounded-lg border border-[var(--line)] bg-[var(--bg)] cursor-pointer select-none">
+                <label className="mt-4 flex items-start gap-2.5 p-3.5 rounded-xl border border-[var(--line)] bg-[var(--bg)] cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={formData.privacyAccepted}
@@ -567,6 +587,7 @@ export default function RegisterPage() {
                   <span className="text-[11px] leading-relaxed font-medium text-editorial-muted">
                     ข้าพเจ้ายอมรับและเข้าใจว่า ข้อมูลส่วนตัวของข้าพเจ้าจะถูกใช้เพื่อการจัดการลงทะเบียน
                     การติดต่อกลับ และบันทึกประวัติการบริจาคโลหิตในกิจกรรมนี้เท่านั้น
+                    <span className="block text-[10px] text-gray-400 mt-0.5">(I agree to the Privacy Notice and consent to the use of my personal data for event management and blood donation records.)</span>
                     <span className="text-red-600 font-bold">*</span>
                   </span>
                 </label>
@@ -579,10 +600,10 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={handlePrev}
-                  className="editorial-btn-secondary text-xs py-2.5 px-4"
+                  className="editorial-btn-secondary text-xs py-2.5 px-4 inline-flex items-center gap-1.5"
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  <span>ย้อนกลับ</span>
+                  <span>ย้อนกลับ / Back</span>
                 </button>
               ) : (
                 <div />
@@ -592,23 +613,23 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="editorial-btn-primary text-xs py-3.5 px-6 ml-auto"
+                  className="editorial-btn-primary text-xs py-3.5 px-6 ml-auto inline-flex items-center gap-1.5"
                 >
-                  <span>ถัดไป</span>
+                  <span>ถัดไป / Next</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               ) : (
                 <button
                   type="submit"
                   disabled={loading}
-                  className="editorial-btn-primary text-xs py-3.5 px-8 ml-auto"
+                  className="editorial-btn-primary text-xs py-3.5 px-8 ml-auto inline-flex items-center gap-1.5"
                 >
                   {loading ? (
-                    <span>กำลังบันทึกข้อมูล...</span>
+                    <span>กำลังบันทึกข้อมูล... (Saving...)</span>
                   ) : (
                     <>
                       <Heart className="h-4 w-4 fill-white" />
-                      <span>ยืนยันการลงทะเบียน</span>
+                      <span>ยืนยันการลงทะเบียน / Complete</span>
                     </>
                   )}
                 </button>
@@ -739,26 +760,27 @@ function WaitlistDialog({
         <div className="space-y-1">
           <span className="text-[10px] font-mono font-bold text-[var(--burgundy-600)] uppercase">WAITLIST</span>
           <h3 id="waitlist-dialog-title" className="text-lg font-black text-editorial-ink">
-            รอบ {slotLabel} เต็มแล้ว
+            รอบ {slotLabel} เต็มแล้ว (Slot Full)
           </h3>
           <p id="waitlist-dialog-desc" className="text-xs text-editorial-muted font-medium leading-relaxed">
             ลงชื่อไว้ในรายการรอ — หากมีผู้ยกเลิก ระบบจะเปิดที่ว่างให้อัตโนมัติ เจ้าหน้าที่จะติดต่อกลับทางโทรศัพท์
+            <span className="block text-[11px] text-gray-400 mt-0.5">(Join the waitlist — if a spot opens up, staff will contact you via phone.)</span>
           </p>
         </div>
 
-        <div className="rounded-lg bg-[var(--bg)] border border-[var(--line)] p-3 text-xs space-y-1">
+        <div className="rounded-xl bg-[var(--bg)] border border-[var(--line)] p-3.5 text-xs space-y-1.5">
           <div className="flex justify-between gap-2">
-            <span className="text-gray-500 font-bold">ชื่อ</span>
+            <span className="text-gray-500 font-bold">ชื่อ / Name</span>
             <span className="font-black text-editorial-ink">{firstName} {lastName}</span>
           </div>
           <div className="flex justify-between gap-2">
-            <span className="text-gray-500 font-bold">เบอร์โทร</span>
+            <span className="text-gray-500 font-bold">เบอร์โทร / Phone</span>
             <span className="font-mono font-black text-editorial-ink">{phone}</span>
           </div>
         </div>
 
         {message && (
-          <div className={`p-3 rounded-lg text-xs font-bold border ${
+          <div className={`p-3 rounded-xl text-xs font-bold border ${
             message.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-700'
           }`}>
             {message.text}
@@ -772,7 +794,7 @@ function WaitlistDialog({
             disabled={loading}
             className="editorial-btn-secondary text-xs py-2 px-4"
           >
-            กลับไปก่อน
+            กลับไปก่อน / Cancel
           </button>
           <button
             type="button"
@@ -780,7 +802,7 @@ function WaitlistDialog({
             disabled={loading}
             className="editorial-btn-primary text-xs py-2 px-4"
           >
-            {loading ? 'กำลังลงชื่อ...' : 'ยืนยันเข้ารายการรอ'}
+            {loading ? 'กำลังลงชื่อ... (Joining...)' : 'ยืนยันเข้ารายการรอ / Join Waitlist'}
           </button>
         </div>
       </div>

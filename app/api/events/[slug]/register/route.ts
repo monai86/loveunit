@@ -80,6 +80,8 @@ export async function POST(
       to: (pickField<string>(reg, 'email', 'email') || '').trim(),
       firstName: pickField<string>(reg, 'firstName', 'first_name') || '',
       lastName: pickField<string>(reg, 'lastName', 'last_name') || '',
+      phone: pickField<string>(reg, 'phone', 'phone') || '',
+      faculty: pickField<string>(reg, 'faculty', 'faculty') || null,
       registrationCode: pickField<string>(reg, 'registrationCode', 'registration_code') || '',
       qrToken: pickField<string>(reg, 'qrToken', 'qr_token') || '',
       slot: regSlot ? { startAt: regSlot.startAt, endAt: regSlot.endAt, start_at: regSlot.start_at, end_at: regSlot.end_at } : null,
