@@ -497,10 +497,10 @@ export default function RegisterPage() {
                 <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-200/80 space-y-1.5 shadow-xs">
                   <div className="flex items-center gap-2 font-black text-amber-950 text-xs">
                     <Sparkles className="h-4 w-4 text-amber-600 shrink-0" />
-                    <span>🎁 สิทธิพิเศษ: 100 ท่านแรกที่ลงทะเบียน เดินทางมางาน และบริจาคโลหิตสำเร็จ จะได้รับของที่ระลึกสุดพิเศษ!</span>
+                    <span>สิทธิพิเศษ: 100 ท่านแรกที่ลงทะเบียน เช็กอินภายในรอบเวลาที่เลือก และบริจาคโลหิตสำเร็จ จะได้รับของที่ระลึกสุดพิเศษ</span>
                   </div>
                   <p className="text-[11px] text-amber-900 leading-relaxed font-medium">
-                    รอบเวลาด้านล่างเป็นการประมาณการช่วงเวลาเดินทางมาถึง เพื่อให้การหมุนเวียนคิวสะดวกรวดเร็วที่สุด
+                    โปรดเลือกช่วงเวลาที่สะดวก และมาถึงเพื่อเช็กอินภายในรอบเวลาที่ลงทะเบียนไว้
                   </p>
                 </div>
 

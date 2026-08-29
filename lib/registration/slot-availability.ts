@@ -3,7 +3,7 @@ export type SlotAvailability = {
   remainingCapacity: number;
 };
 
-/** A slot is selectable only while the server reports remaining capacity. */
-export function isTimeSlotSelectable(slot: SlotAvailability): boolean {
-  return slot.status !== 'FULL' && slot.remainingCapacity > 0;
+/** Arrival windows are guidance only; every active slot accepts registrations. */
+export function isTimeSlotSelectable(_slot: SlotAvailability): boolean {
+  return true;
 }

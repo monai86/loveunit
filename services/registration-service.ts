@@ -45,26 +45,19 @@ export async function registerDonorAtomic(input: {
         };
       }
 
-      // 2. Increment Slot Booked Count (Unlimited Capacity)
+      // 2. Validate the selected arrival window and retain a count for reports.
+      // Arrival windows intentionally have no registration capacity limit.
       if (input.slotId) {
         const slotResult = await tx.execute(
-          sql`SELECT id, capacity, booked_count FROM time_slots WHERE id = ${input.slotId} AND event_id = ${input.eventId} AND is_active = TRUE FOR UPDATE`
+          sql`SELECT id FROM time_slots WHERE id = ${input.slotId} AND event_id = ${input.eventId} AND is_active = TRUE FOR UPDATE`
         );
-        const slotRow = slotResult.rows[0] as { id: string; capacity: number; booked_count: number } | undefined;
+        const slotRow = slotResult.rows[0] as { id: string } | undefined;
 
         if (!slotRow) {
           return { success: false, errorCode: 'SLOT_NOT_FOUND', message: 'ไม่พบช่วงเวลาที่เลือก' };
         }
 
-        if (slotRow.booked_count >= slotRow.capacity) {
-          return {
-            success: false,
-            errorCode: 'SLOT_FULL',
-            message: 'ช่วงเวลานี้เพิ่งเต็ม กรุณาเลือกช่วงเวลาอื่น',
-          };
-        }
-
-        // Increment booked_count
+        // Increment booked_count for staff reporting only; it is not a limit.
         await tx
           .update(timeSlots)
           .set({ bookedCount: sql`${timeSlots.bookedCount} + 1` })

@@ -433,16 +433,8 @@ export async function registerDonorAtomic(input: {
     }
 
     const slot = defaultSlots.find(s => s.id === input.slotId);
-    if (slot) {
-      if (slot.booked_count >= slot.capacity) {
-        return {
-          success: false,
-          errorCode: 'SLOT_FULL',
-          message: 'ช่วงเวลานี้เพิ่งเต็ม กรุณาเลือกช่วงเวลาอื่น',
-        };
-      }
-      slot.booked_count += 1;
-    }
+    // Arrival windows are not capacity-limited; this count is for reporting only.
+    if (slot) slot.booked_count += 1;
 
     const nextSeq = nextRegistrationSequence(
       inMemoryRegistrations

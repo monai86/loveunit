@@ -4,7 +4,7 @@ import { getEventBySlug, getTimeSlots } from '@/services/event-service';
 import { registerDonorAtomic } from '@/services/registration-service';
 import { checkInDonor } from '@/services/checkin-service';
 import { requireStaff } from '@/lib/auth/server';
-import { getErrorMessage, pickField } from '@/lib/utils/format';
+import { getErrorMessage } from '@/lib/utils/format';
 import { ParticipantType, DonationExperience } from '@/lib/types/database';
 
 export async function POST(request: Request) {
@@ -36,8 +36,7 @@ export async function POST(request: Request) {
     const input = parseResult.data;
 
     const activeSlots = await getTimeSlots(event.id);
-    const firstAvailableSlot = activeSlots.find(s => (pickField<number>(s, 'bookedCount', 'booked_count') || 0) < s.capacity);
-    const targetSlotId = firstAvailableSlot ? firstAvailableSlot.id : (activeSlots[0]?.id || '');
+    const targetSlotId = activeSlots[0]?.id || '';
 
     const regResult = await registerDonorAtomic({
       eventId: event.id,
