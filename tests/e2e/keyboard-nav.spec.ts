@@ -10,10 +10,9 @@ import { test, expect, type Page } from '@playwright/test';
 
 
 async function loginStaff(page: Page) {
-  // Use the TEAM_LEAD account — staff-checkin.spec rotates the staff password
-  // in parallel workers, so a shared staff account would race. lead@ is only
-  // used by this spec.
-  const pw = 'Lead@MUMT2026';
+  // The CI seed provides the sole Super Admin account. This flow does not
+  // rotate its password, so parallel E2E workers can use the same stable login.
+  const pw = 'loveunit2026';
 
   // Under heavy parallel load the login click can land before React hydrates,
   // which submits the form natively (GET) and bounces back to /staff/login with
@@ -27,7 +26,7 @@ async function loginStaff(page: Page) {
     }
     const emailInput = page.locator('#staff-email');
     if (await emailInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await emailInput.fill('lead@mahidol.ac.th');
+      await emailInput.fill('monai.yut@student.mahidol.edu');
       await page.locator('#staff-password').fill(pw);
       await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
       await page.waitForURL(/(\/(staff\/change-password|staff\/checkin|admin|mt70))/, { timeout: 20_000 }).catch(() => {});

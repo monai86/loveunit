@@ -1,7 +1,7 @@
 import { test, expect, type APIRequestContext } from '@playwright/test';
 
 const ADMIN_EMAIL = 'monai.yut@student.mahidol.edu';
-const ADMIN_PASS = 'Admin@MUMT2026';
+const ADMIN_PASS = 'loveunit2026';
 const NEW_PASS = 'E2eAdminNew@2026';
 
 test.describe.configure({ mode: 'serial' });
@@ -21,15 +21,7 @@ async function login(page: import('@playwright/test').Page) {
       await emailInput.fill(ADMIN_EMAIL);
       await page.locator('#staff-password').fill(ADMIN_PASS);
       await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
-      try {
-        await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 15_000 });
-      } catch {
-        if (page.url().includes('/staff/login')) {
-          await page.locator('#staff-password').fill(NEW_PASS);
-          await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
-          await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 15_000 }).catch(() => {});
-        }
-      }
+      await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 15_000 }).catch(() => {});
     }
   }
   if (page.url().includes('/staff/change-password')) {

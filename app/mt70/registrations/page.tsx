@@ -72,6 +72,7 @@ export default function AdminRegistrationsPage() {
   const [loading, setLoading] = useState(true);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   
   // Filters
   const [filterType, setFilterType] = useState<string>('ALL');
@@ -95,10 +96,15 @@ export default function AdminRegistrationsPage() {
   }, []);
 
   useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearchQuery(searchQuery), 250);
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
-        const res = await fetch(`/api/admin/registrations?q=${encodeURIComponent(searchQuery)}`);
+        const res = await fetch(`/api/admin/registrations?q=${encodeURIComponent(debouncedSearchQuery)}`);
         const data = await res.json();
         if (res.ok && data.success) {
           setRegistrations((data.registrations || []).map(normalizeRegistration));
@@ -110,7 +116,7 @@ export default function AdminRegistrationsPage() {
       }
     }
     loadData();
-  }, [searchQuery]);
+  }, [debouncedSearchQuery]);
 
   // Client-side filtering
   const filteredList = registrations.filter(r => {

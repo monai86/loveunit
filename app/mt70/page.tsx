@@ -25,9 +25,7 @@ export const dynamic = 'force-dynamic';
 export default async function AdminDashboardPage() {
   const currentUser = await getAuthenticatedUser();
   const event = await getEventBySlug('mumt-2026');
-  const kpis = event
-    ? await getDashboardKPIs(event.id)
-    : {
+  const emptyKpis = {
         totalRegistrations: 0,
         expectedAttendance: 0,
         firstTimeDonors: 0,
@@ -44,8 +42,9 @@ export default async function AdminDashboardPage() {
         attendanceRatePercent: 0,
         slotBreakdown: [] as { slotId: string; timeLabel: string; capacity: number; bookedCount: number; checkedInCount: number }[],
       };
-
-  const allRegistrations = event ? await getAllRegistrations(event.id) : [];
+  const [kpis, allRegistrations] = event
+    ? await Promise.all([getDashboardKPIs(event.id), getAllRegistrations(event.id)])
+    : [emptyKpis, []];
   const recentRegistrations = allRegistrations.slice(0, 8);
   const totalBooked = kpis.slotBreakdown.reduce((acc, s) => acc + s.bookedCount, 0);
 

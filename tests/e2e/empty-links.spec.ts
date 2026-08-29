@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 
-const EMAIL = 'admin@mahidol.ac.th';
-const PASS = 'Admin@MUMT2026';
+const EMAIL = 'monai.yut@student.mahidol.edu';
+const PASS = 'loveunit2026';
 const NEW = 'E2eAdminNew@2026';
 
 test('find empty links on admin/registrations', async ({ page }) => {
@@ -14,15 +14,7 @@ test('find empty links on admin/registrations', async ({ page }) => {
       await emailInput.fill(EMAIL);
       await page.locator('#staff-password').fill(PASS);
       await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
-      try {
-        await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 15_000 });
-      } catch {
-        if (page.url().includes('/staff/login')) {
-          await page.locator('#staff-password').fill(NEW);
-          await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
-          await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 15_000 }).catch(() => {});
-        }
-      }
+      await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 15_000 }).catch(() => {});
     }
   }
   if (page.url().includes('/staff/change-password')) {

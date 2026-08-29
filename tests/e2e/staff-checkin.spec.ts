@@ -8,9 +8,8 @@ import { test, expect, type APIRequestContext } from '@playwright/test';
 // (after a previous run). This spec handles both, then restores the account's
 // password so it can run again.
 
-const STAFF_EMAIL = 'staff@mahidol.ac.th';
-const STAFF_PASS = 'Staff@MUMT2026';
-const NEW_PASS = 'E2eNewPass@2026';
+const STAFF_EMAIL = 'monai.yut@student.mahidol.edu';
+const STAFF_PASS = 'loveunit2026';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -26,25 +25,6 @@ async function getFirstFreeSlot(request: APIRequestContext): Promise<string> {
   const free = slots.find((s) => (s.capacity ?? 0) - (s.bookedCount ?? 0) > 0);
   expect(free, 'expected at least one free slot for the E2E test').toBeTruthy();
   return free!.id;
-}
-
-async function signIn(request: APIRequestContext, email: string, password: string): Promise<string | null> {
-  const res = await request.post('/api/auth/sign-in/email', {
-    data: { email, password },
-  });
-  if (res.status() !== 200) return null;
-  const cookie = res.headers()['set-cookie']?.split(';')[0] || '';
-  return cookie || null;
-}
-
-async function changePasswordWithCookie(request: APIRequestContext, cookie: string, currentPass: string, newPass: string) {
-  const res = await request.post('/api/auth/complete-password-change', {
-    headers: cookie ? { cookie } : {},
-    data: { currentPassword: currentPass, newPassword: newPass },
-  });
-  expect(res.status()).toBe(200);
-  const body = await res.json();
-  expect(body.success).toBe(true);
 }
 
 test('staff can search a donor and check them in', async ({ page, request }) => {
@@ -89,17 +69,7 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
           await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 4000 });
           break;
         } catch {
-          // If login with STAFF_PASS failed on a retry, attempt NEW_PASS
-          if (page.url().includes('/staff/login')) {
-            await page.locator('#staff-password').fill(NEW_PASS);
-            await page.getByRole('button', { name: /เข้าสู่ระบบ/ }).click();
-            try {
-              await page.waitForURL(/\/(staff\/change-password|staff\/checkin|admin|mt70)/, { timeout: 4000 });
-              break;
-            } catch {
-              await page.waitForTimeout(500);
-            }
-          }
+          await page.waitForTimeout(500);
         }
       }
     }
@@ -108,8 +78,8 @@ test('staff can search a donor and check them in', async ({ page, request }) => 
   if (page.url().includes('/staff/change-password')) {
     await expect(page.getByRole('heading', { name: 'ตั้งรหัสผ่านใหม่' })).toBeVisible();
     await page.getByPlaceholder('รหัสที่ระบบแจกให้ครั้งแรก').fill(STAFF_PASS);
-    await page.getByPlaceholder('อย่างน้อย 8 ตัวอักษร').first().fill(NEW_PASS);
-    await page.getByPlaceholder('พิมพ์รหัสผ่านใหม่อีกครั้ง').fill(NEW_PASS);
+    await page.getByPlaceholder('อย่างน้อย 8 ตัวอักษร').first().fill(STAFF_PASS);
+    await page.getByPlaceholder('พิมพ์รหัสผ่านใหม่อีกครั้ง').fill(STAFF_PASS);
     await page.getByRole('button', { name: 'บันทึกรหัสผ่านใหม่' }).click();
     await page.waitForURL(/\/(staff\/checkin|admin|mt70)/, { timeout: 15_000 });
   }
@@ -144,11 +114,5 @@ test.afterAll(async ({ request }) => {
     await request.post('/api/events/mumt-2026/cancel', {
       data: { registrationCode: donorCode, reason: 'E2E teardown cleanup' },
     }).catch(() => {});
-  }
-  // Restore the staff password so the next run can sign in again.
-  // If the account was forced to NEW_PASS this run, rotate back to STAFF_PASS.
-  const cookie = await signIn(request, STAFF_EMAIL, NEW_PASS);
-  if (cookie) {
-    await changePasswordWithCookie(request, cookie, NEW_PASS, STAFF_PASS);
   }
 });
