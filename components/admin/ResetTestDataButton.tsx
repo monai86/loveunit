@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Loader2, RotateCcw } from 'lucide-react';
 
-export function ResetTestDataButton() {
+export function ResetTestDataButton({ label = 'เริ่มเลข Registration Code ใหม่' }: { label?: string }) {
   const [loading, setLoading] = useState(false);
   async function reset() {
     if (!window.confirm('ล้างข้อมูลผู้บริจาคและ waitlist ทั้งหมดของกิจกรรมนี้ใช่หรือไม่?')) return;
@@ -17,5 +17,5 @@ export function ResetTestDataButton() {
     } catch { window.alert('ไม่สามารถเชื่อมต่อระบบได้'); }
     finally { setLoading(false); }
   }
-  return <button type="button" onClick={() => void reset()} disabled={loading} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-xs font-bold text-red-800 hover:bg-red-100 disabled:opacity-60">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCcw className="h-4 w-4" />}รีเซ็ตข้อมูลทดสอบ</button>;
+  return <button type="button" onClick={() => void reset()} disabled={loading} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2 text-xs font-bold text-red-800 hover:bg-red-100 disabled:opacity-60" title="ล้างข้อมูลทดสอบและเริ่ม Registration Code ใหม่ที่ 001">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCcw className="h-4 w-4" />}{label}</button>;
 }

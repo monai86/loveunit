@@ -17,6 +17,7 @@ import {
 import { Registration, TimeSlot } from '@/lib/types/database';
 import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
 import { adminRegistrationUpdateSchema } from '@/lib/validation/schemas';
+import { ResetTestDataButton } from '@/components/admin/ResetTestDataButton';
 
 interface ApiRegistration {
   id: string;
@@ -250,7 +251,8 @@ export default function AdminRegistrationsPage() {
           </h1>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {canManage && <ResetTestDataButton />}
           <a
             href="/api/admin/export"
             className="editorial-btn-primary py-2 px-3.5 text-xs flex items-center gap-2 shadow-2xs"

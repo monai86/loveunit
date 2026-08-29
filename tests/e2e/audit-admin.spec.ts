@@ -148,6 +148,13 @@ test('admin donor deletion uses an in-page confirmation dialog', async ({ page }
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
+test('super admin can find the registration code reset control on registrations', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await login(page);
+  await page.goto('/mt70/registrations');
+  await expect(page.getByRole('button', { name: 'เริ่มเลข Registration Code ใหม่' })).toBeVisible();
+});
+
 test('admin header actions share a balanced height and baseline', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await login(page);
