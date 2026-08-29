@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { registrations, checkinEvents, timeSlots } from '@/db/schema';
 import { eq, and, or, ilike, sql } from 'drizzle-orm';
-import { normalizePhoneNumber } from '@/lib/utils/format';
+import { normalizePhoneNumber, isRegistrationEligibleForSouvenir } from '@/lib/utils/format';
 import { isTransitionAllowed } from '@/lib/db/store';
 import { isMemoryBackendAllowed, searchRegistrations as memorySearch, updateRegistrationStatus as memoryUpdateStatus, cancelRegistration as memoryCancelRegistration } from '@/lib/db/store';
 import { resolveActorId } from '@/lib/auth/server';
@@ -14,7 +14,7 @@ export async function searchRegistrations(query: string) {
 
   if (db) {
     const normPhone = normalizePhoneNumber(q);
-    return await db.query.registrations.findMany({
+    const matched = await db.query.registrations.findMany({
       where: or(
         eq(registrations.qrToken, q),
         ilike(registrations.registrationCode, `%${q}%`),
@@ -28,6 +28,21 @@ export async function searchRegistrations(query: string) {
         timeSlot: true,
       },
     });
+
+    if (matched.length === 0) return [];
+
+    const eventId = matched[0].eventId;
+    const allEventRegs = await db.query.registrations.findMany({
+      where: eq(registrations.eventId, eventId),
+      with: {
+        timeSlot: true,
+      },
+    });
+
+    return matched.map((r) => ({
+      ...r,
+      souvenirEligible: isRegistrationEligibleForSouvenir(r, allEventRegs, 100),
+    }));
   }
 
   if (isMemoryBackendAllowed()) {

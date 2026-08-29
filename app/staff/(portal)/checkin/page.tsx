@@ -14,9 +14,10 @@ import {
   Zap,
   UploadCloud,
   Flashlight,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from 'lucide-react';
-import { formatTimeRange, getRegistrationStatusBadge } from '@/lib/utils/format';
+import { formatTimeRange, formatBangkokTime, getRegistrationStatusBadge } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
 import { enqueueOfflineAction } from '@/lib/pwa/offline-queue';
 
@@ -37,6 +38,8 @@ interface ApiRegistration {
   checked_in_at?: string;
   completedAt?: string;
   completed_at?: string;
+  souvenirEligible?: boolean;
+  souvenir_eligible?: boolean;
   timeSlot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
   time_slot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
 }
@@ -53,6 +56,7 @@ interface RegistrationDetail {
   status: RegistrationStatus;
   checkedInAt?: string;
   completedAt?: string;
+  souvenirEligible: boolean;
 }
 
 function mapRegistration(r: ApiRegistration): RegistrationDetail {
@@ -69,6 +73,7 @@ function mapRegistration(r: ApiRegistration): RegistrationDetail {
     status: r.status || 'REGISTERED',
     checkedInAt: r.checkedInAt || r.checked_in_at || undefined,
     completedAt: r.completedAt || r.completed_at || undefined,
+    souvenirEligible: Boolean(r.souvenirEligible ?? r.souvenir_eligible),
   };
 }
 
@@ -128,6 +133,7 @@ function playAudioChime(type: 'success' | 'souvenir' | 'error' | 'click') {
 
 export default function StaffCheckinPage() {
   const [actionLoading, setActionLoading] = useState(false);
+  const [searching, setSearching] = useState(false);
   const [registration, setRegistration] = useState<RegistrationDetail | null>(null);
 
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; text: string } | null>(null);
@@ -159,6 +165,7 @@ export default function StaffCheckinPage() {
 
     if (busyRef.current) return;
     busyRef.current = true;
+    setSearching(true);
     setMessage(null);
 
     // Tactile haptic vibration
@@ -199,16 +206,20 @@ export default function StaffCheckinPage() {
             text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (รอเช็คอิน) — กรุณากดยืนยันเช็คอินเข้างาน`,
           });
         } else if (found.status === 'CHECKED_IN') {
-          if (soundEnabled) playAudioChime('click');
+          if (soundEnabled) playAudioChime(found.souvenirEligible ? 'souvenir' : 'click');
           setMessage({
             type: 'info',
-            text: `สแกนพบ คุณ${found.firstName} ${found.lastName} (เช็คอินแล้ว) — เมื่อบริจาคโลหิตเสร็จสิ้น กดปุ่มรับของที่ระลึกได้`,
+            text: found.souvenirEligible
+              ? `สแกนพบ คุณ${found.firstName} ${found.lastName} (เช็คอินแล้ว) — ได้รับของที่ระลึก 🎁`
+              : `สแกนพบ คุณ${found.firstName} ${found.lastName} (เช็คอินแล้ว)`,
           });
         } else if (found.status === 'COMPLETED') {
           if (soundEnabled) playAudioChime('souvenir');
           setMessage({
             type: 'success',
-            text: `คุณ${found.firstName} ${found.lastName} ได้บริจาคโลหิตและรับของที่ระลึกเรียบร้อยแล้ว ✨`,
+            text: found.souvenirEligible
+              ? `คุณ${found.firstName} ${found.lastName} ได้บริจาคโลหิตและรับของที่ระลึกเรียบร้อยแล้ว ✨`
+              : `คุณ${found.firstName} ${found.lastName} ได้บริจาคโลหิตเรียบร้อยแล้ว ✨`,
           });
         }
       } else {
@@ -220,6 +231,7 @@ export default function StaffCheckinPage() {
       setMessage({ type: 'error', text: 'เกิดข้อผิดพลาดในการค้นหาข้อมูลจาก QR Code' });
     } finally {
       busyRef.current = false;
+      setSearching(false);
     }
   }, [fastTrackMode, soundEnabled]);
 
@@ -449,7 +461,9 @@ export default function StaffCheckinPage() {
         }
         if (targetStatus === 'COMPLETED') {
           if (soundEnabled) playAudioChime('souvenir');
-          successText = `🎁 บันทึกการบริจาคโลหิตสำเร็จ และมอบของที่ระลึกให้ คุณ${registration.firstName} เรียบร้อยแล้ว ✨`;
+          successText = registration.souvenirEligible
+            ? `🎁 บันทึกการบริจาคโลหิตสำเร็จ และมอบของที่ระลึกให้ คุณ${registration.firstName} เรียบร้อยแล้ว ✨`
+            : `✅ บันทึกการบริจาคโลหิตสำเร็จ คุณ${registration.firstName} เรียบร้อยแล้ว ✨`;
         }
         if (targetStatus === 'CANCELLED') {
           if (soundEnabled) playAudioChime('error');
@@ -553,21 +567,45 @@ export default function StaffCheckinPage() {
         </div>
       </header>
 
-      {scanning && <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-8" aria-hidden="true">
-        <div className="relative aspect-square w-[min(72vw,22rem)] rounded-[2rem] border-2 border-emerald-300/95 shadow-[0_0_0_9999px_rgba(0,0,0,0.18)]">
-          <span className="absolute -left-1 -top-1 h-10 w-10 rounded-tl-2xl border-l-4 border-t-4 border-emerald-300" />
-          <span className="absolute -right-1 -top-1 h-10 w-10 rounded-tr-2xl border-r-4 border-t-4 border-emerald-300" />
-          <span className="absolute -bottom-1 -left-1 h-10 w-10 rounded-bl-2xl border-b-4 border-l-4 border-emerald-300" />
-          <span className="absolute -bottom-1 -right-1 h-10 w-10 rounded-br-2xl border-b-4 border-r-4 border-emerald-300" />
-          <span className="absolute inset-x-4 top-1/2 h-0.5 bg-emerald-300 shadow-[0_0_16px_#6ee7b7]" />
+      {/* Viewfinder with Animated Laser Scanner */}
+      {scanning && (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-8" aria-hidden="true">
+          <div className="relative aspect-square w-[min(72vw,22rem)] rounded-[2rem] border-2 border-emerald-300/95 shadow-[0_0_0_9999px_rgba(0,0,0,0.22)] overflow-hidden">
+            <span className="absolute -left-1 -top-1 h-10 w-10 rounded-tl-2xl border-l-4 border-t-4 border-emerald-300 z-10" />
+            <span className="absolute -right-1 -top-1 h-10 w-10 rounded-tr-2xl border-r-4 border-t-4 border-emerald-300 z-10" />
+            <span className="absolute -bottom-1 -left-1 h-10 w-10 rounded-bl-2xl border-b-4 border-l-4 border-emerald-300 z-10" />
+            <span className="absolute -bottom-1 -right-1 h-10 w-10 rounded-br-2xl border-b-4 border-r-4 border-emerald-300 z-10" />
+            
+            {/* Pulsing Scan Beam */}
+            <div className="absolute inset-x-2 h-1 bg-gradient-to-r from-transparent via-emerald-300 to-transparent shadow-[0_0_16px_#6ee7b7] animate-pulse top-1/2" />
+            <div className="absolute inset-0 bg-emerald-500/5" />
+          </div>
         </div>
-      </div>}
+      )}
 
-      {!scanning && <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-8 text-center">
-        <div className="rounded-full bg-white/10 p-5 text-emerald-200 backdrop-blur-sm"><Camera className="h-10 w-10" /></div>
-        <div><p className="text-xl font-black">พร้อมเปิดกล้อง</p><p className="mt-1 text-sm text-white/75">อนุญาตการเข้าถึงกล้องเพื่อเริ่มสแกน QR</p></div>
-        <button type="button" onClick={() => void startScanner('environment')} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-emerald-400 px-5 text-sm font-black text-emerald-950 shadow-lg"><Camera className="h-5 w-5" />เปิดกล้อง</button>
-      </div>}
+      {!scanning && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-8 text-center">
+          <div className="rounded-full bg-white/10 p-5 text-emerald-200 backdrop-blur-sm"><Camera className="h-10 w-10" /></div>
+          <div><p className="text-xl font-black">พร้อมเปิดกล้อง</p><p className="mt-1 text-sm text-white/75">อนุญาตการเข้าถึงกล้องเพื่อเริ่มสแกน QR</p></div>
+          <button type="button" onClick={() => void startScanner('environment')} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-emerald-400 px-5 text-sm font-black text-emerald-950 shadow-lg"><Camera className="h-5 w-5" />เปิดกล้อง</button>
+        </div>
+      )}
+
+      {/* Searching / Processing Overlay (Instant Visual Feedback) */}
+      {searching && (
+        <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm px-6 transition-all">
+          <div className="flex flex-col items-center rounded-3xl bg-[#07111f]/95 border border-emerald-500/30 p-6 text-center shadow-2xl max-w-xs w-full">
+            <div className="relative mb-3 flex h-14 w-14 items-center justify-center">
+              <div className="absolute h-14 w-14 animate-ping rounded-full bg-emerald-400/20" />
+              <div className="h-10 w-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-300">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            </div>
+            <p className="text-base font-black text-white">⚡ กำลังตรวจสอบ QR Code...</p>
+            <p className="mt-1 text-xs font-medium text-emerald-200/80">ระบบกำลังประมวลผลข้อมูล</p>
+          </div>
+        </div>
+      )}
 
       <div className="absolute inset-x-0 bottom-0 z-20 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
         <div className="mx-auto flex max-w-md items-center justify-center gap-3">
@@ -578,16 +616,114 @@ export default function StaffCheckinPage() {
         </div>
       </div>
 
-      {message && <div role="status" className={`absolute inset-x-4 bottom-24 z-30 mx-auto max-w-md rounded-2xl border px-4 py-3 text-center text-sm font-bold shadow-xl ${message.type === 'error' ? 'border-red-300 bg-red-50 text-red-800' : message.type === 'warning' ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-emerald-300 bg-emerald-50 text-emerald-900'}`}>{message.text}</div>}
+      {message && (
+        <div role="status" className={`absolute inset-x-4 bottom-24 z-30 mx-auto max-w-md rounded-2xl border px-4 py-3 text-center text-sm font-bold shadow-xl ${message.type === 'error' ? 'border-red-300 bg-red-50 text-red-800' : message.type === 'warning' ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-emerald-300 bg-emerald-50 text-emerald-900'}`}>
+          {message.text}
+        </div>
+      )}
 
-      {registration && <section aria-live="polite" className="absolute inset-x-4 bottom-24 z-30 mx-auto max-w-md rounded-3xl bg-white p-4 text-[var(--ink)] shadow-2xl">
-        <div className="flex items-start justify-between gap-3"><div><span className="font-mono text-xs font-bold text-[var(--burgundy-700)]">{registration.registrationCode}</span><h2 className="mt-1 text-lg font-black">คุณ{registration.firstName} {registration.lastName}</h2></div><span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold ${getRegistrationStatusBadge(registration.status).colorClass}`}>{getRegistrationStatusBadge(registration.status).label}</span></div>
-        {registration.status === 'REGISTERED' && <button type="button" disabled={actionLoading} onClick={() => void handleStatusChange('CHECKED_IN')} className="mt-4 min-h-12 w-full rounded-xl bg-blue-700 px-4 text-sm font-black text-white disabled:opacity-50"><UserCheck className="mr-2 inline h-5 w-5" />ยืนยันเช็คอิน</button>}
-        {registration.status === 'CHECKED_IN' && <button type="button" disabled={actionLoading} onClick={() => void handleStatusChange('COMPLETED')} className="mt-4 min-h-12 w-full rounded-xl bg-emerald-700 px-4 text-sm font-black text-white disabled:opacity-50"><Gift className="mr-2 inline h-5 w-5" />บันทึกบริจาคสำเร็จ</button>}
-        {registration.status === 'COMPLETED' && <div className="mt-4 rounded-xl bg-emerald-50 p-3 text-center text-sm font-bold text-emerald-900"><CheckCircle2 className="mr-2 inline h-5 w-5" />ดำเนินการเรียบร้อยแล้ว</div>}
-        <button type="button" onClick={() => setRegistration(null)} className="mt-2 min-h-11 w-full text-xs font-bold text-[var(--muted)]">สแกนคนถัดไป</button>
-      </section>}
+      {/* Registration Result Card */}
+      {registration && (
+        <section aria-live="polite" className="absolute inset-x-4 bottom-20 z-30 mx-auto max-w-md rounded-3xl bg-white p-5 text-[var(--ink)] shadow-2xl border border-gray-100">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <span className="font-mono text-xs font-bold text-[var(--burgundy-700)] bg-[var(--burgundy-50)] px-2 py-0.5 rounded">
+                {registration.registrationCode}
+              </span>
+              <h2 className="mt-1.5 text-lg font-black text-gray-900">
+                คุณ{registration.firstName} {registration.lastName}
+              </h2>
+            </div>
+            <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold shrink-0 ${getRegistrationStatusBadge(registration.status).colorClass}`}>
+              {getRegistrationStatusBadge(registration.status).label}
+            </span>
+          </div>
+
+          {/* Time and Check-in Info */}
+          <div className="mt-3.5 space-y-1.5 rounded-2xl bg-gray-50 p-3 text-xs text-gray-700 border border-gray-100">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500 font-medium">🕒 รอบที่ลงทะเบียน:</span>
+              <span className="font-bold text-gray-900">{registration.timeSlotText}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500 font-medium">📍 เวลาเช็คอิน:</span>
+              <span className={`font-bold ${registration.checkedInAt ? 'text-blue-700' : 'text-gray-500'}`}>
+                {registration.checkedInAt
+                  ? formatBangkokTime(registration.checkedInAt)
+                  : registration.status === 'COMPLETED'
+                  ? 'เช็คอินแล้ว'
+                  : 'ยังไม่ได้เช็คอิน'}
+              </span>
+            </div>
+          </div>
+
+          {/* Souvenir Badge: ONLY when eligible, NO rejection text when not eligible */}
+          {registration.souvenirEligible && (
+            <div className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-2.5 text-emerald-900 shadow-sm">
+              <Gift className="h-5 w-5 text-emerald-600 shrink-0" />
+              <span className="text-sm font-black tracking-wide">ได้รับของที่ระลึก 🎁</span>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="mt-4 space-y-2">
+            {registration.status === 'REGISTERED' && (
+              <button
+                type="button"
+                disabled={actionLoading}
+                onClick={() => void handleStatusChange('CHECKED_IN')}
+                className="min-h-12 w-full rounded-xl bg-blue-700 hover:bg-blue-800 px-4 text-sm font-black text-white shadow-md transition active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {actionLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <UserCheck className="h-5 w-5" />}
+                ยืนยันเช็คอิน
+              </button>
+            )}
+
+            {registration.status === 'CHECKED_IN' && (
+              <button
+                type="button"
+                disabled={actionLoading}
+                onClick={() => void handleStatusChange('COMPLETED')}
+                className={`min-h-12 w-full rounded-xl px-4 text-sm font-black text-white shadow-md transition active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 ${
+                  registration.souvenirEligible
+                    ? 'bg-emerald-700 hover:bg-emerald-800'
+                    : 'bg-emerald-600 hover:bg-emerald-700'
+                }`}
+              >
+                {actionLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : registration.souvenirEligible ? (
+                  <Gift className="h-5 w-5" />
+                ) : (
+                  <CheckCircle2 className="h-5 w-5" />
+                )}
+                {registration.souvenirEligible
+                  ? 'บันทึกบริจาคสำเร็จ & มอบของที่ระลึก'
+                  : 'บันทึกบริจาคสำเร็จ'}
+              </button>
+            )}
+
+            {registration.status === 'COMPLETED' && (
+              <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-center text-sm font-bold text-emerald-900 flex items-center justify-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
+                <span>
+                  {registration.souvenirEligible
+                    ? 'บริจาคสำเร็จและมอบของที่ระลึกแล้ว ✨'
+                    : 'บริจาคโลหิตสำเร็จเรียบร้อยแล้ว ✨'}
+                </span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setRegistration(null)}
+              className="min-h-10 w-full text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)] transition"
+            >
+              สแกนคนถัดไป
+            </button>
+          </div>
+        </section>
+      )}
     </main>
   );
-
 }

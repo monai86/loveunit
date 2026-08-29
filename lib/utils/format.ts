@@ -124,6 +124,121 @@ export function formatTimeRange(startIso: string, endIso: string): string {
 }
 
 /**
+ * Formats a Date object or ISO string into HH:MM น. in Bangkok timezone.
+ * e.g., "09:15 น."
+ */
+export function formatBangkokTime(dateInput?: string | Date | null): string {
+  if (!dateInput) return '';
+  const d = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  if (isNaN(d.getTime())) return '';
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Bangkok',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d);
+  const hours = parts.find((p) => p.type === 'hour')?.value || '00';
+  const mins = parts.find((p) => p.type === 'minute')?.value || '00';
+  return `${hours}:${mins} น.`;
+}
+
+/**
+ * Checks whether a registration is on-time based on check-in time and time slot end time.
+ * Strict rule: Must check in before or at the time slot's endAt.
+ */
+export function isCheckinOnTime(checkedInAt?: string | Date | null, slotEndAt?: string | Date | null): boolean {
+  if (!checkedInAt || !slotEndAt) return false;
+  const checkinTime = typeof checkedInAt === 'string' ? new Date(checkedInAt).getTime() : checkedInAt.getTime();
+  const endTime = typeof slotEndAt === 'string' ? new Date(slotEndAt).getTime() : slotEndAt.getTime();
+  if (isNaN(checkinTime) || isNaN(endTime)) return false;
+  return checkinTime <= endTime;
+}
+
+export interface SouvenirCandidate {
+  id: string;
+  registrationCode?: string;
+  registration_code?: string;
+  source?: string;
+  status?: string;
+  checkedInAt?: string | Date | null;
+  checked_in_at?: string | Date | null;
+  slotEndAt?: string | Date | null;
+  slot_end_at?: string | Date | null;
+  timeSlot?: { endAt?: string | Date; end_at?: string | Date } | null;
+  time_slot?: { endAt?: string | Date; end_at?: string | Date } | null;
+}
+
+/**
+ * Evaluates whether a given registration is eligible for the souvenir (default quota: 100).
+ * Rule:
+ * 1. source === 'ONLINE' (registered online)
+ * 2. status !== 'CANCELLED'
+ * 3. Checked in on-time (checkedInAt <= slot.endAt) or if not yet checked in, slot end time has not passed yet.
+ * 4. Ranked in top 100 on-time online registrations by sequence code.
+ */
+export function isRegistrationEligibleForSouvenir(
+  targetReg: SouvenirCandidate,
+  allCandidates: SouvenirCandidate[],
+  quotaLimit = 100
+): boolean {
+  const getCode = (r: SouvenirCandidate) => r.registrationCode || r.registration_code || '';
+  const getSource = (r: SouvenirCandidate) => r.source || 'ONLINE';
+  const getStatus = (r: SouvenirCandidate) => r.status || 'REGISTERED';
+  const getCheckin = (r: SouvenirCandidate) => r.checkedInAt || r.checked_in_at || null;
+  const getSlotEnd = (r: SouvenirCandidate): string | Date | null => {
+    if (r.slotEndAt) return r.slotEndAt;
+    if (r.slot_end_at) return r.slot_end_at;
+    const slot = r.timeSlot || r.time_slot;
+    return slot ? (slot.endAt || slot.end_at || null) : null;
+  };
+
+  const isEligibleCandidate = (r: SouvenirCandidate): boolean => {
+    const status = getStatus(r);
+    if (status === 'CANCELLED') return false;
+    const source = getSource(r);
+    if (source !== 'ONLINE') return false;
+
+    const checkin = getCheckin(r);
+    const slotEnd = getSlotEnd(r);
+
+    if (checkin) {
+      if (!slotEnd) return true; // If no slot specified, default on-time
+      return isCheckinOnTime(checkin, slotEnd);
+    }
+
+    if (status === 'COMPLETED' || status === 'IN_PROCESS' || status === 'CHECKED_IN') {
+      return true;
+    }
+
+    // If not checked in yet and status is REGISTERED:
+    if (status === 'REGISTERED') {
+      if (!slotEnd) return true;
+      // If slot end has already passed and they haven't checked in, they missed their slot
+      return Date.now() <= new Date(slotEnd).getTime();
+    }
+
+    return false;
+  };
+
+  if (!isEligibleCandidate(targetReg)) {
+    return false;
+  }
+
+  // Filter all candidates that are eligible, sort by queue number or sequence
+  const eligibleList = allCandidates.filter(isEligibleCandidate);
+  eligibleList.sort((a, b) => {
+    const seqA = extractQueueNumber(getCode(a)) ?? 999999;
+    const seqB = extractQueueNumber(getCode(b)) ?? 999999;
+    return seqA - seqB;
+  });
+
+  const targetIndex = eligibleList.findIndex((r) => r.id === targetReg.id);
+  if (targetIndex === -1) return false;
+
+  return targetIndex < quotaLimit;
+}
+
+/**
  * Readable labels in Thai
  */
 export function getParticipantTypeLabel(type: ParticipantType): string {

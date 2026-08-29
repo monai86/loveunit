@@ -15,7 +15,7 @@ import {
   StaffProfile,
   StaffRole
 } from '@/lib/types/database';
-import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence } from '@/lib/utils/format';
+import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence, isRegistrationEligibleForSouvenir } from '@/lib/utils/format';
 
 // Collision-safe id generator for in-memory records. Date.now() alone collides
 // when several records are created within the same millisecond (fast machines
@@ -500,20 +500,34 @@ export async function getRegistrationByQRToken(token: string): Promise<Registrat
   throw new Error('Database connection unconfigured in production environment.');
 }
 
-export async function searchRegistrations(query: string): Promise<Registration[]> {
+export async function searchRegistrations(query: string): Promise<(Registration & { souvenirEligible?: boolean })[]> {
   const q = query.trim().toLowerCase();
   if (!q) return [];
 
   if (isMemoryBackendAllowed()) {
     const normPhone = normalizePhoneNumber(q);
-    return inMemoryRegistrations.filter(r => 
-      q === ' ' ||
-      r.registration_code.toLowerCase().includes(q) ||
-      r.first_name.toLowerCase().includes(q) ||
-      r.last_name.toLowerCase().includes(q) ||
-      r.phone.includes(q) ||
-      (normPhone.length >= 4 && r.phone_normalized.includes(normPhone))
-    ).map(r => ({ ...r, time_slot: defaultSlots.find(s => s.id === r.slot_id) || null }));
+    const allCandidates = inMemoryRegistrations.map((r) => ({
+      ...r,
+      time_slot: defaultSlots.find((s) => s.id === r.slot_id) || null,
+    }));
+
+    return inMemoryRegistrations
+      .filter(
+        (r) =>
+          q === ' ' ||
+          r.qr_token === query.trim() ||
+          r.registration_code.toLowerCase().includes(q) ||
+          r.first_name.toLowerCase().includes(q) ||
+          r.last_name.toLowerCase().includes(q) ||
+          r.phone.includes(q) ||
+          (normPhone.length >= 4 && r.phone_normalized.includes(normPhone))
+      )
+      .map((r) => {
+        const slot = defaultSlots.find((s) => s.id === r.slot_id) || null;
+        const candidate = { ...r, time_slot: slot };
+        const souvenirEligible = isRegistrationEligibleForSouvenir(candidate, allCandidates, 100);
+        return { ...candidate, souvenirEligible };
+      });
   }
 
   throw new Error('Database connection unconfigured in production environment.');
