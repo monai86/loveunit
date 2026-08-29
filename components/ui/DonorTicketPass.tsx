@@ -15,13 +15,12 @@ import {
   Copy,
   Download,
   Droplets,
-  Heart,
   MapPin,
   Moon,
   Phone,
   ShieldCheck,
-  Sparkles,
   User,
+  Utensils,
 } from "lucide-react";
 
 export interface DonorTicketPassProps {
@@ -72,9 +71,9 @@ export function DonorTicketPass({
       const context = canvas.getContext("2d");
       if (!context) return;
       const scale = 2;
-      const width = 520 * scale;
-      const height = 760 * scale;
-      const inset = 24 * scale;
+      const width = 540 * scale;
+      const height = 780 * scale;
+      const inset = 20 * scale;
       canvas.width = width;
       canvas.height = height;
 
@@ -86,58 +85,96 @@ export function DonorTicketPass({
       context.fillStyle = "#FFFFFF";
       context.fillRect(inset, inset, width - inset * 2, height - inset * 2);
       context.strokeStyle = "#E8DCD8";
-      context.lineWidth = scale;
+      context.lineWidth = 1.5 * scale;
       context.strokeRect(inset, inset, width - inset * 2, height - inset * 2);
 
       // Red Gradient Header
-      const headerHeight = 135 * scale;
+      const headerHeight = 125 * scale;
       const grad = context.createLinearGradient(inset, inset, width - inset, inset + headerHeight);
-      grad.addColorStop(0, "#9C1528");
+      grad.addColorStop(0, "#7E0E1D");
       grad.addColorStop(0.5, "#6E101E");
-      grad.addColorStop(1, "#38060F");
+      grad.addColorStop(1, "#560D19");
       context.fillStyle = grad;
       context.fillRect(inset, inset, width - inset * 2, headerHeight);
 
-      // Header Text
-      context.fillStyle = "#FDF6F1";
-      context.textAlign = "left";
-      context.font = `700 ${13 * scale}px sans-serif`;
-      context.fillText("MUMT LoveUnit ครั้งที่ 9 (9th Edition)", inset + 24 * scale, inset + 36 * scale);
-
-      context.font = `800 ${22 * scale}px sans-serif`;
-      context.fillText("ตั๋วลงทะเบียนบริจาคโลหิต", inset + 24 * scale, inset + 70 * scale);
-
+      // Header Text (Symmetrical & Editorial)
       context.fillStyle = "#EFDCD6";
-      context.font = `600 ${12 * scale}px sans-serif`;
-      context.fillText("Blood Donor Official Digital Pass ❤️", inset + 24 * scale, inset + 98 * scale);
+      context.textAlign = "left";
+      context.font = `700 ${11 * scale}px sans-serif`;
+      context.fillText("MUMT BLOOD DONATION 2026 · คณะเทคนิคการแพทย์ ม.มหิดล", inset + 24 * scale, inset + 32 * scale);
+
+      context.fillStyle = "#FFFFFF";
+      context.font = `800 ${22 * scale}px sans-serif`;
+      context.fillText("ตั๋วลงทะเบียนบริจาคโลหิต", inset + 24 * scale, inset + 66 * scale);
+
+      context.fillStyle = "#FBE9EC";
+      context.font = `700 ${11 * scale}px sans-serif`;
+      context.fillText("OFFICIAL BLOOD DONOR DIGITAL PASS", inset + 24 * scale, inset + 92 * scale);
 
       // Registration Number Box
+      const contentWidth = width - inset * 2 - 48 * scale;
       const x = inset + 24 * scale;
-      let y = inset + headerHeight + 36 * scale;
+      let y = inset + headerHeight + 32 * scale;
+
+      context.fillStyle = "#FFF5F6";
+      context.fillRect(x, y - 16 * scale, contentWidth, 68 * scale);
+      context.strokeStyle = "#F1D3D9";
+      context.lineWidth = 1 * scale;
+      context.strokeRect(x, y - 16 * scale, contentWidth, 68 * scale);
 
       context.fillStyle = "#6E101E";
-      context.font = `800 ${11 * scale}px sans-serif`;
-      context.fillText("หมายเลขลงทะเบียน / REGISTRATION NO.", x, y);
+      context.font = `800 ${10 * scale}px sans-serif`;
+      context.fillText("หมายเลขลงทะเบียน / REGISTRATION NO.", x + 16 * scale, y + 6 * scale);
 
-      context.font = `800 ${28 * scale}px monospace`;
-      context.fillText(registrationCode, x, y + 32 * scale);
+      context.font = `900 ${26 * scale}px monospace`;
+      context.fillText(registrationCode, x + 16 * scale, y + 36 * scale);
 
-      // Appointment Details
-      y += 82 * scale;
+      // Symmetrical 2-Column Appointment Details
+      y += 84 * scale;
       context.fillStyle = "#241B1D";
-      context.font = `600 ${12 * scale}px sans-serif`;
-      const detailsList = [
-        `ผู้ลงทะเบียน / Donor Name:  ${name}`,
-        `วันจัดงาน / Date:  ${date}`,
-        `เวลามาถึง / Time:  ${timeSlot}`,
-        `สถานที่ / Venue:  ${venue}`,
-      ];
-      detailsList.forEach((detail) => {
-        context.fillText(detail.slice(0, 56), x, y);
-        y += 26 * scale;
-      });
+      context.font = `600 ${11.5 * scale}px sans-serif`;
 
-      // QR Code
+      const col1X = x;
+      const col2X = x + (contentWidth / 2) + 8 * scale;
+
+      // Row 1
+      context.fillStyle = "#7A6E71";
+      context.font = `700 ${9.5 * scale}px sans-serif`;
+      context.fillText("ผู้ลงทะเบียน / DONOR NAME", col1X, y);
+      context.fillText("วันจัดกิจกรรม / EVENT DATE", col2X, y);
+
+      context.fillStyle = "#241B1D";
+      context.font = `700 ${12 * scale}px sans-serif`;
+      context.fillText(name.slice(0, 24), col1X, y + 18 * scale);
+      context.fillText(date.slice(0, 24), col2X, y + 18 * scale);
+
+      // Row 2
+      y += 42 * scale;
+      context.fillStyle = "#7A6E71";
+      context.font = `700 ${9.5 * scale}px sans-serif`;
+      context.fillText("รอบเวลาที่นัดหมาย / TIME SLOT", col1X, y);
+      context.fillText("สถานที่จัดกิจกรรม / VENUE", col2X, y);
+
+      context.fillStyle = "#6E101E";
+      context.font = `800 ${12 * scale}px sans-serif`;
+      context.fillText(timeSlot, col1X, y + 18 * scale);
+      context.fillStyle = "#241B1D";
+      context.font = `600 ${11 * scale}px sans-serif`;
+      context.fillText(venue.slice(0, 28), col2X, y + 18 * scale);
+
+      // Row 3
+      y += 42 * scale;
+      context.fillStyle = "#7A6E71";
+      context.font = `700 ${9.5 * scale}px sans-serif`;
+      context.fillText("เบอร์โทรศัพท์ / PHONE", col1X, y);
+      context.fillText("คณะ / สังกัด / FACULTY", col2X, y);
+
+      context.fillStyle = "#241B1D";
+      context.font = `600 ${11.5 * scale}px sans-serif`;
+      context.fillText(phone || "—", col1X, y + 18 * scale);
+      context.fillText((faculty || "บุคคลทั่วไป").slice(0, 28), col2X, y + 18 * scale);
+
+      // QR Code Box (Centered)
       const svg = qrRef.current?.querySelector("svg");
       if (svg) {
         const blobUrl = URL.createObjectURL(
@@ -148,13 +185,13 @@ export function DonorTicketPass({
         const image = new window.Image();
         await new Promise<void>((resolve) => {
           image.onload = () => {
-            const size = 150 * scale;
+            const size = 140 * scale;
             const qrX = (width - size) / 2;
-            const qrY = height - inset - size - 62 * scale;
+            const qrY = height - inset - size - 64 * scale;
             context.fillStyle = "#FFFFFF";
             context.fillRect(qrX - 10 * scale, qrY - 10 * scale, size + 20 * scale, size + 20 * scale);
-            context.strokeStyle = "#F1D3D9";
-            context.lineWidth = 2 * scale;
+            context.strokeStyle = "#E8DCD8";
+            context.lineWidth = 1.5 * scale;
             context.strokeRect(qrX - 10 * scale, qrY - 10 * scale, size + 20 * scale, size + 20 * scale);
             context.drawImage(image, qrX, qrY, size, size);
             URL.revokeObjectURL(blobUrl);
@@ -164,14 +201,14 @@ export function DonorTicketPass({
         });
       }
 
-      // Footer note
+      // Footer note (Symmetrical)
       context.fillStyle = "#5F5558";
       context.textAlign = "center";
-      context.font = `600 ${10 * scale}px sans-serif`;
+      context.font = `600 ${9.5 * scale}px sans-serif`;
       context.fillText(
-        "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน (Please present this QR upon arrival)",
+        "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน (Please present this QR at the venue)",
         width / 2,
-        height - inset - 22 * scale,
+        height - inset - 24 * scale,
       );
 
       const link = document.createElement("a");
@@ -185,83 +222,68 @@ export function DonorTicketPass({
     }
   };
 
-  const details = [
-    { label: "ผู้ลงทะเบียน", enLabel: "Donor Name", value: name, icon: User },
-    { label: "วันจัดกิจกรรม", enLabel: "Event Date", value: date, icon: Calendar },
-    { label: "เวลามาถึง", enLabel: "Time Slot", value: timeSlot, icon: Clock, highlight: true },
-    { label: "สถานที่", enLabel: "Venue", value: venue, icon: MapPin },
-    ...(phone ? [{ label: "เบอร์โทรศัพท์", enLabel: "Phone Number", value: phone, icon: Phone }] : []),
-    ...(faculty
-      ? [{ label: "คณะ / สังกัด", enLabel: "Faculty / Org", value: faculty, icon: Building2 }]
-      : []),
-  ];
-
   return (
     <div className="mx-auto w-full max-w-xl space-y-6">
-      {/* Main Ticket Card */}
+      {/* Symmetrical Boarding Pass Card */}
       <article
         data-testid="donor-ticket"
-        className="relative overflow-hidden rounded-3xl border border-[var(--line)] bg-white shadow-xl shadow-[var(--burgundy-950)]/5 transition-all"
+        className="relative overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-xl shadow-[var(--burgundy-950)]/8 transition-all"
       >
-        {/* Playful Red Gradient Header */}
-        <header className="relative overflow-hidden bg-gradient-to-br from-[#9C1528] via-[#6E101E] to-[#38060F] px-6 py-6 text-[var(--cream)] sm:px-8 sm:py-7">
-          {/* Subtle background glow effect */}
-          <div className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-rose-400/20 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-6 left-1/3 h-28 w-28 rounded-full bg-red-500/15 blur-xl" />
-
-          <div className="relative flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/10 p-2 backdrop-blur-md ring-1 ring-white/20 shadow-inner">
+        {/* Editorial Crimson Header */}
+        <header className="relative bg-gradient-to-r from-[#7E0E1D] via-[#6E101E] to-[#560D19] px-6 py-6 text-[var(--cream)] sm:px-8">
+          <div className="flex items-center justify-between gap-4 border-b border-white/15 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white p-1 shadow-sm">
                 <Image
                   src="/images/logo.png"
-                  alt="MUMT LoveUnit"
-                  width={36}
-                  height={36}
-                  className="h-8 w-8 rounded-full object-contain"
+                  alt="MUMT Logo"
+                  width={32}
+                  height={32}
+                  className="h-7 w-7 rounded-full object-contain"
                 />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-xs font-bold text-[var(--cream-dim)] flex items-center gap-1">
-                    <span>MUMT LoveUnit ครั้งที่ 9</span>
-                    <span className="text-[10px] opacity-75">(9th Edition)</span>
-                  </p>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/25 px-2 py-0.5 text-[10px] font-extrabold text-white ring-1 ring-white/20">
-                    <Sparkles className="h-2.5 w-2.5" />
-                    Hero Pass
-                  </span>
-                </div>
-                <h2 className="mt-1 text-xl font-black tracking-tight text-white sm:text-2xl font-display">
-                  ตั๋วลงทะเบียนบริจาคโลหิต
-                </h2>
-                <p className="text-xs font-medium text-[var(--cream-dim)]">
-                  Official Blood Donor Pass ❤️
+                <p className="text-[11px] font-extrabold tracking-wider text-[var(--cream-dim)] uppercase">
+                  MUMT LoveUnit ครั้งที่ 9
+                </p>
+                <p className="text-[11px] text-white/80 font-medium">
+                  คณะเทคนิคการแพทย์ ม.มหิดล
                 </p>
               </div>
             </div>
 
             {isConfirmed && (
-              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/20 px-3 py-1 text-xs font-bold text-emerald-200 backdrop-blur-sm">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-100 backdrop-blur-xs">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
-                <span>ยืนยันแล้ว / Confirmed</span>
+                <span>ยืนยันสิทธิ์แล้ว / Confirmed</span>
               </span>
             )}
           </div>
+
+          <div className="mt-4">
+            <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl font-display">
+              ตั๋วลงทะเบียนบริจาคโลหิต
+            </h2>
+            <p className="text-[11px] font-semibold tracking-wider text-[var(--cream-dim)] uppercase mt-0.5">
+              Official Blood Donation Pass
+            </p>
+          </div>
         </header>
 
-        {/* Ticket Perforation Notch Decorator */}
-        <div className="relative flex items-center justify-between px-4 bg-white">
-          <div className="-ml-7 h-5 w-5 rounded-full bg-[var(--bg)] border-r border-[var(--line)]" />
+        {/* Crisp Symmetrical Perforation Line with Ticket Notches */}
+        <div className="relative flex items-center justify-between px-3 bg-white">
+          <div className="-ml-6 h-6 w-6 rounded-full bg-[var(--bg)] border-r border-[var(--line)] shadow-inner" />
           <div className="flex-1 border-b-2 border-dashed border-[var(--line)] mx-2" />
-          <div className="-mr-7 h-5 w-5 rounded-full bg-[var(--bg)] border-l border-[var(--line)]" />
+          <div className="-mr-6 h-6 w-6 rounded-full bg-[var(--bg)] border-l border-[var(--line)] shadow-inner" />
         </div>
 
-        {/* Card Body */}
+        {/* Ticket Body */}
         <div className="px-6 py-6 sm:px-8 space-y-6">
-          {/* Registration Code Showcase */}
-          <div className="rounded-2xl border border-[var(--rose-100)] bg-gradient-to-br from-[#FFF5F6] to-white p-5 shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
+          
+          {/* Symmetrical Registration Code Block */}
+          <div className="rounded-xl border border-[var(--rose-100)] bg-[#FFF8F9] p-4 sm:p-5">
+            <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
+              <div className="text-center sm:text-left">
                 <p className="text-xs font-black tracking-wider text-[var(--burgundy-700)] uppercase">
                   หมายเลขลงทะเบียน <span className="text-[10px] font-bold text-[var(--muted)]">/ Registration No.</span>
                 </p>
@@ -269,101 +291,120 @@ export function DonorTicketPass({
                   {registrationCode}
                 </p>
               </div>
+
               <button
                 type="button"
                 onClick={copyCode}
                 aria-label="คัดลอกหมายเลขลงทะเบียน"
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] shadow-xs transition-all hover:bg-[var(--rose-100)] hover:scale-105 active:scale-95"
+                className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border border-[var(--line)] bg-white px-4 text-xs font-bold text-[var(--burgundy-700)] shadow-2xs transition-all hover:bg-[var(--rose-100)] active:scale-98"
               >
                 {copied ? (
-                  <Check className="h-5 w-5 text-[var(--ok)] animate-in zoom-in" />
+                  <>
+                    <Check className="h-4 w-4 text-[var(--ok)]" />
+                    <span>คัดลอกแล้ว (Copied)</span>
+                  </>
                 ) : (
-                  <Copy className="h-5 w-5" />
+                  <>
+                    <Copy className="h-4 w-4" />
+                    <span>คัดลอกรหัส (Copy)</span>
+                  </>
                 )}
               </button>
             </div>
-            <p
-              role="status"
-              className="mt-2 text-xs font-medium text-[var(--muted)] flex items-center gap-1.5"
-            >
-              <Heart className="h-3.5 w-3.5 text-rose-500 fill-rose-500" />
-              <span>{copied ? "คัดลอกหมายเลขเรียบร้อยแล้ว! (Copied!)" : "บันทึกหรือแคปเจอร์หน้านี้ไว้ใช้ในวันงาน"}</span>
-            </p>
           </div>
 
-          {/* Appointment Details Section */}
-          <section aria-labelledby="appointment-details">
-            <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+          {/* Symmetrical 2-Column Details Grid */}
+          <section aria-labelledby="appointment-details" className="space-y-3">
+            <div className="border-b border-[var(--line)] pb-2.5">
               <h3
                 id="appointment-details"
-                className="text-base font-black text-[var(--ink)] flex items-center gap-2 font-display"
+                className="text-sm font-black text-[var(--ink)] flex items-center gap-1.5 font-display"
               >
                 <span>รายละเอียดการนัดหมาย</span>
-                <span className="text-xs font-medium text-[var(--muted)]">/ Appointment Details</span>
+                <span className="text-xs font-normal text-[var(--muted)]">/ Appointment Details</span>
               </h3>
             </div>
-            <dl className="mt-3 divide-y divide-[var(--line)]">
-              {details.map(({ label, enLabel, value, icon: Icon, highlight }) => (
-                <div
-                  key={label}
-                  className="grid grid-cols-[2.5rem_1fr] items-center gap-3 py-3"
-                >
-                  <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${highlight ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)]' : 'bg-gray-100 text-gray-600'}`}>
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <dt className="text-xs font-bold text-[var(--muted)] flex items-center gap-1.5">
-                      <span>{label}</span>
-                      <span className="text-[10px] opacity-75 font-normal">({enLabel})</span>
-                    </dt>
-                    <dd className={`mt-0.5 text-sm font-bold leading-6 ${highlight ? 'text-[var(--burgundy-700)] font-black text-base' : 'text-[var(--ink)]'}`}>
-                      {value}
-                    </dd>
-                  </div>
-                </div>
-              ))}
-            </dl>
-          </section>
 
-          {/* QR Code Section */}
-          <section
-            className="rounded-2xl border border-[var(--line)] bg-[var(--bg)] p-6 sm:flex sm:items-center sm:justify-between sm:gap-6"
-            aria-labelledby="ticket-qr-heading"
-          >
-            <div className="space-y-2">
-              <h3
-                id="ticket-qr-heading"
-                className="text-base font-black text-[var(--ink)] font-display flex items-center gap-1.5"
-              >
-                <span>QR สำหรับเช็กอิน</span>
-                <span className="text-xs font-medium text-[var(--muted)]">/ Check-in QR</span>
-              </h3>
-              <p className="max-w-xs text-xs leading-5 text-[var(--muted)]">
-                แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียนเพื่อความสะดวกรวดเร็ว
-                <span className="block text-[11px] opacity-80 mt-0.5">(Present this QR Code to staff at check-in)</span>
-              </p>
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={downloadTicket}
-                  disabled={downloading}
-                  className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[var(--burgundy-700)] to-[var(--burgundy-600)] px-4 py-2.5 text-xs font-black text-white shadow-md shadow-[var(--burgundy-700)]/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
-                >
-                  <Download className="h-4 w-4" />
-                  <span>{downloading ? "กำลังบันทึกภาพ... (Saving...)" : "บันทึกตั๋วเป็นรูปภาพ / Save Pass"}</span>
-                </button>
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+              {/* Donor Name */}
+              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
+                  <User className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                  <span>ผู้ลงทะเบียน / Donor Name</span>
+                </div>
+                <p className="text-sm font-black text-[var(--ink)]">{name}</p>
+              </div>
+
+              {/* Event Date */}
+              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
+                  <Calendar className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                  <span>วันจัดกิจกรรม / Event Date</span>
+                </div>
+                <p className="text-sm font-black text-[var(--ink)]">{date}</p>
+              </div>
+
+              {/* Time Slot */}
+              <div className="rounded-xl border border-[var(--rose-100)] bg-[var(--rose-100)]/30 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)]">
+                  <Clock className="h-3.5 w-3.5" />
+                  <span>รอบเวลาที่นัดหมาย / Time Slot</span>
+                </div>
+                <p className="text-base font-black text-[var(--burgundy-800)]">{timeSlot}</p>
+              </div>
+
+              {/* Venue */}
+              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
+                  <MapPin className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                  <span>สถานที่จัดกิจกรรม / Venue</span>
+                </div>
+                <p className="text-xs font-bold text-[var(--ink)] leading-snug">{venue}</p>
+              </div>
+
+              {/* Phone */}
+              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
+                  <Phone className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                  <span>เบอร์โทรศัพท์ / Phone</span>
+                </div>
+                <p className="text-xs font-bold text-[var(--ink)]">{phone || "—"}</p>
+              </div>
+
+              {/* Faculty */}
+              <div className="rounded-xl border border-[var(--line)] bg-gray-50/50 p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--muted)]">
+                  <Building2 className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                  <span>คณะ / สังกัด / Faculty or Org</span>
+                </div>
+                <p className="text-xs font-bold text-[var(--ink)] leading-snug">{faculty || "บุคคลทั่วไป"}</p>
               </div>
             </div>
+          </section>
 
-            <div
-              ref={qrRef}
-              className="mt-4 flex justify-center sm:mt-0"
-            >
-              <div className="rounded-2xl border-2 border-[var(--rose-100)] bg-white p-3.5 shadow-sm">
+          {/* Symmetrical QR Check-in Center Box */}
+          <section
+            aria-labelledby="ticket-qr-heading"
+            className="rounded-xl border border-[var(--line)] bg-gray-50/60 p-5 text-center space-y-4"
+          >
+            <div>
+              <h3 id="ticket-qr-heading" className="text-sm font-black text-[var(--ink)] font-display">
+                QR Code สำหรับเช็กอิน / Check-in QR Code
+              </h3>
+              <p className="text-xs text-[var(--muted)] mt-0.5">
+                แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน (Please present this QR Code at the registration desk)
+              </p>
+            </div>
+
+            <div className="flex justify-center">
+              <div
+                ref={qrRef}
+                className="rounded-xl border border-[var(--line)] bg-white p-3.5 shadow-sm"
+              >
                 {qrToken ? (
                   <QRCodeSVG
                     value={qrToken}
-                    size={156}
+                    size={160}
                     level="M"
                     title="QR Code สำหรับเช็กอิน"
                     imageSettings={{
@@ -374,59 +415,80 @@ export function DonorTicketPass({
                     }}
                   />
                 ) : (
-                  <div className="flex h-36 w-36 items-center justify-center bg-[var(--bg)] text-center text-xs font-bold text-[var(--muted)]">
+                  <div className="flex h-40 w-40 items-center justify-center bg-gray-50 text-xs font-bold text-[var(--muted)]">
                     กำลังสร้าง QR Code...
                   </div>
                 )}
               </div>
             </div>
+
+            <div>
+              <button
+                type="button"
+                onClick={downloadTicket}
+                disabled={downloading}
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[var(--burgundy-700)] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-[var(--burgundy-900)] active:scale-98 disabled:opacity-60"
+              >
+                <Download className="h-4 w-4" />
+                <span>{downloading ? "กำลังบันทึกภาพ... (Saving...)" : "บันทึกตั๋วเป็นรูปภาพ / Save Ticket PNG"}</span>
+              </button>
+            </div>
           </section>
 
-          {/* Playful & Orderly Health & Prep Checklist Cards */}
-          <div className="rounded-2xl border border-rose-100 bg-rose-50/50 p-4 space-y-3">
-            <div className="flex items-center gap-2">
+          {/* Symmetrical 2x2 Preparation Tips Grid */}
+          <div className="space-y-2.5">
+            <div className="flex items-center gap-1.5">
               <ShieldCheck className="h-4 w-4 text-[var(--burgundy-700)]" />
-              <p className="text-xs font-black text-[var(--burgundy-800)]">
-                ข้อแนะนำการเตรียมตัวก่อนมาบริจาคโลหิต / Preparation Tips
+              <p className="text-xs font-black text-[var(--ink)]">
+                ข้อแนะนำการเตรียมความพร้อม / Preparation Tips
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 text-xs">
-              <div className="flex items-start gap-2 rounded-xl bg-white p-2.5 border border-rose-100/60 shadow-2xs">
+
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 text-xs">
+              {/* ID Card */}
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100/70 bg-white p-3 shadow-2xs">
                 <span className="text-base leading-none">🪪</span>
                 <div>
                   <p className="font-bold text-[var(--ink)]">
                     <strong className="text-[var(--burgundy-800)]">อย่าลืมนำบัตรประชาชนมาด้วย</strong>
                   </p>
-                  <p className="text-[11px] text-[var(--muted)]">หรือบัตรผู้บริจาคโลหิต (Bring ID Card)</p>
+                  <p className="text-[11px] text-[var(--muted)]">หรือบัตรผู้บริจาคโลหิตตัวจริง (National ID Required)</p>
                 </div>
               </div>
-              <div className="flex items-start gap-2 rounded-xl bg-white p-2.5 border border-rose-100/60 shadow-2xs">
-                <Droplets className="h-4 w-4 text-sky-500 mt-0.5 shrink-0" />
+
+              {/* Water */}
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100/70 bg-white p-3 shadow-2xs">
+                <Droplets className="h-4 w-4 text-sky-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="font-bold text-[var(--ink)]">ดื่มน้ำ 3–4 แก้วก่อนมา</p>
-                  <p className="text-[11px] text-[var(--muted)]">Drink plenty of water before arrival</p>
+                  <p className="text-[11px] text-[var(--muted)]">ช่วยระบบไหลเวียนโลหิต (Drink 3–4 glasses of water)</p>
                 </div>
               </div>
-              <div className="flex items-start gap-2 rounded-xl bg-white p-2.5 border border-rose-100/60 shadow-2xs">
-                <Moon className="h-4 w-4 text-indigo-500 mt-0.5 shrink-0" />
+
+              {/* Sleep */}
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100/70 bg-white p-3 shadow-2xs">
+                <Moon className="h-4 w-4 text-indigo-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="font-bold text-[var(--ink)]">นอนหลับพักผ่อน 6–8 ชม.</p>
-                  <p className="text-[11px] text-[var(--muted)]">Get 6–8 hours of sound sleep</p>
+                  <p className="text-[11px] text-[var(--muted)]">ไม่อดนอนในคืนก่อนวันบริจาค (Get 6–8 hours of sleep)</p>
                 </div>
               </div>
-              <div className="flex items-start gap-2 rounded-xl bg-white p-2.5 border border-rose-100/60 shadow-2xs">
-                <span className="text-base leading-none">🥗</span>
+
+              {/* Food */}
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-100/70 bg-white p-3 shadow-2xs">
+                <Utensils className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
                 <div>
                   <p className="font-bold text-[var(--ink)]">งดอาหารไขมันสูง & แอลกอฮอล์</p>
-                  <p className="text-[11px] text-[var(--muted)]">Avoid high-fat food & alcohol</p>
+                  <p className="text-[11px] text-[var(--muted)]">ทานอาหารมื้อหลักล่วงหน้า (Avoid fatty food & alcohol)</p>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </article>
 
-      {/* Action Buttons */}
+      {/* Symmetrical Bottom Actions */}
       <div className="flex flex-col gap-3 sm:flex-row">
         {onReset && (
           <button

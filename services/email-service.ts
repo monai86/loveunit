@@ -70,20 +70,20 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
         <td align="center" style="padding:28px 12px;">
           <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border-radius:18px;overflow:hidden;border:1px solid #E8DCD8;box-shadow:0 6px 20px rgba(56,6,15,0.06);">
             
-            <!-- Red Gradient Hero Header -->
+            <!-- Red Gradient Hero Header (Symmetrical & Editorial) -->
             <tr>
-              <td style="background:linear-gradient(135deg, #9C1528 0%, #6E101E 50%, #38060F 100%);background-color:#6E101E;padding:32px 28px;color:#FDF6F1;">
+              <td style="background:linear-gradient(135deg, #7E0E1D 0%, #6E101E 50%, #560D19 100%);background-color:#6E101E;padding:32px 28px;color:#FDF6F1;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                   <tr>
                     <td>
-                      <p style="margin:0;font-size:12px;font-weight:800;letter-spacing:.08em;color:#EFDCD6;text-transform:uppercase;">
-                        MUMT LoveUnit ครั้งที่ 9 &middot; (9th Edition)
+                      <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#EFDCD6;text-transform:uppercase;">
+                        MUMT BLOOD DONATION 2026 &middot; คณะเทคนิคการแพทย์ ม.มหิดล
                       </p>
                       <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:900;color:#FFFFFF;">
-                        ยืนยันการลงทะเบียนบริจาคโลหิต ❤️
+                        ยืนยันการลงทะเบียนบริจาคโลหิต
                       </h1>
-                      <p style="margin:6px 0 0;font-size:14px;line-height:1.5;color:#FBE9EC;">
-                        Registration confirmed &middot; ขอบคุณที่ร่วมส่งต่อพลังชีวิตไปด้วยกัน
+                      <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:#FBE9EC;font-weight:600;">
+                        Registration confirmed &middot; MUMT LoveUnit ครั้งที่ 9 (9th Edition)
                       </p>
                     </td>
                   </tr>
@@ -97,14 +97,14 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                 
                 <!-- Greeting -->
                 <p style="margin:0;font-size:16px;line-height:1.6;color:#241B1D;">
-                  สวัสดีคุณ <strong>${recipient}</strong> 🩸
+                  สวัสดีคุณ <strong>${recipient}</strong>
                 </p>
                 <p style="margin:8px 0 22px;font-size:14px;line-height:1.65;color:#5F5558;">
-                  การลงทะเบียนของคุณเรียบร้อยแล้ว! ข้อมูลและบัตรลงทะเบียนของคุณพร้อมใช้งาน โปรดแสดง QR Code หรือหมายเลขลงทะเบียนนี้เมื่อมาถึงจุดลงทะเบียนในวันงาน
+                  การลงทะเบียนของคุณเรียบร้อยแล้ว! ข้อมูลการนัดหมายและบัตรดิจิทัลของคุณพร้อมใช้งาน โปรดแสดง QR Code หรือหมายเลขลงทะเบียนนี้เมื่อมาถึงจุดลงทะเบียนในวันงาน
                 </p>
 
                 <!-- Registration Code Highlight Box -->
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;background:linear-gradient(135deg, #FFF5F6 0%, #FFFFFF 100%);border:2px dashed #E8DCD8;border-radius:14px;margin-bottom:24px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;background:#FFF8F9;border:1px solid #F1D3D9;border-radius:14px;margin-bottom:24px;">
                   <tr>
                     <td style="padding:18px 20px;text-align:center;">
                       <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#6E101E;text-transform:uppercase;">
@@ -117,7 +117,7 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                   </tr>
                 </table>
 
-                <!-- Appointment Details Table -->
+                <!-- Symmetrical Appointment Details Table -->
                 <p style="margin:0 0 10px;font-size:15px;font-weight:800;color:#241B1D;">
                   ข้อมูลการนัดหมาย / Appointment Details
                 </p>
@@ -148,11 +148,11 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                   </tr>
                 </table>
 
-                <!-- QR Code Section -->
+                <!-- QR Code Section (Centered & Symmetrical) -->
                 ${hasQrCode ? `
-                <div style="margin:26px 0 0;text-align:center;background:#FFF9FA;border:1px solid #F1D3D9;border-radius:14px;padding:22px;">
-                  <img src="cid:donor-qr-code" width="180" height="180" alt="QR Code สำหรับเช็กอิน" style="display:inline-block;background:#FFFFFF;border:4px solid #FFFFFF;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);" />
-                  <p style="margin:12px 0 0;font-size:14px;line-height:1.5;font-weight:800;color:#241B1D;">
+                <div style="margin:26px 0 0;text-align:center;background:#FBF8F8;border:1px solid #E8DCD8;border-radius:14px;padding:24px;">
+                  <img src="cid:donor-qr-code" width="176" height="176" alt="QR Code สำหรับเช็กอิน" style="display:inline-block;background:#FFFFFF;border:4px solid #FFFFFF;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);" />
+                  <p style="margin:14px 0 0;font-size:14px;line-height:1.5;font-weight:800;color:#241B1D;">
                     แสดง QR Code นี้เมื่อมาถึงจุดลงทะเบียน
                   </p>
                   <p style="margin:4px 0 0;font-size:12px;line-height:1.5;color:#5F5558;">
@@ -160,28 +160,34 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                   </p>
                 </div>` : ''}
 
-                <!-- Playful Preparation Tips Grid -->
+                <!-- Symmetrical 2x2 Preparation Tips Grid -->
                 <div style="margin:26px 0 0;">
                   <p style="margin:0 0 10px;font-size:14px;font-weight:800;color:#241B1D;">
-                    💡 ข้อแนะนำการเตรียมตัว / Preparation Tips
+                    ข้อแนะนำการเตรียมตัว / Preparation Tips
                   </p>
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 8px;">
                     <tr>
                       <td style="background:#FDF6F7;border:1px solid #F8DFE3;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#560D19;">🪪 1. อย่าลืมนำบัตรประชาชนมาด้วย (ID Card)</strong><br />
-                        <span style="color:#5F5558;font-size:12px;">หรือใช้บัตรผู้บริจาคโลหิต เพื่อยืนยันตัวตนหน้างาน</span>
+                        <strong style="color:#560D19;">🪪 1. อย่าลืมนำบัตรประชาชนมาด้วย (National ID)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">หรือใช้บัตรผู้บริจาคโลหิตตัวจริง เพื่อยืนยันตัวตนหน้างาน</span>
                       </td>
                     </tr>
                     <tr>
                       <td style="background:#FDF6F7;border:1px solid #F8DFE3;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#560D19;">💧 2. ดื่มน้ำล่วงหน้า 3–4 แก้ว (Stay Hydrated)</strong><br />
-                        <span style="color:#5F5558;font-size:12px;">ช่วยให้ระบบไหลเวียนโลหิตพร้อมและลดอาการวิงเวียน</span>
+                        <strong style="color:#560D19;">💧 2. ดื่มน้ำล่วงหน้า 3–4 แก้ว (Hydration)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">ช่วยระบบไหลเวียนโลหิตพร้อมและลดอาการวิงเวียน</span>
                       </td>
                     </tr>
                     <tr>
                       <td style="background:#FDF6F7;border:1px solid #F8DFE3;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
-                        <strong style="color:#560D19;">😴 3. นอนหลับพักผ่อนให้พอ 6–8 ชม. (Good Rest)</strong><br />
-                        <span style="color:#5F5558;font-size:12px;">ไม่อดนอน และงดเครื่องดื่มแอลกอฮอล์ก่อนบริจาค</span>
+                        <strong style="color:#560D19;">😴 3. นอนหลับพักผ่อนให้พอ 6–8 ชม. (Sound Sleep)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">ไม่อดนอนในคืนก่อนวันบริจาค และงดแอลกอฮอล์</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="background:#FDF6F7;border:1px solid #F8DFE3;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.55;">
+                        <strong style="color:#560D19;">🥗 4. รับประทานอาหารมื้อหลัก (Healthy Meal)</strong><br />
+                        <span style="color:#5F5558;font-size:12px;">ทานอาหารล่วงหน้า 1–2 ชม. หลีกเลี่ยงอาหารไขมันสูง</span>
                       </td>
                     </tr>
                   </table>
@@ -197,7 +203,7 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
               </td>
             </tr>
 
-            <!-- Footer -->
+            <!-- Symmetrical Footer -->
             <tr>
               <td style="background:#FAF7F7;border-top:1px solid #E8DCD8;padding:18px 28px;text-align:center;">
                 <p style="margin:0;font-size:12px;font-weight:700;color:#5F5558;">
@@ -247,15 +253,15 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
             
             <!-- Red Gradient Hero Header -->
             <tr>
-              <td style="background:linear-gradient(135deg, #9C1528 0%, #6E101E 50%, #38060F 100%);background-color:#6E101E;padding:32px 28px;color:#FDF6F1;">
-                <p style="margin:0;font-size:12px;font-weight:800;letter-spacing:.08em;color:#EFDCD6;text-transform:uppercase;">
-                  MUMT LoveUnit ครั้งที่ 9 &middot; 2 Days to Go!
+              <td style="background:linear-gradient(135deg, #7E0E1D 0%, #6E101E 50%, #560D19 100%);background-color:#6E101E;padding:32px 28px;color:#FDF6F1;">
+                <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#EFDCD6;text-transform:uppercase;">
+                  MUMT BLOOD DONATION 2026 &middot; 2 Days to Go!
                 </p>
                 <h1 style="margin:8px 0 0;font-size:24px;line-height:1.3;font-weight:900;color:#FFFFFF;">
-                  ⏰ อีก 2 วันพบกันนะ! เตือนความพร้อมก่อนวันบริจาคโลหิต
+                  เตือนความพร้อมก่อนวันบริจาคโลหิต
                 </h1>
-                <p style="margin:6px 0 0;font-size:14px;line-height:1.5;color:#FBE9EC;">
-                  Preparation reminder &middot; อีก 2 วันพบกันที่จุดลงทะเบียน
+                <p style="margin:6px 0 0;font-size:13px;line-height:1.5;color:#FBE9EC;font-weight:600;">
+                  Preparation Reminder &middot; อีก 2 วันพบกันที่จุดลงทะเบียน
                 </p>
               </td>
             </tr>
@@ -266,7 +272,7 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
                 
                 <!-- Greeting -->
                 <p style="margin:0;font-size:16px;line-height:1.6;color:#241B1D;">
-                  สวัสดีคุณ <strong>${recipient}</strong> ❤️
+                  สวัสดีคุณ <strong>${recipient}</strong>
                 </p>
                 <p style="margin:8px 0 22px;font-size:14px;line-height:1.65;color:#5F5558;">
                   ขอเตือนรายละเอียดการนัดหมายของคุณ อีกเพียง 2 วันเท่านั้น! เตรียมร่างกายให้พร้อมแล้วมาพบกันตามรอบเวลาที่ท่านได้เลือกไว้
@@ -311,7 +317,7 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
                 <!-- 4-Step Checklist Cards -->
                 <div style="margin:20px 0 0;">
                   <p style="margin:0 0 10px;font-size:15px;font-weight:800;color:#241B1D;">
-                    🎯 เช็กลิสต์เตรียมความพร้อม 4 ข้อ / 4-Step Readiness Checklist
+                    เช็กลิสต์เตรียมความพร้อม 4 ข้อ / 4-Step Readiness Checklist
                   </p>
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0 8px;">
                     <tr>
@@ -343,9 +349,9 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
 
                 <!-- QR Code Preview -->
                 ${hasQrCode ? `
-                <div style="margin:26px 0 0;text-align:center;background:#FFF9FA;border:1px solid #F1D3D9;border-radius:14px;padding:22px;">
+                <div style="margin:26px 0 0;text-align:center;background:#FBF8F8;border:1px solid #E8DCD8;border-radius:14px;padding:24px;">
                   <img src="cid:donor-reminder-qr-code" width="176" height="176" alt="QR Code สำหรับเช็กอิน" style="display:inline-block;background:#FFFFFF;border:4px solid #FFFFFF;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);" />
-                  <p style="margin:12px 0 0;font-size:14px;line-height:1.5;font-weight:800;color:#241B1D;">
+                  <p style="margin:14px 0 0;font-size:14px;line-height:1.5;font-weight:800;color:#241B1D;">
                     แสดง QR Code นี้เมื่อมาถึงจุดลงทะเบียน
                   </p>
                   <p style="margin:4px 0 0;font-size:12px;line-height:1.5;color:#5F5558;">
@@ -363,14 +369,14 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
               </td>
             </tr>
 
-            <!-- Footer -->
+            <!-- Symmetrical Footer -->
             <tr>
               <td style="background:#FAF7F7;border-top:1px solid #E8DCD8;padding:18px 28px;text-align:center;">
                 <p style="margin:0;font-size:12px;font-weight:700;color:#5F5558;">
                   MUMT LoveUnit ครั้งที่ 9 &middot; คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล
                 </p>
                 <p style="margin:4px 0 0;font-size:11px;line-height:1.5;color:#7A6E71;">
-                  Faculty of Medical Technology, Mahidol University &middot; แล้วพบกันในวันงานนะครับ ❤️
+                  Faculty of Medical Technology, Mahidol University &middot; แล้วพบกันในวันงาน
                 </p>
               </td>
             </tr>
