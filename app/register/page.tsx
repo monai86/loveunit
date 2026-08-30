@@ -631,7 +631,7 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="editorial-btn-primary text-xs py-3.5 px-6 ml-auto inline-flex items-center gap-1.5 cursor-pointer"
+                    className="editorial-btn-primary text-xs font-extrabold py-3.5 px-7 ml-auto inline-flex items-center gap-2 cursor-pointer shadow-md shadow-red-950/20 active:scale-95 transition-all"
                   >
                     <span>{tReg.btnNext[language]}</span>
                     <ArrowRight className="h-4 w-4" />
@@ -640,7 +640,7 @@ export default function RegisterPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="editorial-btn-primary text-xs py-3.5 px-8 ml-auto inline-flex items-center gap-1.5 cursor-pointer"
+                    className="editorial-btn-primary text-xs font-extrabold py-3.5 px-8 ml-auto inline-flex items-center gap-2 cursor-pointer shadow-md shadow-red-950/20 active:scale-95 transition-all"
                   >
                     {loading ? (
                       <span>{tReg.btnSubmitting[language]}</span>

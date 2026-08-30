@@ -285,22 +285,29 @@ textarea {
 .text-editorial-red      { color: var(--burgundy-500) !important; }
 
 .editorial-btn-primary {
-  background-color: var(--burgundy-700) !important;
+  background: linear-gradient(to right, #D92231, #A6192E, #7E1120) !important;
   color: #FFFFFF !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   border-radius: var(--radius-md) !important;
   padding: 0.95rem 1.6rem !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 0.5rem !important;
-  transition: background-color 0.15s ease, transform 0.1s ease !important;
+  box-shadow: 0 4px 14px -2px rgba(126, 17, 32, 0.3) !important;
+  transition: all 0.2s ease !important;
   cursor: pointer !important;
   border: none !important;
   font-family: var(--font-display), sans-serif !important;
 }
-.editorial-btn-primary:hover  { background-color: var(--burgundy-900) !important; transform: translateY(-1px) !important; }
-.editorial-btn-primary:active { transform: translateY(0) !important; }
+.editorial-btn-primary:hover  { 
+  background: linear-gradient(to right, #C51D2C, #911426, #6E0F1D) !important; 
+  box-shadow: 0 6px 18px -2px rgba(126, 17, 32, 0.4) !important;
+  transform: translateY(-1px) !important; 
+}
+.editorial-btn-primary:active { 
+  transform: translateY(0) scale(0.97) !important; 
+}
 
 .editorial-btn-secondary {
   background-color: var(--rose-100) !important;
