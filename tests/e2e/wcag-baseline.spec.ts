@@ -75,9 +75,9 @@ test.describe('WCAG 2.2 AA baseline', () => {
     await page.getByRole('button', { name: 'เชิญ Staff' }).click();
     const dialog = page.getByRole('dialog', { name: 'เชิญ Staff ใหม่' });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByLabel('อีเมล')).toBeVisible();
-    await expect(dialog.getByLabel('ชื่อ-นามสกุล')).toBeVisible();
-    await expect(dialog.getByLabel('ฝ่าย / ทีม')).toBeVisible();
+    await expect(dialog.getByLabel(/Email|อีเมล/i)).toBeVisible();
+    await expect(dialog.getByLabel(/Username|ชื่อ-นามสกุล/i)).toBeVisible();
+    await expect(dialog.getByLabel(/ฝ่าย \/ ทีม/i)).toBeVisible();
   });
 
   test('staff scan opens as a non-scrolling full-screen camera workspace', async ({ page }) => {
