@@ -268,18 +268,18 @@ function RegisterContent() {
         <div className="mb-8 pb-6 border-b border-[var(--line)]">
           <div className="flex items-center gap-2 mb-2.5">
             {isWalkInMode ? (
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[var(--burgundy-700)] to-[#9B1D2A] text-white shadow-xs border border-white/20">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20">
                 <Sparkles className="h-3.5 w-3.5 text-amber-300 animate-pulse" />
                 <span>{tReg.walkinBadge[language]}</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-rose-50 to-[var(--rose-100)] text-[var(--burgundy-800)] border border-rose-200/90 shadow-2xs hover:shadow-xs transition-all">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20 hover:shadow-md transition-all">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--burgundy-400)] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--burgundy-600)]" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/70 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
                 </span>
-                <Calendar className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
-                <span className="font-semibold">{isTh ? 'ลงทะเบียนล่วงหน้า' : 'Advance Registration'}</span>
+                <Calendar className="h-3.5 w-3.5 text-white" />
+                <span className="font-bold tracking-normal">{isTh ? 'ลงทะเบียนล่วงหน้า' : 'Advance Registration'}</span>
               </span>
             )}
           </div>

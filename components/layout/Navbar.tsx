@@ -47,14 +47,14 @@ export function Navbar() {
   // Symmetrical & Elegant Pill Switcher
   const langSwitcher = (
     <div 
-      className="inline-flex items-center rounded-full bg-black/[0.04] p-1 border border-[var(--line)] shadow-2xs" 
+      className="inline-flex items-center rounded-full bg-black/[0.04] p-0.5 sm:p-1 border border-[var(--line)] shadow-2xs shrink-0" 
       role="group" 
       aria-label="Language selector"
     >
       <button
         type="button"
         onClick={() => setLanguage('th')}
-        className={`min-w-[34px] h-7 px-2.5 flex items-center justify-center rounded-full text-xs tracking-wider transition-all duration-200 cursor-pointer ${
+        className={`min-w-[32px] sm:min-w-[34px] h-6 sm:h-7 px-2 sm:px-2.5 flex items-center justify-center rounded-full text-[11px] sm:text-xs tracking-wider transition-all duration-200 cursor-pointer ${
           isTh
             ? 'bg-white text-[#A6192E] font-black shadow-xs ring-1 ring-black/5'
             : 'text-[var(--muted)] hover:text-[var(--ink)] font-bold'
@@ -66,7 +66,7 @@ export function Navbar() {
       <button
         type="button"
         onClick={() => setLanguage('en')}
-        className={`min-w-[34px] h-7 px-2.5 flex items-center justify-center rounded-full text-xs tracking-wider transition-all duration-200 cursor-pointer ${
+        className={`min-w-[32px] sm:min-w-[34px] h-6 sm:h-7 px-2 sm:px-2.5 flex items-center justify-center rounded-full text-[11px] sm:text-xs tracking-wider transition-all duration-200 cursor-pointer ${
           isEn
             ? 'bg-white text-[#A6192E] font-black shadow-xs ring-1 ring-black/5'
             : 'text-[var(--muted)] hover:text-[var(--ink)] font-bold'
@@ -140,25 +140,26 @@ export function Navbar() {
         </div>
 
         {/* Mobile & Tablet Action & Hamburger (< 1280px) */}
-        <div className="flex items-center gap-2 shrink-0 xl:hidden">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 xl:hidden">
           {langSwitcher}
 
+          {/* Shown on tablet (sm to xl) where there's plenty of space, hidden on small mobile where bottom bar already handles register */}
           <Link
             href="/register"
-            className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3 py-1.5 text-xs font-extrabold text-white shadow-sm shadow-red-950/20 hover:from-[#C51D2C] hover:to-[#6E0F1D] active:scale-95 transition-all whitespace-nowrap shrink-0"
+            className="hidden sm:inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-extrabold text-white shadow-sm shadow-red-950/20 hover:from-[#C51D2C] hover:to-[#6E0F1D] active:scale-95 transition-all whitespace-nowrap shrink-0"
           >
-            <Heart className="h-3 w-3 fill-white shrink-0" />
+            <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
             <span className="whitespace-nowrap font-extrabold">{isTh ? 'ลงทะเบียน' : 'Register'}</span>
           </Link>
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs"
+            className="flex h-9 w-9 sm:h-11 sm:w-11 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs active:scale-95 transition-transform"
             aria-label={isTh ? 'เปิดเมนูหลัก' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
             aria-controls="public-mobile-menu"
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? <X className="h-4 w-4 sm:h-5 sm:w-5" /> : <Menu className="h-4 w-4 sm:h-5 sm:w-5" />}
           </button>
         </div>
       </div>
