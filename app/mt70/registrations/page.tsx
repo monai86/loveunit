@@ -12,7 +12,8 @@ import {
   Trash2,
   Calendar,
   Phone,
-  AlertTriangle
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 import { Registration, TimeSlot } from '@/lib/types/database';
 import { formatTimeRange, formatBangkokTime, isWalkInRecord, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
@@ -80,6 +81,8 @@ export default function AdminRegistrationsPage() {
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [filterExperience, setFilterExperience] = useState<string>('ALL');
   const [canManage, setCanManage] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string>('');
   const [editingRow, setEditingRow] = useState<Registration | null>(null);
   const [editForm, setEditForm] = useState({ firstName: '', lastName: '', phone: '', email: '' });
   const [editError, setEditError] = useState('');
@@ -103,23 +106,64 @@ export default function AdminRegistrationsPage() {
     return () => window.clearTimeout(timer);
   }, [searchQuery]);
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/admin/registrations?q=${encodeURIComponent(debouncedSearchQuery)}`);
-        const data = await res.json();
-        if (res.ok && data.success) {
-          setRegistrations((data.registrations || []).map(normalizeRegistration));
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const loadData = useCallback(async (isInitial = false) => {
+    try {
+      if (!isInitial) setIsRefreshing(true);
+
+      const res = await fetch(`/api/admin/registrations?q=${encodeURIComponent(debouncedSearchQuery)}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setRegistrations((data.registrations || []).map(normalizeRegistration));
       }
+
+      const now = new Date();
+      setLastUpdated(
+        new Intl.DateTimeFormat('th-TH', {
+          timeZone: 'Asia/Bangkok',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false,
+        }).format(now) + ' น.'
+      );
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+      setIsRefreshing(false);
     }
-    loadData();
   }, [debouncedSearchQuery]);
+
+  useEffect(() => {
+    let isMounted = true;
+    void (async () => {
+      if (isMounted) await loadData(true);
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, [loadData]);
+
+  // Real-time Background Polling (Every 8 seconds when window is in focus)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible' && !editingRow && !deletingRow) {
+        loadData(false);
+      }
+    }, 8000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && !editingRow && !deletingRow) {
+        loadData(false);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [loadData, editingRow, deletingRow]);
 
   // Client-side filtering
   const filteredList = registrations.filter(r => {
@@ -255,16 +299,36 @@ export default function AdminRegistrationsPage() {
       {/* Top Bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-[var(--line)] pb-4">
         <div>
-          <Link href="/mt70" className="inline-flex items-center gap-1 text-xs font-bold text-[var(--burgundy-700)] hover:underline mb-1">
+          <Link href="/mt70" prefetch={true} className="inline-flex items-center gap-1 text-xs font-bold text-[var(--burgundy-700)] hover:underline mb-1">
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>กลับหน้าแดชบอร์ด</span>
           </Link>
-          <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] font-display">
-            รายชื่อผู้ลงทะเบียน ({filteredList.length} คน)
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-black text-[var(--ink)] font-display">
+              รายชื่อผู้ลงทะเบียน ({filteredList.length} คน)
+            </h1>
+            <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-bold">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live
+            </span>
+          </div>
+          {lastUpdated && (
+            <p className="text-[11px] text-[var(--muted)] font-mono mt-0.5">
+              อัปเดตล่าสุด: {lastUpdated}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center justify-end gap-2">
+          <button
+            onClick={() => loadData(false)}
+            disabled={isRefreshing}
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-[var(--line)] hover:bg-gray-50 text-xs font-bold text-[var(--ink)] shadow-2xs transition-all cursor-pointer"
+            title="กดเพื่อดึงข้อมูลผู้ลงทะเบียนล่าสุดทันที"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 text-[var(--burgundy-700)] ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span>{isRefreshing ? 'กำลังดึงข้อมูล...' : 'รีเฟรชสด'}</span>
+          </button>
           {canManage && <ResetTestDataButton />}
           <a
             href="/api/admin/export"

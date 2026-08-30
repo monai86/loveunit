@@ -1,5 +1,6 @@
 // Server-side Authorization & Role-Based Access Control (RBAC) Guards
 
+import { cache } from 'react';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
 import { db } from '@/db';
@@ -43,8 +44,10 @@ export const PRIMARY_ADMIN_EMAIL = 'monai.yut@student.mahidol.edu';
 
 export function isPrimaryAdminEmail(email: string): boolean {
   const configuredEmail = process.env.PRIMARY_ADMIN_EMAIL?.trim().toLowerCase();
-  const primaryEmail = configuredEmail || PRIMARY_ADMIN_EMAIL;
-  return email.trim().toLowerCase() === primaryEmail;
+  if (configuredEmail) {
+    return email.trim().toLowerCase() === configuredEmail;
+  }
+  return email.trim().toLowerCase() === PRIMARY_ADMIN_EMAIL;
 }
 
 export function canDeleteManagedAccount(actor: AuthenticatedUser, target: { id: string; email: string }): boolean {
@@ -64,8 +67,9 @@ function toEffectiveRole(email: string, storedRole: string): StaffRole {
 
 /**
  * Reads Better Auth authenticated server session and loads staff profile from Drizzle DB.
+ * Memoized per request via React cache() to prevent redundant DB calls across layout and pages.
  */
-export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
+export const getAuthenticatedUser = cache(async (): Promise<AuthenticatedUser | null> => {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -117,7 +121,7 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
   }
 
   return null;
-}
+});
 
 /**
  * Role check shared by all guards. `userOverride` lets tests inject a synthetic

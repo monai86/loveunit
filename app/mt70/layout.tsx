@@ -4,15 +4,12 @@ import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { getAuthenticatedUser } from '@/lib/auth/server';
 import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  ScrollText, 
   QrCode, 
   Shield
 } from 'lucide-react';
 import { AdminLogoutButton } from '@/components/admin/AdminLogoutButton';
 import { AdminMobileNav } from '@/components/admin/AdminMobileNav';
+import { AdminDesktopNav } from '@/components/admin/AdminDesktopNav';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthenticatedUser();
@@ -67,47 +64,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden min-w-0 items-center justify-center gap-1 overflow-x-auto text-xs font-black md:flex">
-              <Link
-                href="/mt70"
-                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
-              >
-                <LayoutDashboard className="h-4 w-4 text-[var(--burgundy-600)]" />
-                <span>แดชบอร์ด</span>
-              </Link>
-
-              <Link
-                href="/mt70/registrations"
-                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
-              >
-                <Users className="h-4 w-4 text-blue-600" />
-                <span>รายชื่อผู้ลงทะเบียน</span>
-              </Link>
-
-              <Link
-                href="/mt70/staff"
-                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
-              >
-                <Shield className="h-4 w-4 text-[var(--burgundy-600)]" />
-                <span>จัดการ Staff</span>
-              </Link>
-
-              <Link
-                href="/mt70/content"
-                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
-              >
-                <FileText className="h-4 w-4 text-amber-600" />
-                <span>สื่อ & โปสเตอร์</span>
-              </Link>
-
-              <Link
-                href="/mt70/audit-logs"
-                className="flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-[var(--ink)] transition-all hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]"
-              >
-                <ScrollText className="h-4 w-4 text-gray-600" />
-                <span>Audit Log</span>
-              </Link>
-            </nav>
+            <AdminDesktopNav />
 
             {/* Right Side: Quick Portal Links & User Profile */}
             <div className="flex shrink-0 items-center gap-2">
