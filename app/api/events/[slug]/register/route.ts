@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { publicRegistrationSchema } from '@/lib/validation/schemas';
-import { getEventBySlug } from '@/services/event-service';
+import { getEventBySlug, getTimeSlots } from '@/services/event-service';
 import { registerDonorAtomic } from '@/services/registration-service';
 import { sendRegistrationConfirmation } from '@/services/email-service';
-import { pickField } from '@/lib/utils/format';
+import { pickField, isEventDay } from '@/lib/utils/format';
 import { ParticipantType, DonationExperience } from '@/lib/types/database';
 import { checkRateLimit, rateLimitedResponse } from '@/lib/rate-limit';
 
@@ -27,12 +27,13 @@ export async function POST(
     const openAt = new Date(pickField<string>(event, 'registrationOpenAt', 'registration_open_at') || '');
     const closeAt = new Date(pickField<string>(event, 'registrationCloseAt', 'registration_close_at') || '');
     const isStatusOpen = ['REGISTRATION_OPEN', 'PUBLISHED'].includes(event.status);
-    const isWithinWindow = now >= openAt && now <= closeAt;
+    const isEventDayNow = isEventDay(now);
+    const isWithinWindow = (now >= openAt && now <= closeAt) || isEventDayNow;
 
     if (!isStatusOpen || !isWithinWindow) {
       return NextResponse.json({
         success: false,
-        message: 'ระบบไม่ได้เปิดให้ลงทะเบียนล่วงหน้าในขณะนี้ หรือเลยช่วงเวลาลงทะเบียนแล้ว',
+        message: 'ระบบไม่ได้เปิดให้ลงทะเบียนในขณะนี้ หรือเลยช่วงเวลาจัดกิจกรรมแล้ว',
       }, { status: 400 });
     }
 
@@ -48,6 +49,14 @@ export async function POST(
     }
 
     const input = parseResult.data;
+    const isWalkIn = input.source === 'WALK_IN' || (isEventDayNow && !input.slotId);
+    const source = isWalkIn ? 'WALK_IN' : (input.source || 'ONLINE');
+
+    let targetSlotId = input.slotId;
+    if (!targetSlotId) {
+      const activeSlots = await getTimeSlots(event.id);
+      targetSlotId = activeSlots[0]?.id || '';
+    }
 
     const result = await registerDonorAtomic({
       eventId: event.id,
@@ -59,8 +68,8 @@ export async function POST(
       faculty: input.faculty || undefined,
       academicYear: input.academicYear || undefined,
       donationExperience: input.donationExperience as DonationExperience,
-      slotId: input.slotId,
-      source: 'ONLINE',
+      slotId: targetSlotId,
+      source: source as 'ONLINE' | 'WALK_IN',
     });
 
     if (!result.success) {

@@ -8,16 +8,19 @@ import {
   Heart, 
   Menu, 
   X, 
+  Home, 
+  CheckSquare, 
   BookOpen, 
   MapPin, 
-  Home, 
-  ArrowRight,
-  Image as ImageIcon,
-  CheckSquare,
   Microscope,
-  Globe
+  Image as ImageIcon,
+  ArrowRight,
+  Globe,
+  Search,
+  Sparkles
 } from 'lucide-react';
 import { useLanguage, TRANSLATIONS } from '@/lib/i18n/LanguageContext';
+import { isEventDay } from '@/lib/utils/format';
 
 const emptySubscribe = () => () => {};
 
@@ -26,6 +29,7 @@ export function Navbar() {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const pathname = usePathname();
   const { language, setLanguage, isTh, isEn } = useLanguage();
+  const eventDay = mounted ? isEventDay() : false;
 
   // PUBLIC DONOR NAVIGATION LINKS (DYNAMIC TRANSLATION)
   const navLinks = [
@@ -35,6 +39,7 @@ export function Navbar() {
     { href: '/prepare', label: TRANSLATIONS.nav.prepare[language], icon: BookOpen },
     { href: '/poster', label: TRANSLATIONS.nav.poster[language], icon: ImageIcon },
     { href: '/location', label: TRANSLATIONS.nav.location[language], icon: MapPin },
+    { href: '/lookup', label: TRANSLATIONS.nav.lookup[language], icon: Search },
   ];
 
   // Do not render public navbar on staff/admin/mt70 routes (they use StaffHeader)
@@ -131,8 +136,17 @@ export function Navbar() {
             href="/register"
             className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-4.5 py-2.5 text-xs 2xl:text-[13px] font-extrabold text-white shadow-md shadow-red-950/20 hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] hover:shadow-lg hover:shadow-red-950/30 active:scale-95 transition-all whitespace-nowrap shrink-0 cursor-pointer"
           >
-            <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
-            <span>{TRANSLATIONS.nav.register[language]}</span>
+            {eventDay ? (
+              <>
+                <Sparkles className="h-3.5 w-3.5 fill-white shrink-0" />
+                <span>{TRANSLATIONS.nav.registerWalkIn[language]}</span>
+              </>
+            ) : (
+              <>
+                <Heart className="h-3.5 w-3.5 fill-white shrink-0" />
+                <span>{TRANSLATIONS.nav.register[language]}</span>
+              </>
+            )}
             <ArrowRight className="h-3.5 w-3.5 shrink-0" />
           </Link>
         </div>
@@ -145,8 +159,17 @@ export function Navbar() {
             href="/register"
             className="inline-flex min-h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3 py-1.5 text-xs font-extrabold text-white shadow-sm shadow-red-950/20 hover:from-[#C51D2C] hover:to-[#6E0F1D] active:scale-95 transition-all whitespace-nowrap shrink-0"
           >
-            <Heart className="h-3 w-3 fill-white shrink-0" />
-            <span className="whitespace-nowrap font-extrabold">{isTh ? 'ลงทะเบียน' : 'Register'}</span>
+            {eventDay ? (
+              <>
+                <Sparkles className="h-3 w-3 fill-white shrink-0" />
+                <span className="whitespace-nowrap font-extrabold">{isTh ? 'Walk-in' : 'Walk-in'}</span>
+              </>
+            ) : (
+              <>
+                <Heart className="h-3 w-3 fill-white shrink-0" />
+                <span className="whitespace-nowrap font-extrabold">{isTh ? 'ลงทะเบียน' : 'Register'}</span>
+              </>
+            )}
           </Link>
 
           <button

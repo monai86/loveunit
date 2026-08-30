@@ -18,7 +18,8 @@ export const publicRegistrationSchema = z.object({
   donationExperience: z.enum(['FIRST_TIME', 'RETURNING'], {
     message: 'กรุณาเลือกประสบการณ์การบริจาค',
   }),
-  slotId: z.string().min(1, 'กรุณาเลือกช่วงเวลาเดินทางมาถึง'),
+  slotId: z.string().optional(),
+  source: z.enum(['ONLINE', 'WALK_IN']).optional(),
   privacyAccepted: z.literal(true, {
     message: 'กรุณายอมรับประกาศความเป็นส่วนตัวเพื่อดำเนินการต่อ',
   }),

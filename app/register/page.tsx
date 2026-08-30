@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle, User, ShieldCheck, MapPin, Building, Calendar, CheckCircle2, Edit3 } from 'lucide-react';
 import { MAHIDOL_FACULTIES, ACADEMIC_YEARS } from '@/lib/constants/mahidol';
-import { formatTimeRange } from '@/lib/utils/format';
+import { formatTimeRange, isEventDay } from '@/lib/utils/format';
 import { isTimeSlotSelectable } from '@/lib/registration/slot-availability';
 import { LoadingOverlay } from '@/components/common/LoadingOverlay';
 import { useLanguage, TRANSLATIONS } from '@/lib/i18n/LanguageContext';
@@ -32,10 +32,17 @@ interface ApiSlot {
   status?: string;
 }
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { language, isTh, isEn } = useLanguage();
   const tReg = TRANSLATIONS.register;
+
+  // Determine if Walk-in mode is active (either event day 2026-09-16 or ?mode=walkin)
+  const isWalkInQuery = searchParams.get('mode') === 'walkin';
+  const isWalkInMode = isWalkInQuery || isEventDay();
+
+  const totalSteps = isWalkInMode ? 3 : 4;
 
   const PARTICIPANT_TYPES = [
     { id: 'STUDENT', name: tReg.typeStudent[language] },
@@ -46,7 +53,7 @@ export default function RegisterPage() {
   // Wizard state
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [slotsLoading, setSlotsLoading] = useState(true);
+  const [slotsLoading, setSlotsLoading] = useState(!isWalkInMode);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Available Time Slots
@@ -71,12 +78,15 @@ export default function RegisterPage() {
     privacyAccepted: false,
   });
 
-  // Fetch Time Slots on Mount
+  // Fetch Time Slots on Mount (if advance mode)
   useEffect(() => {
+    if (isWalkInMode) return;
+
+    let ignore = false;
     async function fetchSlots() {
       try {
-        setSlotsLoading(true);
         const res = await fetch('/api/events/mumt-2026/slots');
+        if (ignore) return;
         if (res.ok) {
           const data = await res.json();
           const slots: TimeSlot[] = (data.slots || []).map((s: ApiSlot) => {
@@ -103,13 +113,14 @@ export default function RegisterPage() {
           setErrorMessage(tReg.errSlotLoad[language]);
         }
       } catch {
-        setErrorMessage(tReg.errNetwork[language]);
+        if (!ignore) setErrorMessage(tReg.errNetwork[language]);
       } finally {
-        setSlotsLoading(false);
+        if (!ignore) setSlotsLoading(false);
       }
     }
     fetchSlots();
-  }, [language, tReg.errSlotLoad, tReg.errNetwork]);
+    return () => { ignore = true; };
+  }, [isWalkInMode, language, tReg.errSlotLoad, tReg.errNetwork]);
 
   // Validation
   const validateStep1 = () => {
@@ -134,10 +145,13 @@ export default function RegisterPage() {
       return tReg.errYear[language];
     }
     if (!formData.donationExperience) return tReg.errExp[language];
+    if (isWalkInMode && !formData.privacyAccepted) {
+      return tReg.errPrivacy[language];
+    }
     return null;
   };
 
-  const validateStep3 = () => {
+  const validateStep3Advance = () => {
     if (!formData.timeSlotId) return tReg.errSlot[language];
     if (!formData.privacyAccepted) return tReg.errPrivacy[language];
     return null;
@@ -153,6 +167,10 @@ export default function RegisterPage() {
       const err = validateStep2();
       if (err) return setErrorMessage(err);
       setStep(3);
+    } else if (step === 3 && !isWalkInMode) {
+      const err = validateStep3Advance();
+      if (err) return setErrorMessage(err);
+      setStep(4);
     }
   };
 
@@ -165,13 +183,22 @@ export default function RegisterPage() {
     e.preventDefault();
     setErrorMessage(null);
 
-    const err = validateStep3();
-    if (err) return setErrorMessage(err);
+    if (isWalkInMode) {
+      const err = validateStep2();
+      if (err) return setErrorMessage(err);
+    } else {
+      const err = validateStep3Advance();
+      if (err) return setErrorMessage(err);
+    }
 
     setLoading(true);
     try {
       const { timeSlotId, ...rest } = formData;
-      const payload = { ...rest, slotId: timeSlotId };
+      const payload = {
+        ...rest,
+        slotId: isWalkInMode ? undefined : timeSlotId,
+        source: isWalkInMode ? 'WALK_IN' : 'ONLINE',
+      };
       const res = await fetch('/api/events/mumt-2026/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,14 +206,15 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
-      if (res.ok && data.success && data.registration) {
-        router.push(`/registration/${data.registration.registrationCode}`);
+      const regCode = data.registration?.registrationCode || data.registration?.registration_code;
+      if (res.ok && data.success && regCode) {
+        router.push(`/registration/${regCode}`);
       } else {
         setErrorMessage(data.message || data.error || (isTh ? 'เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง' : 'Registration error. Please try again.'));
+        setLoading(false);
       }
     } catch {
       setErrorMessage(tReg.errNetwork[language]);
-    } finally {
       setLoading(false);
     }
   };
@@ -229,18 +257,33 @@ export default function RegisterPage() {
     }
   };
 
+  const selectedSlotObj = timeSlots.find(s => s.id === formData.timeSlotId);
+
   return (
     <>
       {loading && <LoadingOverlay variant="donor-register" />}
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         
-        {/* Header */}
+        {/* Header Banner */}
         <div className="mb-8 pb-6 border-b border-[var(--line)]">
-          <h1 className="text-2xl font-black text-[var(--ink)] sm:text-4xl">
-            {tReg.title[language]}
+          <div className="flex items-center gap-2 mb-2">
+            {isWalkInMode ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-[#D92231] to-[#7E1120] text-white shadow-xs font-mono">
+                <Sparkles className="h-3 w-3" />
+                {tReg.walkinBadge[language]}
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-[var(--rose-100)] text-[var(--burgundy-700)] border border-[var(--burgundy-200)] font-mono">
+                <Calendar className="h-3 w-3" />
+                {isTh ? 'ลงทะเบียนล่วงหน้า' : 'Advance Registration'}
+              </span>
+            )}
+          </div>
+          <h1 className="text-2xl font-black text-[var(--ink)] sm:text-4xl font-display">
+            {isWalkInMode ? tReg.walkinTitle[language] : tReg.title[language]}
           </h1>
           <p className="mt-2 text-sm text-[var(--muted)] font-medium leading-relaxed">
-            {tReg.subtitle[language]}
+            {isWalkInMode ? tReg.walkinSubtitle[language] : tReg.subtitle[language]}
           </p>
         </div>
 
@@ -251,17 +294,19 @@ export default function RegisterPage() {
           <div className="md:col-span-4 editorial-card p-6 space-y-6">
             <div className="space-y-1">
               <span className="text-[11px] font-mono font-bold text-[var(--burgundy-700)] uppercase block">
-                STEP {step} OF 3
+                STEP {step} OF {totalSteps}
               </span>
               <h2 className="text-base sm:text-lg font-black text-editorial-ink">
                 {step === 1 && tReg.step1Title[language]}
                 {step === 2 && tReg.step2Title[language]}
-                {step === 3 && tReg.step3Title[language]}
+                {step === 3 && (isWalkInMode ? tReg.stepReviewTitle[language] : tReg.step3Title[language])}
+                {step === 4 && tReg.stepReviewTitle[language]}
               </h2>
               <p className="text-xs text-editorial-muted">
                 {step === 1 && tReg.step1Sub[language]}
                 {step === 2 && tReg.step2Sub[language]}
-                {step === 3 && tReg.step3Sub[language]}
+                {step === 3 && (isWalkInMode ? tReg.stepReviewSub[language] : tReg.step3Sub[language])}
+                {step === 4 && tReg.stepReviewSub[language]}
               </p>
             </div>
 
@@ -287,15 +332,39 @@ export default function RegisterPage() {
                 </div>
               </div>
 
+              {!isWalkInMode && (
+                <div className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center gap-3 ${
+                  step === 3 ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs' : step > 3 ? 'border-gray-200 bg-gray-50 text-gray-700' : 'border-gray-100 text-gray-400'
+                }`}>
+                  <span className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center text-[11px] font-mono font-bold shrink-0">03</span>
+                  <div>
+                    <p className="font-black text-gray-900">{tReg.step3Title[language]}</p>
+                    <p className="text-[10px] text-gray-500 font-normal">{tReg.step3Sub[language]}</p>
+                  </div>
+                </div>
+              )}
+
               <div className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center gap-3 ${
-                step === 3 ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs' : 'border-gray-100 text-gray-400'
+                (isWalkInMode ? step === 3 : step === 4) ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs' : 'border-gray-100 text-gray-400'
               }`}>
-                <span className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center text-[11px] font-mono font-bold shrink-0">03</span>
+                <span className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center text-[11px] font-mono font-bold shrink-0">
+                  {isWalkInMode ? '03' : '04'}
+                </span>
                 <div>
-                  <p className="font-black text-gray-900">{tReg.step3Title[language]}</p>
-                  <p className="text-[10px] text-gray-500 font-normal">{tReg.step3Sub[language]}</p>
+                  <p className="font-black text-gray-900">{tReg.stepReviewTitle[language]}</p>
+                  <p className="text-[10px] text-gray-500 font-normal">{tReg.stepReviewSub[language]}</p>
                 </div>
               </div>
+            </div>
+
+            {/* Quick Find My Pass Link */}
+            <div className="pt-4 border-t border-[var(--line)]">
+              <Link
+                href="/lookup"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)] hover:underline"
+              >
+                <span>🔍 {isTh ? 'เคยลงทะเบียนแล้ว? ค้นหาตั๋ว/QR' : 'Already registered? Find pass'}</span>
+              </Link>
             </div>
           </div>
 
@@ -515,11 +584,27 @@ export default function RegisterPage() {
                       })}
                     </div>
                   </div>
+
+                  {/* If Walk-in mode, show PDPA Consent here in Step 2 */}
+                  {isWalkInMode && (
+                    <label className="mt-4 flex items-start gap-2.5 p-3.5 rounded-xl border border-[var(--line)] bg-[var(--bg)] cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={formData.privacyAccepted}
+                        onChange={(e) => setFormData({ ...formData, privacyAccepted: e.target.checked })}
+                        className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)]"
+                      />
+                      <span className="text-[11px] leading-relaxed font-medium text-editorial-muted">
+                        {tReg.privacyNotice.accept[language]}
+                        <span className="text-red-600 font-bold ml-1">*</span>
+                      </span>
+                    </label>
+                  )}
                 </div>
               )}
 
-              {/* STEP 3: TIME SLOT SELECTION */}
-              {step === 3 && (
+              {/* STEP 3: TIME SLOT SELECTION (Advance Mode Only) */}
+              {!isWalkInMode && step === 3 && (
                 <div className="space-y-5">
                   <div className="space-y-1.5 border-b border-[var(--rose-100)] pb-2">
                     <h3 className="text-sm font-black text-[var(--burgundy-700)] uppercase tracking-wider">
@@ -612,6 +697,142 @@ export default function RegisterPage() {
                 </div>
               )}
 
+              {/* FINAL STEP: REVIEW & CONFIRMATION SUMMARY */}
+              {((isWalkInMode && step === 3) || (!isWalkInMode && step === 4)) && (
+                <div className="space-y-6 animate-in fade-in-50 duration-200">
+                  <div className="space-y-1.5 border-b border-[var(--rose-100)] pb-3">
+                    <div className="flex items-center gap-2 text-xs font-black text-[var(--burgundy-700)] uppercase font-mono">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>{tReg.reviewHeading[language]}</span>
+                    </div>
+                    <p className="text-xs text-[var(--muted)] font-medium leading-relaxed">
+                      {tReg.reviewPrompt[language]}
+                    </p>
+                  </div>
+
+                  {/* Summary Card */}
+                  <div className="rounded-2xl border border-[var(--line)] bg-[var(--bg)] p-5 sm:p-6 space-y-4 shadow-2xs">
+                    
+                    {/* Section: Donor Info */}
+                    <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] pb-3.5">
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider block">
+                          {isTh ? 'ผู้ลงทะเบียนบริจาค' : 'Donor Information'}
+                        </span>
+                        <h4 className="text-base sm:text-lg font-black text-[var(--ink)] flex items-center gap-2">
+                          <User className="h-4 w-4 text-[var(--burgundy-700)] shrink-0" />
+                          <span>{formData.firstName} {formData.lastName}</span>
+                        </h4>
+                        <div className="flex items-center gap-3 text-xs text-[var(--muted)] flex-wrap pt-0.5">
+                          <span className="font-mono font-bold text-gray-700">📞 {formData.phone}</span>
+                          {formData.email && (
+                            <span className="text-gray-600">✉️ {formData.email}</span>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className="text-xs font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <Edit3 className="h-3 w-3" />
+                        <span>{tReg.btnEdit[language]}</span>
+                      </button>
+                    </div>
+
+                    {/* Section: Affiliation & Status */}
+                    <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] pb-3.5">
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider block">
+                          {isTh ? 'สังกัดและสถานะ' : 'Affiliation & Status'}
+                        </span>
+                        <div className="flex items-center gap-2 flex-wrap text-xs">
+                          <span className="px-2.5 py-0.5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-800)] font-black border border-[var(--burgundy-200)]">
+                            {formData.participantType === 'STUDENT' ? (isTh ? 'นักศึกษา ม.มหิดล' : 'Mahidol Student') : formData.participantType === 'STAFF' ? (isTh ? 'บุคลากร ม.มหิดล' : 'Mahidol Staff') : (isTh ? 'บุคคลทั่วไป' : 'General Public')}
+                          </span>
+                          {formData.participantType !== 'GENERAL_PUBLIC' && formData.faculty && (
+                            <span className="text-gray-700 font-bold flex items-center gap-1">
+                              <Building className="h-3 w-3 text-gray-400" />
+                              {formData.faculty}
+                            </span>
+                          )}
+                          {formData.participantType === 'STUDENT' && formData.academicYear && (
+                            <span className="text-gray-500 font-medium">({formData.academicYear})</span>
+                          )}
+                        </div>
+                        <div className="pt-1 text-xs font-bold text-emerald-800 flex items-center gap-1.5">
+                          {formData.donationExperience === 'FIRST_TIME' ? (
+                            <>
+                              <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+                              <span>{tReg.expFirst[language]}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Heart className="h-3.5 w-3.5 text-red-600 fill-red-600" />
+                              <span>{tReg.expRegular[language]}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setStep(2)}
+                        className="text-xs font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <Edit3 className="h-3 w-3" />
+                        <span>{tReg.btnEdit[language]}</span>
+                      </button>
+                    </div>
+
+                    {/* Section: Arrival Window & Venue */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider block">
+                          {isTh ? 'รอบเวลาและสถานที่' : 'Time Window & Venue'}
+                        </span>
+                        <div className="flex items-center gap-2 font-mono font-black text-sm text-[var(--burgundy-800)]">
+                          <Clock className="h-4 w-4 text-[var(--burgundy-700)] shrink-0" />
+                          <span>
+                            {isWalkInMode 
+                              ? tReg.walkinSlotLabel[language]
+                              : (selectedSlotObj?.timeSlot || '09:00 – 14:00 น.')}
+                          </span>
+                        </div>
+                        <div className="flex items-start gap-1.5 text-xs text-gray-600 pt-0.5">
+                          <MapPin className="h-3.5 w-3.5 text-gray-400 shrink-0 mt-0.5" />
+                          <span>
+                            {isEn 
+                              ? 'Room 217, Sirividhaya Building, Faculty of Liberal Arts, Mahidol Salaya' 
+                              : 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา'}
+                          </span>
+                        </div>
+                      </div>
+                      {!isWalkInMode && (
+                        <button
+                          type="button"
+                          onClick={() => setStep(3)}
+                          className="text-xs font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                        >
+                          <Edit3 className="h-3 w-3" />
+                          <span>{tReg.btnEdit[language]}</span>
+                        </button>
+                      )}
+                    </div>
+
+                  </div>
+
+                  {/* Assurance Notice */}
+                  <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 text-emerald-900 text-xs font-medium flex items-start gap-2.5">
+                    <ShieldCheck className="h-4 w-4 text-emerald-700 shrink-0 mt-0.5" />
+                    <span>
+                      {isTh
+                        ? 'เมื่อกดยืนยัน ระบบจะสร้างตั๋ว Digital Ticket Pass และ QR Code สำหรับแสดงต่อเจ้าหน้าที่ทันที'
+                        : 'Upon confirmation, your Digital Ticket Pass & QR Code will be generated instantly.'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* WIZARD ACTIONS */}
               <div className="pt-6 border-t border-[var(--line)] flex items-center justify-between">
                 {step > 1 ? (
@@ -627,13 +848,13 @@ export default function RegisterPage() {
                   <div />
                 )}
 
-                {step < 3 ? (
+                {step < totalSteps ? (
                   <button
                     type="button"
                     onClick={handleNext}
                     className="editorial-btn-primary text-xs font-extrabold py-3.5 px-7 ml-auto inline-flex items-center gap-2 cursor-pointer shadow-md shadow-red-950/20 active:scale-95 transition-all"
                   >
-                    <span>{tReg.btnNext[language]}</span>
+                    <span>{step === (totalSteps - 1) ? tReg.btnReview[language] : tReg.btnNext[language]}</span>
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 ) : (
@@ -647,7 +868,7 @@ export default function RegisterPage() {
                     ) : (
                       <>
                         <Heart className="h-4 w-4 fill-white" />
-                        <span>{tReg.btnSubmit[language]}</span>
+                        <span>{tReg.btnSubmitAndGetTicket[language]}</span>
                       </>
                     )}
                   </button>
@@ -679,6 +900,14 @@ export default function RegisterPage() {
 
       </div>
     </>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="py-12 text-center text-xs font-mono font-bold text-gray-400">Loading registration...</div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }
 
@@ -729,22 +958,6 @@ function WaitlistDialog({
       if (focusables.length === 0) {
         e.preventDefault();
         dialog.focus();
-        return;
-      }
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      const active = document.activeElement;
-      if (active === dialog) {
-        e.preventDefault();
-        (e.shiftKey ? last : first).focus();
-        return;
-      }
-      if (e.shiftKey && active === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && active === last) {
-        e.preventDefault();
-        first.focus();
       }
     };
     document.addEventListener('keydown', trap);
@@ -759,21 +972,20 @@ function WaitlistDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs"
       role="dialog"
       aria-modal="true"
       aria-labelledby="waitlist-dialog-title"
-      aria-describedby="waitlist-dialog-desc"
       ref={dialogRef}
       tabIndex={-1}
     >
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4 border border-[var(--line)]">
         <div className="space-y-1">
           <span className="text-[10px] font-mono font-bold text-[var(--burgundy-600)] uppercase">WAITLIST</span>
           <h3 id="waitlist-dialog-title" className="text-lg font-black text-editorial-ink">
             {isTh ? `รอบ ${slotLabel} เต็มแล้ว` : `Time Slot ${slotLabel} is Full`}
           </h3>
-          <p id="waitlist-dialog-desc" className="text-xs text-editorial-muted font-medium leading-relaxed">
+          <p className="text-xs text-editorial-muted font-medium leading-relaxed">
             {isTh
               ? 'ลงชื่อไว้ในรายการรอ — หากมีผู้ยกเลิก ระบบจะเปิดที่ว่างให้อัตโนมัติ เจ้าหน้าที่จะติดต่อกลับทางโทรศัพท์'
               : 'Join the waitlist — if a spot opens up, staff will contact you by phone.'}

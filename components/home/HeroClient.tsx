@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, Calendar, Clock, MapPin, ArrowRight } from 'lucide-react';
-import { formatThaiDate, formatTimeRange } from '@/lib/utils/format';
+import { Heart, Calendar, Clock, MapPin, ArrowRight, Sparkles, Search } from 'lucide-react';
+import { formatThaiDate, formatTimeRange, isEventDay } from '@/lib/utils/format';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+
+const emptySubscribe = () => () => {};
 
 // Official caption (EN) from the event poster — Regional Blood Centre 4, Ratchaburi.
 const EN_DESCRIPTION =
@@ -31,6 +33,8 @@ export function HeroClient({
   endAt: string;
 }) {
   const { isEn } = useLanguage();
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+  const eventDay = mounted ? isEventDay() : false;
 
   const start = startAt ? new Date(startAt) : null;
   const end = endAt ? new Date(endAt) : null;
@@ -49,7 +53,9 @@ export function HeroClient({
     date: isEn ? enDate : thDate,
     time: isEn ? enTime : thTime,
     venue: isEn ? 'Meeting Room 217, Sirividhaya Building' : 'ห้องประชุม 217 อาคารสิริวิทยา',
-    ctaRegister: isEn ? 'Register to donate blood' : 'ลงทะเบียนบริจาคโลหิต',
+    ctaRegister: eventDay 
+      ? (isEn ? 'Walk-in Registration (Event Day)' : 'ลงทะเบียน Walk-in หน้างาน')
+      : (isEn ? 'Register to donate blood' : 'ลงทะเบียนบริจาคโลหิตออนไลน์'),
     ctaPrepare: isEn ? 'Prepare before donating' : 'ดูการเตรียมตัวก่อนบริจาค',
   };
 
@@ -62,8 +68,17 @@ export function HeroClient({
           {/* Top Bar: Event Badge (Clean & focused, language switch handled on Navbar) */}
           <div className="flex items-center justify-start gap-3 mb-6 sm:mb-8">
             <span className="brand-chip rise-in whitespace-nowrap text-xs font-bold shadow-2xs">
-              <Heart className="h-3.5 w-3.5 fill-current shrink-0 text-[var(--burgundy-300)]" />
-              <span>{copy.badge}</span>
+              {eventDay ? (
+                <>
+                  <Sparkles className="h-3.5 w-3.5 fill-current shrink-0 text-amber-300" />
+                  <span className="font-extrabold text-amber-200">{isEn ? 'Event Day · Walk-in Open' : 'วันจัดกิจกรรม · เปิด Walk-in แล้ว'}</span>
+                </>
+              ) : (
+                <>
+                  <Heart className="h-3.5 w-3.5 fill-current shrink-0 text-[var(--burgundy-300)]" />
+                  <span>{copy.badge}</span>
+                </>
+              )}
             </span>
           </div>
 
@@ -87,7 +102,7 @@ export function HeroClient({
               </p>
 
               {/* Event Facts & Action Buttons - Unified Width & Perfect Symmetry */}
-              <div className="space-y-3 pt-1 w-full">
+              <div className="space-y-3.5 pt-1 w-full">
                 
                 {/* Event Facts: 3-column cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full">
@@ -123,10 +138,11 @@ export function HeroClient({
                     <span className="truncate">{isEn ? 'Self-Screening Quiz' : 'ประเมินความพร้อมตนเอง'}</span>
                   </Link>
                   <Link 
-                    href="/knowledge" 
-                    className="btn-outline-cream !w-full border-white/25 bg-white/10 hover:bg-white/20 text-[var(--cream)] font-bold text-xs sm:text-sm px-3 py-3 rounded-2xl flex items-center justify-center text-center transition-colors shadow-2xs"
+                    href="/lookup" 
+                    className="btn-outline-cream !w-full border-white/25 bg-white/10 hover:bg-white/20 text-[var(--cream)] font-bold text-xs sm:text-sm px-3 py-3 rounded-2xl flex items-center justify-center gap-1.5 text-center transition-colors shadow-2xs"
                   >
-                    <span className="truncate">{isEn ? 'Knowledge & Labs' : 'ความรู้ & แล็บตรวจ'}</span>
+                    <Search className="h-3.5 w-3.5 shrink-0 text-white/80" />
+                    <span className="truncate">{isEn ? 'Find My QR Code' : 'ค้นหาตั๋ว / QR Code'}</span>
                   </Link>
                 </div>
 

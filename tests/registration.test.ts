@@ -128,6 +128,35 @@ async function runHardeningTests() {
   assert.ok(kpis.checkedInCount > 0);
   console.log(`✓ Dashboard KPIs aggregated total: ${kpis.totalRegistrations}, checkedIn: ${kpis.checkedInCount}\n`);
 
+  // Test 9: isEventDay Date Detection & Walk-in Registration Codes
+  console.log('Test 9: Event Day & Walk-in Registration Codes');
+  const { isEventDay, generateRegistrationCode: genCode } = await import('../lib/utils/format');
+  const eventDayDate = new Date('2026-09-16T10:00:00+07:00');
+  const otherDayDate = new Date('2026-09-15T10:00:00+07:00');
+  assert.strictEqual(isEventDay(eventDayDate), true, '2026-09-16 must be detected as event day');
+  assert.strictEqual(isEventDay(otherDayDate), false, '2026-09-15 must not be event day');
+
+  const onlineCode = genCode(1, 'ONLINE');
+  const walkinCode = genCode(1, 'WALK_IN');
+  assert.strictEqual(onlineCode, 'LVU26-001', 'Online code must be LVU26-001');
+  assert.strictEqual(walkinCode, 'LVU26-W001', 'Walk-in code must be LVU26-W001');
+  console.log('✓ Event day detection and Walk-in LVU26-WXXX format verified\n');
+
+  // Test 10: findRegistrationsByPhone Phone-only Multi-match Lookup
+  console.log('Test 10: Phone-Only Multi-Match Registration Lookup');
+  const { findRegistrationsByPhone } = await import('../services/registration-service');
+  
+  // Search for the donor registered in Test 5
+  const lookup1 = await findRegistrationsByPhone({ eventId: event.id, phone: '085-999-8877' });
+  assert.strictEqual(lookup1.length, 1, 'Should find 1 registration for 0859998877');
+  const { pickField: pick } = await import('../lib/utils/format');
+  assert.strictEqual(pick(lookup1[0], 'firstName', 'first_name'), 'วิชัย');
+
+  // Search for non-existent number
+  const lookupEmpty = await findRegistrationsByPhone({ eventId: event.id, phone: '099-000-0000' });
+  assert.strictEqual(lookupEmpty.length, 0, 'Should find 0 registrations for unused number');
+  console.log('✓ Phone-only lookup with multi-match support verified\n');
+
   console.log('🎉 ALL HARDENING TESTS PASSED SUCCESSFULLY!');
 }
 

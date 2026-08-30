@@ -210,3 +210,48 @@ export async function findRegistrationByPhoneAndName(input: {
 
   throw new Error('DATABASE_URL is unconfigured in production environment.');
 }
+
+/**
+ * Looks up all non-cancelled registrations by normalized phone number for the specified event.
+ * Returns an array of matching registrations (with timeSlot and event relations).
+ */
+export async function findRegistrationsByPhone(input: {
+  eventId: string;
+  phone: string;
+}) {
+  const phoneNormalized = normalizePhoneNumber(input.phone);
+  if (!phoneNormalized) return [];
+
+  if (db) {
+    const results = await db.query.registrations.findMany({
+      where: and(
+        eq(registrations.eventId, input.eventId),
+        eq(registrations.phoneNormalized, phoneNormalized),
+        ne(registrations.status, 'CANCELLED'),
+      ),
+      with: {
+        timeSlot: true,
+        event: true,
+      },
+      orderBy: (regs, { desc }) => [desc(regs.registeredAt)],
+    });
+    return results || [];
+  }
+
+  if (isMemoryBackendAllowed()) {
+    const matched = inMemoryRegistrations.filter(
+      r =>
+        r.event_id === input.eventId &&
+        r.phone_normalized === phoneNormalized &&
+        r.status !== 'CANCELLED'
+    );
+    return matched.map(reg => ({
+      ...reg,
+      time_slot: defaultSlots.find(s => s.id === reg.slot_id) || null,
+      event: defaultEvent,
+    }));
+  }
+
+  throw new Error('DATABASE_URL is unconfigured in production environment.');
+}
+

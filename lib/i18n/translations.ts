@@ -9,7 +9,8 @@ export const TRANSLATIONS = {
     poster: { th: 'โปสเตอร์', en: 'Posters' },
     location: { th: 'สถานที่จัดงาน', en: 'Location' },
     register: { th: 'ลงทะเบียนบริจาคโลหิต', en: 'Register to Donate' },
-    lookup: { th: 'ค้นหาบัตรลงทะเบียน', en: 'Find Registration Pass' },
+    registerWalkIn: { th: 'ลงทะเบียน Walk-in', en: 'Walk-in Register' },
+    lookup: { th: 'ค้นหาตั๋ว/QR', en: 'Find My QR' },
     brandSub: { th: 'เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ', en: 'Give Blood · Share Love · Save Lives' },
     eventBadge: { th: 'ครั้งที่ 9', en: '9th Edition' },
   },
@@ -27,6 +28,8 @@ export const TRANSLATIONS = {
     date: { th: 'วันพุธที่ 16 กันยายน 2569', en: 'Wednesday, September 16, 2026' },
     time: { th: '09:00 - 14:00 น.', en: '09:00 AM - 02:00 PM' },
     ctaRegister: { th: 'ลงทะเบียนบริจาคโลหิตออนไลน์', en: 'Register Online' },
+    ctaRegisterWalkIn: { th: 'ลงทะเบียน Walk-in หน้างาน', en: 'Walk-in Registration' },
+    ctaLookup: { th: 'ค้นหาตั๋ว / QR Code ของฉัน', en: 'Find My QR Code Pass' },
     ctaPrepare: { th: 'ดูการเตรียมตัวก่อนบริจาค', en: 'Preparation Guide' },
     ctaScreening: { th: 'ทำแบบประเมินสุขภาพตนเอง', en: 'Self-Screening' },
     statsTarget: { th: 'เป้าหมายผู้บริจาคโลหิต', en: 'Donor Target Goal' },
@@ -40,12 +43,26 @@ export const TRANSLATIONS = {
       th: 'กรอกข้อมูลและเลือกรอบเวลาเดินทาง เพื่อรับ QR Code สำหรับแสดงในวันงาน',
       en: 'Fill in your details and choose an arrival time slot to receive your check-in QR Code'
     },
+    walkinTitle: { th: 'ลงทะเบียนบริจาคโลหิต Walk-in หน้างาน', en: 'Walk-in Blood Donation Registration' },
+    walkinSubtitle: {
+      th: 'กรอกข้อมูลเพื่อรับตั๋วและ QR Code สำหรับแสดงต่อเจ้าหน้าที่ในวันงานทันที',
+      en: 'Register on-site to immediately receive your check-in QR Code pass'
+    },
+    walkinBadge: { th: 'โหมด Walk-in วันงาน (16 ก.ย. 2569)', en: 'Event Day Walk-in Mode (16 Sep 2026)' },
+    walkinSlotLabel: { th: 'รอบ Walk-in วันงาน (09:00 – 14:00 น.)', en: 'Event Day Walk-in (09:00 AM – 02:00 PM)' },
     step1Title: { th: 'ข้อมูลส่วนตัว', en: 'Personal Information' },
     step1Sub: { th: 'ใช้เวลาลงทะเบียนประมาณ 2 นาที', en: 'Takes approx. 2 minutes' },
     step2Title: { th: 'สังกัดและสถานภาพ', en: 'Affiliation & Status' },
     step2Sub: { th: 'เลือกสถานะและประสบการณ์การบริจาค', en: 'Select status and donation experience' },
     step3Title: { th: 'รอบเวลาเดินทาง', en: 'Arrival Time Slot' },
     step3Sub: { th: 'เลือกรอบเวลาที่คุณสะดวกเดินทางมาถึง', en: 'Choose your preferred arrival window' },
+    stepReviewTitle: { th: 'ตรวจสอบข้อมูล', en: 'Review Information' },
+    stepReviewSub: { th: 'ตรวจสอบความถูกต้องก่อนยืนยันรับตั๋ว', en: 'Review your details before confirmation' },
+    reviewHeading: { th: 'ตรวจสอบข้อมูลการลงทะเบียน', en: 'Review Registration Details' },
+    reviewPrompt: {
+      th: 'กรุณาตรวจสอบความถูกต้องของข้อมูล หากถูกต้องเรียบร้อยแล้วกด "ยืนยันและรับตั๋ว QR Code"',
+      en: 'Please verify your details. Click "Confirm & Get QR Pass" when ready.'
+    },
     
     // Step 1 Form
     section1: { th: '01. ข้อมูลผู้ลงทะเบียน', en: '01. Personal Information' },
@@ -98,8 +115,11 @@ export const TRANSLATIONS = {
     // Buttons & Navigation
     btnNext: { th: 'ถัดไป', en: 'Next' },
     btnBack: { th: 'ย้อนกลับ', en: 'Back' },
+    btnReview: { th: 'ตรวจสอบข้อมูล', en: 'Review Information' },
+    btnEdit: { th: 'แก้ไขข้อมูล', en: 'Edit Details' },
     btnSubmit: { th: 'ยืนยันการลงทะเบียน', en: 'Confirm Registration' },
-    btnSubmitting: { th: 'กำลังบันทึกข้อมูล...', en: 'Registering...' },
+    btnSubmitAndGetTicket: { th: 'ยืนยันและรับตั๋ว QR Code', en: 'Confirm & Get QR Pass' },
+    btnSubmitting: { th: 'กำลังบันทึกข้อมูลและสร้างตั๋ว...', en: 'Registering & Generating Pass...' },
     
     // Validation Errors
     errFirstName: { th: 'กรุณากรอกชื่อจริง', en: 'Please enter your first name' },

@@ -61,6 +61,26 @@ export function nextRegistrationSequence(codes: string[], source: 'ONLINE' | 'WA
 }
 
 /**
+ * Determines whether the given date (or current time) falls on the MUMT LoveUnit event day (2026-09-16 in Bangkok timezone).
+ */
+export function isEventDay(date: Date = new Date()): boolean {
+  try {
+    const bangkokDateStr = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(date);
+    return bangkokDateStr === '2026-09-16';
+  } catch {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}` === '2026-09-16';
+  }
+}
+
+/**
  * Extracts numeric queue number from a registration code (e.g. "LVU26-042" -> 42, "LVU26-W005" -> 5).
  */
 export function extractQueueNumber(code: string): number | null {
