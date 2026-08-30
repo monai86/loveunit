@@ -25,16 +25,27 @@ export default function StaffLoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   const redirectForRole = async () => {
-    const me = await fetch('/api/auth/me');
-    const data = await me.json();
-    window.location.href = ['SUPER_ADMIN', 'ADMIN'].includes(data?.user?.profile?.role) ? '/mt70' : '/staff/overview';
+    try {
+      const me = await fetch('/api/auth/me', { cache: 'no-store' });
+      if (me.ok) {
+        const data = await me.json();
+        const role = data?.user?.profile?.role;
+        if (role === 'SUPER_ADMIN' || role === 'ADMIN') {
+          window.location.href = '/mt70';
+          return;
+        }
+      }
+    } catch (err) {
+      console.error('Failed to resolve role for redirect:', err);
+    }
+    window.location.href = '/staff/overview';
   };
 
   // Already signed in? Redirect to the matching portal.
   useEffect(() => {
     authClient.getSession().then((res) => {
       if (res?.data?.session) {
-        redirectForRole().catch(() => router.replace('/staff/overview'));
+        redirectForRole();
       }
     }).catch(() => {});
   }, [router]);

@@ -121,31 +121,35 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 shrink-0 w-full sm:w-auto">
           <Link
             href="/staff/walk-in"
-            className="editorial-btn-primary py-2 px-3.5 text-xs flex items-center gap-1.5 shadow-2xs"
+            className="editorial-btn-primary py-2.5 px-3 text-xs flex items-center justify-center gap-1.5 shadow-2xs text-center"
           >
-            <Plus className="h-4 w-4" />
-            <span>ลงทะเบียน Walk-in</span>
+            <Plus className="h-4 w-4 shrink-0" />
+            <span className="truncate">Walk-in</span>
           </Link>
 
           <Link
             href="/staff/checkin"
-            className="editorial-btn-secondary py-2 px-3.5 text-xs flex items-center gap-1.5"
+            className="editorial-btn-secondary py-2.5 px-3 text-xs flex items-center justify-center gap-1.5 text-center"
           >
-            <QrCode className="h-4 w-4 text-[var(--burgundy-700)]" />
-            <span>จุดสแกน QR</span>
+            <QrCode className="h-4 w-4 text-[var(--burgundy-700)] shrink-0" />
+            <span className="truncate">จุดสแกน QR</span>
           </Link>
 
           <a
             href="/api/admin/export"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[var(--line)] hover:bg-gray-50 text-xs font-bold text-[var(--ink)] shadow-2xs transition-all"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white border border-[var(--line)] hover:bg-gray-50 text-xs font-bold text-[var(--ink)] shadow-2xs transition-all text-center"
           >
-            <Download className="h-4 w-4 text-emerald-600" />
-            <span>Export ข้อมูล</span>
+            <Download className="h-4 w-4 text-emerald-600 shrink-0" />
+            <span className="truncate">Export ข้อมูล</span>
           </a>
-          {currentUser?.profile.role === 'SUPER_ADMIN' && <ResetTestDataButton />}
+          {currentUser?.profile.role === 'SUPER_ADMIN' && (
+            <div className="flex items-center justify-center w-full sm:w-auto">
+              <ResetTestDataButton />
+            </div>
+          )}
         </div>
       </div>
 
@@ -160,23 +164,23 @@ export default async function AdminDashboardPage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5">
           {kpiBlocks.map((block) => {
             const Icon = block.icon;
             return (
-              <div key={block.title} className={`p-4 sm:p-5 rounded-2xl border ${block.color} shadow-2xs space-y-2 flex flex-col justify-between`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold opacity-90">{block.title}</span>
-                  <div className="p-1.5 rounded-lg bg-white/80 shadow-2xs">
-                    <Icon className="h-4 w-4" />
+              <div key={block.title} className={`p-3.5 sm:p-5 rounded-2xl border ${block.color} shadow-2xs space-y-2 flex flex-col justify-between`}>
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[11px] sm:text-xs font-bold opacity-90 truncate">{block.title}</span>
+                  <div className="p-1 sm:p-1.5 rounded-lg bg-white/80 shadow-2xs shrink-0">
+                    <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight">{block.value}</span>
-                    <span className="text-xs font-bold">{block.unit}</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-xl sm:text-3xl font-black font-mono tracking-tight">{block.value}</span>
+                    <span className="text-[10px] sm:text-xs font-bold">{block.unit}</span>
                   </div>
-                  <p className="text-[11px] font-medium pt-1 opacity-80">{block.detail}</p>
+                  <p className="text-[10px] sm:text-[11px] font-medium pt-1 opacity-80 line-clamp-1 sm:line-clamp-none">{block.detail}</p>
                 </div>
               </div>
             );

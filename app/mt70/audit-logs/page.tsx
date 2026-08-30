@@ -117,7 +117,37 @@ export default function AdminAuditLogsPage() {
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-2xs">
-          <div className="overflow-x-auto">
+          
+          {/* Mobile Card List */}
+          <div className="block md:hidden divide-y divide-gray-100">
+            {logs.map((log) => (
+              <div key={log.id} className="p-3.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1 rounded-md bg-[var(--rose-100)] px-2 py-0.5 text-[10px] font-bold text-[var(--burgundy-700)]">
+                    <ShieldAlert className="h-3 w-3" />
+                    <span>{formatActionLabel(log.action)}</span>
+                  </span>
+                  <span className="font-mono text-[10px] text-gray-500">{formatDate(log.createdAt)}</span>
+                </div>
+                <div className="flex items-start justify-between text-xs">
+                  <div>
+                    <span className="font-bold text-[var(--ink)]">{log.donorName || '-'}</span>
+                    {log.registrationCode && (
+                      <span className="block font-mono text-[11px] text-[var(--burgundy-700)] font-bold mt-0.5">
+                        {log.registrationCode}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-right font-mono text-[10px] text-gray-400">
+                    โดย: {log.performedBy || 'ระบบ'}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-xs min-w-[620px]">
               <thead className="bg-gray-50/80 border-b border-[var(--line)] text-gray-600 font-bold">
                 <tr>

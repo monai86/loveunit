@@ -418,13 +418,13 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
         </div>
 
         <div className="relative flex-1 max-w-sm">
-          <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search className="h-4 w-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           <input
             type="text"
             placeholder="ค้นหาชื่อ หรืออีเมล..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 rounded-xl border border-[var(--line)] bg-white text-xs font-medium text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)]"
+            className="w-full pl-11 pr-3 py-2 rounded-xl border border-[var(--line)] bg-white text-xs font-medium text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)]"
           />
         </div>
       </div>
@@ -465,19 +465,35 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between pt-1 border-t border-gray-50 text-xs">
-                    <span className="text-gray-500 text-[11px]">{staff.role === 'SUPER_ADMIN' ? 'Super Admin' : staff.role === 'ADMIN' ? 'Admin (ดูอย่างเดียว)' : 'Staff'} · ฝ่าย: {staff.team || 'Management'}</span>
-                    {canManage && <button
-                      type="button"
-                      onClick={() => handleOpenEdit(staff)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[var(--line)] bg-gray-50 hover:bg-gray-100 text-xs font-bold text-[var(--ink)]"
-                    >
-                      <Edit2 className="h-3 w-3 text-gray-500" />
-                      <span>แก้ไข / รหัสผ่าน</span>
-                    </button>}
-                    {canManage && canDelete(staff) && <button type="button" onClick={() => handleOpenDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700">
-                      <Trash2 className="h-3 w-3" /><span>ลบ</span>
-                    </button>}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-gray-100 text-xs">
+                    <div className="flex flex-wrap items-center gap-1.5 text-gray-500 text-[11px]">
+                      <span className="font-bold px-1.5 py-0.5 rounded bg-gray-100 text-[var(--ink)] text-[10px]">
+                        {staff.role === 'SUPER_ADMIN' ? 'Super Admin' : staff.role === 'ADMIN' ? 'Admin' : 'Staff'}
+                      </span>
+                      <span>ฝ่าย: {staff.team || 'Management'}</span>
+                    </div>
+                    <div className="flex items-center gap-2 self-end sm:self-auto">
+                      {canManage && (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEdit(staff)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-[var(--line)] bg-gray-50 hover:bg-gray-100 text-xs font-bold text-[var(--ink)]"
+                        >
+                          <Edit2 className="h-3 w-3 text-gray-500" />
+                          <span>แก้ไข</span>
+                        </button>
+                      )}
+                      {canManage && canDelete(staff) && (
+                        <button
+                          type="button"
+                          onClick={() => handleOpenDelete(staff)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          <span>ลบ</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

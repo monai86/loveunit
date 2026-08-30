@@ -241,7 +241,7 @@ textarea {
   background-color: var(--surface) !important;
   border: 1.5px solid #D9C4C0 !important;
   border-radius: var(--radius-md) !important;
-  padding: 0.7rem 0.95rem !important;
+  padding: 0.7rem 0.95rem;
   font-size: 16px !important; /* Prevents auto-zoom on iOS */
   color: var(--ink) !important;
   outline: none !important;

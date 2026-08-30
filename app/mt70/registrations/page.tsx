@@ -282,23 +282,23 @@ export default function AdminRegistrationsPage() {
           
           <div className="relative flex-1">
             <label htmlFor="reg-search" className="sr-only">ค้นหาผู้ลงทะเบียน</label>
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               id="reg-search"
               type="text"
               placeholder="ค้นหารหัส, ชื่อ-นามสกุล, หรือเบอร์โทรศัพท์..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-[var(--line)] pl-9 pr-3 py-2 text-xs font-medium text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]/20 focus:border-[var(--burgundy-700)]"
+              className="w-full rounded-xl border border-[var(--line)] pl-11 pr-3 py-2 text-xs font-medium text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]/20 focus:border-[var(--burgundy-700)]"
             />
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full md:w-auto">
             <select
               aria-label="กรองตามประเภทผู้เข้าร่วม"
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="rounded-xl border border-[var(--line)] px-2.5 py-2 text-xs font-medium text-[var(--ink)] bg-white"
+              className="w-full rounded-xl border border-[var(--line)] px-2.5 py-2 text-xs font-medium text-[var(--ink)] bg-white shadow-2xs"
             >
               <option value="ALL">ทุกประเภท</option>
               <option value="STUDENT">นักศึกษา</option>
@@ -310,7 +310,7 @@ export default function AdminRegistrationsPage() {
               aria-label="กรองตามสถานะ"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="rounded-xl border border-[var(--line)] px-2.5 py-2 text-xs font-medium text-[var(--ink)] bg-white"
+              className="w-full rounded-xl border border-[var(--line)] px-2.5 py-2 text-xs font-medium text-[var(--ink)] bg-white shadow-2xs"
             >
               <option value="ALL">ทุกสถานะ</option>
               <option value="REGISTERED">ลงทะเบียนแล้ว</option>
@@ -323,7 +323,7 @@ export default function AdminRegistrationsPage() {
               aria-label="กรองตามประสบการณ์"
               value={filterExperience}
               onChange={(e) => setFilterExperience(e.target.value)}
-              className="rounded-xl border border-[var(--line)] px-2.5 py-2 text-xs font-medium text-[var(--ink)] bg-white"
+              className="w-full rounded-xl border border-[var(--line)] px-2.5 py-2 text-xs font-medium text-[var(--ink)] bg-white shadow-2xs"
             >
               <option value="ALL">ทุกประสบการณ์</option>
               <option value="FIRST_TIME">บริจาคครั้งแรก</option>
@@ -384,25 +384,41 @@ export default function AdminRegistrationsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-xs pt-1 border-t border-gray-50">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-gray-100">
                       <span className="text-gray-500 font-mono text-[11px] flex items-center gap-1">
-                        <Calendar className="h-3 w-3 text-gray-400" />
+                        <Calendar className="h-3 w-3 text-gray-400 shrink-0" />
                         <span>{timeLabel}</span>
                       </span>
-                      <Link
-                        href={`/registration/${row.registration_code}`}
-                        target="_blank"
-                        className="inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline"
-                      >
-                        <Eye className="h-3.5 w-3.5" />
-                        <span>ดูบัตร</span>
-                      </Link>
-                      {canManage && <button type="button" onClick={(event) => openEditModal(row, event.currentTarget)} className="inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline">
-                        <Edit2 className="h-3.5 w-3.5" /><span>แก้ไข</span>
-                      </button>}
-                      {canManage && <button type="button" onClick={(event) => openDeleteModal(row, event.currentTarget)} className="inline-flex items-center gap-1 font-bold text-red-700 hover:underline">
-                        <Trash2 className="h-3.5 w-3.5" /><span>ลบ</span>
-                      </button>}
+                      <div className="flex items-center gap-2 self-end sm:self-auto">
+                        <Link
+                          href={`/registration/${row.registration_code}`}
+                          target="_blank"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200 text-xs font-bold text-[var(--burgundy-700)] hover:bg-[var(--rose-100)]"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          <span>ดูบัตร</span>
+                        </Link>
+                        {canManage && (
+                          <button
+                            type="button"
+                            onClick={(event) => openEditModal(row, event.currentTarget)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200 text-xs font-bold text-[var(--burgundy-700)] hover:bg-[var(--rose-100)]"
+                          >
+                            <Edit2 className="h-3.5 w-3.5" />
+                            <span>แก้ไข</span>
+                          </button>
+                        )}
+                        {canManage && (
+                          <button
+                            type="button"
+                            onClick={(event) => openDeleteModal(row, event.currentTarget)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-50 border border-red-200 text-xs font-bold text-red-700 hover:bg-red-100"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span>ลบ</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );

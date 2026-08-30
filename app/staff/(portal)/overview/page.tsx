@@ -169,8 +169,24 @@ export default function StaffOverviewPage() {
 
       <section className="overflow-hidden rounded-2xl border border-[var(--line)] bg-white shadow-2xs" aria-labelledby="staff-registration-list">
         <div className="flex flex-col gap-3 border-b border-[var(--line)] p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
-          <div><h2 id="staff-registration-list" className="text-base font-black text-[var(--ink)]">รายชื่อผู้ลงทะเบียน</h2><p className="mt-0.5 text-xs text-[var(--muted)]">แสดง {visibleRows.length} จาก {registrations.length} รายการ</p></div>
-          <div className="relative w-full lg:max-w-sm"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" /><input aria-label="ค้นหารหัสหรือชื่อผู้บริจาค" value={query} onChange={(event) => setQuery(event.target.value)} className="editorial-input pl-10 text-sm" placeholder="ค้นหารหัส หรือชื่อผู้บริจาค" /></div>
+          <div>
+            <h2 id="staff-registration-list" className="text-base font-black text-[var(--ink)] font-display">
+              รายชื่อผู้ลงทะเบียน
+            </h2>
+            <p className="mt-0.5 text-xs text-[var(--muted)]">
+              แสดง {visibleRows.length} จาก {registrations.length} รายการ
+            </p>
+          </div>
+          <div className="relative w-full lg:max-w-sm">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              aria-label="ค้นหารหัสหรือชื่อผู้บริจาค"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="w-full rounded-2xl border border-[var(--line)] bg-white pl-11 pr-4 py-2.5 text-sm text-[var(--ink)] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]/20 focus:border-[var(--burgundy-700)] transition-all shadow-2xs"
+              placeholder="ค้นหารหัส หรือชื่อผู้บริจาค"
+            />
+          </div>
         </div>
         <div className="flex gap-2 overflow-x-auto border-b border-[var(--line)] px-4 py-3 sm:px-5">
           {filters.map((item) => <button key={item.value} type="button" onClick={() => setFilter(item.value)} aria-pressed={filter === item.value} className={`min-h-11 shrink-0 rounded-full px-3 py-1.5 text-xs font-bold ${filter === item.value ? 'bg-[var(--burgundy-700)] text-white' : 'bg-[var(--bg)] text-[var(--muted)] hover:bg-[var(--rose-100)]'}`}>{item.label}</button>)}

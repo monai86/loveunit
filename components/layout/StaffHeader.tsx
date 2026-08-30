@@ -95,7 +95,17 @@ export function StaffHeader() {
         </nav>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {isAdmin && (
+            <Link
+              href="/mt70"
+              className="inline-flex md:hidden items-center gap-1 rounded-xl bg-gradient-to-r from-[var(--burgundy-800)] to-[var(--burgundy-600)] px-2.5 py-1.5 text-[11px] font-black text-white shadow-xs"
+            >
+              <BarChart3 className="h-3.5 w-3.5 text-amber-300" />
+              <span>Admin</span>
+            </Link>
+          )}
+
           <Link
             href="/"
             className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-[var(--burgundy-700)] px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
@@ -108,10 +118,28 @@ export function StaffHeader() {
       </div>
 
     </header>
-    <nav className="fixed inset-x-0 bottom-0 z-50 grid h-[calc(4.75rem+env(safe-area-inset-bottom))] grid-cols-3 items-end border-t border-[var(--line)] bg-white/95 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(51,25,31,0.08)] backdrop-blur md:hidden" aria-label="เมนูหน้างาน">
-      <Link href="/staff/overview" className={`flex h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${pathname.startsWith('/staff/overview') ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`}><ClipboardList className="h-5 w-5" />ภาพรวม</Link>
-      <Link href="/staff/checkin" aria-label="เปิดหน้าสแกน QR" className="-mt-8 flex h-16 w-16 justify-self-center flex-col items-center justify-center rounded-full border-4 border-[var(--bg)] bg-[var(--burgundy-700)] text-[10px] font-black text-white shadow-lg"><QrCode className="h-6 w-6" />สแกน</Link>
-      <Link href="/staff/walk-in" className={`flex h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${pathname.startsWith('/staff/walk-in') ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`}><UserPlus className="h-5 w-5" />Walk-in</Link>
+    <nav 
+      className={`fixed inset-x-0 bottom-0 z-50 grid h-[calc(4.75rem+env(safe-area-inset-bottom))] ${isAdmin ? 'grid-cols-4' : 'grid-cols-3'} items-end border-t border-[var(--line)] bg-white/95 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(51,25,31,0.08)] backdrop-blur md:hidden`} 
+      aria-label="เมนูหน้างาน"
+    >
+      <Link href="/staff/overview" className={`flex h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${pathname.startsWith('/staff/overview') ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`}>
+        <ClipboardList className="h-5 w-5" />
+        <span>ภาพรวม</span>
+      </Link>
+      <Link href="/staff/checkin" aria-label="เปิดหน้าสแกน QR" className="-mt-6 flex h-14 w-14 justify-self-center flex-col items-center justify-center rounded-full border-4 border-[var(--bg)] bg-[var(--burgundy-700)] text-[10px] font-black text-white shadow-lg">
+        <QrCode className="h-5 w-5" />
+        <span>สแกน</span>
+      </Link>
+      <Link href="/staff/walk-in" className={`flex h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${pathname.startsWith('/staff/walk-in') ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`}>
+        <UserPlus className="h-5 w-5" />
+        <span>Walk-in</span>
+      </Link>
+      {isAdmin && (
+        <Link href="/mt70" className="flex h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-black text-[var(--burgundy-700)]">
+          <BarChart3 className="h-5 w-5 text-[var(--burgundy-700)]" />
+          <span>Admin</span>
+        </Link>
+      )}
     </nav>
     </>
   );
