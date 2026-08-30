@@ -328,7 +328,7 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
                 <span>คำขอสมัคร Staff ({pendingApplications.length})</span>
               </h3>
               <p className="text-xs text-amber-800 mt-0.5">
-                ผู้สมัครตั้งรหัสผ่านความปลอดภัยสูงด้วยตนเองแล้ว Super Admin สามารถกดตอบรับเพื่อเปิดใช้งานบัญชีได้ทันที
+                Super Admin สามารถกดตอบรับเพื่อเปิดใช้งานบัญชีได้ทันที (รหัสผ่านเริ่มต้นคือ <code className="font-mono font-bold bg-white px-1 py-0.5 rounded border border-amber-200 text-[var(--burgundy-700)]">loveunit2026</code>)
               </p>
             </div>
           </div>

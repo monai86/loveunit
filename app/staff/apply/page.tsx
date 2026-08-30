@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState, useMemo } from 'react';
+import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -9,14 +9,10 @@ import {
   Loader2, 
   Search, 
   ShieldCheck, 
-  Eye, 
-  EyeOff, 
-  Check, 
-  X,
-  Lock,
-  User,
-  Mail,
-  Building2
+  User, 
+  Mail, 
+  Building2, 
+  KeyRound 
 } from 'lucide-react';
 
 export default function StaffApplyPage() {
@@ -25,47 +21,16 @@ export default function StaffApplyPage() {
     displayName: '', 
     email: '', 
     team: '', 
-    password: '', 
-    confirmPassword: '' 
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [reference, setReference] = useState('');
   const [status, setStatus] = useState<{ message: string; tone: 'error' | 'success' } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // International Password Requirements Validation
-  const passwordChecks = useMemo(() => {
-    const p = form.password;
-    return {
-      minLength: p.length >= 8,
-      hasUpper: /[A-Z]/.test(p),
-      hasLower: /[a-z]/.test(p),
-      hasNumber: /[0-9]/.test(p),
-      matches: p.length > 0 && p === form.confirmPassword,
-    };
-  }, [form.password, form.confirmPassword]);
-
-  const isPasswordValid = 
-    passwordChecks.minLength && 
-    passwordChecks.hasUpper && 
-    passwordChecks.hasLower && 
-    passwordChecks.hasNumber && 
-    passwordChecks.matches;
-
   async function submit(event: FormEvent) {
     event.preventDefault(); 
     setStatus(null);
-
-    if (!isPasswordValid) {
-      setStatus({ 
-        message: 'กรุณาตั้งรหัสผ่านให้ครบตามเงื่อนไขความปลอดภัยสากล และตรวจสอบให้รหัสผ่านตรงกัน', 
-        tone: 'error' 
-      });
-      return;
-    }
-
     setLoading(true);
+
     try {
       const res = await fetch('/api/staff/applications', { 
         method: 'POST', 
@@ -74,7 +39,6 @@ export default function StaffApplyPage() {
           displayName: form.displayName,
           email: form.email,
           team: form.team,
-          password: form.password,
         }) 
       });
       const data = await res.json();
@@ -84,10 +48,10 @@ export default function StaffApplyPage() {
       }
       setReference(data.application.referenceCode);
       setStatus({ 
-        message: 'ส่งคำขอสมัครเรียบร้อยแล้ว เมื่อผู้ดูแลระบบสูงสุดอนุมัติ คุณจะสามารถเข้าสู่ระบบด้วยรหัสผ่านนี้ได้ทันที', 
+        message: 'ส่งคำขอสมัครเรียบร้อยแล้ว เมื่อผู้ดูแลระบบสูงสุดอนุมัติ คุณจะสามารถเข้าสู่ระบบด้วยรหัสผ่านเริ่มต้น loveunit2026 ได้ทันที', 
         tone: 'success' 
       });
-      setForm({ displayName: '', email: '', team: '', password: '', confirmPassword: '' });
+      setForm({ displayName: '', email: '', team: '' });
     } catch { 
       setStatus({ message: 'ไม่สามารถเชื่อมต่อระบบได้ กรุณาลองใหม่', tone: 'error' }); 
     } finally { 
@@ -124,7 +88,7 @@ export default function StaffApplyPage() {
         </div>
 
         <p className="mt-3 text-xs leading-relaxed text-[var(--muted)]">
-          กรอกข้อมูลและตั้งรหัสผ่านของคุณเพื่อส่งคำขอ เมื่อผู้ดูแลระบบสูงสุดกดตอบรับ คุณจะสามารถเข้าสู่ระบบด้วย Email และรหัสผ่านที่ตั้งไว้นี้ได้ทันที
+          กรอกข้อมูลเพื่อส่งคำขอสมัคร เมื่อผู้ดูแลระบบสูงสุดกดตอบรับ บัญชีจะเปิดใช้งานและสามารถเข้าสู่ระบบด้วยรหัสผ่านเริ่มต้น <strong className="font-mono text-[var(--burgundy-700)]">loveunit2026</strong> ได้ทันที
         </p>
 
         {/* Application Form */}
@@ -132,7 +96,7 @@ export default function StaffApplyPage() {
           
           {/* Username */}
           <div className="space-y-1">
-            <label htmlFor="apply-username" className="block text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
+            <label htmlFor="apply-username" className="text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
               <User className="h-3.5 w-3.5 text-gray-500" />
               <span>Username</span>
               <span className="text-red-500">*</span>
@@ -151,7 +115,7 @@ export default function StaffApplyPage() {
 
           {/* Email */}
           <div className="space-y-1">
-            <label htmlFor="apply-email" className="block text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
+            <label htmlFor="apply-email" className="text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
               <Mail className="h-3.5 w-3.5 text-gray-500" />
               <span>Email</span>
               <span className="text-red-500">*</span>
@@ -170,7 +134,7 @@ export default function StaffApplyPage() {
 
           {/* Team / Department */}
           <div className="space-y-1">
-            <label htmlFor="apply-team" className="block text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
+            <label htmlFor="apply-team" className="text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
               <Building2 className="h-3.5 w-3.5 text-gray-500" />
               <span>หน่วยงาน / ทีม</span>
               <span className="text-red-500">*</span>
@@ -187,90 +151,18 @@ export default function StaffApplyPage() {
             />
           </div>
 
-          {/* Password */}
-          <div className="space-y-1">
-            <label htmlFor="apply-password" className="block text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
-              <Lock className="h-3.5 w-3.5 text-gray-500" />
-              <span>รหัสผ่าน (Password)</span>
-              <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                required
-                id="apply-password"
-                type={showPassword ? 'text' : 'password'}
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder="ตั้งรหัสผ่านตามหลักสากล..."
-                className="editorial-input w-full pr-10 text-xs font-mono"
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
-                aria-label={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4 text-gray-400" />}
-              </button>
+          {/* Default Password Notice Box */}
+          <div className="rounded-2xl border border-rose-100 bg-rose-50/60 p-3.5 flex items-start gap-3">
+            <div className="rounded-xl bg-rose-100 p-2 text-[var(--burgundy-700)] shrink-0 mt-0.5">
+              <KeyRound className="h-4 w-4" />
             </div>
-          </div>
-
-          {/* Confirm Password */}
-          <div className="space-y-1">
-            <label htmlFor="apply-confirm-password" className="block text-xs font-bold text-[var(--ink)] flex items-center gap-1.5">
-              <Lock className="h-3.5 w-3.5 text-gray-500" />
-              <span>ยืนยันรหัสผ่าน (Confirm Password)</span>
-              <span className="text-red-500">*</span>
-            </label>
-            <div className="relative">
-              <input
-                required
-                id="apply-confirm-password"
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={form.confirmPassword}
-                onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-                placeholder="พิมพ์รหัสผ่านอีกครั้งให้ตรงกัน..."
-                className="editorial-input w-full pr-10 text-xs font-mono"
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
-                aria-label={showConfirmPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
-              >
-                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4 text-gray-400" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Real-time Password Security Checklist (ตามหลักการสากล) */}
-          <div className="rounded-xl border border-gray-100 bg-gray-50/80 p-3 space-y-1.5">
-            <p className="text-[11px] font-bold text-gray-600">
-              ข้อกำหนดความปลอดภัยของรหัสผ่าน (NIST / OWASP Standard):
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px]">
-              <div className={`flex items-center gap-1.5 ${passwordChecks.minLength ? 'text-emerald-700 font-bold' : 'text-gray-500'}`}>
-                {passwordChecks.minLength ? <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" /> : <X className="h-3.5 w-3.5 text-gray-400 shrink-0" />}
-                <span>อย่างน้อย 8 ตัวอักษร</span>
-              </div>
-              <div className={`flex items-center gap-1.5 ${passwordChecks.hasUpper ? 'text-emerald-700 font-bold' : 'text-gray-500'}`}>
-                {passwordChecks.hasUpper ? <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" /> : <X className="h-3.5 w-3.5 text-gray-400 shrink-0" />}
-                <span>ตัวพิมพ์ใหญ่ (A-Z)</span>
-              </div>
-              <div className={`flex items-center gap-1.5 ${passwordChecks.hasLower ? 'text-emerald-700 font-bold' : 'text-gray-500'}`}>
-                {passwordChecks.hasLower ? <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" /> : <X className="h-3.5 w-3.5 text-gray-400 shrink-0" />}
-                <span>ตัวพิมพ์เล็ก (a-z)</span>
-              </div>
-              <div className={`flex items-center gap-1.5 ${passwordChecks.hasNumber ? 'text-emerald-700 font-bold' : 'text-gray-500'}`}>
-                {passwordChecks.hasNumber ? <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" /> : <X className="h-3.5 w-3.5 text-gray-400 shrink-0" />}
-                <span>ตัวเลข (0-9)</span>
-              </div>
-              <div className={`sm:col-span-2 flex items-center gap-1.5 ${passwordChecks.matches ? 'text-emerald-700 font-bold' : 'text-gray-500'}`}>
-                {passwordChecks.matches ? <Check className="h-3.5 w-3.5 text-emerald-600 shrink-0" /> : <X className="h-3.5 w-3.5 text-gray-400 shrink-0" />}
-                <span>รหัสผ่านทั้ง 2 ช่องตรงกัน</span>
-              </div>
+            <div className="space-y-0.5">
+              <p className="text-xs font-bold text-[var(--burgundy-800)]">
+                รหัสผ่านเริ่มต้นสำหรับสตาฟทุกคน:
+              </p>
+              <p className="text-xs text-gray-600">
+                เมื่อได้รับการอนุมัติ บัญชีของคุณจะมีรหัสผ่านเริ่มต้นคือ <code className="rounded bg-white px-1.5 py-0.5 font-mono text-xs font-black text-[var(--burgundy-700)] border border-rose-200">loveunit2026</code>
+              </p>
             </div>
           </div>
 
@@ -299,7 +191,7 @@ export default function StaffApplyPage() {
                 {reference}
               </p>
               <p className="text-[11px] text-emerald-700 leading-relaxed">
-                บันทึกเลขนี้ไว้สำหรับตรวจสอบสถานะ เมื่อผู้ดูแลระบบสูงสุดกดตอบรับแล้ว คุณจะสามารถเข้าสู่ระบบด้วย Email และรหัสผ่านที่ตั้งไว้ได้ทันที
+                บันทึกเลขนี้ไว้สำหรับตรวจสอบสถานะ เมื่อผู้ดูแลระบบสูงสุดกดตอบรับแล้ว คุณจะสามารถเข้าสู่ระบบด้วย Email และรหัสผ่านเริ่มต้น <strong className="font-mono">loveunit2026</strong> ได้ทันที
               </p>
             </div>
           )}
@@ -307,7 +199,7 @@ export default function StaffApplyPage() {
           {/* Submit Button */}
           <button 
             type="submit" 
-            disabled={loading || (form.password.length > 0 && !isPasswordValid)} 
+            disabled={loading} 
             className="editorial-btn-primary min-h-11 w-full justify-center text-xs font-extrabold shadow-md shadow-red-950/20 active:scale-95 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
