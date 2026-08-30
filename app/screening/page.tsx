@@ -102,8 +102,8 @@ export default function ScreeningPage() {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--rose-100)] px-3 py-1 text-xs font-black text-[var(--burgundy-700)] border border-[var(--line)]">
-              <ShieldCheck className="h-4 w-4 text-[var(--burgundy-700)]" />
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
+              <ShieldCheck className="h-4 w-4 text-white" />
               <span>{isTh ? 'มาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (2567)' : 'National Blood Centre Standard, Thai Red Cross (2024)'}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">

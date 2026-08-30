@@ -116,8 +116,8 @@ export default function KnowledgePage() {
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[var(--line)]">
           <div className="max-w-3xl space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--rose-100)] px-3 py-1 text-xs font-black text-[var(--burgundy-700)] border border-[var(--line)]">
-              <Microscope className="h-4 w-4 text-[var(--burgundy-700)]" />
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
+              <Microscope className="h-4 w-4 text-white" />
               <span>{isTh ? 'มาตรฐานวิชาการเทคนิคการแพทย์และศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (2567-2568)' : 'Medical Technology & Thai Red Cross Society Standards (2024-2025)'}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">

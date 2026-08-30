@@ -169,8 +169,8 @@ export default function PosterPage() {
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[var(--line)]">
           <div className="max-w-2xl space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--rose-100)] px-3 py-1 text-xs font-black text-[var(--burgundy-700)] border border-[var(--line)]">
-              <Sparkles className="h-3.5 w-3.5 fill-[var(--burgundy-700)]" />
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
+              <Sparkles className="h-3.5 w-3.5 fill-white text-white" />
               <span>{isTh ? 'อัปเดตเวลาจัดงานอย่างเป็นทางการ: 09.00 - 14.00 น.' : 'Official Event Time: 09:00 AM – 02:00 PM'}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">

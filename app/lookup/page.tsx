@@ -184,8 +184,8 @@ export default function LookupPage() {
       {/* Header */}
       <div className="mb-8 pb-6 border-b border-[var(--line)]">
         <div className="flex items-center gap-2 mb-2.5">
-          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-rose-50 to-[var(--rose-100)] text-[var(--burgundy-800)] border border-rose-200/90 shadow-2xs">
-            <Search className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20">
+            <Search className="h-3.5 w-3.5 text-white" />
             <span>{isTh ? 'ค้นหาตั๋วและ QR Code' : 'Find Ticket & QR Pass'}</span>
           </span>
         </div>

@@ -141,8 +141,8 @@ export function HomeSectionsClient() {
         <div className="editorial-card p-6 sm:p-10 bg-gradient-to-br from-[var(--rose-100)]/80 via-white to-amber-50/50 border-2 border-[var(--burgundy-500)]/20 shadow-md">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-4">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-black text-[var(--burgundy-700)] border border-[var(--line)] shadow-2xs">
-                <Sparkles className="h-3.5 w-3.5 fill-[var(--burgundy-700)]" />
+              <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
+                <Sparkles className="h-3.5 w-3.5 fill-white text-white" />
                 <span>{isTh ? 'เครื่องมือใหม่: ประเมินความพร้อมก่อนเดินทาง' : 'Interactive Self-Screening Tool'}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-[var(--ink)]">
