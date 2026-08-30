@@ -15,7 +15,9 @@ import {
   EyeOff,
   UserCheck,
   UserX,
-  Trash2
+  Trash2,
+  AlertTriangle,
+  Loader2
 } from 'lucide-react';
 import { StaffListItem } from '@/services/admin-service';
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
@@ -38,6 +40,12 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
   const [editingStaff, setEditingStaff] = useState<StaffListItem | null>(null);
   const modalRef = useRef<HTMLElement | null>(null);
 
+  // Deletion modal state
+  const [deletingStaff, setDeletingStaff] = useState<StaffListItem | null>(null);
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const deleteDialogRef = useRef<HTMLElement | null>(null);
+
   // Form State
   const [formEmail, setFormEmail] = useState('');
   const [formDisplayName, setFormDisplayName] = useState('');
@@ -57,7 +65,15 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
     if (!submitting) setModalOpen(false);
   }, [submitting]);
 
+  const closeDeleteModal = useCallback(() => {
+    if (!deleteSubmitting) {
+      setDeletingStaff(null);
+      setDeleteError(null);
+    }
+  }, [deleteSubmitting]);
+
   useFocusTrap(modalOpen, modalRef, closeModal);
+  useFocusTrap(!!deletingStaff, deleteDialogRef, closeDeleteModal);
 
   const fetchStaff = useCallback(async () => {
     setLoading(true);
@@ -132,17 +148,29 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
     setModalOpen(true);
   };
 
-  const handleDelete = async (staff: StaffListItem) => {
-    if (!confirm(`ลบบัญชี ${staff.email} ถาวรหรือไม่? บัญชีจะไม่สามารถเข้าสู่ระบบได้อีก`)) return;
+  const handleOpenDelete = (staff: StaffListItem) => {
+    setDeletingStaff(staff);
+    setDeleteError(null);
+  };
+
+  const confirmDeleteStaff = async () => {
+    if (!deletingStaff) return;
+    setDeleteSubmitting(true);
+    setDeleteError(null);
     try {
       const res = await fetch('/api/admin/staff', {
-        method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: staff.userId }),
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: deletingStaff.userId }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.message || 'ไม่สามารถลบบัญชีได้');
       await fetchStaff();
+      setDeletingStaff(null);
     } catch (error) {
-      window.alert(error instanceof Error ? error.message : 'ไม่สามารถลบบัญชีได้');
+      setDeleteError(error instanceof Error ? error.message : 'ไม่สามารถลบบัญชีได้');
+    } finally {
+      setDeleteSubmitting(false);
     }
   };
 
@@ -346,7 +374,7 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
                       <Edit2 className="h-3 w-3 text-gray-500" />
                       <span>แก้ไข / รหัสผ่าน</span>
                     </button>}
-                    {canManage && canDelete(staff) && <button type="button" onClick={() => handleDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700">
+                    {canManage && canDelete(staff) && <button type="button" onClick={() => handleOpenDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700">
                       <Trash2 className="h-3 w-3" /><span>ลบ</span>
                     </button>}
                   </div>
@@ -410,7 +438,7 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
                           <Edit2 className="h-3 w-3 text-gray-500" />
                           <span>แก้ไข / รหัสผ่าน</span>
                         </button>}
-                        {canManage && canDelete(staff) && <button type="button" onClick={() => handleDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700 transition-colors shadow-2xs">
+                        {canManage && canDelete(staff) && <button type="button" onClick={() => handleOpenDelete(staff)} className="ml-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700 transition-colors shadow-2xs">
                           <Trash2 className="h-3 w-3" /><span>ลบ</span>
                         </button>}
                       </td>
@@ -582,6 +610,108 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
 
             </form>
 
+          </section>
+        </div>
+      )}
+
+      {/* Delete Staff Confirmation Modal */}
+      {deletingStaff && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px] animate-in fade-in duration-150"
+          onMouseDown={(event) => { if (event.target === event.currentTarget) closeDeleteModal(); }}
+          onKeyDown={(event) => { if (event.key === 'Escape') closeDeleteModal(); }}
+        >
+          <section
+            ref={deleteDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-staff-title"
+            aria-describedby="delete-staff-description"
+            tabIndex={-1}
+            className="w-full max-w-md overflow-hidden rounded-2xl border border-red-100 bg-white shadow-2xl animate-in zoom-in-95 duration-150"
+          >
+            {/* Header */}
+            <div className="border-b border-red-100 bg-red-50 px-5 py-4 sm:px-6">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-700 shadow-2xs">
+                  <AlertTriangle className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-extrabold uppercase tracking-wider text-red-700">การดำเนินการถาวร</p>
+                  <h2 id="delete-staff-title" className="mt-0.5 text-base font-black text-[var(--ink)]">ยืนยันการลบบัญชี Staff</h2>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-4 px-5 py-5 sm:px-6">
+              <p id="delete-staff-description" className="text-xs leading-relaxed text-gray-600">
+                คุณกำลังจะลบบัญชีของ <strong className="text-[var(--ink)]">{deletingStaff.displayName}</strong> ออกจากระบบผู้ดูแล
+              </p>
+
+              {/* Staff Info Card */}
+              <div className="rounded-xl border border-[var(--line)] bg-[var(--paper)] p-3.5 flex items-center gap-3">
+                <div className="h-9 w-9 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center font-bold text-xs uppercase font-mono shrink-0">
+                  {deletingStaff.displayName ? deletingStaff.displayName.charAt(0) : 'S'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-xs text-[var(--ink)] truncate">{deletingStaff.displayName}</div>
+                  <div className="text-[11px] font-mono text-gray-500 truncate">{deletingStaff.email}</div>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600">
+                      ฝ่าย: {deletingStaff.team || 'Management'}
+                    </span>
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600">
+                      {deletingStaff.role === 'SUPER_ADMIN' ? 'Super Admin' : deletingStaff.role === 'ADMIN' ? 'Admin' : 'Staff'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Warning Notice */}
+              <div className="rounded-xl bg-red-50/80 border border-red-200/70 p-3 text-[11px] font-medium text-red-800 leading-relaxed">
+                ⚠️ บัญชีนี้จะไม่สามารถเข้าสู่ระบบหรือปฏิบัติหน้าที่ในระบบได้อีก และการดำเนินการนี้ไม่สามารถยกเลิกได้
+              </div>
+
+              {/* Error Message */}
+              {deleteError && (
+                <div role="alert" className="rounded-xl bg-red-50 border border-red-200 p-3 text-xs font-bold text-red-700 flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{deleteError}</span>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex flex-col-reverse gap-2 border-t border-[var(--line)] pt-4 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={closeDeleteModal}
+                  disabled={deleteSubmitting}
+                  className="min-h-11 px-4 py-2 rounded-xl border border-[var(--line)] bg-white text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-60 cursor-pointer"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  id="confirm-delete-staff-btn"
+                  type="button"
+                  onClick={() => void confirmDeleteStaff()}
+                  disabled={deleteSubmitting}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 px-5 text-xs font-extrabold text-white shadow-md shadow-red-900/20 active:scale-95 transition-all disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                >
+                  {deleteSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>กำลังลบบัญชี...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4" />
+                      <span>ลบบัญชีถาวร</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </section>
         </div>
       )}
