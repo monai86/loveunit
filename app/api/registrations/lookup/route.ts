@@ -40,6 +40,7 @@ function sanitizeRegistration(reg: RegistrationView) {
     last_name_initial: lastName ? lastName.slice(0, 1) + '.' : '',
     participant_type: reg.participantType || reg.participant_type || '',
     faculty: (reg as { faculty?: string }).faculty || null,
+    phone: (reg as { phone?: string }).phone || '',
     status: reg.status || 'REGISTERED',
     time_slot: slot
       ? {

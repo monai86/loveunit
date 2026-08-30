@@ -37,8 +37,11 @@ export interface DonorTicketPassProps {
   venue?: string;
   qrToken?: string;
   isConfirmed?: boolean;
+  status?: string;
   onReset?: () => void;
   resetLabel?: string;
+  onCancel?: () => void;
+  cancelLabel?: string;
   primaryAction?: { href: string; label: string; icon?: React.ReactNode };
 }
 
@@ -52,8 +55,11 @@ export function DonorTicketPass({
   venue = "ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา",
   qrToken,
   isConfirmed = true,
+  status = "REGISTERED",
   onReset,
   resetLabel,
+  onCancel,
+  cancelLabel,
   primaryAction,
 }: DonorTicketPassProps) {
   const { isTh, isEn } = useLanguage();
@@ -327,10 +333,14 @@ export function DonorTicketPass({
               </div>
             </div>
 
-            {isConfirmed && (
+            {isConfirmed && status !== 'CANCELLED' ? (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/40 bg-emerald-500/25 px-3 py-1 text-xs font-bold text-emerald-100 backdrop-blur-xs">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
                 <span>{isTh ? "ยืนยันสิทธิ์แล้ว" : "Confirmed"}</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-300/40 bg-rose-950/40 px-3 py-1 text-xs font-bold text-rose-200 backdrop-blur-xs">
+                <span>🚫 {isTh ? "ยกเลิกแล้ว" : "Cancelled"}</span>
               </span>
             )}
           </div>
@@ -460,80 +470,107 @@ export function DonorTicketPass({
             aria-labelledby="ticket-qr-heading"
             className="rounded-2xl border border-gray-100 bg-gray-50/70 p-6 text-center space-y-4"
           >
-            <div>
-              <h3 id="ticket-qr-heading" className="text-sm font-black text-gray-900 font-display">
-                {isTh ? "QR Code สำหรับเช็กอิน" : "Check-in QR Code"}
-              </h3>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {isTh ? "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียนในวันงาน" : "Please present this QR Code to staff at the venue on event day"}
-              </p>
-            </div>
+            {isConfirmed && status !== 'CANCELLED' ? (
+              <>
+                <div>
+                  <h3 id="ticket-qr-heading" className="text-sm font-black text-gray-900 font-display">
+                    {isTh ? "QR Code สำหรับเช็กอิน" : "Check-in QR Code"}
+                  </h3>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {isTh ? "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียนในวันงาน" : "Please present this QR Code to staff at the venue on event day"}
+                  </p>
+                </div>
 
-            <div className="flex justify-center">
-              <div
-                ref={qrRef}
-                className="rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm"
-              >
-                {qrToken ? (
-                  <QRCodeSVG
-                    value={qrToken}
-                    size={160}
-                    level="M"
-                    title={isTh ? "QR Code สำหรับเช็กอิน" : "Check-in QR Code"}
-                    imageSettings={{
-                      src: "/images/logo.png",
-                      height: 28,
-                      width: 28,
-                      excavate: true,
-                    }}
-                  />
-                ) : (
-                  <div className="flex h-40 w-40 items-center justify-center bg-gray-50 text-xs font-bold text-gray-400">
-                    {isTh ? "กำลังสร้าง QR Code..." : "Generating QR..."}
+                <div className="flex justify-center">
+                  <div
+                    ref={qrRef}
+                    className="rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm"
+                  >
+                    {qrToken ? (
+                      <QRCodeSVG
+                        value={qrToken}
+                        size={160}
+                        level="M"
+                        title={isTh ? "QR Code สำหรับเช็กอิน" : "Check-in QR Code"}
+                        imageSettings={{
+                          src: "/images/logo.png",
+                          height: 28,
+                          width: 28,
+                          excavate: true,
+                        }}
+                      />
+                    ) : (
+                      <div className="flex h-40 w-40 items-center justify-center bg-gray-50 text-xs font-bold text-gray-400">
+                        {isTh ? "กำลังสร้าง QR Code..." : "Generating QR..."}
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={downloadTicket}
+                    disabled={downloading}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[#C5222F] to-[#A6192E] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-red-900/15 transition-all hover:from-[#B01B27] hover:to-[#911426] active:scale-98 disabled:opacity-60 cursor-pointer"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>{downloading ? (isTh ? "กำลังบันทึกภาพ..." : "Saving...") : (isTh ? "บันทึกภาพตั๋ว" : "Download Pass")}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={shareTicket}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-[#A6192E] transition-all hover:bg-rose-100 active:scale-98 cursor-pointer"
+                  >
+                    <Share2 className="h-4 w-4" />
+                    <span>{isTh ? "แชร์ตั๋ว" : "Share"}</span>
+                  </button>
+
+                  <a
+                    href={getGoogleCalendarUrl()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98"
+                  >
+                    <CalendarPlus className="h-4 w-4 text-blue-600" />
+                    <span>Google Calendar</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={downloadIcs}
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98 cursor-pointer"
+                  >
+                    <Calendar className="h-4 w-4 text-indigo-600" />
+                    <span>Apple Calendar (.ics)</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="py-6 px-4 rounded-2xl bg-rose-50/80 border border-rose-200 text-center space-y-2">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-black text-xl shadow-2xs">
+                  ✕
+                </div>
+                <h3 className="text-base font-black text-rose-950 font-display">
+                  {isTh ? "ตั๋วลงทะเบียนนี้ถูกยกเลิกแล้ว" : "Registration Cancelled"}
+                </h3>
+                <p className="text-xs text-rose-800 max-w-sm mx-auto font-medium">
+                  {isTh 
+                    ? "รหัสและ QR Code นี้ถูกยกเลิกแล้ว ไม่สามารถนำมาใช้สแกนเช็กอินในวันงานได้ หากต้องการเข้าร่วมกิจกรรม กรุณาลงทะเบียนใหม่อีกครั้ง"
+                    : "This registration and QR Code have been voided and cannot be used for check-in on event day."}
+                </p>
+                <div className="pt-3">
+                  <Link
+                    href="/register"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#A6192E] px-4 py-2 text-xs font-bold text-white hover:bg-[#8F1426] transition-all shadow-xs"
+                  >
+                    <span>{isTh ? "ลงทะเบียนใหม่" : "Register Again"}</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
               </div>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
-              <button
-                type="button"
-                onClick={downloadTicket}
-                disabled={downloading}
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[#C5222F] to-[#A6192E] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-red-900/15 transition-all hover:from-[#B01B27] hover:to-[#911426] active:scale-98 disabled:opacity-60 cursor-pointer"
-              >
-                <Download className="h-4 w-4" />
-                <span>{downloading ? (isTh ? "กำลังบันทึกภาพ..." : "Saving...") : (isTh ? "บันทึกภาพตั๋ว" : "Download Pass")}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={shareTicket}
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-[#A6192E] transition-all hover:bg-rose-100 active:scale-98 cursor-pointer"
-              >
-                <Share2 className="h-4 w-4" />
-                <span>{isTh ? "แชร์ตั๋ว" : "Share"}</span>
-              </button>
-
-              <a
-                href={getGoogleCalendarUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98"
-              >
-                <CalendarPlus className="h-4 w-4 text-blue-600" />
-                <span>Google Calendar</span>
-              </a>
-
-              <button
-                type="button"
-                onClick={downloadIcs}
-                className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98 cursor-pointer"
-              >
-                <Calendar className="h-4 w-4 text-indigo-600" />
-                <span>Apple Calendar (.ics)</span>
-              </button>
-            </div>
+            )}
           </section>
 
           {/* Symmetrical 2x2 Preparation Tips Grid */}
@@ -615,6 +652,15 @@ export function DonorTicketPass({
           >
             <ArrowLeft className="h-4 w-4" />
             <span>{effectiveResetLabel}</span>
+          </button>
+        )}
+        {onCancel && isConfirmed && status !== 'CANCELLED' && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="editorial-btn-secondary border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 min-h-11 flex-1 py-3 text-xs font-bold cursor-pointer transition-colors"
+          >
+            <span>{cancelLabel || (isTh ? "ขอยกเลิกการลงทะเบียน" : "Cancel Registration")}</span>
           </button>
         )}
         <Link
