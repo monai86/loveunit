@@ -154,12 +154,12 @@ export function Navbar() {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-9 w-9 sm:h-11 sm:w-11 min-h-[36px] sm:min-h-[44px] min-w-[36px] sm:min-w-[44px] items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs active:scale-95 transition-transform"
+            className="flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-[var(--line)] bg-white text-[var(--burgundy-700)] cursor-pointer shrink-0 shadow-2xs active:scale-95 transition-transform"
             aria-label={isTh ? 'เปิดเมนูหลัก' : 'Open navigation menu'}
             aria-expanded={mobileMenuOpen}
             aria-controls="public-mobile-menu"
           >
-            {mobileMenuOpen ? <X className="h-4 w-4 sm:h-5 sm:w-5" /> : <Menu className="h-4 w-4 sm:h-5 sm:w-5" />}
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
