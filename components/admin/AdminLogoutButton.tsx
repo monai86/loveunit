@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { LogOut, Loader2 } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 
 export function AdminLogoutButton() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
@@ -15,8 +17,8 @@ export function AdminLogoutButton() {
     } catch (err) {
       console.error('Sign out error:', err);
     } finally {
-      // Hard redirect to clear server state and cookies cleanly
-      window.location.href = '/staff/login';
+      router.replace('/staff/login');
+      router.refresh();
     }
   };
 

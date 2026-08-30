@@ -16,8 +16,8 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    // Anti-abuse: waitlist joins rate limiter adjusted for campus NAT
-    if (!checkRateLimit(request, { limit: 200, windowMs: 60 * 1000 })) {
+    // Anti-abuse: waitlist rate limiter (adjusted for high-density campus Wi-Fi NAT)
+    if (!checkRateLimit(request, { limit: 400, windowMs: 60 * 1000 })) {
       return rateLimitedResponse(60);
     }
 

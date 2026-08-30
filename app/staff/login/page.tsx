@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -24,22 +24,24 @@ export default function StaffLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const redirectForRole = async () => {
+  const redirectForRole = useCallback(async () => {
     try {
       const me = await fetch('/api/auth/me', { cache: 'no-store' });
       if (me.ok) {
         const data = await me.json();
         const role = data?.user?.profile?.role;
         if (role === 'SUPER_ADMIN' || role === 'ADMIN') {
-          window.location.href = '/mt70';
+          router.replace('/mt70');
+          router.refresh();
           return;
         }
       }
     } catch (err) {
       console.error('Failed to resolve role for redirect:', err);
     }
-    window.location.href = '/staff/overview';
-  };
+    router.replace('/staff/overview');
+    router.refresh();
+  }, [router]);
 
   // Already signed in? Redirect to the matching portal.
   useEffect(() => {
@@ -48,7 +50,7 @@ export default function StaffLoginPage() {
         redirectForRole();
       }
     }).catch(() => {});
-  }, [router]);
+  }, [redirectForRole]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +74,7 @@ export default function StaffLoginPage() {
 
       const userObj = res?.data?.user as { mustChangePassword?: boolean } | undefined;
       if (userObj?.mustChangePassword) {
-        window.location.href = '/staff/change-password';
+        router.replace('/staff/change-password');
       } else {
         await redirectForRole();
       }

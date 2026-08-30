@@ -17,10 +17,8 @@ import {
   ArrowRight,
   Globe,
   Search,
-  Sparkles
 } from 'lucide-react';
 import { useLanguage, TRANSLATIONS } from '@/lib/i18n/LanguageContext';
-import { isEventDay } from '@/lib/utils/format';
 
 const emptySubscribe = () => () => {};
 
@@ -29,7 +27,6 @@ export function Navbar() {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const pathname = usePathname();
   const { language, setLanguage, isTh, isEn } = useLanguage();
-  const eventDay = isEventDay();
 
   // PUBLIC DONOR NAVIGATION LINKS (DYNAMIC TRANSLATION)
   const navLinks = [

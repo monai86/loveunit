@@ -13,7 +13,7 @@ export async function POST(
 ) {
   try {
     // Anti-abuse: public registration rate limiter adjusted for high-density campus Wi-Fi NAT (200+ concurrent donors)
-    if (!checkRateLimit(request, { limit: 300, windowMs: 60 * 1000 })) {
+    if (!checkRateLimit(request, { limit: 500, windowMs: 60 * 1000 })) {
       return rateLimitedResponse(60);
     }
 

@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   // When deploying on Vercel (process.env.VERCEL is set), omit standalone to let Vercel's native builder trace functions.
   ...(process.env.VERCEL ? {} : { output: "standalone" }),
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  compress: true,
+  poweredByHeader: false,
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'qrcode.react'],
+  },
   async headers() {
     return [
       {

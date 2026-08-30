@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { QrCode, UserPlus, BarChart3, LogOut, Loader2, LayoutDashboard, ClipboardList, ArrowLeft } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 
@@ -146,6 +146,7 @@ export function StaffHeader() {
 }
 
 function LogoutButton() {
+  const router = useRouter();
   const [signingOut, setSigningOut] = useState(false);
 
   const handleLogout = async () => {
@@ -153,7 +154,8 @@ function LogoutButton() {
     try {
       await authClient.signOut();
     } finally {
-      window.location.href = '/staff/login';
+      router.replace('/staff/login');
+      router.refresh();
     }
   };
 

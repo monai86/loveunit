@@ -35,7 +35,12 @@ export function createNeonClient() {
     return null;
   }
 
-  const pool = new Pool({ connectionString });
+  const pool = new Pool({
+    connectionString,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  });
   return drizzle(pool, { schema });
 }
 

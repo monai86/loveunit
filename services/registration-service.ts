@@ -23,7 +23,11 @@ export async function registerDonorAtomic(input: {
 
   if (db) {
     return await db.transaction(async (tx) => {
-      // 1. Check duplicate normalized phone
+      // 1. Acquire event-level advisory transaction lock to guarantee deterministic ordering
+      // and prevent lock ordering deadlocks under 200+ concurrent requests.
+      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${input.eventId}))`);
+
+      // 2. Check duplicate normalized phone
       const existing = await tx
         .select()
         .from(registrations)
@@ -45,7 +49,7 @@ export async function registerDonorAtomic(input: {
         };
       }
 
-      // 2. Validate the selected arrival window and retain a count for reports.
+      // 3. Validate the selected arrival window and retain a count for reports.
       // Arrival windows intentionally have no registration capacity limit.
       if (input.slotId) {
         const slotResult = await tx.execute(
@@ -64,10 +68,7 @@ export async function registerDonorAtomic(input: {
           .where(eq(timeSlots.id, input.slotId));
       }
 
-      // 3. Create a monotonic event code separated by source (Online vs Walk-in).
-      // Lock per event so concurrent requests cannot receive the same number.
-      await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${input.eventId}))`);
-      
+      // 4. Create a monotonic event code separated by source (Online vs Walk-in).
       let nextSeq = 1;
       if (source === 'WALK_IN') {
         const maxSeqResult = await tx.execute(

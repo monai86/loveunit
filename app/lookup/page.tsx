@@ -54,6 +54,13 @@ export default function LookupPage() {
     code: string;
     name: string;
   } | null>(null);
+  const searchControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    return () => {
+      searchControllerRef.current?.abort();
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,12 +79,17 @@ export default function LookupPage() {
       return;
     }
 
+    searchControllerRef.current?.abort();
+    const controller = new AbortController();
+    searchControllerRef.current = controller;
+
     setLoading(true);
     try {
       const res = await fetch('/api/registrations/lookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone: phone.trim() }),
+        signal: controller.signal,
       });
       const data = await res.json();
 
@@ -103,7 +115,10 @@ export default function LookupPage() {
             (isTh ? 'ไม่พบข้อมูลการลงทะเบียนที่ตรงกับเบอร์โทรศัพท์นี้' : 'Registration record not found')
         );
       }
-    } catch {
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return;
+      }
       setErrorMessage(
         isTh
           ? 'เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย กรุณาลองใหม่อีกครั้ง'

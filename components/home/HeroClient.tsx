@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useSyncExternalStore } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, Calendar, Clock, MapPin, ArrowRight, Sparkles, Search } from 'lucide-react';
+import { Heart, Calendar, Clock, MapPin, ArrowRight, Search, Sparkles } from 'lucide-react';
 import { formatThaiDate, formatTimeRange, isEventDay } from '@/lib/utils/format';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-
-const emptySubscribe = () => () => {};
 
 // Official caption (EN) from the event poster — Regional Blood Centre 4, Ratchaburi.
 const EN_DESCRIPTION =
