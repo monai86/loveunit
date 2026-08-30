@@ -8,20 +8,15 @@ process.env.DATA_BACKEND = 'memory';
 import assert from 'node:assert/strict';
 import {
   defaultEvent,
-  inMemoryRegistrations,
   registerDonorAtomic,
   getRegistrationByCode,
   isTransitionAllowed,
 } from '../lib/db/store';
 import { findRegistrationsByPhone } from '../services/registration-service';
-import { cancelRegistration } from '../services/checkin-service';
 import { POST as cancelApiPost } from '../app/api/registrations/cancel/route';
 
 async function runDonorSelfCancelTests() {
   console.log('🧪 Starting Donor Self-Cancellation Test Suite...\n');
-
-  // Clear or note starting count
-  const initialRegCount = inMemoryRegistrations.length;
 
   // ---- Test 1: Register initial donor ----
   console.log('Test 1: Register initial donor');
@@ -137,7 +132,7 @@ async function runDonorSelfCancelTests() {
     lastName: 'รักการให้',
     phone: '0812345602',
     participantType: 'STAFF',
-    donationExperience: 'REPEAT',
+    donationExperience: 'RETURNING',
     slotId: 'ts-3',
     source: 'ONLINE',
   });
@@ -155,7 +150,9 @@ async function runDonorSelfCancelTests() {
     phone: '0812345601',
   });
   assert.strictEqual(lookupActive.length, 1, 'Lookup must return 1 active registration for this phone');
-  assert.strictEqual(lookupActive[0].registration_code, codeARe, 'Lookup must return the new active code');
+  const activeReg = lookupActive[0] as { registration_code?: string; registrationCode?: string };
+  const activeCode = activeReg.registration_code || activeReg.registrationCode;
+  assert.strictEqual(activeCode, codeARe, 'Lookup must return the new active code');
   console.log('✓ Lookup correctly returns only active registration');
 
   console.log('\n🎉 ALL DONOR SELF-CANCELLATION TESTS PASSED SUCCESSFULLY!');

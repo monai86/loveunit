@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   User,
   Utensils,
+  XCircle,
 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { isWalkInRecord } from "@/lib/utils/format";
@@ -77,9 +78,6 @@ export function DonorTicketPass({
   const timeCanvasLabel = isWalkIn
     ? (isTh ? "เวลาลงทะเบียน Walk-in" : "WALK-IN TIME")
     : (isTh ? "รอบเวลาที่นัดหมาย" : "APPOINTMENT TIME");
-  const detailsHeading = isWalkIn
-    ? (isTh ? "รายละเอียดการลงทะเบียน" : "Registration Details")
-    : (isTh ? "รายละเอียดการนัดหมาย" : "Appointment Details");
 
   const copyCode = async () => {
     try {
@@ -658,8 +656,9 @@ export function DonorTicketPass({
           <button
             type="button"
             onClick={onCancel}
-            className="editorial-btn-secondary border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300 min-h-11 flex-1 py-3 text-xs font-bold cursor-pointer transition-colors"
+            className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-xs font-bold text-[#A6192E] shadow-2xs hover:bg-rose-100 hover:border-rose-300 active:scale-98 transition-all cursor-pointer"
           >
+            <XCircle className="h-4 w-4" />
             <span>{cancelLabel || (isTh ? "ขอยกเลิกการลงทะเบียน" : "Cancel Registration")}</span>
           </button>
         )}

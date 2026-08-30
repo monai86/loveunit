@@ -351,7 +351,7 @@ export default function AdminRegistrationsPage() {
             <div className="block md:hidden divide-y divide-gray-100">
               {filteredList.map((row) => {
                 const badge = getRegistrationStatusBadge(row.status);
-                const isWalkIn = isWalkInRecord(row.registration_code) || (row as any).source === 'WALK_IN';
+                const isWalkIn = isWalkInRecord(row.registration_code) || (row as { source?: string }).source === 'WALK_IN';
                 const timeLabel = isWalkIn
                   ? (row.created_at ? `Walk-in (${formatBangkokTime(row.created_at)})` : 'Walk-in')
                   : (row.time_slot ? formatTimeRange(row.time_slot.start_at, row.time_slot.end_at) : '09:00 – 14:00 น.');
@@ -443,7 +443,7 @@ export default function AdminRegistrationsPage() {
                 <tbody className="divide-y divide-gray-100 font-medium">
                   {filteredList.map((row) => {
                     const badge = getRegistrationStatusBadge(row.status);
-                    const isWalkIn = isWalkInRecord(row.registration_code) || (row as any).source === 'WALK_IN';
+                    const isWalkIn = isWalkInRecord(row.registration_code) || (row as { source?: string }).source === 'WALK_IN';
                     const timeLabel = isWalkIn
                       ? (row.created_at ? `Walk-in (${formatBangkokTime(row.created_at)})` : 'Walk-in')
                       : (row.time_slot ? formatTimeRange(row.time_slot.start_at, row.time_slot.end_at) : '09:00 – 14:00 น.');

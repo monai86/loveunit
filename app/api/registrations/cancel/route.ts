@@ -20,9 +20,10 @@ export async function POST(request: Request) {
     const parseResult = cancelSchema.safeParse(body);
 
     if (!parseResult.success) {
+      const issue = parseResult.error.issues?.[0];
       return NextResponse.json({
         success: false,
-        message: parseResult.error.errors[0]?.message || 'ข้อมูลไม่ถูกต้อง',
+        message: issue?.message || 'ข้อมูลไม่ถูกต้อง',
       }, { status: 400 });
     }
 
