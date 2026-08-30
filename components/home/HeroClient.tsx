@@ -52,9 +52,7 @@ export function HeroClient({
     date: isEn ? enDate : thDate,
     time: isEn ? enTime : thTime,
     venue: isEn ? 'Meeting Room 217, Sirividhaya Building' : 'ห้องประชุม 217 อาคารสิริวิทยา',
-    ctaRegister: eventDay 
-      ? (isEn ? 'Walk-in Registration (Event Day)' : 'ลงทะเบียน Walk-in หน้างาน')
-      : (isEn ? 'Register to donate blood' : 'ลงทะเบียนบริจาคโลหิตออนไลน์'),
+    ctaRegister: isEn ? 'Register to donate blood' : 'ลงทะเบียนบริจาคโลหิตออนไลน์',
     ctaPrepare: isEn ? 'Prepare before donating' : 'ดูการเตรียมตัวก่อนบริจาค',
   };
 
