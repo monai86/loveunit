@@ -207,19 +207,26 @@ a, button, input, select, textarea, label {
   touch-action: manipulation;
 }
 
-/* WCAG 2.2 AA: every keyboard-reachable control keeps a high-contrast focus
-   indicator, including legacy controls that previously opted out with
-   Tailwind's `focus:outline-none`. */
+/* WCAG 2.2 AA: every keyboard-reachable interactive element keeps a clean, high-contrast focus indicator */
 a:focus-visible,
 button:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--burgundy-600) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
 input:focus-visible,
 select:focus-visible,
-textarea:focus-visible,
-[role="button"]:focus-visible,
-[tabindex]:focus-visible {
-  outline: 3px solid var(--burgundy-700) !important;
-  outline-offset: 3px !important;
-  box-shadow: 0 0 0 2px var(--surface), 0 0 0 5px var(--burgundy-700) !important;
+textarea:focus-visible {
+  outline: none !important;
+  border-color: var(--burgundy-600) !important;
+  box-shadow: 0 0 0 3px rgba(166, 25, 46, 0.14) !important;
 }
 
 input,
@@ -238,6 +245,7 @@ textarea {
   font-size: 16px !important; /* Prevents auto-zoom on iOS */
   color: var(--ink) !important;
   outline: none !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
 @media screen and (min-width: 640px) {
@@ -246,9 +254,11 @@ textarea {
   }
 }
 
-.editorial-input:focus, select.editorial-input:focus {
-  border-color: var(--burgundy-700) !important;
-  box-shadow: 0 0 0 3px rgba(110, 16, 30, 0.14) !important;
+.editorial-input:focus, select.editorial-input:focus,
+.editorial-input:focus-visible, select.editorial-input:focus-visible {
+  outline: none !important;
+  border-color: var(--burgundy-600) !important;
+  box-shadow: 0 0 0 3px rgba(166, 25, 46, 0.14) !important;
 }
 
 .editorial-input::placeholder { color: var(--faint) !important; }

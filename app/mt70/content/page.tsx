@@ -165,7 +165,7 @@ export default function AdminContentPage() {
                       value={block.title}
                       onChange={(e) => handleUpdateBlock(block.content_key, 'title', e.target.value)}
                       disabled={!canManage}
-                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
+                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)]"
                     />
                   </div>
 
@@ -177,7 +177,7 @@ export default function AdminContentPage() {
                       value={block.description || ''}
                       onChange={(e) => handleUpdateBlock(block.content_key, 'description', e.target.value)}
                       disabled={!canManage}
-                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
+                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)]"
                     />
                   </div>
 
@@ -190,7 +190,7 @@ export default function AdminContentPage() {
                       value={block.image_url || ''}
                       onChange={(e) => handleUpdateBlock(block.content_key, 'image_url', e.target.value)}
                       disabled={!canManage}
-                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
+                      className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)]"
                     />
                   </div>
                 </div>

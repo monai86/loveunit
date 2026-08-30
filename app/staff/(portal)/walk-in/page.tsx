@@ -140,7 +140,7 @@ export default function StaffWalkInPage() {
                 required
                 value={formData.firstName}
                 onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                className="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
+                className="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)]"
               />
             </div>
 
@@ -155,7 +155,7 @@ export default function StaffWalkInPage() {
                 required
                 value={formData.lastName}
                 onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                className="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
+                className="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)]"
               />
             </div>
           </div>
@@ -173,7 +173,7 @@ export default function StaffWalkInPage() {
                 required
                 value={formData.phone}
                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                className="w-full rounded-xl border border-gray-300 pl-10 pr-3.5 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
+                className="w-full rounded-xl border border-gray-300 pl-10 pr-3.5 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)]"
               />
             </div>
           </div>
@@ -203,7 +203,7 @@ export default function StaffWalkInPage() {
                 id="wi-faculty"
                 value={formData.faculty}
                 onChange={(e) => setFormData(prev => ({ ...prev, faculty: e.target.value }))}
-                className="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]"
+                className="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-600)]/20 focus:border-[var(--burgundy-600)]"
               >
                 <option value="">-- เลือกคณะ / สถาบัน --</option>
                 {MAHIDOL_FACULTIES.map((fac) => (
