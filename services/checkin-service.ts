@@ -201,7 +201,10 @@ export async function cancelRegistration(
         registrationId,
         action: 'STATUS_CHANGE_CANCELLED',
         performedBy: resolveActorId(performedBy),
-        metadata: reason ? { reason } : undefined,
+        metadata: {
+          ...(reason ? { reason } : {}),
+          actor: performedBy || 'DONOR_SELF',
+        },
       });
 
       return {

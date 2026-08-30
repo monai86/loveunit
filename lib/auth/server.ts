@@ -23,8 +23,16 @@ export interface AuthenticatedUser {
  */
 export function resolveActorId(actorId?: string | null): string | null {
   if (!actorId) return null;
-  if (actorId.startsWith('u-')) return null;
-  return actorId;
+  const trimmed = actorId.trim();
+  if (
+    trimmed.startsWith('u-') ||
+    trimmed === 'DONOR_SELF' ||
+    trimmed === 'SYSTEM' ||
+    trimmed === 'ANONYMOUS'
+  ) {
+    return null;
+  }
+  return trimmed;
 }
 
 const devProfiles: Record<string, StaffProfile> = {

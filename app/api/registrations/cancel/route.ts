@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     console.error('Error in donor self-cancellation:', error);
     return NextResponse.json({
       success: false,
-      message: 'เกิดข้อผิดพลาดในการยกเลิก กรุณาลองใหม่อีกครั้ง',
+      message: error instanceof Error ? error.message : 'เกิดข้อผิดพลาดในการยกเลิก กรุณาลองใหม่อีกครั้ง',
     }, { status: 500 });
   }
 }
