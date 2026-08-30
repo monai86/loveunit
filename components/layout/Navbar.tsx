@@ -83,10 +83,10 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[var(--bg)]/95 backdrop-blur-md select-none shadow-2xs" suppressHydrationWarning>
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 sm:px-6 xl:px-8 gap-3 sm:gap-4">
+      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-2.5 sm:px-6 xl:px-8 gap-2 sm:gap-4">
         
         {/* 1. Left: Brand Logo & Title */}
-        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink min-w-0 group">
+        <Link href="/" className="flex items-center gap-2 sm:gap-2.5 shrink-0 mr-1 xl:mr-3 group">
           <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-white p-1 border border-[var(--line)] shadow-xs transition-transform group-hover:scale-105 overflow-hidden">
             <Image 
               src="/images/logo.png" 
@@ -108,7 +108,7 @@ export function Navbar() {
         </Link>
 
         {/* 2. Center: Public Navigation links (Desktop >= 1280px) */}
-        <nav className="hidden xl:flex items-center justify-center gap-1 2xl:gap-2 flex-1 min-w-0 mx-2">
+        <nav className="hidden xl:flex items-center justify-center gap-0.5 2xl:gap-1.5 flex-1 min-w-0 mx-1 2xl:mx-3">
           {navLinks.map((item) => {
             const Icon = item.icon;
             const isActive = mounted && (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
@@ -116,13 +116,13 @@ export function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs 2xl:text-[13px] font-semibold whitespace-nowrap shrink-0 transition-all ${
+                className={`flex items-center gap-1 2xl:gap-1.5 rounded-xl px-1.5 2xl:px-2.5 py-1.5 text-xs 2xl:text-[13px] font-semibold whitespace-nowrap shrink-0 transition-all ${
                   isActive
                     ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-2xs font-bold'
                     : 'text-[var(--ink)] hover:bg-black/5 hover:text-[var(--burgundy-700)]'
                 }`}
               >
-                <Icon className={`h-3.5 w-3.5 2xl:h-4 2xl:w-4 shrink-0 ${isActive ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`} />
+                <Icon className={`hidden 2xl:inline-block h-3.5 w-3.5 2xl:h-4 2xl:w-4 shrink-0 ${isActive ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'}`} />
                 <span className="whitespace-nowrap">{item.label}</span>
               </Link>
             );
@@ -130,11 +130,11 @@ export function Navbar() {
         </nav>
 
         {/* 3. Right: Symmetrical Language Switcher & Red Gradient CTA Button (>= 1280px) */}
-        <div className="hidden xl:flex items-center gap-3 shrink-0">
+        <div className="hidden xl:flex items-center gap-2 2xl:gap-3 shrink-0">
           {langSwitcher}
           <Link
             href="/register"
-            className="inline-flex min-h-11 items-center gap-2 rounded-2xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-4.5 py-2.5 text-xs 2xl:text-[13px] font-extrabold text-white shadow-md shadow-red-950/20 hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] hover:shadow-lg hover:shadow-red-950/30 active:scale-95 transition-all whitespace-nowrap shrink-0 cursor-pointer"
+            className="inline-flex min-h-10 2xl:min-h-11 items-center gap-1.5 2xl:gap-2 rounded-2xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 2xl:px-4.5 py-2 2xl:py-2.5 text-xs 2xl:text-[13px] font-extrabold text-white shadow-md shadow-red-950/20 hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] hover:shadow-lg hover:shadow-red-950/30 active:scale-95 transition-all whitespace-nowrap shrink-0 cursor-pointer"
           >
             {eventDay ? (
               <>

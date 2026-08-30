@@ -4,7 +4,7 @@ export const TRANSLATIONS = {
   nav: {
     home: { th: 'หน้าแรก', en: 'Home' },
     screening: { th: 'ประเมินตนเอง', en: 'Self-Screen' },
-    knowledge: { th: 'ความรู้ & แล็บตรวจ', en: 'Knowledge & Lab' },
+    knowledge: { th: 'ความรู้ & แล็บ', en: 'Knowledge & Lab' },
     prepare: { th: 'การเตรียมตัว', en: 'Preparation' },
     poster: { th: 'โปสเตอร์', en: 'Posters' },
     location: { th: 'สถานที่จัดงาน', en: 'Location' },
