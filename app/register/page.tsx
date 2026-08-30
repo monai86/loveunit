@@ -290,8 +290,8 @@ function RegisterContent() {
         {/* Asymmetric 2-Column Desktop Form Shell */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           
-          {/* Left Progress Column (4 Cols) */}
-          <div className="md:col-span-4 editorial-card p-6 space-y-6">
+          {/* Left Progress Column (Desktop Only — 4 Cols) */}
+          <div className="hidden md:block md:col-span-4 editorial-card p-6 space-y-6">
             <div className="space-y-1">
               <span className="text-[11px] font-mono font-bold text-[var(--burgundy-700)] uppercase block">
                 STEP {step} OF {totalSteps}
@@ -368,8 +368,36 @@ function RegisterContent() {
             </div>
           </div>
 
-          {/* Right Form Control Column (8 Cols) */}
-          <div className="md:col-span-8 editorial-card p-6 sm:p-8">
+          {/* Right Form Control Column (8 Cols on desktop, full width on mobile) */}
+          <div className="md:col-span-8 editorial-card p-5 sm:p-8">
+            
+            {/* Mobile-Only Compact Step Indicator (Takes only ~40px height, ensures form is immediately visible above the fold on mobile) */}
+            <div className="block md:hidden mb-5 pb-3.5 border-b border-[var(--line)]">
+              <div className="flex items-center justify-between text-xs mb-2">
+                <span className="font-mono font-bold text-[var(--burgundy-700)]">
+                  {isTh ? `ขั้นตอนที่ ${step} จาก ${totalSteps}` : `Step ${step} of ${totalSteps}`}
+                </span>
+                <span className="font-bold text-[var(--ink)] text-right truncate max-w-[210px]">
+                  {step === 1 && tReg.step1Title[language]}
+                  {step === 2 && tReg.step2Title[language]}
+                  {step === 3 && (isWalkInMode ? tReg.stepReviewTitle[language] : tReg.step3Title[language])}
+                  {step === 4 && tReg.stepReviewTitle[language]}
+                </span>
+              </div>
+              <div className={`grid ${totalSteps === 3 ? 'grid-cols-3' : 'grid-cols-4'} gap-1.5 h-1.5 w-full`}>
+                {Array.from({ length: totalSteps }).map((_, idx) => {
+                  const stepNum = idx + 1;
+                  return (
+                    <div
+                      key={stepNum}
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        step >= stepNum ? 'bg-[var(--burgundy-700)]' : 'bg-gray-200'
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+            </div>
             
             {errorMessage && (
               <div className="mb-6 p-4 rounded-xl bg-[var(--danger-bg)] border border-[#E8B9C1] text-sm font-bold text-[var(--danger)] flex items-start gap-2.5 shadow-xs">
@@ -883,6 +911,16 @@ function RegisterContent() {
 
           </div>
 
+        </div>
+
+        {/* Mobile Quick Find My Pass Link */}
+        <div className="block md:hidden mt-4 text-center">
+          <Link
+            href="/lookup"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)] hover:underline py-2"
+          >
+            <span>🔍 {isTh ? 'เคยลงทะเบียนแล้ว? ค้นหาตั๋ว/QR' : 'Already registered? Find pass'}</span>
+          </Link>
         </div>
 
         {/* WAITLIST CONFIRMATION MODAL (for full slots) */}
