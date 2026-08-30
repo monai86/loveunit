@@ -183,9 +183,11 @@ export default function LookupPage() {
     <div className="mx-auto max-w-xl px-4 py-8 sm:px-6">
       {/* Header */}
       <div className="mb-8 pb-6 border-b border-[var(--line)]">
-        <div className="flex items-center gap-2 text-xs font-black text-[var(--burgundy-700)] uppercase tracking-wider mb-2 font-mono">
-          <Search className="h-3.5 w-3.5" />
-          <span>{isTh ? 'ค้นหาตั๋วและ QR Code' : 'Find Ticket & QR Pass'}</span>
+        <div className="flex items-center gap-2 mb-2.5">
+          <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-rose-50 to-[var(--rose-100)] text-[var(--burgundy-800)] border border-rose-200/90 shadow-2xs">
+            <Search className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+            <span>{isTh ? 'ค้นหาตั๋วและ QR Code' : 'Find Ticket & QR Pass'}</span>
+          </span>
         </div>
         <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl font-display">
           {isTh ? 'ค้นหาตั๋วและ QR Code ของฉัน' : 'Find Your Registration Pass & QR'}

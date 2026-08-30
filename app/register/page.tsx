@@ -266,16 +266,20 @@ function RegisterContent() {
         
         {/* Header Banner */}
         <div className="mb-8 pb-6 border-b border-[var(--line)]">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2.5">
             {isWalkInMode ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-[#D92231] to-[#7E1120] text-white shadow-xs font-mono">
-                <Sparkles className="h-3 w-3" />
-                {tReg.walkinBadge[language]}
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[var(--burgundy-700)] to-[#9B1D2A] text-white shadow-xs border border-white/20">
+                <Sparkles className="h-3.5 w-3.5 text-amber-300 animate-pulse" />
+                <span>{tReg.walkinBadge[language]}</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-[var(--rose-100)] text-[var(--burgundy-700)] border border-[var(--burgundy-200)] font-mono">
-                <Calendar className="h-3 w-3" />
-                {isTh ? 'ลงทะเบียนล่วงหน้า' : 'Advance Registration'}
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-rose-50 to-[var(--rose-100)] text-[var(--burgundy-800)] border border-rose-200/90 shadow-2xs hover:shadow-xs transition-all">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--burgundy-400)] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--burgundy-600)]" />
+                </span>
+                <Calendar className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                <span className="font-semibold">{isTh ? 'ลงทะเบียนล่วงหน้า' : 'Advance Registration'}</span>
               </span>
             )}
           </div>
