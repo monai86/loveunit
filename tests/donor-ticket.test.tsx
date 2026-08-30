@@ -62,7 +62,7 @@ async function runDonorTicketTests() {
   assert.match(markupWalkinTh, /data-testid="donor-ticket"/);
   assert.match(markupWalkinTh, /LVU26-W001/);
   assert.match(markupWalkinTh, /เวลาลงทะเบียน \(Walk-in\)/);
-  assert.match(markupWalkinTh, /รายละเอียดการลงทะเบียน/);
+  assert.match(markupWalkinTh, /รายละเอียดการนัดหมาย/);
   assert.match(markupWalkinTh, /10:15 น\./);
 
   // Walk-in Render (English)
@@ -80,7 +80,7 @@ async function runDonorTicketTests() {
 
   assert.match(markupWalkinEn, /data-testid="donor-ticket"/);
   assert.match(markupWalkinEn, /Walk-in Registration Time/);
-  assert.match(markupWalkinEn, /Registration Details/);
+  assert.match(markupWalkinEn, /Appointment Details/);
 
   console.log('Ticket presents a registration pass cleanly in active language and handles Walk-in timestamps properly.\n');
 }

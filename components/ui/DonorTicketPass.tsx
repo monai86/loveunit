@@ -191,14 +191,30 @@ export function DonorTicketPass({
       context.font = `700 ${11 * scale}px sans-serif`;
       context.fillText(isTh ? "บัตรยืนยันสิทธิ์บริจาคโลหิตทางการ" : "OFFICIAL BLOOD DONOR DIGITAL PASS", inset + 24 * scale, inset + 96 * scale);
 
+      // Registration Number Box
       const contentWidth = width - inset * 2 - 48 * scale;
       const x = inset + 24 * scale;
       let y = inset + headerHeight + 32 * scale;
 
+      context.fillStyle = "#FDF2F3";
+      context.fillRect(x, y - 16 * scale, contentWidth, 68 * scale);
+      context.strokeStyle = "#F5C2C7";
+      context.lineWidth = 1 * scale;
+      context.strokeRect(x, y - 16 * scale, contentWidth, 68 * scale);
+
+      context.fillStyle = "#A6192E";
+      context.font = `800 ${10.5 * scale}px sans-serif`;
+      context.fillText(isTh ? "หมายเลขลงทะเบียน" : "REGISTRATION NO.", x + 16 * scale, y + 6 * scale);
+
+      context.font = `900 ${26 * scale}px monospace`;
+      context.fillText(registrationCode, x + 16 * scale, y + 36 * scale);
+
+      // 2-Column Appointment Details
+      y += 84 * scale;
       const col1X = x;
       const col2X = x + (contentWidth / 2) + 8 * scale;
 
-      y += 84 * scale;
+      // Row 1
       context.fillStyle = "#64748B";
       context.font = `700 ${9.5 * scale}px sans-serif`;
       context.fillText(isTh ? "ผู้ลงทะเบียน" : "DONOR NAME", col1X, y);
@@ -209,6 +225,7 @@ export function DonorTicketPass({
       context.fillText(name.slice(0, 24), col1X, y + 18 * scale);
       context.fillText(defaultDate.slice(0, 24), col2X, y + 18 * scale);
 
+      // Row 2
       y += 42 * scale;
       context.fillStyle = "#64748B";
       context.font = `700 ${9.5 * scale}px sans-serif`;
@@ -218,11 +235,29 @@ export function DonorTicketPass({
       context.fillStyle = "#A6192E";
       context.font = `800 ${12 * scale}px sans-serif`;
       context.fillText(timeSlot, col1X, y + 18 * scale);
-      
+      context.fillStyle = "#0F172A";
+      context.font = `600 ${11 * scale}px sans-serif`;
+      context.fillText(defaultVenue.slice(0, 28), col2X, y + 18 * scale);
+
+      // Row 3
+      y += 42 * scale;
+      context.fillStyle = "#64748B";
+      context.font = `700 ${9.5 * scale}px sans-serif`;
+      context.fillText(isTh ? "เบอร์โทรศัพท์" : "PHONE", col1X, y);
+      context.fillText(isTh ? "สังกัด / คณะ" : "FACULTY / ORG", col2X, y);
+
+      context.fillStyle = "#0F172A";
+      context.font = `600 ${11.5 * scale}px sans-serif`;
+      context.fillText(phone || "—", col1X, y + 18 * scale);
+      context.fillText((faculty || (isTh ? "บุคคลทั่วไป" : "General Public")).slice(0, 28), col2X, y + 18 * scale);
+
+      // QR Code Box (Centered)
       const svg = qrRef.current?.querySelector("svg");
       if (svg) {
         const blobUrl = URL.createObjectURL(
-          new Blob([new XMLSerializer().serializeToString(svg)], { type: "image/svg+xml;charset=utf-8" }),
+          new Blob([new XMLSerializer().serializeToString(svg)], {
+            type: "image/svg+xml;charset=utf-8",
+          }),
         );
         const image = new window.Image();
         await new Promise<void>((resolve) => {
@@ -230,6 +265,11 @@ export function DonorTicketPass({
             const size = 140 * scale;
             const qrX = (width - size) / 2;
             const qrY = height - inset - size - 64 * scale;
+            context.fillStyle = "#FFFFFF";
+            context.fillRect(qrX - 10 * scale, qrY - 10 * scale, size + 20 * scale, size + 20 * scale);
+            context.strokeStyle = "#E2E8F0";
+            context.lineWidth = 1.5 * scale;
+            context.strokeRect(qrX - 10 * scale, qrY - 10 * scale, size + 20 * scale, size + 20 * scale);
             context.drawImage(image, qrX, qrY, size, size);
             URL.revokeObjectURL(blobUrl);
             resolve();
@@ -237,6 +277,16 @@ export function DonorTicketPass({
           image.src = blobUrl;
         });
       }
+
+      // Footer note
+      context.fillStyle = "#64748B";
+      context.textAlign = "center";
+      context.font = `600 ${9.5 * scale}px sans-serif`;
+      context.fillText(
+        isTh ? "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียน" : "Please present this QR Code to staff at the registration desk",
+        width / 2,
+        height - inset - 24 * scale,
+      );
 
       const link = document.createElement("a");
       link.download = `MUMT-LoveUnit-${registrationCode}.png`;
@@ -254,21 +304,99 @@ export function DonorTicketPass({
         aria-label={isTh ? "ตั๋วลงทะเบียนบริจาคโลหิต" : "Blood Donation Registration Ticket"}
         className="relative overflow-hidden rounded-3xl border border-red-100 bg-white shadow-xl shadow-red-950/5"
       >
+        {/* Rich Crimson Gradient Header */}
         <header className="relative bg-gradient-to-r from-[#C5222F] via-[#A6192E] to-[#7A1222] px-6 py-6 text-white sm:px-8">
-          <h2 className="text-xl font-black text-white sm:text-2xl font-display">
-            {isTh ? "ตั๋วลงทะเบียนบริจาคโลหิต" : "Blood Donation Donor Pass"}
-          </h2>
-        </header>
+          <div className="flex items-center justify-between gap-4 border-b border-white/20 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white p-1 shadow-sm">
+                <Image
+                  src="/images/logo.png"
+                  alt="MUMT Logo"
+                  width={32}
+                  height={32}
+                  className="h-7 w-7 rounded-full object-contain"
+                />
+              </div>
+              <div>
+                <p className="text-[11px] font-extrabold tracking-wider text-rose-100 uppercase">
+                  {isTh ? "MUMT LoveUnit ครั้งที่ 9" : "9th MUMT LoveUnit"}
+                </p>
+                <p className="text-[11px] text-white/90 font-medium">
+                  {isTh ? "คณะเทคนิคการแพทย์ ม.มหิดล" : "Faculty of Medical Technology, Mahidol University"}
+                </p>
+              </div>
+            </div>
 
-        <div className="px-6 py-6 sm:px-8 space-y-6">
-          <div className="rounded-2xl border border-red-100 bg-[#FDF2F3] p-4 sm:p-5">
-            <p className="text-xs font-black tracking-wider text-[#A6192E] uppercase">{isTh ? "หมายเลขลงทะเบียน" : "Registration Number"}</p>
-            <p className="mt-1 font-mono text-2xl font-black text-[#7A1222] sm:text-3xl">{registrationCode}</p>
+            {isConfirmed && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/40 bg-emerald-500/25 px-3 py-1 text-xs font-bold text-emerald-100 backdrop-blur-xs">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-300" />
+                <span>{isTh ? "ยืนยันสิทธิ์แล้ว" : "Confirmed"}</span>
+              </span>
+            )}
           </div>
 
-          <section className="space-y-3">
+          <div className="mt-4">
+            <h2 className="text-xl font-black tracking-tight text-white sm:text-2xl font-display">
+              {isTh ? "ตั๋วลงทะเบียนบริจาคโลหิต" : "Blood Donation Donor Pass"}
+            </h2>
+            <p className="text-[11px] font-semibold tracking-wider text-rose-100 uppercase mt-0.5">
+              {isTh ? "บัตรยืนยันสิทธิ์เข้าร่วมกิจกรรม" : "Official Blood Donor Digital Pass"}
+            </p>
+          </div>
+        </header>
+
+        {/* Crisp Ticket Notch Divider */}
+        <div className="relative flex items-center justify-between px-3 bg-white">
+          <div className="-ml-6 h-6 w-6 rounded-full bg-[var(--bg)] border-r border-red-100" />
+          <div className="flex-1 border-b-2 border-dashed border-red-200 mx-2" />
+          <div className="-mr-6 h-6 w-6 rounded-full bg-[var(--bg)] border-l border-red-100" />
+        </div>
+
+        {/* Ticket Body */}
+        <div className="px-6 py-6 sm:px-8 space-y-6">
+          
+          {/* Registration Code Block */}
+          <div className="rounded-2xl border border-red-100 bg-[#FDF2F3] p-4 sm:p-5">
+            <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
+              <div className="text-center sm:text-left">
+                <p className="text-xs font-black tracking-wider text-[#A6192E] uppercase">
+                  {isTh ? "หมายเลขลงทะเบียน" : "Registration Number"}
+                </p>
+                <p className="mt-1 font-mono text-2xl font-black tracking-wider text-[#7A1222] sm:text-3xl">
+                  {registrationCode}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={copyCode}
+                aria-label={isTh ? "คัดลอกหมายเลขลงทะเบียน" : "Copy registration code"}
+                className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl border border-red-200 bg-white px-4 text-xs font-bold text-[#A6192E] shadow-xs transition-all hover:bg-red-50 hover:border-red-300 active:scale-98 cursor-pointer"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 text-emerald-600" />
+                    <span>{isTh ? "คัดลอกแล้ว" : "Copied!"}</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    <span>{isTh ? "คัดลอกรหัส" : "Copy Code"}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Symmetrical 2-Column Details Grid */}
+          <section aria-labelledby="appointment-details" className="space-y-3">
             <div className="border-b border-gray-100 pb-2.5">
-              <h3 className="text-sm font-black text-gray-900 font-display">{detailsHeading}</h3>
+              <h3
+                id="appointment-details"
+                className="text-sm font-black text-gray-900 flex items-center gap-1.5 font-display"
+              >
+                <span>{isTh ? "รายละเอียดการนัดหมาย" : "Appointment Details"}</span>
+              </h3>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {/* Donor Name */}
