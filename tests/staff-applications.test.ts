@@ -22,12 +22,13 @@ async function runStaffApplicationTests() {
 
   // Break caught: allowing a second pending request for the same email would
   // make approval ownership ambiguous.
-  console.log('Test 1: public application creates one pending request per email');
+  console.log('Test 1: public application creates one pending request per email with self-set secure password');
   const pendingEmail = uniqueEmail('pending');
   const submitted = await submitStaffApplication({
     email: pendingEmail,
-    displayName: 'ผู้สมัครทดสอบ',
+    displayName: 'somchai_test',
     team: 'หน่วยงานทดสอบ',
+    password: 'SecurePassword@2026',
   });
   assert.strictEqual(submitted.success, true);
   assert.match(submitted.application.referenceCode, /^STF-[A-Z0-9]{10}$/);
@@ -38,31 +39,31 @@ async function runStaffApplicationTests() {
 
   const duplicate = await submitStaffApplication({
     email: pendingEmail.toUpperCase(),
-    displayName: 'ผู้สมัครซ้ำ',
+    displayName: 'somchai_dup',
     team: 'หน่วยงานทดสอบ',
+    password: 'SecurePassword@2026',
   });
   assert.deepStrictEqual(duplicate, { success: false, code: 'PENDING_APPLICATION_EXISTS' });
   console.log('✓ pending applications are unique by normalized email\n');
 
-  // Break caught: approving a request without creating an enabled STAFF
-  // account would leave the applicant unable to use the staff portal.
-  console.log('Test 2: super-admin approval provisions a STAFF account with a forced password change');
+  // Break caught: Super Admin can directly approve without entering a password,
+  // activating the staff account using applicant's self-chosen password.
+  console.log('Test 2: super-admin one-click approval provisions a STAFF account with applicant password');
   const approval = await approveStaffApplication({
     applicationId: submitted.application.id,
     actorId: 'u-super-admin-test',
-    initialPassword: 'TemporaryPass@2026',
   });
   assert.strictEqual(approval.success, true);
   assert.strictEqual(approval.user.email, pendingEmail);
   assert.strictEqual(approval.user.role, 'STAFF');
   assert.strictEqual(approval.user.isActive, true);
-  assert.strictEqual(approval.user.mustChangePassword, true);
+  assert.strictEqual(approval.user.mustChangePassword, false);
 
   const approvedStatus = await getPublicStaffApplicationStatus(submitted.application.referenceCode);
   assert.strictEqual(approvedStatus?.status, 'APPROVED');
   assert.ok((await getInMemoryStaffProfiles()).some((profile) => profile.email === pendingEmail && profile.role === 'STAFF'));
   assert.ok(getInMemoryAuditLogs().some((entry) => entry.action === 'APPROVE_STAFF_APPLICATION' && entry.entity_id === submitted.application.id));
-  console.log('✓ approval provisions an active Staff account and writes an audit event\n');
+  console.log('✓ one-click approval provisions an active Staff account and writes an audit event\n');
 
   // Break caught: a rejection without its supplied reason would prevent the
   // applicant and operators from understanding the decision.

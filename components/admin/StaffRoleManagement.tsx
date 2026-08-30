@@ -57,7 +57,7 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
   const [formSuccess, setFormSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [applications, setApplications] = useState<StaffApplication[]>([]);
-  const [reviewPassword, setReviewPassword] = useState<Record<string, string>>({});
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [reviewReason, setReviewReason] = useState<Record<string, string>>({});
   const [reviewError, setReviewError] = useState('');
 
@@ -242,15 +242,38 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
 
   const reviewApplication = async (application: StaffApplication, action: 'APPROVE' | 'REJECT') => {
     setReviewError('');
+    setReviewingId(application.id);
     const body = action === 'APPROVE'
-      ? { action, initialPassword: reviewPassword[application.id] || '' }
-      : { action, reason: reviewReason[application.id] || '' };
+      ? { action }
+      : { action, reason: reviewReason[application.id] || 'ไม่ผ่านเกณฑ์การพิจารณา' };
     try {
-      const res = await fetch(`/api/admin/staff-applications/${application.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const res = await fetch(`/api/admin/staff-applications/${application.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
       const data = await res.json();
-      if (!res.ok || !data.success) { setReviewError(data.message || 'ไม่สามารถดำเนินการกับคำขอได้'); return; }
-      setApplications((current) => current.map((item) => item.id === application.id ? { ...item, status: action === 'APPROVE' ? 'APPROVED' : 'REJECTED', rejectionReason: action === 'REJECT' ? (reviewReason[application.id] || null) : null } : item));
-    } catch { setReviewError('ไม่สามารถเชื่อมต่อระบบได้'); }
+      if (!res.ok || !data.success) {
+        setReviewError(data.message || 'ไม่สามารถดำเนินการกับคำขอได้');
+        return;
+      }
+      setApplications((current) =>
+        current.map((item) =>
+          item.id === application.id
+            ? {
+                ...item,
+                status: action === 'APPROVE' ? 'APPROVED' : 'REJECTED',
+                rejectionReason: action === 'REJECT' ? (reviewReason[application.id] || null) : null,
+              }
+            : item
+        )
+      );
+      await fetchStaff();
+    } catch {
+      setReviewError('ไม่สามารถเชื่อมต่อระบบได้');
+    } finally {
+      setReviewingId(null);
+    }
   };
 
   return (
@@ -298,10 +321,88 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
       )}
 
       {canManage && pendingApplications.length > 0 && (
-        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-3">
-          <div><h3 className="text-base font-black text-amber-950">คำขอสมัคร Staff ({pendingApplications.length})</h3><p className="text-xs text-amber-800">ตรวจสอบข้อมูลและตั้งรหัสผ่านเริ่มต้นก่อนอนุมัติ</p></div>
-          {reviewError && <p role="alert" className="rounded-lg bg-red-100 px-3 py-2 text-xs font-medium text-red-800">{reviewError}</p>}
-          {pendingApplications.map((application) => <div key={application.id} className="rounded-xl border border-amber-200 bg-white p-3"><div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-bold text-sm text-[var(--ink)]">{application.displayName}</p><p className="font-mono text-xs text-gray-500">{application.email} · {application.team}</p><p className="font-mono text-[11px] text-amber-700">{application.referenceCode}</p></div><div className="flex flex-col gap-2 sm:flex-row"><input aria-label={`รหัสผ่านเริ่มต้น ${application.displayName}`} type="password" minLength={8} placeholder="รหัสผ่านเริ่มต้น (8+ ตัว)" value={reviewPassword[application.id] || ''} onChange={(e) => setReviewPassword((v) => ({ ...v, [application.id]: e.target.value }))} className="rounded-lg border border-[var(--line)] px-2 py-2 text-xs" /><button type="button" onClick={() => void reviewApplication(application, 'APPROVE')} className="rounded-lg bg-emerald-700 px-3 py-2 text-xs font-bold text-white">อนุมัติ</button></div></div><div className="mt-2 flex gap-2"><input aria-label={`เหตุผลปฏิเสธ ${application.displayName}`} placeholder="เหตุผลปฏิเสธ (ถ้าปฏิเสธ)" value={reviewReason[application.id] || ''} onChange={(e) => setReviewReason((v) => ({ ...v, [application.id]: e.target.value }))} className="min-w-0 flex-1 rounded-lg border border-[var(--line)] px-2 py-2 text-xs" /><button type="button" onClick={() => void reviewApplication(application, 'REJECT')} className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700">ปฏิเสธ</button></div></div>)}
+        <section className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 space-y-3.5 shadow-2xs">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-black text-amber-950 flex items-center gap-2">
+                <span>คำขอสมัคร Staff ({pendingApplications.length})</span>
+              </h3>
+              <p className="text-xs text-amber-800 mt-0.5">
+                ผู้สมัครตั้งรหัสผ่านความปลอดภัยสูงด้วยตนเองแล้ว Super Admin สามารถกดตอบรับเพื่อเปิดใช้งานบัญชีได้ทันที
+              </p>
+            </div>
+          </div>
+
+          {reviewError && (
+            <div role="alert" className="rounded-xl bg-red-100 border border-red-200 px-3 py-2 text-xs font-bold text-red-800">
+              {reviewError}
+            </div>
+          )}
+
+          <div className="space-y-2.5">
+            {pendingApplications.map((application) => (
+              <div key={application.id} className="rounded-xl border border-amber-200 bg-white p-3.5 space-y-3 shadow-2xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs uppercase font-mono shrink-0">
+                      {application.displayName ? application.displayName.charAt(0) : 'S'}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-xs text-[var(--ink)]">{application.displayName}</p>
+                        <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 font-bold">
+                          {application.referenceCode}
+                        </span>
+                      </div>
+                      <p className="font-mono text-[11px] text-gray-500 mt-0.5">
+                        {application.email} · ฝ่าย: {application.team}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={reviewingId === application.id}
+                      onClick={() => void reviewApplication(application, 'APPROVE')}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 px-4 py-2 text-xs font-extrabold text-white transition-all shadow-2xs cursor-pointer disabled:opacity-60"
+                    >
+                      {reviewingId === application.id ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          <span>กำลังตอบรับ...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check className="h-3.5 w-3.5" />
+                          <span>ตอบรับ / อนุมัติ</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Reject Input */}
+                <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                  <input
+                    aria-label={`เหตุผลปฏิเสธ ${application.displayName}`}
+                    placeholder="เหตุผลการปฏิเสธ (ถ้ามี)..."
+                    value={reviewReason[application.id] || ''}
+                    onChange={(e) => setReviewReason((v) => ({ ...v, [application.id]: e.target.value }))}
+                    className="min-w-0 flex-1 rounded-lg border border-[var(--line)] px-2.5 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-red-500"
+                  />
+                  <button
+                    type="button"
+                    disabled={reviewingId === application.id}
+                    onClick={() => void reviewApplication(application, 'REJECT')}
+                    className="rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 px-3 py-1.5 text-xs font-bold text-red-700 transition-colors cursor-pointer disabled:opacity-60"
+                  >
+                    ปฏิเสธ
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
@@ -387,7 +488,7 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
               <table className="w-full text-left text-xs text-[var(--ink)] min-w-[540px]">
                 <thead className="bg-gray-50/80 border-b border-[var(--line)] text-gray-600 font-bold">
                   <tr>
-                    <th className="px-4 py-3 whitespace-nowrap">ชื่อ-นามสกุล / อีเมล</th>
+                    <th className="px-4 py-3 whitespace-nowrap">Username / Email</th>
                     <th className="px-4 py-3 whitespace-nowrap">บทบาท</th>
                     <th className="px-4 py-3 whitespace-nowrap">ฝ่าย / ทีม</th>
                     <th className="px-4 py-3 text-center whitespace-nowrap">สถานะ</th>
@@ -494,30 +595,30 @@ export function StaffRoleManagement({ currentUserRole, currentUserEmail, initial
               {/* Email */}
               <div className="space-y-1">
                 <label htmlFor="staff-email" className="block text-xs font-bold text-[var(--ink)]">
-                  อีเมล
+                  Email
                 </label>
                 <input
                   id="staff-email"
                   type="email"
                   required
                   disabled={!!editingStaff}
-                  placeholder="staff@mahidol.ac.th"
+                  placeholder="name@student.mahidol.ac.th หรือ name@example.com"
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-[var(--line)] bg-gray-50 focus:bg-white text-xs font-medium text-[var(--ink)] disabled:opacity-60 disabled:cursor-not-allowed font-mono"
                 />
               </div>
 
-              {/* Display Name */}
+              {/* Username */}
               <div className="space-y-1">
                 <label htmlFor="staff-display-name" className="block text-xs font-bold text-[var(--ink)]">
-                  ชื่อ-นามสกุล
+                  Username
                 </label>
                 <input
                   id="staff-display-name"
                   type="text"
                   required
-                  placeholder="เช่น สมชาย ใจดี"
+                  placeholder="เช่น somchai_j"
                   value={formDisplayName}
                   onChange={(e) => setFormDisplayName(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-[var(--line)] bg-gray-50 focus:bg-white text-xs font-medium text-[var(--ink)]"

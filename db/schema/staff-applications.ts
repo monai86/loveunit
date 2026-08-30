@@ -17,6 +17,7 @@ export const staffApplications = pgTable('staff_applications', {
   email: text('email').notNull(),
   displayName: text('display_name').notNull(),
   team: text('team').notNull(),
+  passwordHash: text('password_hash'),
   status: staffApplicationStatusEnum('status').default('PENDING').notNull(),
   rejectionReason: text('rejection_reason'),
   reviewedBy: text('reviewed_by').references(() => user.id, { onDelete: 'set null' }),

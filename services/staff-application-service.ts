@@ -17,6 +17,7 @@ export interface StaffApplicationInput {
   email: string;
   displayName: string;
   team: string;
+  password?: string;
 }
 
 export interface PublicStaffApplication {
@@ -54,7 +55,7 @@ export type ReviewStaffApplicationResult =
   | {
     success: true;
     application: PublicStaffApplication;
-    user: { id: string; email: string; role: 'STAFF'; isActive: true; mustChangePassword: true };
+    user: { id: string; email: string; role: 'STAFF'; isActive: true; mustChangePassword: boolean };
   }
   | ApplicationFailure;
 
@@ -164,6 +165,7 @@ export async function submitStaffApplication(input: StaffApplicationInput): Prom
   const team = input.team.trim();
   const now = new Date();
   const expiresAt = new Date(now.getTime() + REVIEW_WINDOW_MS);
+  const passwordHash = input.password ? await hashPassword(input.password) : null;
 
   if (db) {
     const [existingUser] = await db.select({ id: user.id }).from(user).where(eq(user.email, email)).limit(1);
@@ -182,6 +184,7 @@ export async function submitStaffApplication(input: StaffApplicationInput): Prom
         email,
         displayName,
         team,
+        passwordHash,
         expiresAt,
         updatedAt: now,
       }).returning();
@@ -207,6 +210,7 @@ export async function submitStaffApplication(input: StaffApplicationInput): Prom
       email,
       display_name: displayName,
       team,
+      password_hash: passwordHash,
       status: 'PENDING' as const,
       rejection_reason: null,
       reviewed_by: null,
@@ -263,12 +267,10 @@ export async function listStaffApplications(): Promise<AdminStaffApplication[]> 
 export async function approveStaffApplication(params: {
   applicationId: string;
   actorId: string;
-  initialPassword: string;
+  initialPassword?: string;
 }): Promise<ReviewStaffApplicationResult> {
-  if (params.initialPassword.length < 8) return { success: false, code: 'INVALID_INITIAL_PASSWORD' };
   await expirePendingStaffApplications();
   const now = new Date();
-  const passwordHash = await hashPassword(params.initialPassword);
 
   if (db) {
     try {
@@ -283,6 +285,18 @@ export async function approveStaffApplication(params: {
 
         const [existingUser] = await tx.select({ id: user.id }).from(user).where(eq(user.email, application.email)).limit(1);
         if (existingUser) return { success: false as const, code: 'EMAIL_ALREADY_REGISTERED' as const };
+
+        let finalPasswordHash = application.passwordHash;
+        let mustChangePassword = false;
+        if (params.initialPassword) {
+          if (params.initialPassword.length < 8) return { success: false as const, code: 'INVALID_INITIAL_PASSWORD' as const };
+          finalPasswordHash = await hashPassword(params.initialPassword);
+          mustChangePassword = true;
+        } else if (!finalPasswordHash) {
+          const fallback = crypto.randomUUID().slice(0, 16) + 'Aa1!';
+          finalPasswordHash = await hashPassword(fallback);
+          mustChangePassword = true;
+        }
 
         // Claim the pending row before creating credentials. The status check
         // makes repeated approval requests safe under concurrent admin actions.
@@ -300,14 +314,14 @@ export async function approveStaffApplication(params: {
           email: approved.email,
           name: approved.displayName,
           emailVerified: true,
-          mustChangePassword: true,
+          mustChangePassword,
         });
         await tx.insert(account).values({
           id: accountId,
           accountId: approved.email,
           providerId: 'credential',
           userId,
-          password: passwordHash,
+          password: finalPasswordHash,
         });
         await tx.insert(staffProfiles).values({
           userId,
@@ -326,7 +340,7 @@ export async function approveStaffApplication(params: {
             displayName: approved.displayName,
             userId,
             role: 'STAFF',
-            mustChangePassword: true,
+            mustChangePassword,
           },
         });
 
@@ -338,7 +352,7 @@ export async function approveStaffApplication(params: {
             email: approved.email,
             role: 'STAFF' as const,
             isActive: true as const,
-            mustChangePassword: true as const,
+            mustChangePassword,
           },
         };
       });
@@ -355,12 +369,24 @@ export async function approveStaffApplication(params: {
     if (!application) return { success: false, code: 'APPLICATION_NOT_FOUND' };
     if (application.status !== 'PENDING') return { success: false, code: 'APPLICATION_NOT_PENDING' };
 
+    let finalPasswordHash = application.password_hash;
+    let mustChangePassword = false;
+    if (params.initialPassword) {
+      if (params.initialPassword.length < 8) return { success: false, code: 'INVALID_INITIAL_PASSWORD' };
+      finalPasswordHash = await hashPassword(params.initialPassword);
+      mustChangePassword = true;
+    } else if (!finalPasswordHash) {
+      const fallback = crypto.randomUUID().slice(0, 16) + 'Aa1!';
+      finalPasswordHash = await hashPassword(fallback);
+      mustChangePassword = true;
+    }
+
     const provisioned = await provisionInMemoryStaffAccount({
       email: application.email,
       displayName: application.display_name,
       team: application.team,
-      passwordHash,
-      mustChangePassword: true,
+      passwordHash: finalPasswordHash,
+      mustChangePassword,
     });
     if (!provisioned.success) return provisioned;
 
@@ -383,7 +409,7 @@ export async function approveStaffApplication(params: {
         email: provisioned.user.email,
         role: 'STAFF',
         isActive: true,
-        mustChangePassword: true,
+        mustChangePassword,
       },
     };
   }

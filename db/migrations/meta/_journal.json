@@ -50,6 +50,13 @@
       "when": 1787979600000,
       "tag": "0006_set_primary_admin_password",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788050000000,
+      "tag": "0007_staff_application_password_hash",
+      "breakpoints": true
     }
   ]
 }

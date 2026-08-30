@@ -227,6 +227,7 @@ export interface InMemoryStaffApplication {
   email: string;
   display_name: string;
   team: string;
+  password_hash?: string | null;
   status: InMemoryStaffApplicationStatus;
   rejection_reason: string | null;
   reviewed_by: string | null;
