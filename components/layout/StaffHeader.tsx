@@ -45,16 +45,22 @@ export function StaffHeader() {
         
         {/* Brand & Badge */}
         <div className="flex items-center gap-3">
-          <Link href="/staff/overview" className="flex items-center gap-2.5 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--burgundy-700)] text-white p-1 shadow-xs overflow-hidden">
-              <Image src="/images/logo.png" alt="MUMT Logo" width={28} height={28} className="h-6 w-6 object-contain rounded-full" />
+          <Link href="/staff/overview" className="flex items-center gap-2 sm:gap-2.5 shrink min-w-0 group">
+            <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-white p-1 border border-[var(--line)] shadow-xs transition-transform group-hover:scale-105 overflow-hidden">
+              <Image 
+                src="/images/logo.png" 
+                alt="MUMT LOVE UNIT Logo" 
+                width={40} 
+                height={40} 
+                className="h-full w-full object-contain rounded-full" 
+                priority 
+              />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-black text-[var(--burgundy-700)] font-display">MUMT LoveUnit</span>
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[var(--rose-100)] text-[var(--burgundy-700)]">ครั้งที่ 9</span>
-              </div>
-              <h1 className="text-xs font-bold text-[var(--muted)] leading-tight">
+            <div className="shrink-0 flex flex-col justify-center">
+              <span className="text-xs sm:text-sm font-bold text-[var(--ink)] tracking-normal whitespace-nowrap font-display">
+                MUMT LoveUnit <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
+              </span>
+              <h1 className="text-[10px] text-[var(--muted)] whitespace-nowrap block leading-tight font-medium">
                 ระบบหน้างาน
               </h1>
             </div>

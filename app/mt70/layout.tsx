@@ -36,16 +36,24 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             
             {/* Brand Logo & Title */}
             <div className="flex shrink-0 items-center gap-3">
-              <Link href="/mt70" className="flex items-center gap-2.5 group">
-                <div className="h-9 w-9 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs overflow-hidden">
-                  <Image src="/images/logo.png" alt="MUMT Logo" width={28} height={28} className="h-6 w-6 object-contain rounded-full" />
+              <Link href="/mt70" className="flex items-center gap-2 sm:gap-2.5 shrink min-w-0 group">
+                <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-white p-1 border border-[var(--line)] shadow-xs transition-transform group-hover:scale-105 overflow-hidden">
+                  <Image 
+                    src="/images/logo.png" 
+                    alt="MUMT LOVE UNIT Logo" 
+                    width={40} 
+                    height={40} 
+                    className="h-full w-full object-contain rounded-full" 
+                    priority 
+                  />
                 </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-black text-[var(--burgundy-700)] font-display">MUMT LoveUnit</span>
-                    <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-[var(--rose-100)] text-[var(--burgundy-700)]">ครั้งที่ 9</span>
-                  </div>
-                  <span className="text-[11px] font-bold text-[var(--muted)] block leading-tight">แดชบอร์ดแอดมิน</span>
+                <div className="shrink-0 flex flex-col justify-center">
+                  <span className="text-xs sm:text-sm font-bold text-[var(--ink)] tracking-normal whitespace-nowrap font-display">
+                    MUMT LoveUnit <span className="text-[var(--burgundy-600)] font-extrabold">ครั้งที่ 9</span>
+                  </span>
+                  <span className="text-[10px] text-[var(--muted)] whitespace-nowrap block leading-tight">
+                    แดชบอร์ดแอดมิน
+                  </span>
                 </div>
               </Link>
             </div>
