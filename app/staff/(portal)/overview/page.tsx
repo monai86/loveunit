@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, ClipboardList, Loader2, RefreshCw, Search, Users, UserCheck } from 'lucide-react';
-import { getRegistrationStatusBadge, pickField } from '@/lib/utils/format';
+import { getRegistrationStatusBadge, pickField, formatBangkokTime } from '@/lib/utils/format';
 import { summarizeStaffRegistrations } from '@/lib/staff/registration-summary';
 import type { RegistrationStatus } from '@/lib/types/database';
 
@@ -18,16 +18,26 @@ type RegistrationRow = {
 type RawRegistration = Record<string, unknown>;
 
 function normalizeRegistration(row: RawRegistration): RegistrationRow {
-  const slot = (pickField<Record<string, unknown> | null>(row, 'timeSlot', 'time_slot') ?? null);
-  const startAt = slot ? pickField<string>(slot, 'startAt', 'start_at') : undefined;
-  const endAt = slot ? pickField<string>(slot, 'endAt', 'end_at') : undefined;
-  const timeSlotText = startAt && endAt
-    ? new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' }).format(new Date(startAt)) + '–' + new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' }).format(new Date(endAt)) + ' น.'
-    : 'ไม่ระบุรอบเวลา';
+  const code = String(pickField(row, 'registrationCode', 'registration_code') ?? '-');
+  const source = String(pickField(row, 'source', 'source') ?? '');
+  const isWalkIn = code.includes('LVU26-W') || source === 'WALK_IN';
+
+  let timeSlotText = 'ไม่ระบุรอบเวลา';
+  if (isWalkIn) {
+    const regTime = (pickField<string>(row, 'registeredAt', 'registered_at') ?? pickField<string>(row, 'createdAt', 'created_at') ?? null);
+    timeSlotText = regTime ? `Walk-in (${formatBangkokTime(regTime)})` : 'Walk-in';
+  } else {
+    const slot = (pickField<Record<string, unknown> | null>(row, 'timeSlot', 'time_slot') ?? null);
+    const startAt = slot ? pickField<string>(slot, 'startAt', 'start_at') : undefined;
+    const endAt = slot ? pickField<string>(slot, 'endAt', 'end_at') : undefined;
+    timeSlotText = startAt && endAt
+      ? new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' }).format(new Date(startAt)) + '–' + new Intl.DateTimeFormat('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' }).format(new Date(endAt)) + ' น.'
+      : '09:00 – 14:00 น.';
+  }
 
   return {
     id: String(pickField(row, 'id', 'id') ?? ''),
-    registrationCode: String(pickField(row, 'registrationCode', 'registration_code') ?? '-'),
+    registrationCode: code,
     firstName: String(pickField(row, 'firstName', 'first_name') ?? ''),
     lastName: String(pickField(row, 'lastName', 'last_name') ?? ''),
     status: (pickField<RegistrationStatus>(row, 'status', 'status') ?? 'REGISTERED'),

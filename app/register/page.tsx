@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle, User, ShieldCheck, MapPin, Building, Calendar, CheckCircle2, Edit3 } from 'lucide-react';
 import { MAHIDOL_FACULTIES, ACADEMIC_YEARS } from '@/lib/constants/mahidol';
-import { formatTimeRange, isEventDay } from '@/lib/utils/format';
+import { formatTimeRange, formatBangkokTime, isEventDay } from '@/lib/utils/format';
 import { isTimeSlotSelectable } from '@/lib/registration/slot-availability';
 import { LoadingOverlay } from '@/components/common/LoadingOverlay';
 import { useLanguage, TRANSLATIONS } from '@/lib/i18n/LanguageContext';
@@ -788,13 +788,15 @@ function RegisterContent() {
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
                         <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider block">
-                          {isTh ? 'รอบเวลาและสถานที่' : 'Time Window & Venue'}
+                          {isWalkInMode 
+                            ? (isTh ? 'เวลาลงทะเบียนและสถานที่' : 'Registration Time & Venue')
+                            : (isTh ? 'รอบเวลาและสถานที่' : 'Time Window & Venue')}
                         </span>
                         <div className="flex items-center gap-2 font-mono font-black text-sm text-[var(--burgundy-800)]">
                           <Clock className="h-4 w-4 text-[var(--burgundy-700)] shrink-0" />
                           <span>
                             {isWalkInMode 
-                              ? tReg.walkinSlotLabel[language]
+                              ? (isTh ? `เวลาลงทะเบียน: ${formatBangkokTime(new Date())}` : `Registration Time: ${formatBangkokTime(new Date())}`)
                               : (selectedSlotObj?.timeSlot || '09:00 – 14:00 น.')}
                           </span>
                         </div>

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { getDashboardKPIs, getAllRegistrations } from '@/services/admin-service';
 import { getEventBySlug } from '@/services/event-service';
-import { getParticipantTypeLabel, getRegistrationStatusBadge, formatTimeRange } from '@/lib/utils/format';
+import { getParticipantTypeLabel, getRegistrationStatusBadge, formatTimeRange, formatBangkokTime, isWalkInRecord } from '@/lib/utils/format';
 import { RegistrationStatus, ParticipantType } from '@/lib/types/database';
 import { getAuthenticatedUser } from '@/lib/auth/server';
 import { ResetTestDataButton } from '@/components/admin/ResetTestDataButton';
@@ -361,10 +361,15 @@ export default async function AdminDashboardPage() {
                 };
                 const badge = getRegistrationStatusBadge(regObj.status);
                 const slot = regObj.timeSlot || regObj.time_slot;
-                const timeLabel = slot
-                  ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '')
-                  : '09:00 – 14:00 น.';
                 const regCode = regObj.registration_code || regObj.registrationCode || '';
+                const isWalkIn = isWalkInRecord(regCode) || (regObj as unknown as { source?: string }).source === 'WALK_IN';
+                const regTime = (regObj as unknown as { registered_at?: string; registeredAt?: string; created_at?: string; createdAt?: string }).registered_at ||
+                  (regObj as unknown as { registered_at?: string; registeredAt?: string; created_at?: string; createdAt?: string }).registeredAt ||
+                  (regObj as unknown as { registered_at?: string; registeredAt?: string; created_at?: string; createdAt?: string }).created_at ||
+                  (regObj as unknown as { registered_at?: string; registeredAt?: string; created_at?: string; createdAt?: string }).createdAt;
+                const timeLabel = isWalkIn
+                  ? (regTime ? `Walk-in (${formatBangkokTime(regTime)})` : 'Walk-in')
+                  : (slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 – 14:00 น.');
                 const fullName = `${regObj.first_name || regObj.firstName || ''} ${regObj.last_name || regObj.lastName || ''}`.trim();
                 const pType = regObj.participant_type || regObj.participantType || 'STUDENT';
 
@@ -395,7 +400,7 @@ export default async function AdminDashboardPage() {
                         href={`/registration/${regCode}`}
                         className="inline-flex items-center gap-1 font-bold text-[var(--burgundy-700)] hover:underline"
                       >
-                        <Eye className="h-3 w-3" />
+                        <Eye className="h-3.5 w-3.5" />
                         <span>ดูบัตร</span>
                       </Link>
                     </div>
@@ -437,10 +442,15 @@ export default async function AdminDashboardPage() {
                     };
                     const badge = getRegistrationStatusBadge(regObj.status);
                     const slot = regObj.timeSlot || regObj.time_slot;
-                    const timeLabel = slot
-                      ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '')
-                      : '09:00 – 14:00 น.';
                     const regCode = regObj.registration_code || regObj.registrationCode || '';
+                    const isWalkIn = isWalkInRecord(regCode) || (regObj as unknown as { source?: string }).source === 'WALK_IN';
+                    const regTime = (regObj as unknown as { registered_at?: string; registeredAt?: string; created_at?: string; createdAt?: string }).registered_at ||
+                      (regObj as unknown as { registered_at?: string; registeredAt?: string; created_at?: string; createdAt?: string }).registeredAt ||
+                      (regObj as unknown as { registered_at?: string; registeredAt?: string; created_at?: string; createdAt?: string }).created_at ||
+                      (regObj as unknown as { registered_at?: string; registeredAt?: string; created_at?: string; createdAt?: string }).createdAt;
+                    const timeLabel = isWalkIn
+                      ? (regTime ? `Walk-in (${formatBangkokTime(regTime)})` : 'Walk-in')
+                      : (slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 – 14:00 น.');
                     const fullName = `${regObj.first_name || regObj.firstName || ''} ${regObj.last_name || regObj.lastName || ''}`.trim();
                     const pType = regObj.participant_type || regObj.participantType || 'STUDENT';
 

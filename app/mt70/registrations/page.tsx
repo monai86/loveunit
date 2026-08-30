@@ -15,7 +15,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { Registration, TimeSlot } from '@/lib/types/database';
-import { formatTimeRange, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
+import { formatTimeRange, formatBangkokTime, isWalkInRecord, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
 import { adminRegistrationUpdateSchema } from '@/lib/validation/schemas';
 import { ResetTestDataButton } from '@/components/admin/ResetTestDataButton';
 import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
@@ -351,9 +351,10 @@ export default function AdminRegistrationsPage() {
             <div className="block md:hidden divide-y divide-gray-100">
               {filteredList.map((row) => {
                 const badge = getRegistrationStatusBadge(row.status);
-                const timeLabel = row.time_slot
-                  ? formatTimeRange(row.time_slot.start_at, row.time_slot.end_at)
-                  : '09:00 – 14:00 น.';
+                const isWalkIn = isWalkInRecord(row.registration_code) || (row as any).source === 'WALK_IN';
+                const timeLabel = isWalkIn
+                  ? (row.created_at ? `Walk-in (${formatBangkokTime(row.created_at)})` : 'Walk-in')
+                  : (row.time_slot ? formatTimeRange(row.time_slot.start_at, row.time_slot.end_at) : '09:00 – 14:00 น.');
 
                 return (
                   <div key={row.id} className="p-3.5 space-y-2.5">
@@ -442,9 +443,10 @@ export default function AdminRegistrationsPage() {
                 <tbody className="divide-y divide-gray-100 font-medium">
                   {filteredList.map((row) => {
                     const badge = getRegistrationStatusBadge(row.status);
-                    const timeLabel = row.time_slot
-                      ? formatTimeRange(row.time_slot.start_at, row.time_slot.end_at)
-                      : '09:00 – 14:00 น.';
+                    const isWalkIn = isWalkInRecord(row.registration_code) || (row as any).source === 'WALK_IN';
+                    const timeLabel = isWalkIn
+                      ? (row.created_at ? `Walk-in (${formatBangkokTime(row.created_at)})` : 'Walk-in')
+                      : (row.time_slot ? formatTimeRange(row.time_slot.start_at, row.time_slot.end_at) : '09:00 – 14:00 น.');
 
                     return (
                       <tr key={row.id} className="hover:bg-gray-50/80 transition-colors">

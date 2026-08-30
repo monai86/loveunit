@@ -49,7 +49,7 @@ export const TRANSLATIONS = {
       en: 'Register on-site to immediately receive your check-in QR Code pass'
     },
     walkinBadge: { th: 'โหมด Walk-in วันงาน (16 ก.ย. 2569)', en: 'Event Day Walk-in Mode (16 Sep 2026)' },
-    walkinSlotLabel: { th: 'รอบ Walk-in วันงาน (09:00 – 14:00 น.)', en: 'Event Day Walk-in (09:00 AM – 02:00 PM)' },
+    walkinSlotLabel: { th: 'เวลาลงทะเบียน Walk-in (บันทึกเวลาหน้างานทันที)', en: 'Walk-in Registration Time (Recorded at event)' },
     step1Title: { th: 'ข้อมูลส่วนตัว', en: 'Personal Information' },
     step1Sub: { th: 'ใช้เวลาลงทะเบียนประมาณ 2 นาที', en: 'Takes approx. 2 minutes' },
     step2Title: { th: 'สังกัดและสถานภาพ', en: 'Affiliation & Status' },

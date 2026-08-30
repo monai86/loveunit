@@ -45,7 +45,44 @@ async function runDonorTicketTests() {
   assert.match(markupEn, /Appointment Details/);
   assert.match(markupEn, /Donor Preparation Tips/);
 
-  console.log('Ticket presents a registration pass cleanly in active language.\n');
+  // Walk-in Render (Thai)
+  const markupWalkinTh = renderToStaticMarkup(
+    <LanguageProvider defaultLanguage="th">
+      <DonorTicketPass
+        registrationCode="LVU26-W001"
+        name="กิตติศักดิ์ มหิดล"
+        timeSlot="10:15 น."
+        date="พุธที่ 16 กันยายน 2569"
+        venue="ห้องประชุม 217 อาคารสิริวิทยา"
+        qrToken="test-walkin-pass-token"
+      />
+    </LanguageProvider>,
+  );
+
+  assert.match(markupWalkinTh, /data-testid="donor-ticket"/);
+  assert.match(markupWalkinTh, /LVU26-W001/);
+  assert.match(markupWalkinTh, /เวลาลงทะเบียน \(Walk-in\)/);
+  assert.match(markupWalkinTh, /รายละเอียดการลงทะเบียน/);
+  assert.match(markupWalkinTh, /10:15 น\./);
+
+  // Walk-in Render (English)
+  const markupWalkinEn = renderToStaticMarkup(
+    <LanguageProvider defaultLanguage="en">
+      <DonorTicketPass
+        registrationCode="LVU26-W001"
+        name="Kittisak Mahidol"
+        timeSlot="10:15 น."
+        venue="Room 217, Sirividhaya"
+        qrToken="test-walkin-pass-token"
+      />
+    </LanguageProvider>,
+  );
+
+  assert.match(markupWalkinEn, /data-testid="donor-ticket"/);
+  assert.match(markupWalkinEn, /Walk-in Registration Time/);
+  assert.match(markupWalkinEn, /Registration Details/);
+
+  console.log('Ticket presents a registration pass cleanly in active language and handles Walk-in timestamps properly.\n');
 }
 
 runDonorTicketTests().catch((error) => {

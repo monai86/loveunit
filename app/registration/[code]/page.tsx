@@ -2,7 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { getRegistrationByCode } from '@/services/registration-service';
-import { formatTimeRange } from '@/lib/utils/format';
+import { formatTimeRange, formatBangkokTime, isWalkInRecord } from '@/lib/utils/format';
 import { RegistrationPoster } from '@/components/registration/RegistrationPoster';
 import { DonorTicketPass } from '@/components/ui/DonorTicketPass';
 
@@ -19,6 +19,11 @@ interface RegistrationView {
   qrToken?: string;
   qr_token?: string;
   faculty?: string | null;
+  source?: string;
+  registeredAt?: string;
+  registered_at?: string;
+  createdAt?: string;
+  created_at?: string;
   timeSlot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
   time_slot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
 }
@@ -39,13 +44,17 @@ export default async function RegistrationDetailPage({ params }: PageProps) {
 
   const reg = registration as RegistrationView;
   const regCode = reg.registrationCode || reg.registration_code || code;
+  const isWalkIn = isWalkInRecord(regCode) || reg.source === 'WALK_IN';
   const firstName = reg.firstName || reg.first_name || '';
   const lastName = reg.lastName || reg.last_name || '';
   const fullName = `${firstName} ${lastName}`;
   const phone = reg.phone || '';
   const qrToken = reg.qrToken || reg.qr_token || '';
   const slot = reg.timeSlot || reg.time_slot;
-  const timeSlot = slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 – 14:00 น.';
+  const regTime = reg.registeredAt || reg.registered_at || reg.createdAt || reg.created_at;
+  const timeSlot = isWalkIn
+    ? (regTime ? formatBangkokTime(regTime) : formatBangkokTime(new Date()))
+    : (slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 – 14:00 น.');
   const facultyName = reg.faculty || 'มหาวิทยาลัยมหิดล';
 
   return (

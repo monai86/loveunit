@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { AlertTriangle, Search, ShieldCheck, Loader2, User, Clock, ArrowRight, ArrowLeft, Heart, CheckCircle2 } from 'lucide-react';
 import { DonorTicketPass } from '@/components/ui/DonorTicketPass';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import { formatBangkokTime, isWalkInRecord } from '@/lib/utils/format';
 
 interface LookupResult {
   registration_code: string;
@@ -15,6 +16,8 @@ interface LookupResult {
   participant_type: string;
   faculty?: string | null;
   status: string;
+  registered_at?: string;
+  created_at?: string;
   time_slot: { time_label: string } | null;
   event: { name?: string; start_at?: string; venue_name?: string } | null;
 }
@@ -129,7 +132,11 @@ export default function LookupPage() {
           <DonorTicketPass
             registrationCode={selectedResult.registration_code}
             name={`${selectedResult.first_name} ${selectedResult.last_name_initial}`}
-            timeSlot={selectedResult.time_slot?.time_label || '09:00 – 14:00 น.'}
+            timeSlot={
+              isWalkInRecord(selectedResult.registration_code)
+                ? (selectedResult.registered_at ? formatBangkokTime(selectedResult.registered_at) : formatBangkokTime(new Date()))
+                : (selectedResult.time_slot?.time_label || '09:00 – 14:00 น.')
+            }
             date={isEn ? 'Wednesday, September 16, 2026' : 'พุธที่ 16 กันยายน 2569'}
             venue={selectedResult.event?.venue_name || (isEn ? 'Meeting Room 217, Sirividhaya Building, Mahidol University Salaya' : 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา')}
             qrToken={selectedResult.qr_token}
@@ -154,7 +161,13 @@ export default function LookupPage() {
           </div>
 
           <div className="space-y-3">
-            {matches.map((item, idx) => (
+            {matches.map((item, idx) => {
+              const isItemWalkIn = isWalkInRecord(item.registration_code);
+              const itemTimeLabel = isItemWalkIn
+                ? (item.registered_at ? (isTh ? `ลงทะเบียน Walk-in (${formatBangkokTime(item.registered_at)})` : `Walk-in (${formatBangkokTime(item.registered_at)})`) : (isTh ? 'ลงทะเบียน Walk-in' : 'Walk-in'))
+                : (item.time_slot?.time_label || '09:00 – 14:00 น.');
+
+              return (
               <div
                 key={item.registration_code || idx}
                 onClick={() => setSelectedResult(item)}
@@ -179,7 +192,7 @@ export default function LookupPage() {
                     <div className="flex items-center gap-3 text-xs text-[var(--muted)] flex-wrap pt-0.5">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3.5 w-3.5 text-gray-400" />
-                        <span>{item.time_slot?.time_label || (isTh ? 'รอบ Walk-in วันงาน' : 'Walk-in')}</span>
+                        <span>{itemTimeLabel}</span>
                       </span>
                       {item.faculty && (
                         <span>· {item.faculty}</span>
@@ -200,7 +213,8 @@ export default function LookupPage() {
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="pt-2 text-center">

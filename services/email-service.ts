@@ -5,7 +5,7 @@
 
 import nodemailer from 'nodemailer';
 import QRCode from 'qrcode';
-import { formatTimeRange } from '@/lib/utils/format';
+import { formatTimeRange, formatBangkokTime, isWalkInRecord } from '@/lib/utils/format';
 
 export interface ConfirmationInput {
   to: string;
@@ -15,6 +15,7 @@ export interface ConfirmationInput {
   faculty?: string | null;
   registrationCode: string;
   qrToken?: string;
+  registeredAt?: string;
   slot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
   venueName?: string;
   eventDateLabel?: string;
@@ -87,9 +88,16 @@ function escapeHtml(value: string): string {
 }
 
 function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
-  const timeSlot = input.slot
-    ? formatTimeRange(input.slot.startAt || input.slot.start_at || '', input.slot.endAt || input.slot.end_at || '')
-    : '09:00 – 14:00 น.';
+  const isWalkIn = isWalkInRecord(input.registrationCode);
+  const timeSlot = isWalkIn
+    ? (input.registeredAt ? formatBangkokTime(input.registeredAt) : formatBangkokTime(new Date()))
+    : (input.slot ? formatTimeRange(input.slot.startAt || input.slot.start_at || '', input.slot.endAt || input.slot.end_at || '') : '09:00 – 14:00 น.');
+  const detailsHeading = isWalkIn
+    ? 'ข้อมูลการลงทะเบียน Walk-in / Walk-in Registration Details'
+    : 'ข้อมูลการนัดหมาย / Appointment Details';
+  const timeLabel = isWalkIn
+    ? '🕒 เวลาลงทะเบียน Walk-in / Walk-in Time'
+    : '🕒 รอบเวลาเดินทาง / Arrival Slot';
 
   const appUrl = getPublicAppUrl();
   const eventDate = escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569');
@@ -189,7 +197,7 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
 
                 <!-- 2-Column Symmetrical Appointment Details Table -->
                 <p style="margin:0 0 12px;font-size:14.5px;font-weight:800;color:#0F172A;letter-spacing:-0.01em;">
-                  ข้อมูลการนัดหมาย / Appointment Details
+                  ${detailsHeading}
                 </p>
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;border-collapse:separate;border-spacing:8px 8px;margin-bottom:18px;">
                   <!-- Row 1: Donor Name & Event Date -->
@@ -206,7 +214,7 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                   <!-- Row 2: Time Slot & Venue -->
                   <tr>
                     <td style="width:50%;background:#FDF2F3;border:1px solid #FECDD3;border-radius:12px;padding:12px 14px;vertical-align:top;">
-                      <p style="margin:0;font-size:11px;font-weight:700;color:#991B1B;">🕒 รอบเวลาเดินทาง / Arrival Slot</p>
+                      <p style="margin:0;font-size:11px;font-weight:700;color:#991B1B;">${timeLabel}</p>
                       <p style="margin:4px 0 0;font-size:15px;font-weight:900;color:#7A1222;">${timeSlot}</p>
                     </td>
                     <td style="width:50%;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:12px 14px;vertical-align:top;">
