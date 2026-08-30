@@ -25,19 +25,24 @@ test('donor can register online and reach the QR pass', async ({ page }) => {
 
   // ---- Step 3: pick a preferred arrival slot + accept privacy ----
   await expect(page.getByRole('heading', { name: /03\. เลือกรอบเวลา/ })).toBeVisible();
-  // Click the first preferred arrival slot.
-  const slot = page.locator('button[type="button"]').filter({ hasText: /09:00|10:00|11:00|12:00|13:00/ }).first();
+  // Click an available preferred arrival slot (10:00+).
+  const slot = page.locator('button[type="button"]').filter({ hasText: /10:00|11:00|12:00|13:00/ }).first();
   await slot.click();
   await page.getByRole('checkbox').check();
 
-  await page.getByRole('button', { name: 'ยืนยันการลงทะเบียน' }).click();
+  // Move to Step 4: Review
+  await page.getByRole('button', { name: 'ตรวจสอบข้อมูล' }).click();
 
-  // ---- Redirect to /registration/[code] with the pass ----
+  // ---- Step 4: Review details and confirm ----
+  await expect(page.getByText('ตรวจสอบข้อมูลการลงทะเบียน')).toBeVisible();
+  
+  await page.locator('button[type="submit"]').click({ noWaitAfter: true });
   await page.waitForURL(/\/registration\//, { timeout: 15_000 });
+
   expect(page.url()).toMatch(/\/registration\/LVU26-/);
 
-  // QR code rendered (qrcode.react renders an <svg>) + donor name shown.
-  await expect(page.locator('svg').first()).toBeVisible();
+  // QR code rendered + donor name shown.
+  await expect(page.getByRole('img', { name: /QR Code/ })).toBeVisible();
   await expect(page.getByText(firstName)).toBeVisible();
   await expect(page.getByText(lastName)).toBeVisible();
 

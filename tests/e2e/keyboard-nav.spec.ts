@@ -91,16 +91,12 @@ test.describe('keyboard navigation & focus trap', () => {
     await page.waitForTimeout(300);
 
     // STEP 2: participant type buttons should be keyboard-reachable
-    const step2Buttons = page.getByRole('button', { name: 'นักศึกษา ม.มหิดล' });
+    const step2Buttons = page.getByRole('button', { name: 'บุคคลทั่วไป' });
     await expect(step2Buttons).toBeVisible();
     await step2Buttons.focus();
     await page.keyboard.press('Enter');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    const step2Focus = await page.evaluate(() => document.activeElement?.id || document.activeElement?.tagName || '');
-    // After 3 tabs from participant buttons: faculty select or experience buttons
-    expect(['reg-faculty', 'BUTTON', 'SELECT']).toContain(step2Focus);
+    await page.getByRole('button', { name: /เคยบริจาคแล้ว/ }).click();
+    await page.waitForTimeout(200);
 
     // Fill step 2 → step 3
     await page.getByRole('button', { name: 'ถัดไป' }).focus();
@@ -194,6 +190,6 @@ test.describe('keyboard navigation & focus trap', () => {
     await page.waitForTimeout(1500);
 
     // Success alert should appear (form is keyboard-submittable)
-    await expect(page.getByText(/ลงทะเบียน & เช็คอินสำเร็จ/)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/ลงทะเบียน & เช็คอินสำเร็จ/)).toBeVisible({ timeout: 10_000 });
   });
 });

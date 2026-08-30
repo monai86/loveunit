@@ -701,10 +701,10 @@ function RegisterContent() {
               {((isWalkInMode && step === 3) || (!isWalkInMode && step === 4)) && (
                 <div className="space-y-6 animate-in fade-in-50 duration-200">
                   <div className="space-y-1.5 border-b border-[var(--rose-100)] pb-3">
-                    <div className="flex items-center gap-2 text-xs font-black text-[var(--burgundy-700)] uppercase font-mono">
-                      <CheckCircle2 className="h-4 w-4" />
+                    <h3 className="flex items-center gap-2 text-xs sm:text-sm font-black text-[var(--burgundy-700)] uppercase font-mono">
+                      <CheckCircle2 className="h-4 w-4 shrink-0" />
                       <span>{tReg.reviewHeading[language]}</span>
-                    </div>
+                    </h3>
                     <p className="text-xs text-[var(--muted)] font-medium leading-relaxed">
                       {tReg.reviewPrompt[language]}
                     </p>
@@ -850,6 +850,7 @@ function RegisterContent() {
 
                 {step < totalSteps ? (
                   <button
+                    key="wizard-next-btn"
                     type="button"
                     onClick={handleNext}
                     className="editorial-btn-primary text-xs font-extrabold py-3.5 px-7 ml-auto inline-flex items-center gap-2 cursor-pointer shadow-md shadow-red-950/20 active:scale-95 transition-all"
@@ -859,6 +860,7 @@ function RegisterContent() {
                   </button>
                 ) : (
                   <button
+                    key="wizard-submit-btn"
                     type="submit"
                     disabled={loading}
                     className="editorial-btn-primary text-xs font-extrabold py-3.5 px-8 ml-auto inline-flex items-center gap-2 cursor-pointer shadow-md shadow-red-950/20 active:scale-95 transition-all"

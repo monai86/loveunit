@@ -2,7 +2,6 @@ import { test } from '@playwright/test';
 
 const EMAIL = 'monai.yut@student.mahidol.edu';
 const PASS = 'loveunit2026';
-const NEW = 'E2eAdminNew@2026';
 
 test('find empty links on admin/registrations', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -19,13 +18,13 @@ test('find empty links on admin/registrations', async ({ page }) => {
   }
   if (page.url().includes('/staff/change-password')) {
     await page.getByPlaceholder('รหัสที่ระบบแจกให้ครั้งแรก').fill(PASS);
-    await page.getByPlaceholder('อย่างน้อย 8 ตัวอักษร').first().fill(NEW);
-    await page.getByPlaceholder('พิมพ์รหัสผ่านใหม่อีกครั้ง').fill(NEW);
+    await page.getByPlaceholder('อย่างน้อย 8 ตัวอักษร').first().fill(PASS);
+    await page.getByPlaceholder('พิมพ์รหัสผ่านใหม่อีกครั้ง').fill(PASS);
     await page.getByRole('button', { name: 'บันทึกรหัสผ่านใหม่' }).click();
     await page.waitForURL(/\/(staff\/checkin|admin|mt70)/, { timeout: 15_000 });
   }
   await page.goto('/mt70/registrations');
-  await page.waitForTimeout(600);
+  await page.waitForLoadState('networkidle').catch(() => {});
   const empty = await page.evaluate(() => {
     return [...document.querySelectorAll('a')]
       .filter((el) => !(el.textContent || '').trim())
