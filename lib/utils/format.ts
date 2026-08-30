@@ -62,20 +62,51 @@ export function nextRegistrationSequence(codes: string[], source: 'ONLINE' | 'WA
 
 /**
  * Determines whether the given date (or current time) falls on the MUMT LoveUnit event day (2026-09-16 in Bangkok timezone).
+ * Supports simulation flags (NEXT_PUBLIC_FORCE_EVENT_DAY, query params, or localStorage) when called without an explicit date.
  */
-export function isEventDay(date: Date = new Date()): boolean {
+export function isEventDay(date?: Date): boolean {
+  if (date) {
+    try {
+      const bangkokDateStr = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Bangkok',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(date);
+      return bangkokDateStr === '2026-09-16';
+    } catch {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}` === '2026-09-16';
+    }
+  }
+
+  if (typeof process !== 'undefined' && (process.env.NEXT_PUBLIC_FORCE_EVENT_DAY === 'true' || process.env.FORCE_EVENT_DAY === 'true')) {
+    return true;
+  }
+  if (typeof window !== 'undefined') {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('eventDay') === 'true' || urlParams.get('mode') === 'walkin' || window.localStorage.getItem('FORCE_EVENT_DAY') === 'true') {
+        return true;
+      }
+    } catch {}
+  }
+
+  const now = new Date();
   try {
     const bangkokDateStr = new Intl.DateTimeFormat('en-CA', {
       timeZone: 'Asia/Bangkok',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
-    }).format(date);
+    }).format(now);
     return bangkokDateStr === '2026-09-16';
   } catch {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}` === '2026-09-16';
   }
 }

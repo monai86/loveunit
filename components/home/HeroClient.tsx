@@ -33,8 +33,7 @@ export function HeroClient({
   endAt: string;
 }) {
   const { isEn } = useLanguage();
-  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
-  const eventDay = mounted ? isEventDay() : false;
+  const eventDay = isEventDay();
 
   const start = startAt ? new Date(startAt) : null;
   const end = endAt ? new Date(endAt) : null;

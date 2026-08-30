@@ -27,7 +27,7 @@ export async function POST(
     const openAt = new Date(pickField<string>(event, 'registrationOpenAt', 'registration_open_at') || '');
     const closeAt = new Date(pickField<string>(event, 'registrationCloseAt', 'registration_close_at') || '');
     const isStatusOpen = ['REGISTRATION_OPEN', 'PUBLISHED'].includes(event.status);
-    const isEventDayNow = isEventDay(now);
+    const isEventDayNow = isEventDay();
     const isWithinWindow = (now >= openAt && now <= closeAt) || isEventDayNow;
 
     if (!isStatusOpen || !isWithinWindow) {

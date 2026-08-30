@@ -29,7 +29,7 @@ export function Navbar() {
   const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const pathname = usePathname();
   const { language, setLanguage, isTh, isEn } = useLanguage();
-  const eventDay = mounted ? isEventDay() : false;
+  const eventDay = isEventDay();
 
   // PUBLIC DONOR NAVIGATION LINKS (DYNAMIC TRANSLATION)
   const navLinks = [
