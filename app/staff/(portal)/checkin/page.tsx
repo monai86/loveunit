@@ -833,28 +833,30 @@ export default function StaffCheckinPage() {
               </div>
             </div>
 
-            {/* Souvenir Status */}
-            {registration.souvenirDetails ? (
-              <div className={`mt-3 rounded-xl border p-3 flex items-center gap-3 ${registration.souvenirDetails.colorClass}`}>
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 shadow-2xs shrink-0">
-                  <Gift className="h-4 w-4 text-amber-700" />
+            {/* Souvenir Status - Only show if ELIGIBLE */}
+            {Boolean(registration.souvenirDetails?.eligible || registration.souvenirEligible) && (
+              registration.souvenirDetails ? (
+                <div className={`mt-3 rounded-xl border p-3 flex items-center gap-3 ${registration.souvenirDetails.colorClass}`}>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 shadow-2xs shrink-0">
+                    <Gift className="h-4 w-4 text-amber-700" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-amber-950">{registration.souvenirDetails.badgeText}</p>
+                    <p className="text-[11px] text-amber-900/80 mt-0.5">{registration.souvenirDetails.subText}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-black text-amber-950">{registration.souvenirDetails.badgeText}</p>
-                  <p className="text-[11px] text-amber-900/80 mt-0.5">{registration.souvenirDetails.subText}</p>
+              ) : registration.souvenirEligible ? (
+                <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3 flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-800 shrink-0">
+                    <Gift className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black text-amber-950">ได้รับของที่ระลึกพิเศษ (100 สิทธิ์แรก)</p>
+                    <p className="text-[11px] text-amber-800/90 mt-0.5">ผู้บริจาคเช็คอินตรงเวลาตามรอบนัดหมาย</p>
+                  </div>
                 </div>
-              </div>
-            ) : registration.souvenirEligible ? (
-              <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3 flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-800 shrink-0">
-                  <Gift className="h-4 w-4" />
-                </div>
-                <div>
-                  <p className="text-xs font-black text-amber-950">ได้รับของที่ระลึกพิเศษ (100 สิทธิ์แรก)</p>
-                  <p className="text-[11px] text-amber-800/90 mt-0.5">ผู้บริจาคเช็คอินตรงเวลาตามรอบนัดหมาย</p>
-                </div>
-              </div>
-            ) : null}
+              ) : null
+            )}
 
             {/* Action Buttons */}
             <div className="mt-5 space-y-2">
