@@ -10,7 +10,7 @@ import {
   SouvenirCandidate 
 } from '../lib/utils/format';
 
-console.log('🧪 Running Souvenir Eligibility & Walk-in Code Test Suite...\n');
+console.log('🧪 Running 2-Tier Fair Souvenir Eligibility & Walk-in Test Suite...\n');
 
 // --- Test 1: formatBangkokTime formatting ---
 console.log('Test 1: formatBangkokTime produces HH:MM น. in Bangkok timezone');
@@ -25,11 +25,8 @@ console.log('✓ Time formatting works correctly\n');
 console.log('Test 2: isCheckinOnTime strict check (no late permitted)');
 const slotEnd = '2026-09-18T10:00:00.000Z';
 
-// Checked in before end time
 assert.strictEqual(isCheckinOnTime('2026-09-18T09:45:00.000Z', slotEnd), true, 'before end time is on-time');
-// Checked in exactly at end time
 assert.strictEqual(isCheckinOnTime('2026-09-18T10:00:00.000Z', slotEnd), true, 'exactly at end time is on-time');
-// Checked in after end time
 assert.strictEqual(isCheckinOnTime('2026-09-18T10:00:01.000Z', slotEnd), false, 'after end time is late');
 assert.strictEqual(isCheckinOnTime('2026-09-18T10:30:00.000Z', slotEnd), false, '30 mins after end time is late');
 console.log('✓ On-time evaluation works strictly\n');
@@ -54,134 +51,158 @@ assert.strictEqual(isWalkInRecord('LVU26-001'), false);
 assert.strictEqual(isWalkInRecord({ source: 'WALK_IN', registrationCode: 'LVU26-W005' }), true);
 console.log('✓ Walk-in codes generate separate LVU26-W... sequence independently\n');
 
-// --- Test 4: Online Souvenir Quota roll-over for 100 souvenirs ---
-console.log('Test 4: Online Quota roll-over for 100 souvenirs');
+// --- Test 4: Tier 1 Online Top 100 Guaranteed Quota & Spillover to On-Site Pool ---
+console.log('Test 4: Tier 1 Online Top 100 Guaranteed Quota & Spillover to On-Site Pool');
 
-const onlineCandidates: SouvenirCandidate[] = [];
+const allCandidates: SouvenirCandidate[] = [];
 
-// Create 110 online registrations (LVU26-001 to LVU26-110)
-for (let i = 1; i <= 110; i++) {
+// Create 100 Tier 1 online registrations (LVU26-001 to LVU26-100)
+for (let i = 1; i <= 100; i++) {
   const padded = String(i).padStart(3, '0');
-  onlineCandidates.push({
+  allCandidates.push({
     id: `reg-online-${i}`,
     registrationCode: `LVU26-${padded}`,
     source: 'ONLINE',
-    status: 'CHECKED_IN',
+    status: 'COMPLETED',
     checkedInAt: '2026-09-18T09:15:00.000Z',
+    completedAt: '2026-09-18T09:30:00.000Z',
     slotEndAt: '2026-09-18T10:00:00.000Z',
   });
 }
 
-// Before any cancellation, 1..100 are eligible, 101..110 are not
-assert.strictEqual(isRegistrationEligibleForSouvenir(onlineCandidates[0], onlineCandidates, 100), true, '#001 is eligible');
-assert.strictEqual(isRegistrationEligibleForSouvenir(onlineCandidates[99], onlineCandidates, 100), true, '#100 is eligible');
-assert.strictEqual(isRegistrationEligibleForSouvenir(onlineCandidates[100], onlineCandidates, 100), false, '#101 is initially NOT eligible');
+// Create Online #101 and #102 who registered late
+allCandidates.push({
+  id: 'reg-online-101',
+  registrationCode: 'LVU26-101',
+  source: 'ONLINE',
+  status: 'COMPLETED',
+  checkedInAt: '2026-09-18T09:05:00.000Z',
+  completedAt: '2026-09-18T09:20:00.000Z', // Completed very early at 09:20
+  slotEndAt: '2026-09-18T10:00:00.000Z',
+});
 
-// Donor #020 CANCELLED their registration
-onlineCandidates[19].status = 'CANCELLED';
+allCandidates.push({
+  id: 'reg-online-102',
+  registrationCode: 'LVU26-102',
+  source: 'ONLINE',
+  status: 'COMPLETED',
+  checkedInAt: '2026-09-18T11:00:00.000Z',
+  completedAt: '2026-09-18T11:30:00.000Z', // Completed later at 11:30
+  slotEndAt: '2026-09-18T12:00:00.000Z',
+});
 
-// Donor #045 arrived LATE
-onlineCandidates[44].checkedInAt = '2026-09-18T10:30:00.000Z'; // slot ended at 10:00:00
-
-// Verify #020 (cancelled) and #045 (late) are not eligible
-assert.strictEqual(isRegistrationEligibleForSouvenir(onlineCandidates[19], onlineCandidates, 100), false);
-assert.strictEqual(isRegistrationEligibleForSouvenir(onlineCandidates[44], onlineCandidates, 100), false);
-
-// Now, the 2 freed quota spots roll over to #101 and #102
-assert.strictEqual(isRegistrationEligibleForSouvenir(onlineCandidates[100], onlineCandidates, 100), true, '#101 gets rolled-over slot');
-assert.strictEqual(isRegistrationEligibleForSouvenir(onlineCandidates[101], onlineCandidates, 100), true, '#102 gets rolled-over slot');
-assert.strictEqual(isRegistrationEligibleForSouvenir(onlineCandidates[102], onlineCandidates, 100), false, '#103 exceeds quota');
-
-console.log('✓ Online Quota roll-over works correctly\n');
-
-// --- Test 5: Walk-in Souvenir Eligibility based on Completion Time ---
-console.log('Test 5: Walk-in Souvenir Eligibility based on COMPLETION TIME (Not Registration Code)');
-
-const walkInCandidates: SouvenirCandidate[] = [];
-
-// Create 105 Walk-in donors (LVU26-W001 to LVU26-W105)
-for (let i = 1; i <= 105; i++) {
+// Create 98 Walk-in completed donors
+for (let i = 1; i <= 98; i++) {
   const padded = String(i).padStart(3, '0');
-  walkInCandidates.push({
-    id: `reg-walkin-${i}`,
-    registrationCode: `LVU26-W${padded}`,
-    source: 'WALK_IN',
-    status: 'CHECKED_IN',
-    checkedInAt: '2026-09-18T09:00:00.000Z',
-    completedAt: null,
-  });
-}
-
-// While CHECKED_IN or IN_PROCESS, walk-in donors are pending completion and not yet eligible
-assert.strictEqual(isRegistrationEligibleForSouvenir(walkInCandidates[0], walkInCandidates, 100), false, 'Walk-in #001 pending completion is not eligible yet');
-const pendingDetails = getSouvenirEligibilityDetails(walkInCandidates[0], walkInCandidates, 100, 100);
-assert.strictEqual(pendingDetails.isPending, true);
-
-// Case: Walk-in #100 completes donation FIRST at 09:15
-walkInCandidates[99].status = 'COMPLETED';
-walkInCandidates[99].completedAt = '2026-09-18T09:15:00.000Z';
-
-// Walk-in #001 completes donation LATER at 11:30
-walkInCandidates[0].status = 'COMPLETED';
-walkInCandidates[0].completedAt = '2026-09-18T11:30:00.000Z';
-
-// Both are within the 100 quota, but Walk-in #100 ranks #1 because they finished first!
-assert.strictEqual(isRegistrationEligibleForSouvenir(walkInCandidates[99], walkInCandidates, 100), true, 'Walk-in #100 is eligible');
-assert.strictEqual(isRegistrationEligibleForSouvenir(walkInCandidates[0], walkInCandidates, 100), true, 'Walk-in #001 is eligible');
-
-const details100 = getSouvenirEligibilityDetails(walkInCandidates[99], walkInCandidates, 100, 100);
-assert.strictEqual(details100.rank, 1, 'Walk-in #100 who completed first gets Rank 1 in Walk-in souvenir list');
-
-const details001 = getSouvenirEligibilityDetails(walkInCandidates[0], walkInCandidates, 100, 100);
-assert.strictEqual(details001.rank, 2, 'Walk-in #001 who completed second gets Rank 2 in Walk-in souvenir list');
-
-// Simulate 100 completed walk-ins in total
-for (let i = 1; i <= 100; i++) {
-  walkInCandidates[i - 1].status = 'COMPLETED';
-  walkInCandidates[i - 1].completedAt = new Date(Date.parse('2026-09-18T09:00:00.000Z') + i * 60000).toISOString();
-}
-
-// 101st walk-in donor completes after the first 100
-walkInCandidates[100].status = 'COMPLETED';
-walkInCandidates[100].completedAt = new Date(Date.parse('2026-09-18T09:00:00.000Z') + 101 * 60000).toISOString();
-
-// Check 100th vs 101st completed walk-in
-assert.strictEqual(isRegistrationEligibleForSouvenir(walkInCandidates[99], walkInCandidates, 100), true, '100th completed walk-in is eligible');
-assert.strictEqual(isRegistrationEligibleForSouvenir(walkInCandidates[100], walkInCandidates, 100), false, '101st completed walk-in exceeds 100 quota');
-
-console.log('✓ Walk-in souvenir eligibility strictly follows completion order (first 100 completed donors)\n');
-
-// --- Test 6: Continuous Unlimited Walk-in Registrations ---
-console.log('Test 6: Continuous Walk-in registration remains open indefinitely even after 100+ souvenirs');
-
-// Ensure all 1..105 have completed
-for (let i = 1; i <= 105; i++) {
-  walkInCandidates[i - 1].status = 'COMPLETED';
-  if (!walkInCandidates[i - 1].completedAt) {
-    walkInCandidates[i - 1].completedAt = new Date(Date.parse('2026-09-18T09:00:00.000Z') + i * 60000).toISOString();
-  }
-}
-
-// Create Walk-in donors 106 to 250 (LVU26-W106 to LVU26-W250)
-for (let i = 106; i <= 250; i++) {
-  const padded = String(i).padStart(3, '0');
-  walkInCandidates.push({
+  allCandidates.push({
     id: `reg-walkin-${i}`,
     registrationCode: `LVU26-W${padded}`,
     source: 'WALK_IN',
     status: 'COMPLETED',
-    checkedInAt: '2026-09-18T12:00:00.000Z',
-    completedAt: new Date(Date.parse('2026-09-18T12:00:00.000Z') + i * 60000).toISOString(),
+    checkedInAt: '2026-09-18T09:30:00.000Z',
+    completedAt: new Date(Date.parse('2026-09-18T09:40:00.000Z') + i * 60000).toISOString(),
   });
 }
 
-assert.strictEqual(walkInCandidates.length, 250, 'System supports 250+ walk-in records');
-assert.strictEqual(walkInCandidates[249].registrationCode, 'LVU26-W250');
-assert.strictEqual(isRegistrationEligibleForSouvenir(walkInCandidates[249], walkInCandidates, 100), false, '250th walk-in completed successfully without souvenir');
+// 1. Online #001..#100 are eligible in Tier 1
+assert.strictEqual(isRegistrationEligibleForSouvenir(allCandidates[0], allCandidates, 100, 100), true, '#001 is eligible');
+assert.strictEqual(isRegistrationEligibleForSouvenir(allCandidates[99], allCandidates, 100, 100), true, '#100 is eligible');
 
-const details250 = getSouvenirEligibilityDetails(walkInCandidates[249], walkInCandidates, 100, 100);
-assert.strictEqual(details250.eligible, false);
-assert.strictEqual(details250.rank, 250);
-console.log('✓ Walk-in registration and check-in continue indefinitely for all donors\n');
+// 2. Online #101 completed at 09:20 (earliest in On-site pool) -> Must be Rank 1 in On-Site Pool!
+const donor101 = allCandidates.find((r) => r.id === 'reg-online-101')!;
+assert.strictEqual(isRegistrationEligibleForSouvenir(donor101, allCandidates, 100, 100), true, '#101 who finished early gets On-Site souvenir');
+const details101 = getSouvenirEligibilityDetails(donor101, allCandidates, 100, 100);
+assert.strictEqual(details101.eligible, true);
+assert.strictEqual(details101.rank, 1, '#101 has Rank 1 in On-Site pool');
 
-console.log('🎉 ALL SOUVENIR ELIGIBILITY & WALK-IN TESTS PASSED SUCCESSFULLY!');
+// 3. Online #050 cancels their registration
+const donor50 = allCandidates.find((r) => r.registrationCode === 'LVU26-050')!;
+donor50.status = 'CANCELLED';
+
+// #050 is no longer eligible
+assert.strictEqual(isRegistrationEligibleForSouvenir(donor50, allCandidates, 100, 100), false);
+
+// The On-site pool now expands by +1 (from 100 to 101 items) to absorb the cancelled slot
+const donor102 = allCandidates.find((r) => r.id === 'reg-online-102')!;
+assert.strictEqual(isRegistrationEligibleForSouvenir(donor102, allCandidates, 100, 100), true, '#102 gets on-site souvenir within expanded pool');
+
+console.log('✓ Tier 1 Online and Tier 2 On-Site Pool work seamlessly and fairly\n');
+
+// --- Test 5: Walk-in and Online 101+ Chronological Competition ---
+console.log('Test 5: Walk-in and Online 101+ Chronological Competition in On-Site Pool');
+
+const walkInPool: SouvenirCandidate[] = [];
+
+// 1 Online 101+ donor
+walkInPool.push({
+  id: 'online-101',
+  registrationCode: 'LVU26-101',
+  source: 'ONLINE',
+  status: 'COMPLETED',
+  completedAt: '2026-09-18T09:10:00.000Z', // 1st
+});
+
+// 1 Walk-in donor who finished at 09:15
+walkInPool.push({
+  id: 'walkin-1',
+  registrationCode: 'LVU26-W001',
+  source: 'WALK_IN',
+  status: 'COMPLETED',
+  completedAt: '2026-09-18T09:15:00.000Z', // 2nd
+});
+
+// 1 Walk-in donor who hasn't completed (status CHECKED_IN)
+walkInPool.push({
+  id: 'walkin-2',
+  registrationCode: 'LVU26-W002',
+  source: 'WALK_IN',
+  status: 'CHECKED_IN',
+  completedAt: null,
+});
+
+// Online 101 is Rank 1, Walk-in 1 is Rank 2
+const dOnline101 = getSouvenirEligibilityDetails(walkInPool[0], walkInPool, 0, 100);
+const dWalkin1 = getSouvenirEligibilityDetails(walkInPool[1], walkInPool, 0, 100);
+const dWalkin2 = getSouvenirEligibilityDetails(walkInPool[2], walkInPool, 0, 100);
+
+assert.strictEqual(dOnline101.eligible, true);
+assert.strictEqual(dOnline101.rank, 1);
+
+assert.strictEqual(dWalkin1.eligible, true);
+assert.strictEqual(dWalkin1.rank, 2);
+
+assert.strictEqual(dWalkin2.eligible, false, 'Uncompleted walk-in is not eligible yet');
+assert.strictEqual(dWalkin2.isPending, true);
+
+console.log('✓ Chronological completion ranking operates without bias between Walk-in and 101+\n');
+
+// --- Test 6: Capacity and Beyond Quota Handling ---
+console.log('Test 6: Capacity and Beyond Quota Handling');
+
+const largePool: SouvenirCandidate[] = [];
+// 100 completed in Tier 2
+for (let i = 1; i <= 100; i++) {
+  largePool.push({
+    id: `pool-${i}`,
+    registrationCode: i % 2 === 0 ? `LVU26-W${String(i).padStart(3, '0')}` : `LVU26-${String(100 + i).padStart(3, '0')}`,
+    source: i % 2 === 0 ? 'WALK_IN' : 'ONLINE',
+    status: 'COMPLETED',
+    completedAt: new Date(Date.parse('2026-09-18T09:00:00.000Z') + i * 60000).toISOString(),
+  });
+}
+
+// 101st completed in Tier 2
+largePool.push({
+  id: 'pool-101',
+  registrationCode: 'LVU26-W101',
+  source: 'WALK_IN',
+  status: 'COMPLETED',
+  completedAt: new Date(Date.parse('2026-09-18T09:00:00.000Z') + 101 * 60000).toISOString(),
+});
+
+assert.strictEqual(isRegistrationEligibleForSouvenir(largePool[99], largePool, 0, 100), true, '100th completed is eligible');
+assert.strictEqual(isRegistrationEligibleForSouvenir(largePool[100], largePool, 0, 100), false, '101st completed is NOT eligible');
+
+console.log('✓ Quota limits and boundary conditions pass with 100% precision\n');
+
+console.log('🎉 ALL 2-TIER SOUVENIR ELIGIBILITY TESTS PASSED SUCCESSFULLY!');

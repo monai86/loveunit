@@ -254,31 +254,36 @@ export interface SouvenirEligibilityDetails {
 }
 
 /**
- * Evaluates whether a given registration is eligible for the souvenir (default quota: 100 for online, 100 for walk-in).
+ * Evaluates whether a given registration is eligible for the souvenir under the fair 2-tier distribution model:
  * 
- * Rules:
- * 1. ONLINE Donors (Quota: 100):
- *    - source === 'ONLINE'
- *    - status !== 'CANCELLED'
- *    - Checked in on-time (checkedInAt <= slot.endAt) or if not yet checked in, slot end time has not passed.
- *    - Ranked in top 100 on-time online registrations by sequence code.
+ * Total Event Souvenirs = 200 items (onlineQuota + onSiteQuota).
  * 
- * 2. WALK-IN Donors (Quota: 100):
- *    - source === 'WALK_IN'
- *    - Sequence code does NOT determine priority.
- *    - Determined strictly by who completes donation first (status === 'COMPLETED').
- *    - Top 100 walk-ins with status === 'COMPLETED' sorted chronologically by completedAt.
+ * 1. Tier 1 (Online Top 100 Reserved: LVU26-001 to LVU26-100):
+ *    - Must be an Online registration with numeric sequence <= 100.
+ *    - Must not be CANCELLED.
+ *    - Must check in on-time (checkedInAt <= slot.endAt). If not yet checked in, slot end time has not passed.
+ *    - Receives guaranteed online souvenir upon completing donation.
+ * 
+ * 2. Spillover / Unclaimed Online Slots:
+ *    - If any of LVU26-001..100 is CANCELLED, misses checkin time (late), or does not complete,
+ *      that reserved spot automatically rolls over into the On-Site Souvenir Pool.
+ * 
+ * 3. Tier 2 (On-Site Pool: All Walk-in Donors + Online LVU26-101+):
+ *    - Competes for the On-Site Souvenir Pool (Base 100 + Spillover from Tier 1).
+ *    - Priority is determined strictly by CHRONOLOGICAL DONATION COMPLETION TIME (completedAt).
+ *    - Who completes donation first gets the on-site souvenir first.
  */
 export function isRegistrationEligibleForSouvenir(
   targetReg: SouvenirCandidate,
   allCandidates: SouvenirCandidate[],
-  quotaLimit = 100
+  onlineQuota = 100,
+  onSiteQuota = 100
 ): boolean {
   const getCode = (r: SouvenirCandidate) => r.registrationCode || r.registration_code || '';
   const getSource = (r: SouvenirCandidate) => r.source || (isWalkInRecord(getCode(r)) ? 'WALK_IN' : 'ONLINE');
   const getStatus = (r: SouvenirCandidate) => r.status || 'REGISTERED';
   const getCheckin = (r: SouvenirCandidate) => r.checkedInAt || r.checked_in_at || null;
-  const getCompleted = (r: SouvenirCandidate) => r.completedAt || r.completed_at || r.checkedInAt || r.checked_in_at || null;
+  const getCompleted = (r: SouvenirCandidate) => r.completedAt || r.completed_at || null;
   const getSlotEnd = (r: SouvenirCandidate): string | Date | null => {
     if (r.slotEndAt) return r.slotEndAt;
     if (r.slot_end_at) return r.slot_end_at;
@@ -286,82 +291,85 @@ export function isRegistrationEligibleForSouvenir(
     return slot ? (slot.endAt || slot.end_at || null) : null;
   };
 
-  const isWalkIn = getSource(targetReg) === 'WALK_IN' || isWalkInRecord(getCode(targetReg));
+  const isOnline = (r: SouvenirCandidate) => getSource(r) === 'ONLINE' && !isWalkInRecord(getCode(r));
+  const getSeq = (r: SouvenirCandidate) => extractQueueNumber(getCode(r)) ?? 999999;
 
-  // --- Case A: Walk-in Donor Evaluation ---
-  if (isWalkIn) {
-    const targetStatus = getStatus(targetReg);
-    // Walk-in souvenir is strictly awarded to donors who complete donation (COMPLETED)
-    if (targetStatus !== 'COMPLETED') {
-      return false;
-    }
+  // Helper to check if a Tier 1 online registration (001-100) is holding/consuming a reserved slot
+  const isTier1Candidate = (r: SouvenirCandidate) => isOnline(r) && getSeq(r) <= onlineQuota;
 
-    // Filter all completed walk-in candidates and sort chronologically by completedAt
-    const completedWalkIns = allCandidates.filter((r) => {
-      const s = getSource(r);
-      const isW = s === 'WALK_IN' || isWalkInRecord(getCode(r));
-      return isW && getStatus(r) === 'COMPLETED';
-    });
-
-    completedWalkIns.sort((a, b) => {
-      const timeA = new Date(getCompleted(a) || 0).getTime();
-      const timeB = new Date(getCompleted(b) || 0).getTime();
-      if (timeA !== timeB) return timeA - timeB;
-      const seqA = extractQueueNumber(getCode(a)) ?? 999999;
-      const seqB = extractQueueNumber(getCode(b)) ?? 999999;
-      return seqA - seqB;
-    });
-
-    const targetIndex = completedWalkIns.findIndex((r) => r.id === targetReg.id);
-    if (targetIndex === -1) return false;
-    return targetIndex < quotaLimit;
-  }
-
-  // --- Case B: Online Donor Evaluation ---
-  const isEligibleOnlineCandidate = (r: SouvenirCandidate): boolean => {
+  const isHoldingTier1Slot = (r: SouvenirCandidate): boolean => {
+    if (!isTier1Candidate(r)) return false;
     const status = getStatus(r);
     if (status === 'CANCELLED') return false;
-    const source = getSource(r);
-    if (source !== 'ONLINE' && isWalkInRecord(getCode(r))) return false;
-
     const checkin = getCheckin(r);
     const slotEnd = getSlotEnd(r);
-
     if (checkin) {
-      if (!slotEnd) return true; // If no slot specified, default on-time
+      if (!slotEnd) return true;
       return isCheckinOnTime(checkin, slotEnd);
     }
-
-    if (status === 'COMPLETED' || status === 'IN_PROCESS' || status === 'CHECKED_IN') {
-      return true;
-    }
-
-    // If not checked in yet and status is REGISTERED:
-    if (status === 'REGISTERED') {
-      if (!slotEnd) return true;
-      // If slot end has already passed and they haven't checked in, they missed their slot
+    // If not checked in yet, only holds slot if slot end hasn't passed
+    if (slotEnd) {
       return Date.now() <= new Date(slotEnd).getTime();
     }
-
-    return false;
+    return true;
   };
 
-  if (!isEligibleOnlineCandidate(targetReg)) {
+  const targetStatus = getStatus(targetReg);
+  const targetCheckin = getCheckin(targetReg);
+  const targetSlotEnd = getSlotEnd(targetReg);
+
+  // --- Case A: Target is Tier 1 Online (001 - 100) ---
+  if (isTier1Candidate(targetReg)) {
+    if (targetStatus === 'CANCELLED') return false;
+    const isLate = Boolean(targetCheckin && targetSlotEnd && !isCheckinOnTime(targetCheckin, targetSlotEnd));
+    if (!isLate) {
+      if (targetStatus === 'COMPLETED' || targetStatus === 'CHECKED_IN') {
+        return true;
+      }
+      if (targetStatus === 'REGISTERED') {
+        if (!targetSlotEnd) return true;
+        return Date.now() <= new Date(targetSlotEnd).getTime();
+      }
+      return false;
+    }
+  }
+
+  // --- Case B: Target is Tier 2 (Walk-in OR Online 101+ OR Late Online 001-100) ---
+  // Must be COMPLETED to claim an On-Site souvenir
+  if (targetStatus !== 'COMPLETED') {
     return false;
   }
 
-  // Filter all online candidates that are eligible, sort by queue number or sequence
-  const eligibleOnlineList = allCandidates.filter(isEligibleOnlineCandidate);
-  eligibleOnlineList.sort((a, b) => {
-    const seqA = extractQueueNumber(getCode(a)) ?? 999999;
-    const seqB = extractQueueNumber(getCode(b)) ?? 999999;
-    return seqA - seqB;
+  // Calculate dynamic On-Site pool size: Total Event Quota - Active Tier 1 Slot Holders
+  const activeTier1Holders = allCandidates.filter(isHoldingTier1Slot).length;
+  const totalEventQuota = onlineQuota + onSiteQuota;
+  const dynamicOnSitePoolSize = Math.max(onSiteQuota, totalEventQuota - activeTier1Holders);
+
+  // Collect all Tier 2 candidates that have COMPLETED donation
+  const completedTier2Candidates = allCandidates.filter((r) => {
+    if (getStatus(r) !== 'COMPLETED') return false;
+    if (getSource(r) === 'WALK_IN' || isWalkInRecord(getCode(r))) return true;
+    if (isOnline(r)) {
+      if (getSeq(r) > onlineQuota) return true;
+      const chk = getCheckin(r);
+      const slEnd = getSlotEnd(r);
+      if (chk && slEnd && !isCheckinOnTime(chk, slEnd)) return true;
+    }
+    return false;
   });
 
-  const targetIndex = eligibleOnlineList.findIndex((r) => r.id === targetReg.id);
+  // Sort chronologically by completedAt, tie-break by registration code
+  completedTier2Candidates.sort((a, b) => {
+    const timeA = new Date(getCompleted(a) || getCheckin(a) || 0).getTime();
+    const timeB = new Date(getCompleted(b) || getCheckin(b) || 0).getTime();
+    if (timeA !== timeB) return timeA - timeB;
+    return getSeq(a) - getSeq(b);
+  });
+
+  const targetIndex = completedTier2Candidates.findIndex((r) => r.id === targetReg.id);
   if (targetIndex === -1) return false;
 
-  return targetIndex < quotaLimit;
+  return targetIndex < dynamicOnSitePoolSize;
 }
 
 /**
@@ -371,88 +379,122 @@ export function getSouvenirEligibilityDetails(
   targetReg: SouvenirCandidate,
   allCandidates: SouvenirCandidate[],
   onlineQuota = 100,
-  walkInQuota = 100
+  onSiteQuota = 100
 ): SouvenirEligibilityDetails {
   const getCode = (r: SouvenirCandidate) => r.registrationCode || r.registration_code || '';
   const getSource = (r: SouvenirCandidate) => r.source || (isWalkInRecord(getCode(r)) ? 'WALK_IN' : 'ONLINE');
   const getStatus = (r: SouvenirCandidate) => r.status || 'REGISTERED';
-  const getCompleted = (r: SouvenirCandidate) => r.completedAt || r.completed_at || r.checkedInAt || r.checked_in_at || null;
+  const getCheckin = (r: SouvenirCandidate) => r.checkedInAt || r.checked_in_at || null;
+  const getCompleted = (r: SouvenirCandidate) => r.completedAt || r.completed_at || null;
+  const getSlotEnd = (r: SouvenirCandidate): string | Date | null => {
+    if (r.slotEndAt) return r.slotEndAt;
+    if (r.slot_end_at) return r.slot_end_at;
+    const slot = r.timeSlot || r.time_slot;
+    return slot ? (slot.endAt || slot.end_at || null) : null;
+  };
 
-  const isWalkIn = getSource(targetReg) === 'WALK_IN' || isWalkInRecord(getCode(targetReg));
+  const isOnline = (r: SouvenirCandidate) => getSource(r) === 'ONLINE' && !isWalkInRecord(getCode(r));
+  const getSeq = (r: SouvenirCandidate) => extractQueueNumber(getCode(r)) ?? 999999;
+  const isTier1Candidate = (r: SouvenirCandidate) => isOnline(r) && getSeq(r) <= onlineQuota;
 
-  if (isWalkIn) {
-    const targetStatus = getStatus(targetReg);
-    const completedWalkIns = allCandidates.filter((r) => {
-      const isW = getSource(r) === 'WALK_IN' || isWalkInRecord(getCode(r));
-      return isW && getStatus(r) === 'COMPLETED';
-    });
+  const isHoldingTier1Slot = (r: SouvenirCandidate): boolean => {
+    if (!isTier1Candidate(r)) return false;
+    const status = getStatus(r);
+    if (status === 'CANCELLED') return false;
+    const checkin = getCheckin(r);
+    const slotEnd = getSlotEnd(r);
+    if (checkin) {
+      if (!slotEnd) return true;
+      return isCheckinOnTime(checkin, slotEnd);
+    }
+    if (slotEnd) {
+      return Date.now() <= new Date(slotEnd).getTime();
+    }
+    return true;
+  };
 
-    completedWalkIns.sort((a, b) => {
-      const timeA = new Date(getCompleted(a) || 0).getTime();
-      const timeB = new Date(getCompleted(b) || 0).getTime();
-      if (timeA !== timeB) return timeA - timeB;
-      const seqA = extractQueueNumber(getCode(a)) ?? 999999;
-      const seqB = extractQueueNumber(getCode(b)) ?? 999999;
-      return seqA - seqB;
-    });
+  const targetStatus = getStatus(targetReg);
+  const targetCheckin = getCheckin(targetReg);
+  const targetSlotEnd = getSlotEnd(targetReg);
 
-    const targetIndex = completedWalkIns.findIndex((r) => r.id === targetReg.id);
-
-    if (targetStatus === 'COMPLETED') {
-      if (targetIndex !== -1 && targetIndex < walkInQuota) {
+  // --- Tier 1 Online (001 - 100) ---
+  if (isTier1Candidate(targetReg)) {
+    const isLate = Boolean(targetCheckin && targetSlotEnd && !isCheckinOnTime(targetCheckin, targetSlotEnd));
+    if (!isLate && targetStatus !== 'CANCELLED') {
+      const isEligible = isRegistrationEligibleForSouvenir(targetReg, allCandidates, onlineQuota, onSiteQuota);
+      if (isEligible) {
         return {
           eligible: true,
-          quotaType: 'WALK_IN',
-          rank: targetIndex + 1,
-          quotaLimit: walkInQuota,
-          badgeText: `ได้รับของที่ระลึก Walk-in (ลำดับบริจาคเสร็จที่ #${targetIndex + 1}/${walkInQuota})`,
-          subText: 'ผู้บริจาค Walk-in ที่บริจาคสำเร็จ 100 ท่านแรก',
-          colorClass: 'from-purple-50 to-pink-50/40 border-purple-200 text-purple-950',
+          quotaType: 'ONLINE',
+          quotaLimit: onlineQuota,
+          badgeText: 'ได้รับของที่ระลึกออนไลน์ (100 สิทธิ์แรก)',
+          subText: 'ผู้ลงทะเบียนออนไลน์ 100 ท่านแรกและเช็กอินตรงเวลาตามรอบนัดหมาย',
+          colorClass: 'from-amber-50 to-orange-50/40 border-amber-200/80 text-amber-950',
         };
       }
+    }
+  }
+
+  // --- Tier 2 (Walk-in and Online 101+) ---
+  const activeTier1Holders = allCandidates.filter(isHoldingTier1Slot).length;
+  const totalEventQuota = onlineQuota + onSiteQuota;
+  const dynamicOnSitePoolSize = Math.max(onSiteQuota, totalEventQuota - activeTier1Holders);
+
+  const completedTier2Candidates = allCandidates.filter((r) => {
+    if (getStatus(r) !== 'COMPLETED') return false;
+    if (getSource(r) === 'WALK_IN' || isWalkInRecord(getCode(r))) return true;
+    if (isOnline(r)) {
+      if (getSeq(r) > onlineQuota) return true;
+      const chk = getCheckin(r);
+      const slEnd = getSlotEnd(r);
+      if (chk && slEnd && !isCheckinOnTime(chk, slEnd)) return true;
+    }
+    return false;
+  });
+
+  completedTier2Candidates.sort((a, b) => {
+    const timeA = new Date(getCompleted(a) || getCheckin(a) || 0).getTime();
+    const timeB = new Date(getCompleted(b) || getCheckin(b) || 0).getTime();
+    if (timeA !== timeB) return timeA - timeB;
+    return getSeq(a) - getSeq(b);
+  });
+
+  const targetIndex = completedTier2Candidates.findIndex((r) => r.id === targetReg.id);
+
+  if (targetStatus === 'COMPLETED') {
+    if (targetIndex !== -1 && targetIndex < dynamicOnSitePoolSize) {
+      const isW = getSource(targetReg) === 'WALK_IN' || isWalkInRecord(getCode(targetReg));
       return {
-        eligible: false,
-        quotaType: 'WALK_IN',
-        rank: targetIndex !== -1 ? targetIndex + 1 : undefined,
-        quotaLimit: walkInQuota,
-        badgeText: `บริจาคสำเร็จ (เกินโควตา Walk-in ${walkInQuota} สิทธิ์แรก)`,
-        subText: 'ครบโควตาของที่ระลึก Walk-in แล้ว',
-        colorClass: 'from-gray-50 to-slate-50 border-gray-200 text-gray-700',
+        eligible: true,
+        quotaType: isW ? 'WALK_IN' : 'ONLINE',
+        rank: targetIndex + 1,
+        quotaLimit: dynamicOnSitePoolSize,
+        badgeText: `ได้รับของที่ระลึกหน้างาน (ลำดับบริจาคเสร็จที่ #${targetIndex + 1}/${dynamicOnSitePoolSize})`,
+        subText: isW ? 'ผู้บริจาค Walk-in ที่บริจาคสำเร็จตามลำดับเวลา' : 'ผู้ลงทะเบียนออนไลน์ที่บริจาคสำเร็จในโควตาหน้างาน',
+        colorClass: 'from-purple-50 to-pink-50/40 border-purple-200 text-purple-950',
       };
     }
-
-    // Not yet completed
     return {
       eligible: false,
-      isPending: true,
-      quotaType: 'WALK_IN',
-      quotaLimit: walkInQuota,
-      badgeText: `ผู้บริจาค Walk-in (โควตาของที่ระลึก 100 ท่านแรกที่บริจาคเสร็จ)`,
-      subText: 'ตัดสินสิทธิ์ตามลำดับที่บริจาคเสร็จสมบูรณ์ (ไม่ใช่ลำดับรหัสลงทะเบียน)',
-      colorClass: 'from-amber-50 to-orange-50/40 border-amber-200 text-amber-950',
+      quotaType: 'NONE',
+      rank: targetIndex !== -1 ? targetIndex + 1 : undefined,
+      quotaLimit: dynamicOnSitePoolSize,
+      badgeText: `บริจาคสำเร็จ (เกินโควตาของที่ระลึกหน้างาน ${dynamicOnSitePoolSize} สิทธิ์)`,
+      subText: 'ครบโควตาของที่ระลึกแล้ว',
+      colorClass: 'from-gray-50 to-slate-50 border-gray-200 text-gray-700',
     };
   }
 
-  // Online Donor
-  const isEligible = isRegistrationEligibleForSouvenir(targetReg, allCandidates, onlineQuota);
-  if (isEligible) {
-    return {
-      eligible: true,
-      quotaType: 'ONLINE',
-      quotaLimit: onlineQuota,
-      badgeText: `ได้รับของที่ระลึกออนไลน์ (100 สิทธิ์แรก)`,
-      subText: 'ผู้บริจาคลงทะเบียนออนไลน์และเช็กอินตรงเวลาตามรอบนัดหมาย',
-      colorClass: 'from-amber-50 to-orange-50/40 border-amber-200/80 text-amber-950',
-    };
-  }
-
+  // Not yet completed
+  const isW = getSource(targetReg) === 'WALK_IN' || isWalkInRecord(getCode(targetReg));
   return {
     eligible: false,
-    quotaType: 'ONLINE',
-    quotaLimit: onlineQuota,
-    badgeText: 'ไม่มีสิทธิ์รับของที่ระลึกออนไลน์',
-    subText: 'ลงทะเบียนเกิน 100 สิทธิ์แรก หรือมาไม่ตรงรอบเวลา',
-    colorClass: 'from-gray-50 to-slate-50 border-gray-200 text-gray-700',
+    isPending: true,
+    quotaType: isW ? 'WALK_IN' : 'ONLINE',
+    quotaLimit: dynamicOnSitePoolSize,
+    badgeText: 'โควตาของที่ระลึกหน้างาน (นับตามลำดับที่บริจาคเสร็จสมบูรณ์)',
+    subText: 'ตัดสินสิทธิ์ตามลำดับที่บริจาคเสร็จสมบูรณ์ (First Completed)',
+    colorClass: 'from-amber-50 to-orange-50/40 border-amber-200 text-amber-950',
   };
 }
 
