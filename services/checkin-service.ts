@@ -40,16 +40,29 @@ export async function searchRegistrations(query: string) {
 
   if (db) {
     const normPhone = normalizePhoneNumber(q);
+    const nameParts = q.split(/\s+/).filter(Boolean);
+    const conditions = [
+      eq(registrations.qrToken, q),
+      eq(registrations.registrationCode, q.toUpperCase()),
+      ilike(registrations.registrationCode, `%${q}%`),
+      ilike(registrations.firstName, `%${q}%`),
+      ilike(registrations.lastName, `%${q}%`),
+      sql`lower(${registrations.firstName} || ' ' || ${registrations.lastName}) ILIKE ${`%${q.toLowerCase()}%`}`,
+      ilike(registrations.phone, `%${q}%`),
+      normPhone.length >= 3 ? ilike(registrations.phoneNormalized, `%${normPhone}%`) : undefined,
+    ];
+
+    if (nameParts.length >= 2) {
+      conditions.push(
+        and(
+          ilike(registrations.firstName, `%${nameParts[0]}%`),
+          ilike(registrations.lastName, `%${nameParts.slice(1).join(' ')}%`)
+        )
+      );
+    }
+
     const matched = await db.query.registrations.findMany({
-      where: or(
-        eq(registrations.qrToken, q),
-        eq(registrations.registrationCode, q.toUpperCase()),
-        ilike(registrations.registrationCode, `%${q}%`),
-        ilike(registrations.firstName, `%${q}%`),
-        ilike(registrations.lastName, `%${q}%`),
-        ilike(registrations.phone, `%${q}%`),
-        normPhone.length >= 4 ? ilike(registrations.phoneNormalized, `%${normPhone}%`) : undefined
-      ),
+      where: or(...conditions.filter(Boolean)),
       limit: 50,
       with: {
         timeSlot: true,

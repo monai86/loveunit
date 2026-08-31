@@ -11,6 +11,7 @@ type RegistrationRow = {
   registrationCode: string;
   firstName: string;
   lastName: string;
+  phone?: string;
   status: RegistrationStatus;
   timeSlotText: string;
 };
@@ -40,6 +41,7 @@ function normalizeRegistration(row: RawRegistration): RegistrationRow {
     registrationCode: code,
     firstName: String(pickField(row, 'firstName', 'first_name') ?? ''),
     lastName: String(pickField(row, 'lastName', 'last_name') ?? ''),
+    phone: String(pickField(row, 'phone', 'phone') ?? ''),
     status: (pickField<RegistrationStatus>(row, 'status', 'status') ?? 'REGISTERED'),
     timeSlotText,
   };
@@ -134,9 +136,14 @@ export default function StaffOverviewPage() {
   const summary = useMemo(() => summarizeStaffRegistrations(registrations), [registrations]);
   const visibleRows = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
+    const queryDigits = query.replace(/\D/g, '');
     return registrations.filter((registration) => {
       const matchesFilter = filter === 'ALL' || registration.status === filter || (filter === 'CHECKED_IN' && registration.status === 'IN_PROCESS');
-      const matchesQuery = !normalizedQuery || `${registration.registrationCode} ${registration.firstName} ${registration.lastName}`.toLowerCase().includes(normalizedQuery);
+      const searchTarget = `${registration.registrationCode} ${registration.firstName} ${registration.lastName} ${registration.phone || ''}`.toLowerCase();
+      const phoneDigits = (registration.phone || '').replace(/\D/g, '');
+      const matchesQuery = !normalizedQuery || 
+        searchTarget.includes(normalizedQuery) ||
+        (queryDigits.length >= 3 && phoneDigits.includes(queryDigits));
       return matchesFilter && matchesQuery;
     });
   }, [filter, query, registrations]);

@@ -414,7 +414,7 @@ export async function registerDonorAtomic(input: {
   faculty?: string;
   academicYear?: string;
   donationExperience: DonationExperience;
-  slotId: string;
+  slotId?: string | null;
   source?: 'ONLINE' | 'WALK_IN' | 'ADMIN';
 }): Promise<{ success: boolean; registration?: Registration; errorCode?: string; message?: string }> {
   const phoneNormalized = normalizePhoneNumber(input.phone);
@@ -459,7 +459,7 @@ export async function registerDonorAtomic(input: {
       faculty: input.faculty || null,
       academic_year: input.academicYear || null,
       donation_experience: input.donationExperience,
-      slot_id: input.slotId,
+      slot_id: input.slotId || null,
       status: 'REGISTERED',
       source: source,
       privacy_accepted: true,
@@ -513,17 +513,24 @@ export async function searchRegistrations(query: string): Promise<(Registration 
       time_slot: defaultSlots.find((s) => s.id === r.slot_id) || null,
     }));
 
+    const nameParts = q.split(/\s+/).filter(Boolean);
     return inMemoryRegistrations
-      .filter(
-        (r) =>
-          q === ' ' ||
-          r.qr_token === query.trim() ||
-          r.registration_code.toLowerCase().includes(q) ||
-          r.first_name.toLowerCase().includes(q) ||
-          r.last_name.toLowerCase().includes(q) ||
-          r.phone.includes(q) ||
-          (normPhone.length >= 4 && r.phone_normalized.includes(normPhone))
-      )
+      .filter((r) => {
+        if (q === ' ') return true;
+        if (r.qr_token === query.trim()) return true;
+        const code = r.registration_code.toLowerCase();
+        if (code.includes(q)) return true;
+        const firstName = r.first_name.toLowerCase();
+        const lastName = r.last_name.toLowerCase();
+        const fullName = `${firstName} ${lastName}`;
+        if (firstName.includes(q) || lastName.includes(q) || fullName.includes(q)) return true;
+        if (nameParts.length >= 2 && firstName.includes(nameParts[0]) && lastName.includes(nameParts.slice(1).join(' '))) return true;
+        if (r.phone.includes(q)) return true;
+        if (normPhone.length >= 3 && r.phone_normalized.includes(normPhone)) return true;
+        const digitsOnlyQuery = q.replace(/\D/g, '');
+        if (digitsOnlyQuery.length >= 3 && r.phone_normalized.includes(digitsOnlyQuery)) return true;
+        return false;
+      })
       .map((r) => {
         const slot = defaultSlots.find((s) => s.id === r.slot_id) || null;
         const candidate = { ...r, time_slot: slot };
