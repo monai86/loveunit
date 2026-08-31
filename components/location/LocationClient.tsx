@@ -86,8 +86,8 @@ export function LocationClient({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-[var(--line)]">
         <div className="max-w-2xl space-y-2">
-          <div className="inline-flex items-center gap-2 rounded-full bg-[var(--burgundy-50)] text-[var(--burgundy-700)] border border-[var(--burgundy-200)] px-3.5 py-1 text-xs font-bold">
-            <Building2 className="h-3.5 w-3.5" />
+          <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
+            <Building2 className="h-3.5 w-3.5 text-white" />
             <span>{isTh ? 'อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา' : 'Sirividhaya Building, Mahidol University Salaya'}</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
