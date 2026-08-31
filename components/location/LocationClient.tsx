@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { 
   Bus, 
   Car, 
-  ArrowRight, 
   MapPin, 
   Train, 
   Bike, 
@@ -111,13 +109,6 @@ export function LocationClient({
             <span>{isTh ? 'นำทางใน Google Maps' : 'Open Google Maps'}</span>
             <ExternalLink className="h-3.5 w-3.5 opacity-80" />
           </a>
-          <Link
-            href="/register"
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--burgundy-600)] hover:bg-[var(--burgundy-700)] text-white font-extrabold px-5 py-2.5 text-xs shadow-md transition-all cursor-pointer"
-          >
-            <span>{isTh ? 'ลงทะเบียนออนไลน์' : 'Register Online'}</span>
-            <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
       </div>
 
