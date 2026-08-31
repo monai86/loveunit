@@ -147,55 +147,74 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
         <td align="center" style="padding:28px 12px;">
           <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border-radius:24px;overflow:hidden;border:1px solid #E2E8F0;box-shadow:0 12px 36px rgba(15,23,42,0.06);">
             
-            <!-- Luxurious Crimson Red Gradient Header -->
+            <!-- Exact Match to Web DonorTicketPass Header -->
             <tr>
-              <td style="background:linear-gradient(135deg, #DC2626 0%, #B91C1C 40%, #991B1B 75%, #7F1D1D 100%);background-color:#B91C1C;padding:28px 24px 26px;color:#FFFFFF;">
+              <td style="background:linear-gradient(135deg, #C5222F 0%, #A6192E 45%, #7A1222 100%);background-color:#A6192E;padding:24px 24px 20px;color:#FFFFFF;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;">
                   <tr>
                     <td style="vertical-align:middle;">
-                      <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:.05em;color:#FEE2E2;">
-                        MUMT LOVEUNIT ครั้งที่ 9 &middot; คณะเทคนิคการแพทย์ ม.มหิดล
+                      <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#FFE4E6;text-transform:uppercase;white-space:nowrap;">
+                        MUMT LoveUnit ครั้งที่ 9
                       </p>
-                      <p style="margin:2px 0 0;font-size:11px;color:#FECDD3;opacity:0.9;">
-                        Faculty of Medical Technology, Mahidol University
+                      <p style="margin:2px 0 0;font-size:11.5px;font-weight:600;color:#FFFFFF;opacity:0.95;white-space:nowrap;">
+                        คณะเทคนิคการแพทย์ ม.มหิดล
                       </p>
                     </td>
                     <td align="right" style="vertical-align:middle;">
-                      <span style="display:inline-block;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.35);border-radius:9999px;padding:4px 12px;font-size:11px;font-weight:700;color:#FFFFFF;white-space:nowrap;">
+                      <span style="display:inline-block;background:rgba(16,185,129,0.25);border:1px solid rgba(110,231,183,0.45);border-radius:9999px;padding:4px 12px;font-size:11px;font-weight:700;color:#D1FAE5;white-space:nowrap;">
                         &#10003; ยืนยันสิทธิ์แล้ว
                       </span>
                     </td>
                   </tr>
                 </table>
-                <h1 class="header-title" style="margin:16px 0 0;font-size:25px;line-height:1.25;font-weight:800;color:#FFFFFF;letter-spacing:-0.01em;">
-                  ตั๋วลงทะเบียนบริจาคโลหิต
-                </h1>
-                <p style="margin:4px 0 0;font-size:12px;color:#FEE2E2;font-weight:500;">
-                  Official Blood Donation Pass &middot; Registration confirmed
-                </p>
+                <div style="border-top:1px solid rgba(255,255,255,0.2);margin-top:14px;padding-top:14px;">
+                  <h1 class="header-title" style="margin:0;font-size:22px;line-height:1.25;font-weight:900;color:#FFFFFF;letter-spacing:-0.01em;">
+                    ตั๋วลงทะเบียนบริจาคโลหิต
+                  </h1>
+                  <p style="margin:4px 0 0;font-size:11px;font-weight:600;letter-spacing:.06em;color:#FFE4E6;text-transform:uppercase;">
+                    บัตรยืนยันสิทธิ์เข้าร่วมกิจกรรม &middot; Registration confirmed
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Ticket Perforation Dashed Separator -->
+            <tr>
+              <td style="padding:0 20px;background:#FFFFFF;height:12px;line-height:12px;font-size:1px;">
+                <div style="border-bottom:2px dashed #FECDD3;height:6px;line-height:6px;font-size:1px;">&nbsp;</div>
               </td>
             </tr>
 
             <!-- Content Area -->
             <tr>
-              <td class="card-content" style="padding:28px 24px 22px;">
+              <td class="card-content" style="padding:20px 24px 22px;">
                 
                 <!-- Greeting & Summary -->
-                <p class="body-font" style="margin:0;font-size:16px;line-height:1.6;color:#0F172A;">
-                  สวัสดีคุณ <strong style="color:#B91C1C;font-size:16.5px;font-weight:700;">${recipient}</strong>
+                <p class="body-font" style="margin:0;font-size:15.5px;line-height:1.6;color:#0F172A;">
+                  สวัสดีคุณ <strong style="color:#A6192E;font-size:16px;font-weight:700;">${recipient}</strong>
                 </p>
-                <p class="body-font" style="margin:8px 0 20px;font-size:14px;line-height:1.7;color:#334155;">
+                <p class="body-font" style="margin:8px 0 18px;font-size:13.5px;line-height:1.65;color:#334155;">
                   การลงทะเบียนของคุณเรียบร้อยแล้ว (Registration confirmed) สามารถแสดง QR Code หรือแจ้งหมายเลขลงทะเบียนด้านล่างนี้ ณ จุดรับบริจาคโลหิตในวันงาน
                 </p>
 
-                <!-- Boarding Pass Style Code Box with Soft Red Gradient -->
-                <div style="background:linear-gradient(180deg, #FFF5F5 0%, #FEF2F2 100%);border:1.5px solid #FECDD3;border-radius:16px;padding:18px 20px;text-align:center;margin-bottom:24px;">
-                  <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#991B1B;text-transform:uppercase;">
-                    หมายเลขลงทะเบียนของคุณ / REGISTRATION CODE
-                  </p>
-                  <p class="code-font" style="margin:6px 0 0;font-family:'SF Mono','JetBrains Mono','Roboto Mono',Menlo,Consolas,monospace;font-size:34px;font-weight:900;letter-spacing:.12em;color:#B91C1C;line-height:1.1;">
-                    ${escapeHtml(input.registrationCode)}
-                  </p>
+                <!-- Boarding Pass Style Code Box (Guaranteed No Wrapping) -->
+                <div style="background:linear-gradient(180deg, #FFF5F5 0%, #FEF2F2 100%);border:1.5px solid #FECDD3;border-radius:16px;padding:16px 16px;text-align:center;margin-bottom:22px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;">
+                    <tr>
+                      <td align="center" style="white-space:nowrap;padding:0;">
+                        <span style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#991B1B;text-transform:uppercase;white-space:nowrap;">
+                          หมายเลขลงทะเบียน &middot; REGISTRATION NO.
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center" style="padding:6px 0 0;">
+                        <p class="code-font" style="margin:0;font-family:'SF Mono','JetBrains Mono','Roboto Mono',Menlo,Consolas,monospace;font-size:32px;font-weight:900;letter-spacing:.12em;color:#A6192E;line-height:1.1;white-space:nowrap;">
+                          ${escapeHtml(input.registrationCode)}
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
                 </div>
 
                 <!-- Structured Appointment Details Card (No Emojis) -->
@@ -433,17 +452,17 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
         <td align="center" style="padding:28px 12px;">
           <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#FFFFFF;border-radius:24px;overflow:hidden;border:1px solid #E2E8F0;box-shadow:0 12px 36px rgba(15,23,42,0.06);">
             
-            <!-- Luxurious Crimson Red Gradient Header -->
+            <!-- Exact Match to Web DonorTicketPass Header -->
             <tr>
-              <td style="background:linear-gradient(135deg, #DC2626 0%, #B91C1C 40%, #991B1B 75%, #7F1D1D 100%);background-color:#B91C1C;padding:28px 24px 26px;color:#FFFFFF;">
+              <td style="background:linear-gradient(135deg, #C5222F 0%, #A6192E 45%, #7A1222 100%);background-color:#A6192E;padding:24px 24px 20px;color:#FFFFFF;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;">
                   <tr>
                     <td style="vertical-align:middle;">
-                      <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:.05em;color:#FEE2E2;">
-                        MUMT LOVEUNIT 2026 &middot; 2 Days to Go!
+                      <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#FFE4E6;text-transform:uppercase;white-space:nowrap;">
+                        MUMT LoveUnit 2026
                       </p>
-                      <p style="margin:2px 0 0;font-size:11px;color:#FECDD3;opacity:0.9;">
-                        Faculty of Medical Technology, Mahidol University
+                      <p style="margin:2px 0 0;font-size:11.5px;font-weight:600;color:#FFFFFF;opacity:0.95;white-space:nowrap;">
+                        2 Days to Go &middot; คณะเทคนิคการแพทย์
                       </p>
                     </td>
                     <td align="right" style="vertical-align:middle;">
@@ -453,35 +472,54 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
                     </td>
                   </tr>
                 </table>
-                <h1 class="header-title" style="margin:16px 0 0;font-size:25px;line-height:1.25;font-weight:800;color:#FFFFFF;letter-spacing:-0.01em;">
-                  เตือนความพร้อมก่อนวันบริจาคโลหิต
-                </h1>
-                <p style="margin:4px 0 0;font-size:12px;color:#FEE2E2;font-weight:500;">
-                  Preparation Reminder &middot; อีก 2 วันพบกันที่จุดรับบริจาค
-                </p>
+                <div style="border-top:1px solid rgba(255,255,255,0.2);margin-top:14px;padding-top:14px;">
+                  <h1 class="header-title" style="margin:0;font-size:22px;line-height:1.25;font-weight:900;color:#FFFFFF;letter-spacing:-0.01em;">
+                    เตือนความพร้อมก่อนวันบริจาคโลหิต
+                  </h1>
+                  <p style="margin:4px 0 0;font-size:11px;font-weight:600;letter-spacing:.06em;color:#FFE4E6;text-transform:uppercase;">
+                    บัตรยืนยันสิทธิ์เข้าร่วมกิจกรรม &middot; อีก 2 วันพบกัน
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Ticket Perforation Dashed Separator -->
+            <tr>
+              <td style="padding:0 20px;background:#FFFFFF;height:12px;line-height:12px;font-size:1px;">
+                <div style="border-bottom:2px dashed #FECDD3;height:6px;line-height:6px;font-size:1px;">&nbsp;</div>
               </td>
             </tr>
 
             <!-- Content Area -->
             <tr>
-              <td class="card-content" style="padding:28px 24px 22px;">
+              <td class="card-content" style="padding:20px 24px 22px;">
                 
                 <!-- Greeting & Summary -->
-                <p class="body-font" style="margin:0;font-size:16px;line-height:1.6;color:#0F172A;">
-                  สวัสดีคุณ <strong style="color:#B91C1C;font-size:16.5px;font-weight:700;">${recipient}</strong>
+                <p class="body-font" style="margin:0;font-size:15.5px;line-height:1.6;color:#0F172A;">
+                  สวัสดีคุณ <strong style="color:#A6192E;font-size:16px;font-weight:700;">${recipient}</strong>
                 </p>
-                <p class="body-font" style="margin:8px 0 20px;font-size:14px;line-height:1.7;color:#334155;">
+                <p class="body-font" style="margin:8px 0 18px;font-size:13.5px;line-height:1.65;color:#334155;">
                   ขอเตือนรายละเอียดการนัดหมายของคุณ อีกเพียง 2 วันเท่านั้น! เตรียมร่างกายให้พร้อมแล้วมาพบกันตามรอบเวลาที่ท่านได้เลือกไว้
                 </p>
 
-                <!-- Boarding Pass Style Code Box -->
-                <div style="background:linear-gradient(180deg, #FFF5F5 0%, #FEF2F2 100%);border:1.5px solid #FECDD3;border-radius:16px;padding:18px 20px;text-align:center;margin-bottom:24px;">
-                  <p style="margin:0;font-size:11px;font-weight:800;letter-spacing:.08em;color:#991B1B;text-transform:uppercase;">
-                    หมายเลขลงทะเบียนของคุณ / REGISTRATION CODE
-                  </p>
-                  <p class="code-font" style="margin:6px 0 0;font-family:'SF Mono','JetBrains Mono','Roboto Mono',Menlo,Consolas,monospace;font-size:34px;font-weight:900;letter-spacing:.12em;color:#B91C1C;line-height:1.1;">
-                    ${escapeHtml(input.registrationCode)}
-                  </p>
+                <!-- Boarding Pass Style Code Box (Guaranteed No Wrapping) -->
+                <div style="background:linear-gradient(180deg, #FFF5F5 0%, #FEF2F2 100%);border:1.5px solid #FECDD3;border-radius:16px;padding:16px 16px;text-align:center;margin-bottom:22px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;">
+                    <tr>
+                      <td align="center" style="white-space:nowrap;padding:0;">
+                        <span style="font-size:11px;font-weight:800;letter-spacing:.08em;color:#991B1B;text-transform:uppercase;white-space:nowrap;">
+                          หมายเลขลงทะเบียน &middot; REGISTRATION NO.
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center" style="padding:6px 0 0;">
+                        <p class="code-font" style="margin:0;font-family:'SF Mono','JetBrains Mono','Roboto Mono',Menlo,Consolas,monospace;font-size:32px;font-weight:900;letter-spacing:.12em;color:#A6192E;line-height:1.1;white-space:nowrap;">
+                          ${escapeHtml(input.registrationCode)}
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
                 </div>
 
                 <!-- Structured Appointment Details Card -->
