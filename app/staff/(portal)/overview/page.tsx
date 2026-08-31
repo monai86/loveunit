@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, ClipboardList, Loader2, RefreshCw, Search, Users, UserCheck } from 'lucide-react';
-import { getRegistrationStatusBadge, pickField, formatBangkokTime } from '@/lib/utils/format';
+import { getRegistrationStatusBadge, pickField, formatBangkokTime, isRegistrationEligibleForSouvenir } from '@/lib/utils/format';
 import { summarizeStaffRegistrations } from '@/lib/staff/registration-summary';
 import type { RegistrationStatus } from '@/lib/types/database';
 

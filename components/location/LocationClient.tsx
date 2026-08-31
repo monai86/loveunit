@@ -10,14 +10,10 @@ import {
   Bike, 
   Phone, 
   ExternalLink,
-  Compass,
   X,
   ZoomIn,
-  CheckCircle2,
   Navigation,
   Download,
-  Info,
-  Calendar,
   Clock,
   Building2
 } from 'lucide-react';
@@ -70,7 +66,7 @@ type TransitTab = 'BUS' | 'TRAM' | 'SHUTTLE' | 'TRAIN' | 'CAR';
 
 export function LocationClient({
   locationInfographic,
-  transportInfographic,
+  transportInfographic: _transportInfographic,
 }: LocationClientProps) {
   const { isTh } = useLanguage();
   const [activeModalImg, setActiveModalImg] = useState<{ src: string; title: string } | null>(null);

@@ -20,8 +20,7 @@ import {
   Search,
   Phone,
   Clock,
-  Check,
-  Sparkles
+  Check
 } from 'lucide-react';
 import { formatTimeRange, formatBangkokTime, getRegistrationStatusBadge, isWalkInRecord, type SouvenirEligibilityDetails } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';

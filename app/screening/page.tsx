@@ -11,7 +11,6 @@ import {
   ShieldCheck, 
   Heart, 
   Info, 
-  Sparkles,
   ChevronRight,
   Clock
 } from 'lucide-react';
@@ -75,16 +74,6 @@ export default function ScreeningPage() {
     setAnswers({});
     setCurrentCategoryIndex(0);
     setSubmitted(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleQuickFillHealthy = () => {
-    const perfectAnswers: Record<string, boolean> = {};
-    for (const q of OFFICIAL_SCREENING_QUESTIONS) {
-      perfectAnswers[q.id] = q.idealAnswer;
-    }
-    setAnswers(perfectAnswers);
-    setSubmitted(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
