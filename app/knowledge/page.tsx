@@ -15,11 +15,7 @@ import {
   Droplets,
   Share2,
   Check,
-  AlertTriangle,
-  BookOpen,
-  FileText,
-  Download,
-  Award
+  AlertTriangle
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
@@ -961,135 +957,6 @@ export default function KnowledgePage() {
 
         </section>
       )}
-
-      {/* SECTION: OFFICIAL ACADEMIC STANDARDS & REFERENCE DOCUMENTS */}
-      <section className="space-y-6 pt-6 border-t border-[var(--line)]">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-[var(--burgundy-600)]" />
-            <h2 className="text-xl sm:text-2xl font-black text-[var(--ink)]">
-              {isTh ? 'เอกสารวิชาการและคู่มือมาตรฐานอ้างอิงทางการ' : 'Official Academic Standards & Reference Manuals'}
-            </h2>
-          </div>
-          <p className="mt-1 text-xs text-[var(--muted)] font-medium">
-            {isTh 
-              ? 'มาตรฐานการปฏิบัติงานธนาคารเลือดและเกณฑ์การตรวจคัดกรองโลหิต ศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย' 
-              : 'Official Blood Bank and Transfusion Service Standards by National Blood Centre, Thai Red Cross Society.'}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Document 1 */}
-          <article className="editorial-card p-5 flex flex-col justify-between space-y-4 group">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-red-50 text-[var(--burgundy-700)] border border-red-200 px-2.5 py-0.5 text-[10px] font-black uppercase">
-                  PDF · มาตรฐาน พ.ศ. 2567
-                </span>
-                <BookOpen className="h-4 w-4 text-[var(--burgundy-600)]" />
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="text-sm font-black text-[var(--ink)] group-hover:text-[var(--burgundy-700)] transition-colors leading-snug">
-                  {isTh ? 'หนังสือมาตรฐานธนาคารเลือดและงานบริการโลหิต 2567' : 'Standards for Blood Banks & Transfusion Services (2024)'}
-                </h3>
-                <p className="text-xs text-[var(--muted)] leading-relaxed line-clamp-3">
-                  {isTh
-                    ? 'หลักเกณฑ์และมาตรฐานการดำเนินงานธนาคารเลือดทั่วประเทศ การบริหารจัดการคุณภาพ และความปลอดภัยของผู้บริจาคและผู้รับโลหิต'
-                    : 'Nationwide standard guidelines for blood banking, quality management systems, donor screening, and patient safety.'}
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[var(--line)] flex items-center justify-between">
-              <span className="text-[11px] font-mono text-gray-500">Official PDF</span>
-              <a
-                href="/docs/blood-bank-standards-2567.pdf"
-                download="blood-bank-standards-2567.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--burgundy-50)] hover:bg-[var(--burgundy-100)] text-[var(--burgundy-700)] px-3 py-1.5 text-xs font-extrabold border border-[var(--burgundy-200)] transition-all cursor-pointer shadow-2xs"
-              >
-                <Download className="h-3.5 w-3.5" />
-                <span>{isTh ? 'เปิด / ดาวน์โหลด' : 'View / Download'}</span>
-              </a>
-            </div>
-          </article>
-
-          {/* Document 2 */}
-          <article className="editorial-card p-5 flex flex-col justify-between space-y-4 group">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-blue-50 text-blue-800 border border-blue-200 px-2.5 py-0.5 text-[10px] font-black uppercase">
-                  PDF · คู่มือ พ.ศ. 2564
-                </span>
-                <FileText className="h-4 w-4 text-blue-600" />
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="text-sm font-black text-[var(--ink)] group-hover:text-blue-900 transition-colors leading-snug">
-                  {isTh ? 'คู่มือการรับบริจาคโลหิต พ.ศ. 2564' : 'Blood Donor Eligibility & Collection Handbook (2021)'}
-                </h3>
-                <p className="text-xs text-[var(--muted)] leading-relaxed line-clamp-3">
-                  {isTh
-                    ? 'แนวทางการคัดกรองคุณสมบัติผู้บริจาคโลหิต ข้อห้ามชั่วคราวและถาวร การดูแลสุขภาพก่อนและหลังบริจาคโลหิต'
-                    : 'Comprehensive donor eligibility criteria, medical evaluation protocols, and pre-/post-donation health advisories.'}
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[var(--line)] flex items-center justify-between">
-              <span className="text-[11px] font-mono text-gray-500">Official PDF</span>
-              <a
-                href="/docs/blood-donation-handbook-2564.pdf"
-                download="blood-donation-handbook-2564.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-900 px-3 py-1.5 text-xs font-extrabold border border-blue-200 transition-all cursor-pointer shadow-2xs"
-              >
-                <Download className="h-3.5 w-3.5" />
-                <span>{isTh ? 'เปิด / ดาวน์โหลด' : 'View / Download'}</span>
-              </a>
-            </div>
-          </article>
-
-          {/* Document 3 */}
-          <article className="editorial-card p-5 flex flex-col justify-between space-y-4 group">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 text-[10px] font-black uppercase">
-                  PDF · บทที่ 4 (ปรับปรุง 2568)
-                </span>
-                <Microscope className="h-4 w-4 text-emerald-600" />
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="text-sm font-black text-[var(--ink)] group-hover:text-emerald-900 transition-colors leading-snug">
-                  {isTh ? 'บทที่ 4: การทดสอบโลหิตบริจาค (Laboratory Standards)' : 'Chapter 4: Donor Testing & Screening Standards'}
-                </h3>
-                <p className="text-xs text-[var(--muted)] leading-relaxed line-clamp-3">
-                  {isTh
-                    ? 'ข้อกำหนดมาตรฐานห้องปฏิบัติการ การทดสอบทางซีโรโลยี (Serology) และอณูชีววิทยา (ID-NAT) ตรวจคัดกรองเชื้อ HIV, HBV, HCV, Syphilis'
-                    : 'Detailed laboratory screening protocols: Serology (EIA/CLIA) and Molecular ID-NAT for HIV, HBV, HCV, and Syphilis.'}
-                </p>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-[var(--line)] flex items-center justify-between">
-              <span className="text-[11px] font-mono text-gray-500">Official PDF</span>
-              <a
-                href="/docs/lab-testing-standards-ch4.pdf"
-                download="lab-testing-standards-ch4.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 px-3 py-1.5 text-xs font-extrabold border border-emerald-200 transition-all cursor-pointer shadow-2xs"
-              >
-                <Download className="h-3.5 w-3.5" />
-                <span>{isTh ? 'เปิด / ดาวน์โหลด' : 'View / Download'}</span>
-              </a>
-            </div>
-          </article>
-
-        </div>
-      </section>
 
     </div>
   );
