@@ -11,9 +11,7 @@ import {
   RotateCcw,
   Volume2,
   VolumeX,
-  Zap,
   UploadCloud,
-  Flashlight,
   ArrowLeft,
   Loader2,
   X,
@@ -22,7 +20,8 @@ import {
   Search,
   Phone,
   Clock,
-  Check
+  Check,
+  Sparkles
 } from 'lucide-react';
 import { formatTimeRange, formatBangkokTime, getRegistrationStatusBadge, isWalkInRecord, type SouvenirEligibilityDetails } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
@@ -107,7 +106,6 @@ function playAudioChime(type: 'success' | 'souvenir' | 'error' | 'click') {
     const now = ctx.currentTime;
 
     if (type === 'success') {
-      // High-pitched pleasant double chime (880Hz -> 1320Hz)
       osc.type = 'sine';
       osc.frequency.setValueAtTime(880, now);
       osc.frequency.exponentialRampToValueAtTime(1320, now + 0.1);
@@ -116,7 +114,6 @@ function playAudioChime(type: 'success' | 'souvenir' | 'error' | 'click') {
       osc.start(now);
       osc.stop(now + 0.16);
     } else if (type === 'souvenir') {
-      // Triumphant chord (587Hz -> 880Hz -> 1174Hz)
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(587.33, now);
       osc.frequency.setValueAtTime(880, now + 0.08);
@@ -126,7 +123,6 @@ function playAudioChime(type: 'success' | 'souvenir' | 'error' | 'click') {
       osc.start(now);
       osc.stop(now + 0.35);
     } else if (type === 'error') {
-      // Low saw buzz (220Hz)
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(220, now);
       gain.gain.setValueAtTime(0.25, now);
@@ -134,7 +130,6 @@ function playAudioChime(type: 'success' | 'souvenir' | 'error' | 'click') {
       osc.start(now);
       osc.stop(now + 0.25);
     } else {
-      // Subtle click
       osc.type = 'sine';
       osc.frequency.setValueAtTime(600, now);
       gain.gain.setValueAtTime(0.1, now);
@@ -254,10 +249,7 @@ export default function StaffCheckinPage() {
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [scanning, setScanning] = useState(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
-  const [selectedCameraId] = useState<string>('');
-  const [torchOn, setTorchOn] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [fastTrackMode, setFastTrackMode] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -303,25 +295,6 @@ export default function StaffCheckinPage() {
         const found = mapRegistration(data.registrations[0]);
         setRegistration(found);
 
-        if (fastTrackMode && found.status === 'REGISTERED') {
-          if (soundEnabled) playAudioChime('success');
-          try {
-            const checkinRes = await fetch('/api/staff/checkin', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ registrationId: found.id, status: 'CHECKED_IN' }),
-            });
-            const checkinData = await checkinRes.json();
-            if (checkinRes.ok && checkinData.success) {
-              setRegistration({ ...found, status: 'CHECKED_IN' as RegistrationStatus, checkedInAt: new Date().toISOString() });
-              setMessage({ type: 'success', text: `เช็คอินสำเร็จ: คุณ${found.firstName} ${found.lastName}` });
-              return;
-            }
-          } catch {
-            // Fall back to manual confirmation when connection is unavailable
-          }
-        }
-
         if (found.status === 'REGISTERED') {
           if (soundEnabled) playAudioChime('success');
         } else if (found.status === 'CHECKED_IN') {
@@ -340,7 +313,7 @@ export default function StaffCheckinPage() {
       busyRef.current = false;
       setSearching(false);
     }
-  }, [fastTrackMode, soundEnabled]);
+  }, [soundEnabled]);
 
   const stopScanner = useCallback(async () => {
     if (scannerRef.current) {
@@ -359,8 +332,7 @@ export default function StaffCheckinPage() {
       scannerRef.current = null;
     }
     setScanning(false);
-    setTorchOn(false);
-  }, [setScanning, setTorchOn]);
+  }, [setScanning]);
 
   const startScanner = useCallback(async (
     targetFacing: 'environment' | 'user' = facingMode, 
@@ -404,8 +376,8 @@ export default function StaffCheckinPage() {
           const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
           const qrEdgeSize = Math.floor(minEdge * 0.72);
           return {
-            width: Math.max(200, Math.min(qrEdgeSize, 320)),
-            height: Math.max(200, Math.min(qrEdgeSize, 320)),
+            width: Math.max(220, Math.min(qrEdgeSize, 320)),
+            height: Math.max(220, Math.min(qrEdgeSize, 320)),
           };
         },
         aspectRatio: isFullscreen ? undefined : 1.0,
@@ -461,21 +433,21 @@ export default function StaffCheckinPage() {
       if (errMsg.includes('NotAllowedError') || errMsg.includes('Permission') || errMsg.includes('Permission denied')) {
         setMessage({ type: 'error', text: 'เบราว์เซอร์ไม่อนุญาตให้เข้าถึงกล้อง กรุณากดอนุญาตสิทธิ์การใช้กล้อง (Camera Permission)' });
       } else if (errMsg.includes('NotFoundError') || errMsg.includes('no camera')) {
-        setMessage({ type: 'error', text: 'ไม่พบอุปกรณ์กล้องบนเครื่องนี้ กรุณาใช้การอัปโหลดภาพ QR แทน' });
+        setMessage({ type: 'error', text: 'ไม่พบอุปกรณ์กล้องบนเครื่องนี้ กรุณาใช้การค้นหารายชื่อแทน' });
       } else {
         setMessage({ type: 'error', text: 'ไม่สามารถเปิดกล้องได้ กรุณาตรวจสอบการอนุญาตสิทธิ์กล้อง' });
       }
     }
   }, [facingMode, handleLookupByToken, setFacingMode, setScanning]);
 
-  // Reactive camera startup when mode, camera device, or facing changes
+  // Reactive camera startup
   useEffect(() => {
     let unmounted = false;
     const targetContainer = 'qr-reader-fullscreen';
 
     const timer = setTimeout(() => {
       if (!unmounted) {
-        void startScanner(facingMode, selectedCameraId, targetContainer);
+        void startScanner(facingMode, undefined, targetContainer);
       }
     }, 200);
 
@@ -483,7 +455,7 @@ export default function StaffCheckinPage() {
       unmounted = true;
       clearTimeout(timer);
     };
-  }, [facingMode, selectedCameraId, startScanner]);
+  }, [facingMode, startScanner]);
 
   // Keyboard wedge listener for USB/Bluetooth physical barcode scanners
   useEffect(() => {
@@ -520,7 +492,7 @@ export default function StaffCheckinPage() {
 
   useEffect(() => () => { void stopScanner(); }, [stopScanner]);
 
-  // The scanner is a dedicated camera workspace, not a scrollable portal page.
+  // Dedicated scanner viewport
   useEffect(() => {
     const bodyOverflow = document.body.style.overflow;
     const htmlOverflow = document.documentElement.style.overflow;
@@ -609,19 +581,6 @@ export default function StaffCheckinPage() {
     setFacingMode(nextFacing);
   };
 
-  const toggleTorch = async () => {
-    if (!scannerRef.current || !scanning) return;
-    try {
-      const nextTorch = !torchOn;
-      await scannerRef.current.applyVideoConstraints({
-        advanced: [{ torch: nextTorch } as MediaTrackConstraintSet],
-      });
-      setTorchOn(nextTorch);
-    } catch {
-      setMessage({ type: 'warning', text: 'อุปกรณ์นี้ไม่รองรับการเปิดไฟฉาย' });
-    }
-  };
-
   // Image Upload / Screenshot Scanner
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -652,7 +611,7 @@ export default function StaffCheckinPage() {
   return (
     <main 
       data-testid="fullscreen-scanner" 
-      className="fixed inset-0 isolate h-[100dvh] w-screen overflow-hidden bg-black text-white select-none" 
+      className="fixed inset-0 isolate h-[100dvh] w-screen overflow-hidden bg-slate-950 text-white select-none font-sans" 
       aria-label="กล้องสแกน QR ผู้บริจาค"
     >
       <h1 className="sr-only">กล้องสแกน QR ผู้บริจาค</h1>
@@ -661,53 +620,38 @@ export default function StaffCheckinPage() {
       {/* Video Viewport */}
       <div 
         id="qr-reader-fullscreen" 
-        className="absolute inset-0 h-full w-full bg-[#090d16] [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover [&_#qr-shaded-region]:!hidden [&_div]:!border-none" 
+        className="absolute inset-0 h-full w-full bg-slate-950 [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover [&_#qr-shaded-region]:!hidden [&_div]:!border-none" 
       />
       
-      {/* Cinematic Ambient Dark Vignette */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-black/10 to-black/70" aria-hidden="true" />
+      {/* Subtle Professional Vignette */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/80" aria-hidden="true" />
 
-      {/* Minimalist Top Control Bar */}
+      {/* Clean Top Navigation Bar */}
       <header className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-4 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6">
         <div className="flex items-center gap-2">
           <Link 
             href="/staff/overview" 
-            className="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-3.5 text-xs font-semibold text-white/90 shadow-lg backdrop-blur-md transition active:scale-95 hover:bg-black/60 hover:text-white"
+            className="inline-flex h-10 items-center gap-1.5 rounded-full border border-white/20 bg-black/40 px-3.5 text-xs font-bold text-white shadow-lg backdrop-blur-md transition active:scale-95 hover:bg-black/60"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>ภาพรวม</span>
           </Link>
-
-          <button 
-            type="button" 
-            onClick={() => setSearchModalOpen(true)} 
-            className="inline-flex h-10 items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-950/60 px-3.5 text-xs font-bold text-emerald-300 shadow-lg backdrop-blur-md transition active:scale-95 hover:bg-emerald-900/80 hover:text-white"
-            aria-label="ค้นหารายชื่อผู้ลงทะเบียน"
-          >
-            <Search className="h-4 w-4 text-emerald-400" />
-            <span className="hidden xs:inline">ค้นหารายชื่อ</span>
-          </button>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Live Status Capsule */}
-          <div className="inline-flex h-10 items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3.5 text-xs font-medium text-white/90 shadow-lg backdrop-blur-md">
-            <span className="relative flex h-2 w-2">
-              {scanning && (
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              )}
-              <span className={`relative inline-flex h-2 w-2 rounded-full ${scanning ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-            </span>
-            <span className="tracking-wide">{scanning ? 'พร้อมสแกน' : 'กำลังเปิดกล้อง'}</span>
+          {/* Status Indicator */}
+          <div className="inline-flex h-10 items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3.5 text-xs font-medium text-white shadow-lg backdrop-blur-md">
+            <span className={`h-2 w-2 rounded-full ${scanning ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
+            <span className="font-semibold text-xs">{scanning ? 'พร้อมสแกน' : 'กำลังเปิดกล้อง'}</span>
           </div>
 
-          {/* Quick Sound Toggle */}
+          {/* Sound Toggle */}
           <button 
             type="button" 
             onClick={() => setSoundEnabled(!soundEnabled)} 
             aria-pressed={soundEnabled} 
             aria-label={soundEnabled ? 'ปิดเสียง' : 'เปิดเสียง'} 
-            className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 shadow-lg backdrop-blur-md transition active:scale-95 ${
+            className={`inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 shadow-lg backdrop-blur-md transition active:scale-95 ${
               soundEnabled ? 'bg-black/40 text-white hover:bg-black/60' : 'bg-black/60 text-white/40'
             }`}
           >
@@ -716,41 +660,38 @@ export default function StaffCheckinPage() {
         </div>
       </header>
 
-      {/* Sleek Apple-style Viewfinder Reticle */}
+      {/* Professional Medical-Grade Viewfinder Frame (NO AI Slop / NO fake green laser) */}
       {scanning && (
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center px-8" aria-hidden="true">
-          <div className="relative aspect-square w-[min(70vw,18.5rem)]">
+          <div className="relative aspect-square w-[min(72vw,19rem)]">
             
-            {/* 4 Precision Corner Guides */}
-            <span className="absolute -left-0.5 -top-0.5 h-8 w-8 rounded-tl-2xl border-l-[3px] border-t-[3px] border-white/90" />
-            <span className="absolute -right-0.5 -top-0.5 h-8 w-8 rounded-tr-2xl border-r-[3px] border-t-[3px] border-white/90" />
-            <span className="absolute -bottom-0.5 -left-0.5 h-8 w-8 rounded-bl-2xl border-b-[3px] border-l-[3px] border-white/90" />
-            <span className="absolute -bottom-0.5 -right-0.5 h-8 w-8 rounded-br-2xl border-b-[3px] border-r-[3px] border-white/90" />
-            
-            {/* Ultra-subtle Hairline Laser Shimmer */}
-            <div className="absolute inset-x-3 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_rgba(52,211,153,0.8)] opacity-70 animate-pulse top-1/2" />
+            {/* 4 Clean Precision Corner Brackets */}
+            <span className="absolute -left-1 -top-1 h-7 w-7 rounded-tl-xl border-l-[3.5px] border-t-[3.5px] border-white shadow-sm" />
+            <span className="absolute -right-1 -top-1 h-7 w-7 rounded-tr-xl border-r-[3.5px] border-t-[3.5px] border-white shadow-sm" />
+            <span className="absolute -bottom-1 -left-1 h-7 w-7 rounded-bl-xl border-b-[3.5px] border-l-[3.5px] border-white shadow-sm" />
+            <span className="absolute -bottom-1 -right-1 h-7 w-7 rounded-br-xl border-b-[3.5px] border-r-[3.5px] border-white shadow-sm" />
           </div>
 
-          <p className="mt-5 text-center text-xs font-medium text-white/70 tracking-wide drop-shadow-md">
-            วาง QR Code ให้อยู่ในกรอบเพื่อสแกน
+          <p className="mt-6 text-center text-xs font-semibold text-white/90 tracking-wide bg-black/50 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 shadow-md">
+            สแกน QR Code บนตั๋วผู้บริจาค
           </p>
         </div>
       )}
 
-      {/* Idle State when Camera is not started */}
+      {/* Idle State when Camera is inactive */}
       {!scanning && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 px-8 text-center">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-white/80 backdrop-blur-md shadow-2xl">
-            <Camera className="h-10 w-10 mx-auto text-emerald-400" />
+          <div className="rounded-3xl border border-white/15 bg-white/10 p-6 text-white backdrop-blur-md shadow-2xl">
+            <Camera className="h-10 w-10 mx-auto text-white/90" />
           </div>
           <div>
             <p className="text-lg font-bold text-white">กล้องพร้อมสแกน QR Code</p>
-            <p className="mt-1 text-xs text-white/60">อนุญาตการเข้าถึงกล้องเพื่อเริ่มสแกน</p>
+            <p className="mt-1 text-xs text-white/70">กดปุ่มด้านล่างเพื่อเริ่มเปิดใช้งานกล้อง</p>
           </div>
           <button 
             type="button" 
             onClick={() => void startScanner('environment')} 
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 text-xs font-bold text-slate-950 shadow-xl transition active:scale-95 hover:bg-slate-100"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-6 text-xs font-extrabold text-white shadow-xl transition active:scale-95 hover:opacity-90 border border-white/20 cursor-pointer"
           >
             <Camera className="h-4 w-4" />
             <span>เปิดกล้องสแกนเนอร์</span>
@@ -758,7 +699,7 @@ export default function StaffCheckinPage() {
         </div>
       )}
 
-      {/* Themed Loading Overlays for Scanner & Check-in */}
+      {/* Themed Loading Overlays */}
       {searching && <LoadingOverlay variant="staff-scan" />}
       {uploadingImage && (
         <LoadingOverlay
@@ -773,9 +714,9 @@ export default function StaffCheckinPage() {
       {message && !registration && (
         <div className="pointer-events-none absolute top-16 inset-x-4 z-40 mx-auto max-w-md animate-in fade-in slide-in-from-top-2 duration-200">
           <div className={`flex items-center gap-2.5 rounded-2xl border p-3.5 text-xs font-semibold shadow-2xl backdrop-blur-xl ${
-            message.type === 'error' ? 'border-red-500/30 bg-red-950/90 text-red-200' :
-            message.type === 'warning' ? 'border-amber-500/30 bg-amber-950/90 text-amber-200' :
-            'border-emerald-500/30 bg-emerald-950/90 text-emerald-200'
+            message.type === 'error' ? 'border-red-500/30 bg-red-950/95 text-red-100' :
+            message.type === 'warning' ? 'border-amber-500/30 bg-amber-950/95 text-amber-100' :
+            'border-emerald-500/30 bg-emerald-950/95 text-emerald-100'
           }`}>
             {message.type === 'error' ? <AlertCircle className="h-4 w-4 shrink-0 text-red-400" /> :
              message.type === 'warning' ? <AlertTriangle className="h-4 w-4 shrink-0 text-amber-400" /> :
@@ -785,105 +726,84 @@ export default function StaffCheckinPage() {
         </div>
       )}
 
-      {/* Modern Floating Bottom Camera Toolbar */}
+      {/* Professional Streamlined Bottom Action Bar */}
       <div className="absolute inset-x-0 bottom-0 z-20 px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:px-6">
-        <div className="mx-auto flex max-w-sm items-center justify-around rounded-full border border-white/15 bg-black/60 px-4 py-2 shadow-2xl backdrop-blur-xl">
+        <div className="mx-auto flex max-w-md items-center justify-between gap-2.5 rounded-2xl border border-white/20 bg-black/60 p-2 shadow-2xl backdrop-blur-xl">
+          
+          {/* Main Action: Search by Name/Code/Phone */}
           <button 
             type="button" 
             onClick={() => setSearchModalOpen(true)} 
             aria-label="ค้นหารหัส ชื่อ หรือเบอร์โทร" 
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300 transition active:scale-90 hover:bg-emerald-500/30 hover:text-white"
-            title="ค้นหารหัส/ชื่อ/เบอร์โทร"
+            className="flex-1 min-h-11 inline-flex items-center justify-center gap-2 rounded-xl bg-white/15 hover:bg-white/25 active:scale-[0.98] text-xs font-bold text-white transition cursor-pointer border border-white/10"
           >
-            <Search className="h-4 w-4" />
+            <Search className="h-4 w-4 text-white" />
+            <span>ค้นหารหัส / ชื่อ / เบอร์โทร</span>
           </button>
 
+          {/* Secondary Action: Flip Camera */}
           <button 
             type="button" 
             onClick={toggleCameraFacing} 
             aria-label="สลับกล้องหน้า/หลัง" 
-            className="flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition active:scale-90 hover:text-white"
+            className="h-11 w-11 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white/90 hover:text-white transition cursor-pointer border border-white/10 shrink-0"
             title="สลับกล้อง"
           >
             <RotateCcw className="h-4 w-4" />
           </button>
-          
-          <button 
-            type="button" 
-            onClick={toggleTorch} 
-            disabled={!scanning} 
-            aria-label={torchOn ? 'ปิดไฟฉาย' : 'เปิดไฟฉาย'} 
-            className={`flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 disabled:opacity-30 ${
-              torchOn ? 'bg-amber-400 text-amber-950 shadow-md shadow-amber-400/40' : 'text-white/80 hover:text-white'
-            }`}
-            title="เปิด/ปิดไฟฉาย"
-          >
-            <Flashlight className="h-4 w-4" />
-          </button>
 
-          <button 
-            type="button" 
-            onClick={() => setFastTrackMode((enabled) => !enabled)} 
-            aria-pressed={fastTrackMode} 
-            aria-label={fastTrackMode ? 'ปิดโหมดเช็คอินด่วน' : 'เปิดโหมดเช็คอินด่วน'} 
-            className={`flex h-10 w-10 items-center justify-center rounded-full transition active:scale-90 ${
-              fastTrackMode ? 'bg-emerald-400 text-emerald-950 shadow-md shadow-emerald-400/40' : 'text-white/80 hover:text-white'
-            }`}
-            title="โหมดเช็คอินด่วน (Auto Check-in)"
-          >
-            <Zap className="h-4 w-4" />
-          </button>
-
+          {/* Secondary Action: Upload Image */}
           <button 
             type="button" 
             disabled={uploadingImage} 
             onClick={() => fileInputRef.current?.click()} 
             aria-label="เลือกภาพ QR จากคลังภาพ" 
-            className="flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition active:scale-90 hover:text-white disabled:opacity-30"
-            title="อัปโหลดรูป QR Code"
+            className="h-11 w-11 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white/90 hover:text-white transition cursor-pointer border border-white/10 shrink-0 disabled:opacity-40"
+            title="อัปโหลดรูปภาพ QR Code"
           >
             <UploadCloud className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      {/* Modern iOS Bottom Sheet Card for Scanned Donor */}
+      {/* Professional Donor Verification Card Modal */}
       {registration && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-[2px] p-0 sm:p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-150">
           <section 
             aria-live="polite" 
-            className="w-full max-w-lg rounded-t-[2rem] sm:rounded-3xl bg-white p-6 text-slate-900 shadow-2xl border border-slate-100 animate-in slide-in-from-bottom-5 duration-200"
+            className="w-full max-w-lg rounded-t-3xl sm:rounded-3xl bg-white p-6 text-slate-900 shadow-2xl border border-slate-200 animate-in slide-in-from-bottom-4 duration-200"
           >
-            {/* Grab Handle for Mobile */}
+            {/* Grab Handle */}
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-slate-200 sm:hidden" />
 
-            {/* Header: Code + Status Badge + Walk-in Badge + Close Button */}
-            <div className="flex items-center justify-between gap-3">
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-xs font-bold text-[#7A1222] bg-[#FDF2F3] border border-[#F8D7DA] px-2.5 py-1 rounded-lg">
+                <span className="font-mono text-xs font-black text-white bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-2.5 py-1 rounded-lg shadow-2xs">
                   {registration.registrationCode}
                 </span>
                 {registration.isWalkIn && (
-                  <span className="rounded-full border border-emerald-300 bg-emerald-100 px-2.5 py-0.5 text-[11px] font-black text-emerald-900">
+                  <span className="rounded-md bg-emerald-100 text-emerald-900 border border-emerald-300 px-2 py-0.5 text-[11px] font-black">
                     Walk-in
                   </span>
                 )}
-                <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${getRegistrationStatusBadge(registration.status).colorClass}`}>
+                <span className={`rounded-md border px-2 py-0.5 text-[11px] font-bold ${getRegistrationStatusBadge(registration.status).colorClass}`}>
                   {getRegistrationStatusBadge(registration.status).label}
                 </span>
               </div>
+
               <button 
                 type="button" 
                 onClick={() => setRegistration(null)} 
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition active:scale-90"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition active:scale-90 cursor-pointer"
                 aria-label="ปิดหน้าต่าง"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Donor Name & Affiliation */}
-            <div className="mt-3">
+            {/* Donor Identity */}
+            <div className="mt-4">
               <h2 className="text-xl font-black text-slate-950 tracking-tight">
                 คุณ{registration.firstName} {registration.lastName}
               </h2>
@@ -897,13 +817,13 @@ export default function StaffCheckinPage() {
 
             {/* 2-Column Info Grid */}
             <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-              <div className="rounded-xl bg-slate-50 border border-slate-100 p-3">
-                <span className="block text-[11px] font-medium text-slate-500">🕒 รอบเวลาเดินทาง</span>
-                <span className="mt-1 block font-bold text-slate-900">{registration.timeSlotText}</span>
+              <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-3">
+                <span className="block text-[11px] font-bold text-slate-500">รอบเวลานัดหมาย</span>
+                <span className="mt-1 block font-black text-slate-900">{registration.timeSlotText}</span>
               </div>
-              <div className="rounded-xl bg-slate-50 border border-slate-100 p-3">
-                <span className="block text-[11px] font-medium text-slate-500">📍 เวลาเช็คอิน</span>
-                <span className={`mt-1 block font-bold ${registration.checkedInAt ? 'text-blue-700' : 'text-slate-600'}`}>
+              <div className="rounded-xl bg-slate-50 border border-slate-200/80 p-3">
+                <span className="block text-[11px] font-bold text-slate-500">เวลาเช็คอิน</span>
+                <span className={`mt-1 block font-black ${registration.checkedInAt ? 'text-blue-700' : 'text-slate-600'}`}>
                   {registration.checkedInAt
                     ? formatBangkokTime(registration.checkedInAt)
                     : registration.status === 'COMPLETED'
@@ -913,25 +833,25 @@ export default function StaffCheckinPage() {
               </div>
             </div>
 
-            {/* Souvenir Eligibility Banner */}
+            {/* Souvenir Status */}
             {registration.souvenirDetails ? (
-              <div className={`mt-3 rounded-xl bg-gradient-to-r border p-3 flex items-center gap-3 ${registration.souvenirDetails.colorClass}`}>
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/80 shadow-2xs shrink-0">
-                  <Gift className="h-5 w-5" />
+              <div className={`mt-3 rounded-xl border p-3 flex items-center gap-3 ${registration.souvenirDetails.colorClass}`}>
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 shadow-2xs shrink-0">
+                  <Gift className="h-4 w-4 text-amber-700" />
                 </div>
                 <div>
-                  <p className="text-xs font-black">{registration.souvenirDetails.badgeText}</p>
-                  <p className="text-[11px] opacity-85 mt-0.5">{registration.souvenirDetails.subText}</p>
+                  <p className="text-xs font-black text-amber-950">{registration.souvenirDetails.badgeText}</p>
+                  <p className="text-[11px] text-amber-900/80 mt-0.5">{registration.souvenirDetails.subText}</p>
                 </div>
               </div>
             ) : registration.souvenirEligible ? (
-              <div className="mt-3 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50/40 border border-amber-200/80 p-3 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-800 shrink-0">
-                  <Gift className="h-5 w-5" />
+              <div className="mt-3 rounded-xl bg-amber-50 border border-amber-200 p-3 flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-800 shrink-0">
+                  <Gift className="h-4 w-4" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-amber-950">ได้รับของที่ระลึกพิเศษ (100 สิทธิ์แรก)</p>
-                  <p className="text-[11px] text-amber-800/80 mt-0.5">ผู้บริจาคเช็คอินตรงเวลาตามรอบนัดหมาย</p>
+                  <p className="text-xs font-black text-amber-950">ได้รับของที่ระลึกพิเศษ (100 สิทธิ์แรก)</p>
+                  <p className="text-[11px] text-amber-800/90 mt-0.5">ผู้บริจาคเช็คอินตรงเวลาตามรอบนัดหมาย</p>
                 </div>
               </div>
             ) : null}
@@ -943,7 +863,7 @@ export default function StaffCheckinPage() {
                   type="button"
                   disabled={actionLoading}
                   onClick={() => void handleStatusChange('CHECKED_IN')}
-                  className="min-h-12 w-full rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] px-4 text-sm font-bold text-white shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="min-h-12 w-full rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] active:scale-[0.99] px-4 text-xs font-black text-white shadow-md shadow-red-950/20 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer border border-white/20"
                 >
                   {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserCheck className="h-4 w-4" />}
                   <span>ยืนยันเช็คอินเข้างาน (Confirm Check-in)</span>
@@ -955,11 +875,7 @@ export default function StaffCheckinPage() {
                   type="button"
                   disabled={actionLoading}
                   onClick={() => void handleStatusChange('COMPLETED')}
-                  className={`min-h-12 w-full rounded-2xl px-4 text-sm font-bold text-white shadow-md transition active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 ${
-                    registration.souvenirEligible
-                      ? 'bg-emerald-600 hover:bg-emerald-700'
-                      : 'bg-emerald-600 hover:bg-emerald-700'
-                  }`}
+                  className="min-h-12 w-full rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] px-4 text-xs font-black text-white shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {actionLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -971,13 +887,13 @@ export default function StaffCheckinPage() {
                   <span>
                     {registration.souvenirEligible
                       ? 'บันทึกบริจาคสำเร็จ & มอบของที่ระลึก'
-                      : 'บันทึกบริจาคสำเร็จ (Complete)'}
+                      : 'บันทึกบริจาคสำเร็จ (Complete Donation)'}
                   </span>
                 </button>
               )}
 
               {registration.status === 'COMPLETED' && (
-                <div className="rounded-2xl bg-emerald-50 border border-emerald-200/80 p-3.5 text-center flex items-center justify-center gap-2 text-emerald-900 font-bold text-xs">
+                <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 text-center flex items-center justify-center gap-2 text-emerald-900 font-black text-xs">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
                   <span>
                     {registration.souvenirEligible
@@ -990,7 +906,7 @@ export default function StaffCheckinPage() {
               <button
                 type="button"
                 onClick={() => setRegistration(null)}
-                className="min-h-11 w-full rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-xs font-semibold text-slate-700 transition"
+                className="min-h-11 w-full rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-xs font-bold text-slate-700 transition cursor-pointer"
               >
                 สแกนคนถัดไป (Scan Next)
               </button>
@@ -998,32 +914,33 @@ export default function StaffCheckinPage() {
           </section>
         </div>
       )}
-      {/* Manual Search Modal / Drawer */}
+
+      {/* Professional Search Modal / Drawer */}
       {searchModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-md p-0 sm:p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-150">
           <section 
             aria-label="ค้นหาผู้ลงทะเบียนเพื่อเช็คอิน" 
-            className="w-full max-w-2xl max-h-[90dvh] flex flex-col rounded-t-[2rem] sm:rounded-3xl bg-slate-900 border border-slate-700/80 text-white shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 duration-200"
+            className="w-full max-w-2xl max-h-[90dvh] flex flex-col rounded-t-3xl sm:rounded-3xl bg-white text-slate-900 shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-200 border border-slate-200"
           >
-            {/* Grab Handle for Mobile */}
-            <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-slate-700 sm:hidden" />
+            {/* Grab Handle */}
+            <div className="mx-auto mt-3 h-1 w-10 rounded-full bg-slate-200 sm:hidden" />
 
             {/* Modal Header & Search Bar */}
-            <div className="p-4 sm:p-5 border-b border-slate-800 space-y-3">
+            <div className="p-4 sm:p-5 border-b border-slate-100 space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--rose-100)] text-[var(--burgundy-700)]">
                     <Search className="h-4 w-4" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-white leading-tight">ค้นหารายชื่อผู้ลงทะเบียน</h2>
-                    <p className="text-xs text-slate-400">เสิชด้วยรหัส, ชื่อ-นามสกุล, หรือเบอร์โทรศัพท์</p>
+                    <h2 className="text-base font-black text-slate-950 leading-tight">ค้นหารายชื่อผู้ลงทะเบียน</h2>
+                    <p className="text-xs text-slate-500 font-medium">ค้นหาด้วยรหัส, ชื่อ-นามสกุล, หรือเบอร์โทรศัพท์</p>
                   </div>
                 </div>
                 <button 
                   type="button" 
                   onClick={() => setSearchModalOpen(false)} 
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition active:scale-90"
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition active:scale-90 cursor-pointer"
                   aria-label="ปิดหน้าต่างค้นหา"
                 >
                   <X className="h-4 w-4" />
@@ -1039,13 +956,13 @@ export default function StaffCheckinPage() {
                   value={searchQuery}
                   onChange={(e) => handleSearchInputChange(e.target.value)}
                   placeholder="พิมพ์รหัส (เช่น LVU26-001, W001), ชื่อ, หรือเบอร์โทร..."
-                  className="w-full h-11 pl-10 pr-10 rounded-xl bg-slate-800/90 border border-slate-700 text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition"
+                  className="w-full h-11 pl-10 pr-10 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-500)]/30 focus:border-[var(--burgundy-500)] transition font-medium"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => handleSearchInputChange('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center rounded-full bg-slate-700 text-slate-300 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-6 w-6 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:text-black cursor-pointer"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -1058,10 +975,10 @@ export default function StaffCheckinPage() {
                   <button
                     type="button"
                     onClick={() => setSearchFilter('ALL')}
-                    className={`px-3 py-1 rounded-lg font-semibold transition ${
+                    className={`px-3 py-1 rounded-lg font-bold transition cursor-pointer ${
                       searchFilter === 'ALL'
-                        ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
                     ทั้งหมด ({searchResults.length})
@@ -1069,10 +986,10 @@ export default function StaffCheckinPage() {
                   <button
                     type="button"
                     onClick={() => setSearchFilter('ONLINE')}
-                    className={`px-3 py-1 rounded-lg font-semibold transition ${
+                    className={`px-3 py-1 rounded-lg font-bold transition cursor-pointer ${
                       searchFilter === 'ONLINE'
-                        ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
                     ออนไลน์ ({searchResults.filter((r) => !r.isWalkIn).length})
@@ -1080,10 +997,10 @@ export default function StaffCheckinPage() {
                   <button
                     type="button"
                     onClick={() => setSearchFilter('WALK_IN')}
-                    className={`px-3 py-1 rounded-lg font-semibold transition ${
+                    className={`px-3 py-1 rounded-lg font-bold transition cursor-pointer ${
                       searchFilter === 'WALK_IN'
-                        ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
                     Walk-in ({searchResults.filter((r) => r.isWalkIn).length})
@@ -1093,46 +1010,24 @@ export default function StaffCheckinPage() {
             </div>
 
             {/* Results Content Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+            <div className="flex-1 overflow-y-auto p-4 space-y-2.5 max-h-[50vh]">
               {searchLoading ? (
                 <div className="py-12 flex flex-col items-center justify-center text-center text-slate-400 gap-2">
-                  <Loader2 className="h-6 w-6 animate-spin text-emerald-400" />
-                  <p className="text-xs">กำลังค้นหาข้อมูล...</p>
+                  <Loader2 className="h-6 w-6 animate-spin text-[var(--burgundy-700)]" />
+                  <p className="text-xs font-medium">กำลังค้นหาข้อมูล...</p>
                 </div>
               ) : searchQuery.trim() === '' ? (
-                <div className="py-10 text-center text-slate-400 space-y-4">
-                  <div className="h-12 w-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto text-emerald-400">
-                    <Search className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-300">พิมพ์คำค้นหาเพื่อเริ่มค้นหา</p>
-                    <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-                      สามารถค้นหาด้วยรหัสลงทะเบียน (เช่น 001 หรือ W001), ชื่อ-นามสกุล, หรือเบอร์โทรศัพท์ 4 ตัวท้าย
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
-                    <span className="text-slate-400">ตัวอย่าง:</span>
-                    <button
-                      type="button"
-                      onClick={() => handleSearchInputChange('LVU26-')}
-                      className="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
-                    >
-                      LVU26- (ออนไลน์)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleSearchInputChange('LVU26-W')}
-                      className="px-2.5 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700"
-                    >
-                      LVU26-W (Walk-in)
-                    </button>
-                  </div>
+                <div className="py-10 text-center text-slate-500 space-y-2">
+                  <p className="text-sm font-bold text-slate-800">พิมพ์คำค้นหาเพื่อเริ่มค้นหา</p>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    ค้นหาได้ด้วยรหัสลงทะเบียน (เช่น 001 หรือ W001), ชื่อ-นามสกุล, หรือเบอร์โทรศัพท์
+                  </p>
                 </div>
               ) : (searchResults.filter((r) => searchFilter === 'ALL' || (searchFilter === 'ONLINE' && !r.isWalkIn) || (searchFilter === 'WALK_IN' && r.isWalkIn))).length === 0 ? (
-                <div className="py-12 text-center text-slate-400 space-y-2">
-                  <AlertCircle className="h-8 w-8 mx-auto text-amber-400" />
-                  <p className="text-sm font-bold text-slate-200">ไม่พบข้อมูลที่ตรงกับ &quot;{searchQuery}&quot;</p>
-                  <p className="text-xs text-slate-400">กรุณาตรวจสอบการสะกดชื่อ รหัส หรือเบอร์โทรศัพท์อีกครั้ง</p>
+                <div className="py-10 text-center text-slate-500 space-y-2">
+                  <AlertCircle className="h-6 w-6 mx-auto text-amber-500" />
+                  <p className="text-sm font-bold text-slate-800">ไม่พบข้อมูลที่ตรงกับ &quot;{searchQuery}&quot;</p>
+                  <p className="text-xs text-slate-500">กรุณาตรวจสอบการสะกดชื่อ รหัส หรือเบอร์โทรศัพท์อีกครั้ง</p>
                 </div>
               ) : (
                 searchResults
@@ -1151,29 +1046,29 @@ export default function StaffCheckinPage() {
                           setRegistration(donor);
                           setSearchModalOpen(false);
                         }}
-                        className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700/80 hover:bg-slate-800 hover:border-slate-600 transition cursor-pointer"
+                        className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-white border border-slate-200 hover:border-[var(--burgundy-300)] hover:shadow-md transition cursor-pointer"
                       >
                         <div className="space-y-1.5 flex-1 min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <span
                               className={`font-mono text-xs font-bold px-2 py-0.5 rounded-md border ${
                                 donor.isWalkIn
-                                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-700/60'
-                                  : 'bg-red-950/80 text-red-300 border-red-700/60'
+                                  ? 'bg-emerald-50 text-emerald-900 border-emerald-200'
+                                  : 'bg-[var(--rose-100)] text-[var(--burgundy-800)] border-[var(--burgundy-200)]'
                               }`}
                             >
                               {donor.registrationCode}
                             </span>
                             {donor.isWalkIn && (
-                              <span className="rounded-full border border-emerald-500/40 bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-300">
+                              <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-black text-emerald-800">
                                 Walk-in
                               </span>
                             )}
-                            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${statusInfo.colorClass}`}>
+                            <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold ${statusInfo.colorClass}`}>
                               {statusInfo.label}
                             </span>
                             {donor.souvenirEligible && (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+                              <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-bold text-amber-800">
                                 <Gift className="h-3 w-3" />
                                 <span>ของที่ระลึก</span>
                               </span>
@@ -1181,10 +1076,10 @@ export default function StaffCheckinPage() {
                           </div>
 
                           <div>
-                            <p className="text-sm font-bold text-white group-hover:text-emerald-300 transition">
+                            <p className="text-sm font-black text-slate-900 group-hover:text-[var(--burgundy-700)] transition">
                               คุณ{donor.firstName} {donor.lastName}
                             </p>
-                            <p className="text-xs text-slate-400">
+                            <p className="text-xs text-slate-500 font-medium">
                               {donor.facultyName} &middot; {
                                 donor.participantType === 'STUDENT' ? 'นักศึกษา' :
                                 donor.participantType === 'STAFF' ? 'บุคลากร' : 'บุคคลทั่วไป'
@@ -1192,7 +1087,7 @@ export default function StaffCheckinPage() {
                             </p>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 font-medium">
                             <span className="inline-flex items-center gap-1">
                               <Phone className="h-3 w-3 text-slate-400" />
                               <span>{donor.phone}</span>
@@ -1205,13 +1100,13 @@ export default function StaffCheckinPage() {
                         </div>
 
                         {/* Quick Action Button */}
-                        <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-700/50">
+                        <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                           {isPending && (
                             <button
                               type="button"
                               disabled={isCheckingThis}
                               onClick={(e) => void handleQuickCheckinFromSearch(donor, e)}
-                              className="min-h-9 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:scale-95 text-xs font-bold text-white shadow-md transition disabled:opacity-50 flex items-center gap-1.5"
+                              className="min-h-9 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] active:scale-95 text-xs font-black text-white shadow-xs transition disabled:opacity-50 flex items-center gap-1.5 cursor-pointer border border-white/20"
                             >
                               {isCheckingThis ? (
                                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -1230,7 +1125,7 @@ export default function StaffCheckinPage() {
                                 setRegistration(donor);
                                 setSearchModalOpen(false);
                               }}
-                              className="min-h-9 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-xs font-bold text-white shadow-md transition flex items-center gap-1.5"
+                              className="min-h-9 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-xs font-black text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer"
                             >
                               <CheckCircle2 className="h-3.5 w-3.5" />
                               <span>บันทึกบริจาค</span>
@@ -1238,7 +1133,7 @@ export default function StaffCheckinPage() {
                           )}
 
                           {isCompleted && (
-                            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1.5 rounded-xl">
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-xl">
                               <Check className="h-3.5 w-3.5" />
                               <span>สำเร็จแล้ว</span>
                             </span>
@@ -1251,12 +1146,12 @@ export default function StaffCheckinPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-              <span>แตะที่รายชื่อเพื่อเปิดหน้ารายละเอียดและดำเนินการ</span>
+            <div className="p-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 font-medium">
+              <span>แตะที่รายชื่อเพื่อเปิดดูข้อมูลและดำเนินการ</span>
               <button
                 type="button"
                 onClick={() => setSearchModalOpen(false)}
-                className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold transition"
+                className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 transition cursor-pointer"
               >
                 ปิด
               </button>
