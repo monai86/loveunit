@@ -14,11 +14,12 @@ type RegistrationRow = {
   phone?: string;
   status: RegistrationStatus;
   timeSlotText: string;
+  souvenirEligible?: boolean;
 };
 
 type RawRegistration = Record<string, unknown>;
 
-function normalizeRegistration(row: RawRegistration): RegistrationRow {
+function normalizeRegistration(row: RawRegistration, allRows: RawRegistration[]): RegistrationRow {
   const code = String(pickField(row, 'registrationCode', 'registration_code') ?? '-');
   const source = String(pickField(row, 'source', 'source') ?? '');
   const isWalkIn = code.includes('LVU26-W') || source === 'WALK_IN';
@@ -36,14 +37,38 @@ function normalizeRegistration(row: RawRegistration): RegistrationRow {
       : '09:00 – 14:00 น.';
   }
 
-  return {
+  // Calculate souvenir eligibility
+  const candidate = {
     id: String(pickField(row, 'id', 'id') ?? ''),
+    registrationCode: code,
+    source,
+    status: String(pickField(row, 'status', 'status') ?? 'REGISTERED'),
+    checkedInAt: pickField<string>(row, 'checkedInAt', 'checked_in_at'),
+    completedAt: pickField<string>(row, 'completedAt', 'completed_at'),
+    slotEndAt: (pickField<Record<string, unknown> | null>(row, 'timeSlot', 'time_slot'))?.endAt as string | undefined,
+  };
+
+  const allCandidates = allRows.map((r) => ({
+    id: String(pickField(r, 'id', 'id') ?? ''),
+    registrationCode: String(pickField(r, 'registrationCode', 'registration_code') ?? ''),
+    source: String(pickField(r, 'source', 'source') ?? ''),
+    status: String(pickField(r, 'status', 'status') ?? 'REGISTERED'),
+    checkedInAt: pickField<string>(r, 'checkedInAt', 'checked_in_at'),
+    completedAt: pickField<string>(r, 'completedAt', 'completed_at'),
+    slotEndAt: (pickField<Record<string, unknown> | null>(r, 'timeSlot', 'time_slot'))?.endAt as string | undefined,
+  }));
+
+  const souvenirEligible = isRegistrationEligibleForSouvenir(candidate, allCandidates, 100, 100);
+
+  return {
+    id: candidate.id,
     registrationCode: code,
     firstName: String(pickField(row, 'firstName', 'first_name') ?? ''),
     lastName: String(pickField(row, 'lastName', 'last_name') ?? ''),
     phone: String(pickField(row, 'phone', 'phone') ?? ''),
     status: (pickField<RegistrationStatus>(row, 'status', 'status') ?? 'REGISTERED'),
     timeSlotText,
+    souvenirEligible,
   };
 }
 
@@ -74,7 +99,8 @@ export default function StaffOverviewPage() {
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || 'ไม่สามารถโหลดข้อมูลได้');
-      setRegistrations((data.registrations as RawRegistration[]).map(normalizeRegistration));
+      const rawList = data.registrations as RawRegistration[];
+      setRegistrations(rawList.map((r) => normalizeRegistration(r, rawList)));
       setLastUpdated(new Date());
     } catch (loadError) {
       if (!isBackground) {
@@ -97,7 +123,8 @@ export default function StaffOverviewPage() {
         const data = await response.json();
         if (mounted) {
           if (!response.ok || !data.success) throw new Error(data.message || 'ไม่สามารถโหลดข้อมูลได้');
-          setRegistrations((data.registrations as RawRegistration[]).map(normalizeRegistration));
+          const rawList = data.registrations as RawRegistration[];
+          setRegistrations(rawList.map((r) => normalizeRegistration(r, rawList)));
           setLastUpdated(new Date());
         }
       } catch (loadError) {
@@ -208,7 +235,7 @@ export default function StaffOverviewPage() {
         <div className="flex gap-2 overflow-x-auto border-b border-[var(--line)] px-4 py-3 sm:px-5">
           {filters.map((item) => <button key={item.value} type="button" onClick={() => setFilter(item.value)} aria-pressed={filter === item.value} className={`min-h-11 shrink-0 rounded-full px-3 py-1.5 text-xs font-bold ${filter === item.value ? 'bg-[var(--burgundy-700)] text-white' : 'bg-[var(--bg)] text-[var(--muted)] hover:bg-[var(--rose-100)]'}`}>{item.label}</button>)}
         </div>
-        {loading ? <div className="flex min-h-56 items-center justify-center gap-2 text-sm font-bold text-[var(--muted)]"><Loader2 className="h-5 w-5 animate-spin" />กำลังโหลดรายชื่อ…</div> : error ? <div className="p-8 text-center text-sm font-bold text-red-700">{error}</div> : visibleRows.length === 0 ? <div className="p-10 text-center text-sm font-bold text-[var(--muted)]">ไม่พบรายชื่อที่ตรงกับเงื่อนไข</div> : <><div className="hidden overflow-x-auto md:block"><table className="w-full text-left"><thead className="bg-[var(--bg)] text-xs text-[var(--muted)]"><tr><th className="px-5 py-3 font-bold">รหัส</th><th className="px-5 py-3 font-bold">ชื่อ-นามสกุล</th><th className="px-5 py-3 font-bold">รอบเวลา</th><th className="px-5 py-3 font-bold">สถานะ</th></tr></thead><tbody className="divide-y divide-[var(--line)]">{visibleRows.map((row) => { const badge = getRegistrationStatusBadge(row.status); return <tr key={row.id}><td className="px-5 py-4 font-mono text-xs font-bold text-[var(--burgundy-700)]">{row.registrationCode}</td><td className="px-5 py-4 text-sm font-bold text-[var(--ink)]">{row.firstName} {row.lastName}</td><td className="px-5 py-4 text-sm text-[var(--muted)]">{row.timeSlotText}</td><td className="px-5 py-4"><span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-bold ${badge.colorClass}`}>{badge.label}</span></td></tr>; })}</tbody></table></div><div className="divide-y divide-[var(--line)] md:hidden">{visibleRows.map((row) => { const badge = getRegistrationStatusBadge(row.status); return <article key={row.id} className="flex items-center justify-between gap-3 p-4"><div className="min-w-0"><p className="font-mono text-[11px] font-bold text-[var(--burgundy-700)]">{row.registrationCode}</p><h3 className="mt-1 truncate text-sm font-black text-[var(--ink)]">{row.firstName} {row.lastName}</h3><p className="mt-1 text-xs text-[var(--muted)]">{row.timeSlotText}</p></div><span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-bold ${badge.colorClass}`}>{badge.label}</span></article>; })}</div></>}
+        {loading ? <div className="flex min-h-56 items-center justify-center gap-2 text-sm font-bold text-[var(--muted)]"><Loader2 className="h-5 w-5 animate-spin" />กำลังโหลดรายชื่อ…</div> : error ? <div className="p-8 text-center text-sm font-bold text-red-700">{error}</div> : visibleRows.length === 0 ? <div className="p-10 text-center text-sm font-bold text-[var(--muted)]">ไม่พบรายชื่อที่ตรงกับเงื่อนไข</div> : <><div className="hidden overflow-x-auto md:block"><table className="w-full text-left"><thead className="bg-[var(--bg)] text-xs text-[var(--muted)]"><tr><th className="px-5 py-3 font-bold">รหัส</th><th className="px-5 py-3 font-bold">ชื่อ-นามสกุล</th><th className="px-5 py-3 font-bold">รอบเวลา</th><th className="px-5 py-3 font-bold">สถานะ</th><th className="px-5 py-3 font-bold">ของที่ระลึก</th></tr></thead><tbody className="divide-y divide-[var(--line)]">{visibleRows.map((row) => { const badge = getRegistrationStatusBadge(row.status); return <tr key={row.id}><td className="px-5 py-4 font-mono text-xs font-bold text-[var(--burgundy-700)]">{row.registrationCode}</td><td className="px-5 py-4 text-sm font-bold text-[var(--ink)]">{row.firstName} {row.lastName}</td><td className="px-5 py-4 text-sm text-[var(--muted)]">{row.timeSlotText}</td><td className="px-5 py-4"><span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-bold ${badge.colorClass}`}>{badge.label}</span></td><td className="px-5 py-4">{row.souvenirEligible ? <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 border border-amber-300 px-2 py-0.5 text-[11px] font-black text-amber-950 shadow-2xs">🎁 มีสิทธิ์</span> : <span className="text-xs text-slate-400">-</span>}</td></tr>; })}</tbody></table></div><div className="divide-y divide-[var(--line)] md:hidden">{visibleRows.map((row) => { const badge = getRegistrationStatusBadge(row.status); return <article key={row.id} className="flex items-center justify-between gap-3 p-4"><div className="min-w-0"><div className="flex items-center gap-1.5"><p className="font-mono text-[11px] font-bold text-[var(--burgundy-700)]">{row.registrationCode}</p>{row.souvenirEligible && <span className="text-[10px] font-black text-amber-900 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300">🎁 ของที่ระลึก</span>}</div><h3 className="mt-1 truncate text-sm font-black text-[var(--ink)]">{row.firstName} {row.lastName}</h3><p className="mt-1 text-xs text-[var(--muted)]">{row.timeSlotText}</p></div><span className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-bold ${badge.colorClass}`}>{badge.label}</span></article>; })}</div></>}
       </section>
     </main>
   );
