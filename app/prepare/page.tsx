@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
@@ -14,12 +14,16 @@ import {
   ShieldCheck, 
   Gift,
   ChevronRight,
-  Activity
+  Activity,
+  ZoomIn,
+  X,
+  Download
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function PreparePage() {
   const { isTh } = useLanguage();
+  const [activeModalImg, setActiveModalImg] = useState<{ src: string; title: string } | null>(null);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-12">
@@ -257,6 +261,37 @@ export default function PreparePage() {
             </Link>
           </div>
 
+          {/* Official Donor Eligibility Infographic */}
+          <div className="editorial-card p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-[var(--ink)]">{isTh ? 'คุณสมบัติเบื้องต้น' : 'Donor Eligibility'}</span>
+              <span className="text-[10px] font-bold text-[var(--burgundy-700)] bg-[var(--rose-100)] px-2 py-0.5 rounded-full">
+                {isTh ? 'สภากาชาดไทย' : 'Official'}
+              </span>
+            </div>
+
+            <div 
+              onClick={() => setActiveModalImg({ src: '/images/education/donor-eligibility-infographic.jpg', title: isTh ? 'คุณสมบัติของผู้บริจาคเลือด' : 'Basic Donor Eligibility Criteria' })}
+              className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-[var(--line)] bg-white cursor-zoom-in"
+            >
+              <Image
+                src="/images/education/donor-eligibility-infographic.jpg"
+                alt="คุณสมบัติของผู้บริจาคเลือด"
+                fill
+                sizes="(min-width: 768px) 30vw, 90vw"
+                className="object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/15 flex items-center justify-center">
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 text-[var(--ink)] p-2 rounded-full shadow-md">
+                  <ZoomIn className="h-4 w-4 text-[var(--burgundy-700)]" />
+                </span>
+              </div>
+            </div>
+            <p className="text-[11px] text-[var(--muted)] text-center font-medium">
+              {isTh ? 'เกณฑ์คุณสมบัติเบื้องต้น: อายุ 17-70 ปี, น้ำหนัก ≥45 กก.' : 'Basic Criteria: Age 17-70, Weight ≥45kg'}
+            </p>
+          </div>
+
           {/* Educational Infographic Preview */}
           <div className="editorial-card p-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -266,14 +301,22 @@ export default function PreparePage() {
               </Link>
             </div>
 
-            <div className="relative aspect-[4/5] rounded-xl overflow-hidden border border-[var(--line)] bg-white">
+            <div 
+              onClick={() => setActiveModalImg({ src: '/images/education/benefits-5-reasons.png', title: isTh ? '5 ข้อดีของการบริจาคโลหิต' : '5 Health Benefits of Blood Donation' })}
+              className="group relative aspect-[4/5] rounded-xl overflow-hidden border border-[var(--line)] bg-white cursor-zoom-in"
+            >
               <Image
                 src="/images/education/benefits-5-reasons.png"
                 alt="5 ข้อดีของการบริจาคโลหิต"
                 fill
                 sizes="(min-width: 768px) 30vw, 90vw"
-                className="object-contain"
+                className="object-contain transition-transform duration-300 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/15 flex items-center justify-center">
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 text-[var(--ink)] p-2 rounded-full shadow-md">
+                  <ZoomIn className="h-4 w-4 text-[var(--burgundy-700)]" />
+                </span>
+              </div>
             </div>
             <p className="text-[11px] text-[var(--muted)] text-center font-medium">
               {isTh ? '5 ข้อดีของการบริจาคโลหิต (ศูนย์บริการโลหิตแห่งชาติ)' : '5 Health Benefits of Donating Blood'}
@@ -300,6 +343,50 @@ export default function PreparePage() {
         </div>
 
       </div>
+
+      {/* Image Modal Preview */}
+      {activeModalImg && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setActiveModalImg(null)}
+        >
+          <div 
+            className="relative max-h-[92vh] max-w-4xl w-full overflow-hidden rounded-2xl bg-white p-3 shadow-2xl space-y-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-2 pt-1 border-b border-gray-100 pb-2">
+              <h3 className="text-sm font-bold text-gray-900 line-clamp-1">{activeModalImg.title}</h3>
+              <div className="flex items-center gap-2">
+                <a
+                  href={activeModalImg.src}
+                  download="mumt-infographic.jpg"
+                  className="rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 px-2.5 py-1 text-xs font-bold flex items-center gap-1 transition-colors"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  <span>ดาวน์โหลด</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setActiveModalImg(null)}
+                  className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            <div className="relative h-[78vh] w-full bg-gray-50 rounded-xl overflow-hidden">
+              <Image
+                src={activeModalImg.src}
+                alt={activeModalImg.title}
+                fill
+                className="object-contain"
+                sizes="95vw"
+                priority
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

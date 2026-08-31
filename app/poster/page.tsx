@@ -122,6 +122,15 @@ const EDUCATIONAL_INFOGRAPHICS = [
     descEn: 'Blood cannot be synthetically manufactured. Regular donor supply is vital for emergencies.',
     fileName: 'why-blood-donation-matters.png',
   },
+  {
+    src: '/images/education/donor-eligibility-infographic.jpg',
+    title: 'คุณสมบัติเบื้องต้นของผู้บริจาคเลือด',
+    titleEn: 'Basic Donor Eligibility Criteria',
+    badge: 'Donor Criteria',
+    desc: 'อายุ 17-70 ปี, น้ำหนัก ≥45 กก., สุขภาพแข็งแรง, โรคประจำตัวไม่กระทบการบริจาค และนอนหลับพักผ่อน ≥5 ชม.',
+    descEn: 'Age 17-70, Weight ≥45kg, good physical health, no conflicting chronic diseases, and ≥5 hrs restful sleep.',
+    fileName: 'donor-eligibility-criteria.jpg',
+  },
 ];
 
 export default function PosterPage() {
