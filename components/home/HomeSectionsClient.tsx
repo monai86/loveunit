@@ -28,8 +28,6 @@ import {
   ChevronRight,
   Check
 } from 'lucide-react';
-import { BloodCompatibilityWidget } from '@/components/home/BloodCompatibilityWidget';
-import { BloodImpactGauge } from '@/components/home/BloodImpactGauge';
 import { SocialLinks } from '@/components/common/SocialLinks';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
@@ -324,9 +322,6 @@ export function HomeSectionsClient() {
         </div>
       </section>
 
-      {/* ============ INTERACTIVE BLOOD COMPATIBILITY MATCHER ============ */}
-      <BloodCompatibilityWidget />
-
       {/* ============ INTERACTIVE SELF-SCREENING FEATURE CALLOUT ============ */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="editorial-card p-6 sm:p-10 bg-gradient-to-br from-[var(--rose-100)]/80 via-white to-amber-50/50 border-2 border-[var(--burgundy-500)]/20 shadow-md">
@@ -336,8 +331,15 @@ export function HomeSectionsClient() {
                 <Sparkles className="h-3.5 w-3.5 fill-white text-white" />
                 <span>{isTh ? 'เครื่องมือใหม่: ประเมินความพร้อมก่อนเดินทาง' : 'Interactive Self-Screening Tool'}</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-[var(--ink)]">
-                {isTh ? 'ตรวจเช็กความพร้อมของคุณด้วย “ระบบประเมินตนเอง (Self-Screening)”' : 'Evaluate your donation readiness in 2 minutes'}
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--ink)] leading-snug">
+                {isTh ? (
+                  <>
+                    ตรวจเช็กความพร้อมของคุณด้วย <br className="hidden sm:inline" />
+                    <span className="inline-block whitespace-nowrap">“ระบบประเมินตนเอง (Self-Screening)”</span>
+                  </>
+                ) : (
+                  'Evaluate your donation readiness in 2 minutes'
+                )}
               </h2>
               <p className="text-sm sm:text-[15px] leading-relaxed text-[var(--muted)] font-medium max-w-2xl">
                 {isTh
@@ -471,9 +473,6 @@ export function HomeSectionsClient() {
           </div>
         </div>
       </section>
-
-      {/* ============ COMMUNITY IMPACT & 200-UNIT MULTIPLIER GAUGE ============ */}
-      <BloodImpactGauge />
 
       {/* ============ OFFICIAL POSTERS & INFOGRAPHICS ============ */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6">
@@ -726,7 +725,7 @@ export function HomeSectionsClient() {
             <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
               <Link
                 href="/screening"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--burgundy-600)] hover:bg-[var(--burgundy-700)] text-white font-extrabold px-5 py-2.5 text-xs shadow-md transition-all cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] text-white font-extrabold px-5 py-2.5 text-xs shadow-md shadow-red-950/20 active:scale-95 transition-all cursor-pointer border border-white/20"
               >
                 <span>{isTh ? 'ทำแบบประเมินตนเอง (2 นาที)' : 'Start 2-Min Quiz'}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
