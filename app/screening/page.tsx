@@ -12,7 +12,8 @@ import {
   Heart, 
   Info, 
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Clock
 } from 'lucide-react';
 import { 
   OFFICIAL_SCREENING_QUESTIONS, 
@@ -238,22 +239,25 @@ export default function ScreeningPage() {
                       </span>
                     </div>
 
-                    <div className="p-2.5 rounded-lg bg-amber-50/80 border border-amber-200 text-amber-950 font-medium">
-                      ⚠️ <strong>{isTh ? 'เหตุผล:' : 'Reason:'}</strong> {item.reason}
+                    <div className="p-2.5 rounded-lg bg-amber-50/80 border border-amber-200 text-amber-950 font-medium flex items-start gap-2">
+                      <AlertTriangle className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+                      <span><strong>{isTh ? 'เหตุผล:' : 'Reason:'}</strong> {item.reason}</span>
                     </div>
 
                     {item.durationText && (
-                      <p className="text-[11px] font-bold text-[var(--burgundy-700)]">
-                        ⏳ {isTh ? 'ระยะเวลางด:' : 'Duration:'} {item.durationText}
+                      <p className="text-[11px] font-bold text-[var(--burgundy-700)] flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>{isTh ? 'ระยะเวลางด:' : 'Duration:'} {item.durationText}</span>
                       </p>
                     )}
 
-                    <p className="text-[11px] text-[var(--muted)] leading-relaxed">
-                      💡 {isTh ? 'คำแนะนำ:' : 'Guidance:'} {item.guidance}
+                    <p className="text-[11px] text-[var(--muted)] leading-relaxed flex items-start gap-1.5">
+                      <Info className="h-3.5 w-3.5 text-blue-600 shrink-0 mt-0.5" />
+                      <span><strong>{isTh ? 'คำแนะนำ:' : 'Guidance:'}</strong> {item.guidance}</span>
                     </p>
 
                     {item.question.officialReference && (
-                      <p className="text-[10px] text-gray-400 font-mono">
+                      <p className="text-[10px] text-gray-400 font-mono pl-5">
                         {isTh ? 'อ้างอิง:' : 'Reference:'} {item.question.officialReference}
                       </p>
                     )}

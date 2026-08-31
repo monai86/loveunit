@@ -128,7 +128,7 @@ export function Footer() {
                     rel="noopener noreferrer"
                     className="text-xs text-[var(--burgundy-600)] font-bold hover:underline inline-flex items-center gap-1"
                   >
-                    <span>🗺️ {isTh ? 'เปิดดูแผนที่ Google Maps' : 'Open in Google Maps'}</span>
+                    <span>{isTh ? 'เปิดดูแผนที่ Google Maps' : 'Open in Google Maps'}</span>
                     <ArrowRight className="h-3 w-3" />
                   </a>
                 </div>

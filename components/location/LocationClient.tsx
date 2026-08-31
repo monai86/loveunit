@@ -1,8 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Bus, Car, ArrowRight, MapPin } from 'lucide-react';
+import Image from 'next/image';
+import { 
+  Bus, 
+  Car, 
+  ArrowRight, 
+  MapPin, 
+  Train, 
+  Bike, 
+  Phone, 
+  Navigation, 
+  ExternalLink,
+  Compass,
+  X,
+  ZoomIn,
+  Building,
+  CheckCircle2
+} from 'lucide-react';
 import { InfographicSlot } from '@/components/infographic/InfographicSlot';
 import { SocialLinks } from '@/components/common/SocialLinks';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -22,11 +38,54 @@ interface LocationClientProps {
   } | null;
 }
 
+const TRAVEL_GUIDE_INFOGRAPHICS = [
+  {
+    src: '/images/location/travel-route-1.png',
+    title: 'วิธีเดินทางมางานจากภายนอกมหาวิทยาลัย (ตอนที่ 1)',
+    titleEn: 'Campus Travel Guide from Outside Campus (Part 1)',
+    badge: 'ตอนที่ 1',
+    desc: 'แผนผังเส้นทางหลัก ประตูทางเข้า และจุดเชื่อมต่อรถโดยสารสู่มหาวิทยาลัยมหิดล ศาลายา',
+    descEn: 'Main route overview, entrance gates, and public transit connections to Mahidol Salaya.',
+  },
+  {
+    src: '/images/location/travel-route-2.png',
+    title: 'วิธีเดินทางมางานจากภายนอกมหาวิทยาลัย (ตอนที่ 2)',
+    titleEn: 'Campus Travel Guide from Outside Campus (Part 2)',
+    badge: 'ตอนที่ 2',
+    desc: 'จุดต่อรถรางไฟฟ้าสวัสดิการ (MU Tram) และเส้นทางเดินเท้าเข้าสู่อาคารสิริวิทยา',
+    descEn: 'MU Electric Tram interchange and walking paths to Sirividhaya Building.',
+  },
+  {
+    src: '/images/location/travel-route-3.png',
+    title: 'วิธีเดินทางมางานจากภายนอกมหาวิทยาลัย (ตอนที่ 3)',
+    titleEn: 'Campus Travel Guide from Outside Campus (Part 3)',
+    badge: 'ตอนที่ 3',
+    desc: 'จุดจอดรถยนต์ส่วนตัว ลานจอด MLC และการเดินทางขึ้นสู่ห้องประชุม 217 ชั้น 2',
+    descEn: 'Visitor parking areas, MLC lot, and access to 2nd Floor Meeting Room 217.',
+  },
+];
+
+const VENUE_PHOTOS = [
+  {
+    src: '/images/location/sirividhaya-venue-1.jpg',
+    title: 'อาคารสิริวิทยา คณะศิลปศาสตร์',
+    titleEn: 'Sirividhaya Building, Faculty of Liberal Arts',
+    desc: 'อาคารจัดงานหลัก บริเวณชั้น 2 ห้องประชุม 217',
+  },
+  {
+    src: '/images/location/sirividhaya-venue-2.jpg',
+    title: 'บรรยากาศและทางเข้าห้องประชุม 217',
+    titleEn: 'Meeting Room 217 Hall & Entry Area',
+    desc: 'จุดลงทะเบียนและรับบริจาคโลหิต พร้อมสิ่งอำนวยความสะดวกครบครัน',
+  },
+];
+
 export function LocationClient({
   locationInfographic,
   transportInfographic,
 }: LocationClientProps) {
   const { isTh } = useLanguage();
+  const [activeModalImg, setActiveModalImg] = useState<{ src: string; title: string } | null>(null);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-12">
@@ -73,13 +132,17 @@ export function LocationClient({
                   className="w-full py-2.5 px-4 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 text-xs font-black flex items-center justify-center gap-2 transition-all shadow-xs"
                 >
                   <MapPin className="h-4 w-4 text-blue-600 shrink-0" />
-                  <span>{isTh ? '🗺️ เปิดนำทางใน Google Maps' : '🗺️ Open in Google Maps'}</span>
+                  <span>{isTh ? 'เปิดนำทางใน Google Maps' : 'Open in Google Maps'}</span>
+                  <ExternalLink className="h-3.5 w-3.5 opacity-70" />
                 </a>
               </div>
 
               <div className="pt-2 border-t border-[var(--rose-100)] text-[11px] font-bold text-[var(--muted)] space-y-2">
-                <p>{isTh ? '📞 ติดต่อสอบถามเส้นทางในวันงาน:' : '📞 Direction Support on Event Day:'}</p>
-                <div className="space-y-0.5">
+                <div className="flex items-center gap-1.5 text-gray-700">
+                  <Phone className="h-3.5 w-3.5 text-[var(--burgundy-700)]" />
+                  <span>{isTh ? 'ติดต่อสอบถามเส้นทางในวันงาน:' : 'Direction Support on Event Day:'}</span>
+                </div>
+                <div className="space-y-0.5 pl-5">
                   <p>• {isTh ? 'เปา' : 'Pao'}: <a href="tel:0969866245" className="text-[var(--burgundy-700)] underline">09-6986-6245</a></p>
                   <p>• {isTh ? 'แตงโม' : 'Tangmo'}: <a href="tel:0656274319" className="text-[var(--burgundy-700)] underline">06-5627-4319</a></p>
                 </div>
@@ -93,8 +156,9 @@ export function LocationClient({
           {/* Detailed Campus Transit & Directions Card */}
           <div className="editorial-card p-6 space-y-5">
             <div className="flex items-center justify-between border-b border-[#FCE8EC] pb-2">
-              <h2 className="text-base font-black text-[var(--burgundy-700)] uppercase tracking-wider">
-                {isTh ? 'คู่มือการเดินทางมายังวิทยาเขตศาลายา' : 'Mahidol Salaya Campus Directions'}
+              <h2 className="text-base font-black text-[var(--burgundy-700)] uppercase tracking-wider flex items-center gap-2">
+                <Compass className="h-4 w-4 text-[var(--burgundy-700)]" />
+                <span>{isTh ? 'คู่มือการเดินทางมายังวิทยาเขตศาลายา' : 'Mahidol Salaya Campus Directions'}</span>
               </h2>
             </div>
 
@@ -103,7 +167,7 @@ export function LocationClient({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-blue-600 text-white text-xs font-black shrink-0">
-                    🚋
+                    <Train className="h-4 w-4" />
                   </span>
                   <div>
                     <h3 className="text-xs font-black text-blue-950">
@@ -123,7 +187,7 @@ export function LocationClient({
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="h-2.5 w-2.5 rounded-full bg-blue-600 shrink-0" />
                     <strong className="font-black text-blue-950 text-[11px]">
-                      {isTh ? '🔵 สายสีน้ำเงิน (ผ่านหน้าอาคารสิริวิทยา คณะศิลปศาสตร์โดยตรง — แนะนำ):' : '🔵 Blue Line (Direct to Sirividhaya Bldg / Liberal Arts — Recommended):'}
+                      {isTh ? 'สายสีน้ำเงิน (ผ่านหน้าอาคารสิริวิทยา คณะศิลปศาสตร์โดยตรง — แนะนำ):' : 'Blue Line (Direct to Sirividhaya Bldg / Liberal Arts — Recommended):'}
                     </strong>
                   </div>
                   <p className="text-[11px] text-gray-700 leading-relaxed pl-4">
@@ -136,7 +200,7 @@ export function LocationClient({
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-600 shrink-0" />
                     <strong className="font-black text-emerald-950 text-[11px]">
-                      {isTh ? '🟢 สายสีเขียว:' : '🟢 Green Line:'}
+                      {isTh ? 'สายสีเขียว:' : 'Green Line:'}
                     </strong>
                   </div>
                   <p className="text-[11px] text-gray-700 leading-relaxed pl-4">
@@ -146,11 +210,12 @@ export function LocationClient({
                   </p>
                 </li>
                 <li className="text-[11px] text-gray-600 pl-2">
-                  <span className="font-bold text-gray-800">• {isTh ? '🔴 สายสีแดง & 🟡 สายสีเหลือง:' : '🔴 Red & 🟡 Yellow Lines:'}</span>{' '}
+                  <span className="font-bold text-gray-800">• {isTh ? 'สายสีแดง & สายสีเหลือง:' : 'Red & Yellow Lines:'}</span>{' '}
                   {isTh ? 'สายเชื่อมต่อรอบนอก ประตู 5, วิทยาลัยดุริยางคศิลป์ และพื้นที่หอพัก' : 'Outer ring routes connecting Gate 5, College of Music, and dorms.'}
                 </li>
-                <li className="text-[11px] text-emerald-800 pl-2 font-bold">
-                  🚲 <strong>Anywheel:</strong> {isTh ? 'บริการจักรยานสาธารณะสีเขียว ปลดล็อกผ่านแอป Anywheel มีจุดจอดทั่วทั้งวิทยาเขตและหน้าอาคารสิริวิทยา' : 'Green bike-sharing service via Anywheel app with parking stations campus-wide.'}
+                <li className="text-[11px] text-emerald-800 pl-2 font-bold flex items-center gap-1.5">
+                  <Bike className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                  <span><strong>Anywheel:</strong> {isTh ? 'บริการจักรยานสาธารณะสีเขียว ปลดล็อกผ่านแอป Anywheel มีจุดจอดทั่วทั้งวิทยาเขตและหน้าอาคารสิริวิทยา' : 'Green bike-sharing service via Anywheel app with parking stations campus-wide.'}</span>
                 </li>
               </ul>
             </div>
@@ -172,44 +237,44 @@ export function LocationClient({
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-gray-800 font-medium">
                 <div className="p-2.5 rounded-xl bg-white/90 border border-rose-100 shadow-2xs">
-                  <span className="font-black text-rose-950 block">🚌 สาย 515 (4-61) [TSB / ขสมก.]</span>
+                  <span className="font-black text-rose-950 block">สาย 515 (4-61) [TSB / ขสมก.]</span>
                   <span className="text-[10px] text-gray-600 leading-tight block mt-0.5">
                     {isTh ? 'อนุสาวรีย์ชัยสมรภูมิ – ราชวิถี – เซ็นทรัลปิ่นเกล้า – สายใต้ใหม่ – ม.มหิดล ศาลายา' : 'Victory Monument – Ratchawithi – Pinklao – Southern Bus – Mahidol'}
                   </span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white/90 border border-rose-100 shadow-2xs">
-                  <span className="font-black text-rose-950 block">🚌 สาย 547 (4-63) [Thai Smile Bus]</span>
+                  <span className="font-black text-rose-950 block">สาย 547 (4-63) [Thai Smile Bus]</span>
                   <span className="text-[10px] text-gray-600 leading-tight block mt-0.5">
                     {isTh ? 'สวนลุมพินี – สีลม – สาทร – เพชรเกษม – เดอะมอลล์บางแค – ศาลายา' : 'Lumphini – Silom – Sathon – Phetkasem – The Mall Bangkae – Salaya'}
                   </span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white/90 border border-rose-100 shadow-2xs">
-                  <span className="font-black text-rose-950 block">🚌 สาย 124 (4-51) [Thai Smile Bus]</span>
+                  <span className="font-black text-rose-950 block">สาย 124 (4-51) [Thai Smile Bus]</span>
                   <span className="text-[10px] text-gray-600 leading-tight block mt-0.5">
                     {isTh ? 'สนามหลวง – สะพานสมเด็จพระปิ่นเกล้า – ม.มหิดล ศาลายา' : 'Sanam Luang – Pinklao Bridge – Mahidol Salaya'}
                   </span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white/90 border border-rose-100 shadow-2xs">
-                  <span className="font-black text-rose-950 block">🚌 สาย 556</span>
+                  <span className="font-black text-rose-950 block">สาย 556</span>
                   <span className="text-[10px] text-gray-600 leading-tight block mt-0.5">
                     {isTh ? 'แอร์พอร์ตลิงก์มักกะสัน – กองสลาก – ม.มหิดล ศาลายา – วัดไร่ขิง' : 'ARL Makkasan – Democracy Monument – Mahidol – Wat Rai Khing'}
                   </span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white/90 border border-rose-100 shadow-2xs">
-                  <span className="font-black text-rose-950 block">🚌 สาย 84ก (4-46)</span>
+                  <span className="font-black text-rose-950 block">สาย 84ก (4-46)</span>
                   <span className="text-[10px] text-gray-600 leading-tight block mt-0.5">
                     {isTh ? 'วงเวียนใหญ่ – ท่าพระ – เพชรเกษม – เดอะมอลล์บางแค – ม.มหิดล ศาลายา' : 'Wongwian Yai – Tha Phra – Bangkae – Mahidol Salaya'}
                   </span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white/90 border border-rose-100 shadow-2xs">
-                  <span className="font-black text-rose-950 block">🚌 สาย Y70E [ทางด่วน] / สาย 388</span>
+                  <span className="font-black text-rose-950 block">สาย Y70E [ทางด่วน] / สาย 388</span>
                   <span className="text-[10px] text-gray-600 leading-tight block mt-0.5">
                     {isTh ? 'BTS หมอชิต / MRT สวนจตุจักร (ทางด่วน) และ สาย 388 ปากเกร็ด – ศาลายา' : 'BTS Mo Chit / MRT Chatuchak (Expressway) & Bus 388 Pak Kret'}
                   </span>
                 </div>
               </div>
               <p className="text-[10px] text-gray-500 pl-1">
-                🚐 <strong>รถตู้ร่วมบริการ:</strong> {isTh ? 'อนุสาวรีย์ชัยสมรภูมิ (หน้า รพ.ราชวิถี), เซ็นทรัลปิ่นเกล้า, ฟิวเจอร์พาร์ครังสิต, เดอะมอลล์บางแค' : 'Vans from Victory Monument, Central Pinklao, Future Park Rangsit, The Mall Bangkae.'}
+                <strong>รถตู้ร่วมบริการ:</strong> {isTh ? 'อนุสาวรีย์ชัยสมรภูมิ (หน้า รพ.ราชวิถี), เซ็นทรัลปิ่นเกล้า, ฟิวเจอร์พาร์ครังสิต, เดอะมอลล์บางแค' : 'Vans from Victory Monument, Central Pinklao, Future Park Rangsit, The Mall Bangkae.'}
               </p>
             </div>
 
@@ -217,7 +282,7 @@ export function LocationClient({
             <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-200/90 space-y-3">
               <div className="flex items-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-600 text-white text-xs font-black shrink-0">
-                  🚆
+                  <Train className="h-4 w-4" />
                 </span>
                 <div>
                   <h3 className="text-xs font-black text-purple-950">
@@ -231,7 +296,7 @@ export function LocationClient({
               <ul className="text-xs text-purple-950 space-y-2 pl-1 font-medium">
                 <li className="p-2.5 rounded-xl bg-white/90 border border-purple-200/80 shadow-2xs">
                   <strong className="font-black text-purple-950 block text-[11px] mb-0.5">
-                    🚐 {isTh ? 'รถศาลายาลิงค์ (Salaya Link — ไมโครบัสตรงสู่ BTS):' : 'Salaya Link (Direct Microbus to BTS):'}
+                    {isTh ? 'รถศาลายาลิงค์ (Salaya Link — ไมโครบัสตรงสู่ BTS):' : 'Salaya Link (Direct Microbus to BTS):'}
                   </strong>
                   <p className="text-[11px] text-gray-700 leading-relaxed">
                     {isTh
@@ -278,7 +343,7 @@ export function LocationClient({
               <ul className="text-xs text-amber-950 space-y-2 pl-1 font-medium">
                 <li className="p-2.5 rounded-xl bg-white/90 border border-amber-200/80 shadow-2xs">
                   <strong className="font-black text-amber-950 block text-[11px]">
-                    📍 {isTh ? 'จุดจอดที่ 1: ลานจอดและอาคารจอดรถ ศูนย์การเรียนรู้มหิดล (MLC — แนะนำ):' : 'Lot 1: Mahidol Learning Center (MLC Parking — Recommended):'}
+                    {isTh ? 'จุดจอดที่ 1: ลานจอดและอาคารจอดรถ ศูนย์การเรียนรู้มหิดล (MLC — แนะนำ):' : 'Lot 1: Mahidol Learning Center (MLC Parking — Recommended):'}
                   </strong>
                   <p className="text-[11px] text-gray-700 leading-relaxed mt-0.5">
                     {isTh
@@ -313,8 +378,10 @@ export function LocationClient({
 
         </div>
 
-        {/* Right Infographic Maps (7 Cols) */}
+        {/* Right Column: Visual Maps & Travel Infographics (7 Cols) */}
         <div className="md:col-span-7 space-y-6">
+          
+          {/* Main Visual Slots */}
           <div className="editorial-card p-3">
             <InfographicSlot
               contentKey="location_infographic"
@@ -324,6 +391,99 @@ export function LocationClient({
               altText={locationInfographic?.altText}
               aspectRatio="banner"
             />
+          </div>
+
+          {/* New Official 3-Part Travel Guide from Outside Campus */}
+          <div className="editorial-card p-6 space-y-4">
+            <div className="border-b border-[#FCE8EC] pb-3">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[var(--burgundy-700)] bg-[var(--burgundy-50)] px-2.5 py-1 rounded-full border border-[var(--burgundy-200)]">
+                {isTh ? 'คู่มือภาพนำทางทางการ' : 'Official Visual Guides'}
+              </span>
+              <h2 className="text-lg font-black text-[var(--ink)] mt-2">
+                {isTh ? 'วิธีเดินทางมางาน (จากภายนอกมหาวิทยาลัย)' : 'Step-by-Step Travel Guides'}
+              </h2>
+              <p className="text-xs text-[var(--muted)] font-medium mt-1">
+                {isTh ? 'คลิกที่รูปภาพเพื่อเปิดดูขนาดใหญ่ความคมชัดสูง' : 'Click on any image to view in high resolution'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {TRAVEL_GUIDE_INFOGRAPHICS.map((item, idx) => (
+                <div 
+                  key={idx}
+                  onClick={() => setActiveModalImg({ src: item.src, title: isTh ? item.title : item.titleEn })}
+                  className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[var(--line)] bg-white p-2 shadow-xs transition-all hover:border-[var(--burgundy-300)] hover:shadow-md"
+                >
+                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl bg-gray-100">
+                    <Image
+                      src={item.src}
+                      alt={isTh ? item.title : item.titleEn}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20 flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 text-[var(--ink)] p-2 rounded-full shadow-md">
+                        <ZoomIn className="h-4 w-4" />
+                      </span>
+                    </div>
+                    <span className="absolute top-2 left-2 bg-[var(--burgundy-700)] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">
+                      {item.badge}
+                    </span>
+                  </div>
+                  <div className="pt-2 px-1">
+                    <p className="text-xs font-bold text-[var(--ink)] line-clamp-1 group-hover:text-[var(--burgundy-700)]">
+                      {isTh ? item.title : item.titleEn}
+                    </p>
+                    <p className="text-[10px] text-[var(--muted)] line-clamp-2 mt-0.5 font-medium">
+                      {isTh ? item.desc : item.descEn}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Venue Real Photos */}
+          <div className="editorial-card p-6 space-y-4">
+            <div className="border-b border-[#FCE8EC] pb-2 flex items-center justify-between">
+              <h2 className="text-sm font-black text-[var(--burgundy-700)] uppercase tracking-wider flex items-center gap-2">
+                <Building className="h-4 w-4 text-[var(--burgundy-700)]" />
+                <span>{isTh ? 'บรรยากาศสถานที่จริง ณ อาคารสิริวิทยา' : 'Sirividhaya Venue Photos'}</span>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {VENUE_PHOTOS.map((photo, pIdx) => (
+                <div 
+                  key={pIdx}
+                  onClick={() => setActiveModalImg({ src: photo.src, title: isTh ? photo.title : photo.titleEn })}
+                  className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[var(--line)] bg-white p-2 shadow-xs transition-all hover:border-[var(--burgundy-300)]"
+                >
+                  <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-gray-100">
+                    <Image
+                      src={photo.src}
+                      alt={isTh ? photo.title : photo.titleEn}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                    />
+                    <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20 flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 text-[var(--ink)] p-2 rounded-full shadow-md">
+                        <ZoomIn className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </div>
+                  <div className="pt-2 px-1">
+                    <p className="text-xs font-bold text-[var(--ink)]">
+                      {isTh ? photo.title : photo.titleEn}
+                    </p>
+                    <p className="text-[10px] text-[var(--muted)] mt-0.5">
+                      {photo.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="editorial-card p-3">
@@ -336,10 +496,46 @@ export function LocationClient({
               aspectRatio="banner"
             />
           </div>
+
         </div>
 
       </div>
 
+      {/* Image Modal Preview */}
+      {activeModalImg && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setActiveModalImg(null)}
+        >
+          <div 
+            className="relative max-h-[90vh] max-w-4xl w-full overflow-hidden rounded-2xl bg-white p-3 shadow-2xl space-y-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-2 pt-1 border-b border-gray-100 pb-2">
+              <h3 className="text-sm font-bold text-gray-900 line-clamp-1">{activeModalImg.title}</h3>
+              <button
+                type="button"
+                onClick={() => setActiveModalImg(null)}
+                className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="relative h-[75vh] w-full bg-gray-50 rounded-xl overflow-hidden">
+              <Image
+                src={activeModalImg.src}
+                alt={activeModalImg.title}
+                fill
+                className="object-contain"
+                sizes="90vw"
+                priority
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
+

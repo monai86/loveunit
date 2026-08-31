@@ -25,6 +25,8 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 const OFFICIAL_POSTERS = [
   {
     src: '/images/poster-th.jpg',
+    pdfUrl: '/docs/poster-a4.pdf',
+    pdfFileName: 'mumt-blood-donation-2026-poster-a4-th.pdf',
     label: 'ภาษาไทย (A4 Official)',
     badge: 'A4 ไทย',
     title: 'โปสเตอร์ประชาสัมพันธ์ทางการ (ภาษาไทย)',
@@ -37,6 +39,8 @@ const OFFICIAL_POSTERS = [
   },
   {
     src: '/images/poster-en.jpg',
+    pdfUrl: '/docs/poster-a4.pdf',
+    pdfFileName: 'mumt-blood-donation-2026-poster-a4-en.pdf',
     label: 'English (A4 Official)',
     badge: 'A4 EN',
     title: 'โปสเตอร์ประชาสัมพันธ์ทางการ (English)',
@@ -49,6 +53,8 @@ const OFFICIAL_POSTERS = [
   },
   {
     src: '/images/poster-a3-minimal.jpg',
+    pdfUrl: '/docs/poster-a3.pdf',
+    pdfFileName: 'mumt-loveunit-poster-a3.pdf',
     label: 'A3 Minimal Design',
     badge: 'A3 Minimal',
     title: 'โปสเตอร์แบบมินิมอล “Give Blood Give Love” (A3)',
@@ -290,7 +296,7 @@ export default function PosterPage() {
                 </div>
               </div>
 
-              <div className="pt-4 mt-3 border-t border-[var(--line)] flex items-center justify-between">
+              <div className="pt-4 mt-3 border-t border-[var(--line)] flex items-center justify-between gap-2 flex-wrap">
                 <button
                   type="button"
                   onClick={() => setActivePoster({ src: poster.src, title: isTh ? poster.title : poster.titleEn, alt: poster.alt, fileName: poster.fileName })}
@@ -299,14 +305,26 @@ export default function PosterPage() {
                   <ZoomIn className="h-3.5 w-3.5" />
                   <span>{isTh ? 'ดูภาพขยาย' : 'Zoom In'}</span>
                 </button>
-                <a
-                  href={poster.src}
-                  download={poster.fileName}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rose-100)] hover:bg-[var(--rose-200)] text-[var(--burgundy-700)] px-3 py-1.5 text-xs font-extrabold border border-[var(--line)] transition-all cursor-pointer"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  <span>{isTh ? 'ดาวน์โหลด' : 'Download'}</span>
-                </a>
+                <div className="flex items-center gap-1.5">
+                  {poster.pdfUrl && (
+                    <a
+                      href={poster.pdfUrl}
+                      download={poster.pdfFileName}
+                      className="inline-flex items-center gap-1 rounded-lg bg-[var(--burgundy-50)] hover:bg-[var(--burgundy-100)] text-[var(--burgundy-700)] px-2.5 py-1.5 text-[11px] font-extrabold border border-[var(--burgundy-200)] transition-all cursor-pointer shadow-2xs"
+                    >
+                      <Download className="h-3 w-3" />
+                      <span>PDF</span>
+                    </a>
+                  )}
+                  <a
+                    href={poster.src}
+                    download={poster.fileName}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--rose-100)] hover:bg-[var(--rose-200)] text-[var(--burgundy-700)] px-3 py-1.5 text-xs font-extrabold border border-[var(--line)] transition-all cursor-pointer"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    <span>JPG</span>
+                  </a>
+                </div>
               </div>
             </article>
           ))}
