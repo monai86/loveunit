@@ -28,6 +28,8 @@ import {
   ChevronRight,
   Check
 } from 'lucide-react';
+import { BloodCompatibilityWidget } from '@/components/home/BloodCompatibilityWidget';
+import { BloodImpactGauge } from '@/components/home/BloodImpactGauge';
 import { SocialLinks } from '@/components/common/SocialLinks';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
@@ -322,6 +324,9 @@ export function HomeSectionsClient() {
         </div>
       </section>
 
+      {/* ============ INTERACTIVE BLOOD COMPATIBILITY MATCHER ============ */}
+      <BloodCompatibilityWidget />
+
       {/* ============ INTERACTIVE SELF-SCREENING FEATURE CALLOUT ============ */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="editorial-card p-6 sm:p-10 bg-gradient-to-br from-[var(--rose-100)]/80 via-white to-amber-50/50 border-2 border-[var(--burgundy-500)]/20 shadow-md">
@@ -466,6 +471,9 @@ export function HomeSectionsClient() {
           </div>
         </div>
       </section>
+
+      {/* ============ COMMUNITY IMPACT & 200-UNIT MULTIPLIER GAUGE ============ */}
+      <BloodImpactGauge />
 
       {/* ============ OFFICIAL POSTERS & INFOGRAPHICS ============ */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6">
