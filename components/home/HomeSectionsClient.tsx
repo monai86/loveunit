@@ -21,7 +21,12 @@ import {
   Heart,
   MapPin,
   Clock,
-  Phone
+  Phone,
+  Calendar,
+  HeartPulse,
+  Droplets,
+  ChevronRight,
+  Check
 } from 'lucide-react';
 import { SocialLinks } from '@/components/common/SocialLinks';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -31,54 +36,234 @@ export function HomeSectionsClient() {
 
   const donorSteps = isTh
     ? [
-        { num: '01', title: 'ประเมินสุขภาพ', desc: 'ตรวจเช็กความพร้อมผ่านระบบออนไลน์' },
-        { num: '02', title: 'ลงทะเบียนจองรอบ', desc: 'เลือกช่วงเวลาระหว่าง 09.00 - 14.00 น.' },
-        { num: '03', title: 'เตรียมร่างกาย', desc: 'นอนหลับ 6 ชม. & ดื่มน้ำ 500 มล.' },
-        { num: '04', title: 'บริจาคโลหิต', desc: 'ใช้เวลาประมาณ 10-15 นาที ณ ห้อง 217' },
-        { num: '05', title: 'รับของที่ระลึก & ของว่าง', desc: 'รับของที่ระลึกพิเศษ และของว่างบำรุงสุขภาพ' },
+        { 
+          num: '01', 
+          title: 'ประเมินสุขภาพ', 
+          desc: 'ตรวจเช็กความพร้อมผ่านระบบออนไลน์', 
+          duration: 'ใช้เวลา ~2 นาที',
+          action: 'ทำแบบประเมิน',
+          href: '/screening',
+          icon: ShieldCheck,
+          accent: 'from-amber-500 to-orange-600'
+        },
+        { 
+          num: '02', 
+          title: 'ลงทะเบียนจองรอบ', 
+          desc: 'เลือกช่วงเวลาระหว่าง 09.00 - 14.00 น.', 
+          duration: 'ใช้เวลา ~1 นาที',
+          action: 'จองรอบเวลา',
+          href: '/register',
+          icon: Calendar,
+          accent: 'from-rose-500 to-[var(--burgundy-700)]'
+        },
+        { 
+          num: '03', 
+          title: 'เตรียมร่างกาย', 
+          desc: 'นอนหลับ 5-6 ชม. & ดื่มน้ำ 500 มล.', 
+          duration: 'คืนก่อนวันงาน',
+          action: 'ดูวิธีเตรียมตัว',
+          href: '/prepare',
+          icon: HeartPulse,
+          accent: 'from-blue-500 to-indigo-600'
+        },
+        { 
+          num: '04', 
+          title: 'บริจาคโลหิต', 
+          desc: 'ใช้เวลาประมาณ 10-15 นาที ณ ห้อง 217', 
+          duration: 'วันงานจริง',
+          action: 'ดูแผนที่สถานที่',
+          href: '/location',
+          icon: Droplets,
+          accent: 'from-red-600 to-[var(--burgundy-800)]'
+        },
+        { 
+          num: '05', 
+          title: 'รับของที่ระลึก & อาหารว่าง', 
+          desc: 'รับของที่ระลึกพิเศษ และของว่างบำรุงสุขภาพ', 
+          duration: 'หลังบริจาค',
+          action: 'ดูของที่ระลึก',
+          href: '/poster',
+          icon: Gift,
+          accent: 'from-emerald-500 to-teal-700'
+        },
       ]
     : [
-        { num: '01', title: 'Self-Screening', desc: 'Check eligibility via online assessment' },
-        { num: '02', title: 'Select Time Slot', desc: 'Choose arrival time between 09:00 - 14:00' },
-        { num: '03', title: 'Prepare Body', desc: 'Sleep 6+ hrs & drink 500 mL water' },
-        { num: '04', title: 'Donate Blood', desc: 'Takes approx. 10-15 mins at Room 217' },
-        { num: '05', title: 'Souvenir & Snacks', desc: 'Receive limited edition gift & refreshments' },
+        { 
+          num: '01', 
+          title: 'Self-Screening', 
+          desc: 'Check eligibility via online assessment', 
+          duration: 'Takes ~2 mins',
+          action: 'Start Assessment',
+          href: '/screening',
+          icon: ShieldCheck,
+          accent: 'from-amber-500 to-orange-600'
+        },
+        { 
+          num: '02', 
+          title: 'Select Time Slot', 
+          desc: 'Choose arrival time between 09:00 - 14:00', 
+          duration: 'Takes ~1 min',
+          action: 'Reserve Slot',
+          href: '/register',
+          icon: Calendar,
+          accent: 'from-rose-500 to-[var(--burgundy-700)]'
+        },
+        { 
+          num: '03', 
+          title: 'Prepare Body', 
+          desc: 'Sleep 5-6+ hrs & drink 500 mL water', 
+          duration: 'Night before',
+          action: 'Prep Guide',
+          href: '/prepare',
+          icon: HeartPulse,
+          accent: 'from-blue-500 to-indigo-600'
+        },
+        { 
+          num: '04', 
+          title: 'Donate Blood', 
+          desc: 'Takes approx. 10-15 mins at Room 217', 
+          duration: 'Event Day',
+          action: 'View Venue',
+          href: '/location',
+          icon: Droplets,
+          accent: 'from-red-600 to-[var(--burgundy-800)]'
+        },
+        { 
+          num: '05', 
+          title: 'Souvenir & Refreshments', 
+          desc: 'Receive limited edition gift & snacks', 
+          duration: 'Post-donation',
+          action: 'View Gifts',
+          href: '/poster',
+          icon: Gift,
+          accent: 'from-emerald-500 to-teal-700'
+        },
       ];
 
   const dos = isTh
     ? [
-        { icon: GlassWater, text: 'ดื่มน้ำเปล่า 3-4 แก้ว (500 มล.) ก่อนบริจาค 20-30 นาที' },
-        { icon: Utensils, text: 'รับประทานอาหารมื้อหลักก่อนมาบริจาค (หลีกเลี่ยงของมัน)' },
-        { icon: Moon, text: 'นอนหลับพักผ่อนให้เพียงพอ อย่างน้อย 5-6 ชั่วโมง' },
+        { 
+          icon: GlassWater, 
+          title: 'ดื่มน้ำเปล่า 3-4 แก้ว (500 มล.)',
+          desc: 'ดื่มก่อนบริจาค 20-30 นาที ช่วยเพิ่มปริมาตรเลือดและลดอาการวิงเวียน',
+          tag: 'สำคัญมาก'
+        },
+        { 
+          icon: Utensils, 
+          title: 'รับประทานอาหารมื้อหลัก',
+          desc: 'กินอาหารก่อนมาบริจาค (หลีกเลี่ยงอาหารมัน) เพื่อให้ร่างกายมีพลังงาน',
+          tag: 'ก่อนบริจาค'
+        },
+        { 
+          icon: Moon, 
+          title: 'นอนหลับพักผ่อนให้เพียงพอ',
+          desc: 'นอนหลับอย่างน้อย 5-6 ชั่วโมงต่อเนื่องในคืนก่อนวันบริจาค',
+          tag: 'อย่างน้อย 5-6 ชม.'
+        },
       ]
     : [
-        { icon: GlassWater, text: 'Drink 3-4 glasses of water (500 mL) 20-30 mins prior' },
-        { icon: Utensils, text: 'Eat a light regular meal (avoid greasy/fatty food)' },
-        { icon: Moon, text: 'Get at least 5-6 hours of restful continuous sleep' },
+        { 
+          icon: GlassWater, 
+          title: 'Drink 3-4 glasses of water (500 mL)',
+          desc: 'Drink 20-30 mins prior to boost blood volume and prevent dizziness.',
+          tag: 'Crucial'
+        },
+        { 
+          icon: Utensils, 
+          title: 'Eat a proper light meal',
+          desc: 'Have a nutritious meal beforehand (avoid greasy foods) for energy.',
+          tag: 'Pre-donation'
+        },
+        { 
+          icon: Moon, 
+          title: 'Get adequate restful sleep',
+          desc: 'Ensure at least 5-6 hours of continuous restful sleep the night before.',
+          tag: '≥ 5-6 Hours'
+        },
       ];
 
   const donts = isTh
     ? [
-        { icon: Wine, text: 'งดเครื่องดื่มแอลกอฮอล์ อย่างน้อย 24 ชั่วโมง' },
-        { icon: Cigarette, text: 'งดสูบบุหรี่ ก่อนและหลังบริจาคอย่างน้อย 1 ชั่วโมง' },
-        { icon: XCircle, text: 'งดอาหารไขมันสูง เช่น ข้าวขาหมู แกงกะทิ ขนมหวาน' },
+        { 
+          icon: Wine, 
+          title: 'งดเครื่องดื่มแอลกอฮอล์',
+          desc: 'งดดื่มสุรา/เบียร์อย่างน้อย 24 ชั่วโมง เพื่อป้องกันตับทำงานหนักและเลือดเจือจาง',
+          tag: 'งด 24 ชม.'
+        },
+        { 
+          icon: Cigarette, 
+          title: 'งดสูบบุหรี่',
+          desc: 'งดสูบบุหรี่ก่อนและหลังบริจาคอย่างน้อย 1 ชั่วโมง ป้องกันสารคาร์บอนมอนอกไซด์ในเลือด',
+          tag: 'งด 1 ชม.'
+        },
+        { 
+          icon: XCircle, 
+          title: 'งดอาหารไขมันสูง',
+          desc: 'หลีกเลี่ยงข้าวขาหมู แกงกะทิ ของทอด ขนมหวาน เพื่อป้องกันพลาสมาขุ่น (Chylomicronemia)',
+          tag: 'มื้อก่อนบริจาค'
+        },
       ]
     : [
-        { icon: Wine, text: 'Avoid alcohol beverages for at least 24 hours' },
-        { icon: Cigarette, text: 'Avoid smoking 1 hour before and after donation' },
-        { icon: XCircle, text: 'Avoid rich fatty foods (fried dishes, coconut milk)' },
+        { 
+          icon: Wine, 
+          title: 'Avoid Alcoholic Beverages',
+          desc: 'Abstain for at least 24 hours to reduce liver stress and prevent dilution.',
+          tag: '24 Hours'
+        },
+        { 
+          icon: Cigarette, 
+          title: 'Avoid Smoking',
+          desc: 'Refrain from smoking 1 hour before and after to keep oxygen levels optimal.',
+          tag: '1 Hour'
+        },
+        { 
+          icon: XCircle, 
+          title: 'Avoid High-Fat / Greasy Meals',
+          desc: 'Avoid fried foods and coconut milk to prevent turbid lipemic plasma.',
+          tag: 'Pre-meal'
+        },
       ];
 
   const requirements = isTh
     ? [
-        { icon: UserRound, text: 'อายุระหว่าง 17 - 70 ปีบริบูรณ์ (ครั้งแรกไม่เกิน 60 ปี)' },
-        { icon: Scale, text: 'น้ำหนักตัวตั้งแต่ 45 กิโลกรัม ขึ้นไป' },
-        { icon: ShieldCheck, text: 'ความเข้มข้นโลหิต หญิง ≥ 12.5 / ชาย ≥ 13.0 g/dL' },
+        { 
+          icon: UserRound, 
+          title: 'อายุระหว่าง 17 - 70 ปีบริบูรณ์',
+          desc: 'อายุ 17 ปีต้องมีใบยินยอมจากผู้ปกครอง / ผู้บริจาคครั้งแรกอายุไม่เกิน 60 ปี',
+          tag: '17 - 70 ปี'
+        },
+        { 
+          icon: Scale, 
+          title: 'น้ำหนักตัวตั้งแต่ 45 กิโลกรัม ขึ้นไป',
+          desc: 'เกณฑ์มาตรฐานเพื่อความปลอดภัยในการเจาะเก็บโลหิต 350 - 450 มิลลิลิตร',
+          tag: '≥ 45 กก.'
+        },
+        { 
+          icon: ShieldCheck, 
+          title: 'ความเข้มข้นของโลหิต (ฮีโมโกลบิน)',
+          desc: 'หญิง ≥ 12.5 g/dL / ชาย ≥ 13.0 g/dL (ตรวจคัดกรองเบื้องต้นหน้างานฟรี)',
+          tag: 'ตรวจคัดกรองฟรี'
+        },
       ]
     : [
-        { icon: UserRound, text: 'Age 17 - 70 years old (First-timers ≤ 60)' },
-        { icon: Scale, text: 'Body weight at least 45 kg (99 lbs)' },
-        { icon: ShieldCheck, text: 'Hemoglobin: Female ≥ 12.5 / Male ≥ 13.0 g/dL' },
+        { 
+          icon: UserRound, 
+          title: 'Age 17 - 70 years old',
+          desc: 'Age 17 requires parental consent. First-time donors must be under 60.',
+          tag: '17 - 70 Yrs'
+        },
+        { 
+          icon: Scale, 
+          title: 'Body weight at least 45 kg (99 lbs)',
+          desc: 'Standard physical requirement for safe whole blood collection (350-450 mL).',
+          tag: '≥ 45 kg'
+        },
+        { 
+          icon: ShieldCheck, 
+          title: 'Hemoglobin Concentration',
+          desc: 'Female ≥ 12.5 g/dL / Male ≥ 13.0 g/dL (Complimentary on-site screening).',
+          tag: 'Free Screening'
+        },
       ];
 
   return (
@@ -202,32 +387,83 @@ export function HomeSectionsClient() {
         </div>
       </section>
 
-      {/* ============ 5-STEP DONATION JOURNEY ============ */}
+      {/* ============ 5-STEP DONATION JOURNEY (UPGRADED INTERACTIVE FLOW) ============ */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="max-w-2xl space-y-3">
-          <h2 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
-            {isTh ? '5 ขั้นตอนการบริจาคโลหิต' : '5 Steps of Blood Donation'}
-          </h2>
-          <p className="text-[15px] leading-relaxed text-[var(--muted)] font-medium">
-            {isTh 
-              ? 'ตั้งแต่วินาทีที่คุณกดลงทะเบียน ไปจนถึงการพักผ่อนหลังบริจาค — เราจัดคิวให้เป็นระบบและสะดวกสบาย'
-              : 'From online registration to post-donation refreshments — smooth, coordinated, and comfortable.'}
-          </p>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="max-w-2xl space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
+              <Sparkles className="h-3.5 w-3.5 fill-white text-white" />
+              <span>{isTh ? 'เส้นทางการเป็นผู้ให้' : 'Donor Journey'}</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
+              {isTh ? '5 ขั้นตอนการบริจาคโลหิต' : '5 Steps of Blood Donation'}
+            </h2>
+            <p className="text-[15px] leading-relaxed text-[var(--muted)] font-medium">
+              {isTh 
+                ? 'ตั้งแต่วินาทีที่คุณกดลงทะเบียน ไปจนถึงการพักผ่อนหลังบริจาค — เราจัดระบบให้คุณสะดวกรวดเร็วและอุ่นใจทุกขั้นตอน'
+                : 'From online booking to post-donation care — smooth, coordinated, and comfortable.'}
+            </p>
+          </div>
+
+          <Link 
+            href="/prepare"
+            className="inline-flex items-center gap-1.5 text-xs font-black text-[var(--burgundy-700)] hover:underline whitespace-nowrap"
+          >
+            <span>{isTh ? 'ดูคู่มือการเตรียมตัวฉบับเต็ม' : 'Full Preparation Guide'}</span>
+            <ChevronRight className="h-4 w-4" />
+          </Link>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {donorSteps.map((step) => (
-            <div
-              key={step.num}
-              className="relative bg-[var(--surface)] border border-[var(--line)] rounded-xl p-5 pt-7 hover:border-[var(--burgundy-500)] hover:shadow-[var(--shadow-soft)] transition-all"
-            >
-              <span className="absolute -top-3.5 left-5 inline-flex h-7 items-center rounded-full bg-[var(--burgundy-700)] px-2.5 text-xs font-bold text-white shadow-xs">
-                {step.num}
-              </span>
-              <h3 className="text-base font-extrabold text-[var(--ink)]">{step.title}</h3>
-              <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted)] font-medium">{step.desc}</p>
-            </div>
-          ))}
+        {/* Dynamic Connected Journey Grid */}
+        <div className="relative mt-10">
+          {/* Desktop Connecting Background Rail */}
+          <div className="hidden lg:block absolute top-[48px] left-[7%] right-[7%] h-[3px] bg-gradient-to-r from-amber-400 via-[var(--burgundy-500)] to-emerald-500 rounded-full z-0 opacity-40" />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 relative z-10">
+            {donorSteps.map((step) => {
+              const StepIcon = step.icon;
+              return (
+                <Link
+                  key={step.num}
+                  href={step.href}
+                  className="group relative flex flex-col justify-between bg-white border border-[var(--line)] rounded-2xl p-5 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-[var(--burgundy-400)] cursor-pointer"
+                >
+                  {/* Top Step Header with Animated Glow Icon & Step Number */}
+                  <div>
+                    <div className="flex items-center justify-between gap-2 pb-4">
+                      <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${step.accent} text-white flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
+                        <StepIcon className="h-6 w-6" />
+                      </div>
+                      <div className="text-right">
+                        <span className="font-mono text-2xl font-black text-gray-200 group-hover:text-[var(--burgundy-600)] transition-colors block leading-none">
+                          {step.num}
+                        </span>
+                        <span className="text-[10px] font-bold text-[var(--muted)] block mt-1">
+                          {step.duration}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Step Title & Details */}
+                    <div className="space-y-1.5 pt-1">
+                      <h3 className="text-base font-black text-[var(--ink)] group-hover:text-[var(--burgundy-700)] transition-colors">
+                        {step.title}
+                      </h3>
+                      <p className="text-xs leading-relaxed text-[var(--muted)] font-medium">
+                        {step.desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Bottom Interactive Micro Action */}
+                  <div className="mt-5 pt-3 border-t border-gray-100 flex items-center justify-between text-xs font-black text-[var(--burgundy-700)] group-hover:text-[var(--burgundy-600)]">
+                    <span>{step.action}</span>
+                    <ArrowRight className="h-3.5 w-3.5 transform group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -282,96 +518,214 @@ export function HomeSectionsClient() {
         </div>
       </section>
 
-      {/* ============ PREPARATION & DONOR GUIDELINES ============ */}
-      <section className="border-y border-[var(--line)] bg-[var(--surface)]">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
+      {/* ============ PREPARATION & DONOR GUIDELINES (INTERACTIVE BENTO GRID) ============ */}
+      <section className="border-y border-[var(--line)] bg-gradient-to-b from-gray-50/70 via-white to-gray-50/70">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 space-y-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="max-w-2xl space-y-3">
+            <div className="max-w-2xl space-y-2">
+              <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
+                <Heart className="h-3.5 w-3.5 fill-white text-white" />
+                <span>{isTh ? 'คู่มือเตรียมร่างกาย' : 'Readiness Guide'}</span>
+              </div>
               <h2 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
-                {isTh ? 'ข้อมูลการเตรียมตัว' : 'Donor Preparation Guide'}
+                {isTh ? 'ข้อมูลการเตรียมตัวก่อนบริจาคโลหิต' : 'Donor Preparation & Standards'}
               </h2>
               <p className="text-[15px] leading-relaxed text-[var(--muted)] font-medium">
                 {isTh 
-                  ? 'ตรวจสอบตัวเองก่อนวันบริจาค เพื่อให้การบริจาคของคุณผ่านฉลุย'
-                  : 'Check your physical readiness before arriving on event day.'}
+                  ? 'ตรวจสอบความพร้อมของร่างกาย เพื่อให้การบริจาคของคุณราบรื่น ปลอดภัย และได้โลหิตที่มีคุณภาพสูงสุดแก่ผู้ป่วย'
+                  : 'Ensure optimal physical condition for a smooth, safe donation experience.'}
               </p>
             </div>
-            <Link href="/prepare" className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--burgundy-700)] hover:underline py-1.5 cursor-pointer">
+            <Link 
+              href="/prepare" 
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--rose-100)] hover:bg-[var(--rose-200)] text-[var(--burgundy-700)] font-extrabold px-4 py-2.5 text-xs border border-[var(--line)] transition-all cursor-pointer shadow-xs"
+            >
               <span>{isTh ? 'อ่านคู่มือฉบับเต็ม' : 'Read Full Guide'}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* DO'S */}
-            <div className="rounded-xl border border-[var(--ok)]/25 bg-[var(--ok-bg)]/60 p-6">
-              <div className="flex items-center gap-3 pb-4">
-                <div className="h-10 w-10 rounded-lg bg-[var(--ok)] text-white flex items-center justify-center">
-                  <CheckCircle2 className="h-5 w-5" />
+          {/* Bento-Style 3 Rich Interactive Column Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* 1. DO'S (EMERALD HIGHLIGHT) */}
+            <div className="group relative bg-white border border-emerald-200/80 rounded-2xl p-6 shadow-xs hover:shadow-xl hover:border-emerald-400 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-emerald-100">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-9 w-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+                      <Check className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-lg font-black text-emerald-950">
+                      {isTh ? 'สิ่งที่ควรทำ' : "Do's"}
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-black uppercase text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    {isTh ? 'แนะนำให้ปฏิบัติ' : 'Recommended'}
+                  </span>
                 </div>
-                <h3 className="text-lg font-extrabold text-[var(--ink)]">
-                  {isTh ? 'สิ่งที่ควรทำ' : "Do's"}
-                </h3>
+
+                <div className="space-y-3.5">
+                  {dos.map((item, i) => {
+                    const Icon = item.icon;
+                    return (
+                      <div 
+                        key={i} 
+                        className="p-3.5 rounded-xl bg-emerald-50/40 hover:bg-emerald-50/80 border border-emerald-100/80 transition-colors space-y-1"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4 text-emerald-700 shrink-0" />
+                            <h4 className="text-xs font-black text-emerald-950">{item.title}</h4>
+                          </div>
+                          <span className="text-[10px] font-bold text-emerald-800 bg-white px-2 py-0.5 rounded-md border border-emerald-200 shadow-2xs whitespace-nowrap">
+                            {item.tag}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-gray-600 pl-6 leading-relaxed font-medium">
+                          {item.desc}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <ul className="space-y-3.5 text-[15px] font-medium text-[var(--ink)]">
-                {dos.map((item, i) => {
-                  const Icon = item.icon;
-                  return (
-                    <li key={i} className="flex items-start gap-3">
-                      <Icon className="h-5 w-5 text-[var(--ok)] shrink-0 mt-0.5" />
-                      <span className="leading-relaxed">{item.text}</span>
-                    </li>
-                  );
-                })}
-              </ul>
+
+              <div className="mt-5 pt-3 border-t border-emerald-100/60 flex items-center justify-between text-[11px] font-bold text-emerald-800">
+                <span>{isTh ? 'ร่างกายพร้อม โลหิตมีคุณภาพ' : 'Optimal blood vitality'}</span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+              </div>
             </div>
 
-            {/* DON'T */}
-            <div className="rounded-xl border border-[var(--danger)]/25 bg-[var(--danger-bg)]/60 p-6">
-              <div className="flex items-center gap-3 pb-4">
-                <div className="h-10 w-10 rounded-lg bg-[var(--danger)] text-white flex items-center justify-center">
-                  <XCircle className="h-5 w-5" />
+            {/* 2. DON'TS (RUBY / ROSE HIGHLIGHT) */}
+            <div className="group relative bg-white border border-rose-200/80 rounded-2xl p-6 shadow-xs hover:shadow-xl hover:border-rose-400 transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-rose-100">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-9 w-9 rounded-xl bg-rose-600 text-white flex items-center justify-center shadow-xs">
+                      <XCircle className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-lg font-black text-rose-950">
+                      {isTh ? 'สิ่งที่ควรหลีกเลี่ยง' : "Don'ts"}
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-black uppercase text-rose-800 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+                    {isTh ? 'ข้อควรระวัง' : 'Precautions'}
+                  </span>
                 </div>
-                <h3 className="text-lg font-extrabold text-[var(--ink)]">
-                  {isTh ? 'สิ่งที่ควรหลีกเลี่ยง' : "Don'ts"}
-                </h3>
+
+                <div className="space-y-3.5">
+                  {donts.map((item, i) => {
+                    const Icon = item.icon;
+                    return (
+                      <div 
+                        key={i} 
+                        className="p-3.5 rounded-xl bg-rose-50/40 hover:bg-rose-50/80 border border-rose-100/80 transition-colors space-y-1"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4 text-rose-700 shrink-0" />
+                            <h4 className="text-xs font-black text-rose-950">{item.title}</h4>
+                          </div>
+                          <span className="text-[10px] font-bold text-rose-800 bg-white px-2 py-0.5 rounded-md border border-rose-200 shadow-2xs whitespace-nowrap">
+                            {item.tag}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-gray-600 pl-6 leading-relaxed font-medium">
+                          {item.desc}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <ul className="space-y-3.5 text-[15px] font-medium text-[var(--ink)]">
-                {donts.map((item, i) => {
-                  const Icon = item.icon;
-                  return (
-                    <li key={i} className="flex items-start gap-3">
-                      <Icon className="h-5 w-5 text-[var(--danger)] shrink-0 mt-0.5" />
-                      <span className="leading-relaxed">{item.text}</span>
-                    </li>
-                  );
-                })}
-              </ul>
+
+              <div className="mt-5 pt-3 border-t border-rose-100/60 flex items-center justify-between text-[11px] font-bold text-rose-800">
+                <span>{isTh ? 'ป้องกันภาวะพลาสมาขุ่น' : 'Prevent lipemic plasma'}</span>
+                <XCircle className="h-4 w-4 text-rose-600" />
+              </div>
             </div>
 
-            {/* REQUIREMENTS */}
-            <div className="rounded-xl border border-[var(--line)] bg-[var(--rose-100)]/50 p-6">
-              <div className="flex items-center gap-3 pb-4">
-                <div className="h-10 w-10 rounded-lg bg-[var(--burgundy-700)] text-white flex items-center justify-center">
-                  <UserRound className="h-5 w-5" />
+            {/* 3. REQUIREMENTS (BURGUNDY HIGHLIGHT) */}
+            <div className="group relative bg-white border border-[var(--burgundy-200)]/80 rounded-2xl p-6 shadow-xs hover:shadow-xl hover:border-[var(--burgundy-400)] transition-all duration-300 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[var(--burgundy-100)]">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-9 w-9 rounded-xl bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs">
+                      <UserRound className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-lg font-black text-[var(--burgundy-950)]">
+                      {isTh ? 'คุณสมบัติผู้บริจาค' : 'Requirements'}
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-black uppercase text-[var(--burgundy-800)] bg-[var(--rose-100)] px-2.5 py-0.5 rounded-full border border-[var(--burgundy-200)]">
+                    {isTh ? 'เกณฑ์มาตรฐาน' : 'Criteria'}
+                  </span>
                 </div>
-                <h3 className="text-lg font-extrabold text-[var(--ink)]">
-                  {isTh ? 'คุณสมบัติผู้บริจาค' : 'Requirements'}
-                </h3>
+
+                <div className="space-y-3.5">
+                  {requirements.map((item, i) => {
+                    const Icon = item.icon;
+                    return (
+                      <div 
+                        key={i} 
+                        className="p-3.5 rounded-xl bg-[var(--rose-100)]/30 hover:bg-[var(--rose-100)]/70 border border-[var(--line)] transition-colors space-y-1"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <Icon className="h-4 w-4 text-[var(--burgundy-700)] shrink-0" />
+                            <h4 className="text-xs font-black text-[var(--ink)]">{item.title}</h4>
+                          </div>
+                          <span className="text-[10px] font-bold text-[var(--burgundy-800)] bg-white px-2 py-0.5 rounded-md border border-[var(--line)] shadow-2xs whitespace-nowrap">
+                            {item.tag}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-gray-600 pl-6 leading-relaxed font-medium">
+                          {item.desc}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <ul className="space-y-3.5 text-[15px] font-medium text-[var(--ink)]">
-                {requirements.map((item, i) => {
-                  const Icon = item.icon;
-                  return (
-                    <li key={i} className="flex items-start gap-3">
-                      <Icon className="h-5 w-5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
-                      <span className="leading-relaxed">{item.text}</span>
-                    </li>
-                  );
-                })}
-              </ul>
+
+              <div className="mt-5 pt-3 border-t border-[var(--burgundy-100)]/60 flex items-center justify-between text-[11px] font-bold text-[var(--burgundy-700)]">
+                <span>{isTh ? 'มาตรฐานสภากาชาดไทย' : 'Red Cross Standards'}</span>
+                <ShieldCheck className="h-4 w-4 text-[var(--burgundy-700)]" />
+              </div>
+            </div>
+
+          </div>
+
+          {/* Interactive Quick-Check Bottom Banner */}
+          <div className="rounded-2xl bg-gradient-to-r from-[var(--rose-100)]/80 via-white to-blue-50/60 p-5 sm:p-6 border border-[var(--line)] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5 text-center sm:text-left">
+              <div className="h-11 w-11 rounded-xl bg-[var(--burgundy-700)] text-white flex items-center justify-center shrink-0 shadow-md">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <div>
+                <h4 className="text-sm font-black text-[var(--ink)]">
+                  {isTh ? 'ต้องการประเมินความพร้อมแบบละเอียดก่อนเดินทาง?' : 'Want a full 2-minute eligibility self-check?'}
+                </h4>
+                <p className="text-xs text-[var(--muted)] font-medium">
+                  {isTh 
+                    ? 'เช็กประวัติสุขภาพ ยา วัคซีน และโรคประจำตัว ทราบผลทันทีไม่ต้องรอวันงาน' 
+                    : 'Check your health history, medication, vaccines, and readiness with instant results.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
+              <Link
+                href="/screening"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--burgundy-600)] hover:bg-[var(--burgundy-700)] text-white font-extrabold px-5 py-2.5 text-xs shadow-md transition-all cursor-pointer"
+              >
+                <span>{isTh ? 'ทำแบบประเมินตนเอง (2 นาที)' : 'Start 2-Min Quiz'}</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
           </div>
+
         </div>
       </section>
 
