@@ -226,7 +226,7 @@ export function LocationClient({
                 <a
                   href={mainMapImage}
                   download="mumt-loveunit-salaya-campus-map.jpg"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--burgundy-600)] hover:bg-[var(--burgundy-700)] text-white px-3 py-1.5 text-xs font-extrabold transition-all cursor-pointer shadow-xs"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] text-white px-3 py-1.5 text-xs font-extrabold transition-all cursor-pointer shadow-xs active:scale-95 border border-white/20"
                 >
                   <Download className="h-3.5 w-3.5" />
                   <span>{isTh ? 'ดาวน์โหลดภาพ' : 'Download'}</span>
@@ -312,7 +312,7 @@ export function LocationClient({
                     className="object-contain transition-transform duration-300 group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 33vw"
                   />
-                  <span className="absolute top-2.5 left-2.5 rounded-full bg-[var(--burgundy-700)] px-2.5 py-0.5 text-[10px] font-black uppercase text-white shadow-md">
+                  <span className="absolute top-2.5 left-2.5 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-2.5 py-0.5 text-[10px] font-black uppercase text-white shadow-md border border-white/20">
                     {item.badge}
                   </span>
                   <span className="absolute top-2.5 right-2.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[var(--burgundy-700)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity">

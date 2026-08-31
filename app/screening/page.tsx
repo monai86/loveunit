@@ -116,18 +116,6 @@ export default function ScreeningPage() {
                 : 'Evaluate your physical readiness, health history, medications, and risk factors before donating blood for maximum donor and patient safety.'}
             </p>
           </div>
-
-          {!submitted && (
-            <button
-              type="button"
-              onClick={handleQuickFillHealthy}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--burgundy-700)] bg-[var(--rose-100)] hover:bg-[var(--rose-200)] border border-[var(--line)] px-3.5 py-2.5 rounded-xl transition-all self-start md:self-auto shrink-0 cursor-pointer"
-              title={isTh ? 'ตอบตามเกณฑ์มาตรฐานกรณีผู้บริจาคสุขภาพสมบูรณ์' : 'Simulate fully eligible donor'}
-            >
-              <Sparkles className="h-3.5 w-3.5 fill-[var(--burgundy-700)]" />
-              <span>{isTh ? 'ทดลองตรวจด่วน (สุขภาพสมบูรณ์)' : 'Quick Test (All Clear)'}</span>
-            </button>
-          )}
         </div>
       </div>
 
@@ -180,7 +168,7 @@ export default function ScreeningPage() {
               {result.canProceedToRegister ? (
                 <Link
                   href="/register"
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--burgundy-700)] hover:bg-[var(--burgundy-800)] text-white font-extrabold px-6 py-3 text-sm shadow-md transition-all active:scale-95"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] text-white font-extrabold px-6 py-3 text-sm shadow-md shadow-red-950/20 transition-all active:scale-95 border border-white/20"
                 >
                   <Heart className="h-4 w-4 fill-white" />
                   <span>{isTh ? 'ดำเนินการลงทะเบียนจองรอบเวลา' : 'Proceed to Registration'}</span>

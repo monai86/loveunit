@@ -160,7 +160,7 @@ export function HeroClient({
                     priority
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-4">
-                    <span className="text-xs font-bold text-white bg-[var(--burgundy-700)] px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-white bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 border border-white/20">
                       <span>{isEn ? 'Click to view full poster' : 'คลิกเพื่อดูโปสเตอร์เต็ม'}</span>
                       <ArrowRight className="h-3.5 w-3.5" />
                     </span>

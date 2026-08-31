@@ -209,7 +209,7 @@ export default function PosterPage() {
             </button>
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--burgundy-600)] px-5 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-[var(--burgundy-700)] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] px-5 py-2.5 text-xs font-extrabold text-white shadow-md shadow-red-950/20 active:scale-95 transition-all cursor-pointer border border-white/20"
             >
               <Heart className="h-4 w-4 fill-white" />
               <span>{isTh ? 'ลงทะเบียนออนไลน์' : 'Register Online'}</span>
@@ -291,7 +291,7 @@ export default function PosterPage() {
                     sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 95vw"
                     className="object-contain transition-transform duration-300 group-hover:scale-105"
                   />
-                  <span className="absolute top-2 left-2 rounded-full bg-[var(--burgundy-700)] px-2.5 py-0.5 text-[10px] font-black uppercase text-white shadow-md">
+                  <span className="absolute top-2 left-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-2.5 py-0.5 text-[10px] font-black uppercase text-white shadow-md border border-white/20">
                     {poster.badge}
                   </span>
                   <span className="absolute top-2 right-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[var(--burgundy-700)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity">

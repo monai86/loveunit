@@ -513,7 +513,7 @@ export function HomeSectionsClient() {
                   className="object-contain transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
-              <span className="absolute left-2.5 top-2.5 rounded-full bg-[var(--burgundy-700)] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-md">
+              <span className="absolute left-2.5 top-2.5 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-md border border-white/20">
                 {p.label}
               </span>
               <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-3 pb-2.5 pt-8 text-xs font-extrabold text-white flex items-center justify-between">

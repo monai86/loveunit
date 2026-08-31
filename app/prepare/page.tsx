@@ -64,7 +64,7 @@ export default function PreparePage() {
             </Link>
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--burgundy-600)] hover:bg-[var(--burgundy-700)] text-white font-extrabold px-5 py-2.5 text-xs shadow-md transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] text-white font-extrabold px-5 py-2.5 text-xs shadow-md shadow-red-950/20 active:scale-95 transition-all cursor-pointer border border-white/20"
             >
               <Heart className="h-4 w-4 fill-white" />
               <span>{isTh ? 'ลงทะเบียนออนไลน์' : 'Register Online'}</span>
