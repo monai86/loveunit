@@ -15,7 +15,6 @@ import {
   Microscope,
   Image as ImageIcon,
   ArrowRight,
-  Globe,
   Search,
 } from 'lucide-react';
 import { useLanguage, TRANSLATIONS } from '@/lib/i18n/LanguageContext';
@@ -168,14 +167,6 @@ export function Navbar() {
       {mobileMenuOpen && (
         <div id="public-mobile-menu" className="border-t border-[var(--line)] bg-[var(--bg)] px-4 py-4 shadow-xl xl:hidden animate-in slide-in-from-top-2 duration-150">
           <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between pb-2 border-b border-[var(--line)] px-2">
-              <span className="text-xs font-bold text-[var(--muted)] flex items-center gap-1.5">
-                <Globe className="h-3.5 w-3.5" />
-                <span>{isTh ? 'ภาษา / Language' : 'Language / ภาษา'}</span>
-              </span>
-              {langSwitcher}
-            </div>
-
             {navLinks.map((item) => {
               const Icon = item.icon;
               const isActive = mounted && (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
