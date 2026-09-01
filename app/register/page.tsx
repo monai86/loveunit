@@ -64,6 +64,10 @@ function RegisterContent() {
   const [waitlistLoading, setWaitlistLoading] = useState(false);
   const [waitlistMessage, setWaitlistMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // PR Channel state
+  const [selectedPrChannel, setSelectedPrChannel] = useState<string>('');
+  const [customPrChannel, setCustomPrChannel] = useState<string>('');
+
   // Form Fields
   const [formData, setFormData] = useState({
     firstName: '',
@@ -74,6 +78,7 @@ function RegisterContent() {
     faculty: MAHIDOL_FACULTIES[0].name,
     academicYear: ACADEMIC_YEARS[0].value,
     donationExperience: 'FIRST_TIME',
+    prChannel: '',
     timeSlotId: '',
     privacyAccepted: false,
   });
@@ -617,6 +622,76 @@ function RegisterContent() {
                     </div>
                   </div>
 
+                  {/* PR Source / Acquisition Channel (Optional) */}
+                  <div className="pt-2">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-bold text-gray-700">
+                        {tReg.prSource[language]}
+                      </label>
+                      <span className="text-[11px] text-gray-400 font-medium">
+                        {tReg.prSourceOptional[language]}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {[
+                        { id: 'Instagram', label: 'Instagram', icon: '📸' },
+                        { id: 'Facebook', label: 'Facebook', icon: '📘' },
+                        { id: 'LINE', label: 'LINE / OpenChat', icon: '💬' },
+                        { id: 'TikTok', label: 'TikTok', icon: '🎵' },
+                        { id: 'Poster', label: isTh ? 'โปสเตอร์ / ป้าย' : 'Poster / Banner', icon: '📢' },
+                        { id: 'PR_Walk', label: isTh ? 'ขบวนเดิน PR ในมอ' : 'On-campus PR', icon: '🚶' },
+                        { id: 'Referral', label: isTh ? 'เพื่อน / คนรู้จัก' : 'Friend Referral', icon: '👥' },
+                        { id: 'Other', label: isTh ? 'อื่นๆ' : 'Other', icon: '🌐' },
+                      ].map((pr) => {
+                        const isSelected = selectedPrChannel === pr.id;
+                        return (
+                          <button
+                            key={pr.id}
+                            type="button"
+                            onClick={() => {
+                              if (isSelected) {
+                                setSelectedPrChannel('');
+                                setFormData({ ...formData, prChannel: '' });
+                              } else {
+                                setSelectedPrChannel(pr.id);
+                                if (pr.id !== 'Other') {
+                                  setFormData({ ...formData, prChannel: pr.id });
+                                } else {
+                                  setFormData({ ...formData, prChannel: customPrChannel.trim() || (isTh ? 'อื่นๆ' : 'Other') });
+                                }
+                              }
+                            }}
+                            className={`py-2 px-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
+                              isSelected
+                                ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1.5 ring-[var(--burgundy-700)] shadow-2xs font-black'
+                                : 'border-gray-200 hover:border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                            }`}
+                          >
+                            <span className="text-sm">{pr.icon}</span>
+                            <span className="truncate">{pr.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {selectedPrChannel === 'Other' && (
+                      <div className="mt-2.5 animate-in fade-in-50 duration-150">
+                        <input
+                          type="text"
+                          value={customPrChannel}
+                          onChange={(e) => {
+                            setCustomPrChannel(e.target.value);
+                            setFormData({ ...formData, prChannel: e.target.value.trim() || (isTh ? 'อื่นๆ' : 'Other') });
+                          }}
+                          placeholder={tReg.prOtherPlaceholder[language]}
+                          maxLength={100}
+                          className="editorial-input text-xs sm:text-sm py-2 px-3 rounded-xl"
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   {/* If Walk-in mode, show PDPA Consent here in Step 2 (Frameless) */}
                   {isWalkInMode && (
                     <div className="mt-5 pt-4 border-t border-[var(--rose-100)] space-y-2.5">
@@ -816,6 +891,12 @@ function RegisterContent() {
                             </>
                           )}
                         </div>
+                        {formData.prChannel && (
+                          <div className="pt-1 text-[11px] text-gray-500 font-medium flex items-center gap-1">
+                            <span>📢 {isTh ? 'ทราบข่าวจาก:' : 'Heard via:'}</span>
+                            <span className="font-bold text-gray-700">{formData.prChannel}</span>
+                          </div>
+                        )}
                       </div>
                       <button
                         type="button"

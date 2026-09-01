@@ -15,6 +15,7 @@ export async function registerDonorAtomic(input: {
   faculty?: string;
   academicYear?: string;
   donationExperience: DonationExperience;
+  prChannel?: string | null;
   slotId: string;
   source?: RegistrationSource;
 }) {
@@ -102,6 +103,7 @@ export async function registerDonorAtomic(input: {
           faculty: input.faculty || null,
           academicYear: input.academicYear || null,
           donationExperience: input.donationExperience as DonationExperience,
+          prChannel: input.prChannel || null,
           slotId: input.slotId || null,
           status: 'REGISTERED',
           source: source as RegistrationSource,

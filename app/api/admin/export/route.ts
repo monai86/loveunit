@@ -104,6 +104,7 @@ export async function GET() {
       'คณะ/หน่วยงาน',
       'ชั้นปี',
       'ประสบการณ์การบริจาค',
+      'ช่องทางประชาสัมพันธ์',
       'รอบเวลา',
       'สถานะ',
       'แหล่งที่มา',
@@ -129,6 +130,7 @@ export async function GET() {
         pick(r, 'faculty', 'faculty') ?? '',
         pick(r, 'academicYear', 'academic_year') ?? '',
         pick(r, 'donationExperience', 'donation_experience') === 'FIRST_TIME' ? 'ครั้งแรก' : 'เคยบริจาค',
+        pick(r, 'prChannel', 'pr_channel') ?? 'ไม่ได้ระบุ',
         slotStart && slotEnd ? formatTimeRange(String(slotStart), String(slotEnd)) : 'ไม่ระบุ',
         getRegistrationStatusBadge(status as never).label,
         pick(r, 'source', 'source') === 'WALK_IN' ? 'Walk-in' : pick(r, 'source', 'source') === 'ADMIN' ? 'Admin' : 'ออนไลน์',
@@ -140,7 +142,7 @@ export async function GET() {
     const regSheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
     regSheet['!cols'] = [
       { wch: 14 }, { wch: 16 }, { wch: 16 }, { wch: 14 }, { wch: 24 },
-      { wch: 20 }, { wch: 28 }, { wch: 12 }, { wch: 16 }, { wch: 16 },
+      { wch: 20 }, { wch: 28 }, { wch: 12 }, { wch: 16 }, { wch: 24 }, { wch: 16 },
       { wch: 14 }, { wch: 10 }, { wch: 22 }, { wch: 22 },
     ];
     XLSX.utils.book_append_sheet(workbook, regSheet, 'รายชื่อผู้ลงทะเบียน');

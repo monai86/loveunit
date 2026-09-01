@@ -68,6 +68,7 @@ export async function POST(
       faculty: input.faculty || undefined,
       academicYear: input.academicYear || undefined,
       donationExperience: input.donationExperience as DonationExperience,
+      prChannel: input.prChannel || undefined,
       slotId: targetSlotId,
       source: source as 'ONLINE' | 'WALK_IN',
     });

@@ -93,6 +93,9 @@ export const TRANSLATIONS = {
     expFirstDesc: { th: 'ยังไม่เคยบริจาคโลหิตมาก่อน', en: 'Never donated blood before' },
     expRegular: { th: 'เคยบริจาคแล้ว', en: 'Regular Donor' },
     expRegularDesc: { th: 'เคยบริจาคโลหิตมาแล้วอย่างน้อย 1 ครั้ง', en: 'Have donated blood at least once before' },
+    prSource: { th: 'แหล่งข่าวสารที่ทำให้ทราบกิจกรรมนี้', en: 'How did you hear about this event?' },
+    prSourceOptional: { th: '(ไม่บังคับ)', en: '(Optional)' },
+    prOtherPlaceholder: { th: 'ระบุแหล่งข่าวสารอื่นๆ...', en: 'Please specify other source...' },
     
     // Step 3 Form
     section3: { th: '03. เลือกรอบเวลาเดินทาง', en: '03. Choose Arrival Time Slot' },

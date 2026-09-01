@@ -27,6 +27,7 @@ export const registrations = pgTable('registrations', {
   faculty: text('faculty'),
   academicYear: text('academic_year'),
   donationExperience: donationExperienceEnum('donation_experience').notNull(),
+  prChannel: text('pr_channel'),
   slotId: uuid('slot_id').references(() => timeSlots.id, { onDelete: 'set null' }),
   status: registrationStatusEnum('status').default('REGISTERED').notNull(),
   source: registrationSourceEnum('source').default('ONLINE').notNull(),

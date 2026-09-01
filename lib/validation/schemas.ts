@@ -18,6 +18,7 @@ export const publicRegistrationSchema = z.object({
   donationExperience: z.enum(['FIRST_TIME', 'RETURNING'], {
     message: 'กรุณาเลือกประสบการณ์การบริจาค',
   }),
+  prChannel: z.string().max(200).optional().nullable(),
   slotId: z.string().optional(),
   source: z.enum(['ONLINE', 'WALK_IN']).optional(),
   privacyAccepted: z.literal(true, {
@@ -43,6 +44,7 @@ export const walkInRegistrationSchema = z.object({
   faculty: z.string().optional(),
   academicYear: z.string().optional(),
   donationExperience: z.enum(['FIRST_TIME', 'RETURNING']),
+  prChannel: z.string().max(200).optional().nullable(),
 });
 
 export type WalkInRegistrationInput = z.infer<typeof walkInRegistrationSchema>;

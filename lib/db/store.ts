@@ -415,6 +415,7 @@ export async function registerDonorAtomic(input: {
   faculty?: string;
   academicYear?: string;
   donationExperience: DonationExperience;
+  prChannel?: string | null;
   slotId?: string | null;
   source?: 'ONLINE' | 'WALK_IN' | 'ADMIN';
 }): Promise<{ success: boolean; registration?: Registration; errorCode?: string; message?: string }> {
@@ -460,6 +461,7 @@ export async function registerDonorAtomic(input: {
       faculty: input.faculty || null,
       academic_year: input.academicYear || null,
       donation_experience: input.donationExperience,
+      pr_channel: input.prChannel || null,
       slot_id: input.slotId || null,
       status: 'REGISTERED',
       source: source,
@@ -702,23 +704,32 @@ export async function getDashboardKPIs(_eventId: string): Promise<DashboardKPIs>
     };
   });
 
-  return {
-    totalRegistrations,
-    expectedAttendance: totalRegistrations,
-    firstTimeDonors,
-    returningDonors,
-    studentsCount,
-    staffCount,
-    generalPublicCount,
-    checkedInCount,
-    walkInCount,
-    inProcessCount,
-    completedCount,
-    cancelledCount,
-    noShowCount,
-    attendanceRatePercent,
-    slotBreakdown,
-  };
+    const prChannelBreakdown: Record<string, number> = {};
+    for (const r of regs) {
+      if (r.status !== 'CANCELLED') {
+        const channel = r.pr_channel || 'ไม่ได้ระบุ';
+        prChannelBreakdown[channel] = (prChannelBreakdown[channel] || 0) + 1;
+      }
+    }
+
+    return {
+      totalRegistrations,
+      expectedAttendance: totalRegistrations,
+      firstTimeDonors,
+      returningDonors,
+      studentsCount,
+      staffCount,
+      generalPublicCount,
+      checkedInCount,
+      walkInCount,
+      inProcessCount,
+      completedCount,
+      cancelledCount,
+      noShowCount,
+      attendanceRatePercent,
+      slotBreakdown,
+      prChannelBreakdown,
+    };
 }
 
 export async function logAuditAction(action: string, entityType: string, entityId: string, actorId?: string, metadata?: Record<string, unknown>) {

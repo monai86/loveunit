@@ -47,6 +47,7 @@ export async function POST(request: Request) {
       faculty: input.faculty || undefined,
       academicYear: input.academicYear || undefined,
       donationExperience: input.donationExperience as DonationExperience,
+      prChannel: input.prChannel || undefined,
       slotId: targetSlotId,
       source: 'WALK_IN',
     });

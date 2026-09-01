@@ -14,7 +14,8 @@ import {
   QrCode,
   Download,
   GraduationCap,
-  RefreshCw
+  RefreshCw,
+  Megaphone
 } from 'lucide-react';
 import { getParticipantTypeLabel, getRegistrationStatusBadge, formatTimeRange, formatBangkokTime, isWalkInRecord } from '@/lib/utils/format';
 import { RegistrationStatus, ParticipantType, DashboardKPIs } from '@/lib/types/database';
@@ -397,6 +398,68 @@ export function AdminDashboardClient({
         </div>
 
       </section>
+
+      {/* ============ PR CHANNELS & MARKETING ATTRIBUTION ============ */}
+      {kpis.prChannelBreakdown && Object.keys(kpis.prChannelBreakdown).length > 0 && (
+        <section className="editorial-card p-5 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+            <div className="space-y-0.5">
+              <h3 className="text-sm font-black text-[var(--ink)] flex items-center gap-2">
+                <Megaphone className="h-4 w-4 text-[var(--burgundy-700)]" />
+                <span>แหล่งข่าวสารการประชาสัมพันธ์ (PR Channel Attribution)</span>
+              </h3>
+              <p className="text-[11px] text-[var(--muted)]">
+                สถิติช่องทางที่ทำให้ผู้บริจาคทราบข่าวกิจกรรม (สำหรับวัดผลการประชาสัมพันธ์)
+              </p>
+            </div>
+            <span className="text-xs font-mono font-bold text-[var(--burgundy-700)] bg-[var(--rose-100)] px-2.5 py-1 rounded-lg border border-[var(--line)]">
+              {Object.values(kpis.prChannelBreakdown).reduce((a, b) => a + b, 0)} คน
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {Object.entries(kpis.prChannelBreakdown)
+              .sort(([, a], [, b]) => b - a)
+              .map(([channel, count]) => {
+                const total = Object.values(kpis.prChannelBreakdown!).reduce((a, b) => a + b, 0);
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                
+                const getIcon = (ch: string) => {
+                  if (ch.includes('Instagram')) return '📸';
+                  if (ch.includes('Facebook')) return '📘';
+                  if (ch.includes('LINE')) return '💬';
+                  if (ch.includes('TikTok')) return '🎵';
+                  if (ch.includes('Poster') || ch.includes('โปสเตอร์')) return '📢';
+                  if (ch.includes('PR_Walk') || ch.includes('เดิน')) return '🚶';
+                  if (ch.includes('Referral') || ch.includes('เพื่อน') || ch.includes('รู้จัก')) return '👥';
+                  return '🌐';
+                };
+
+                return (
+                  <div key={channel} className="p-3.5 rounded-xl bg-gray-50/80 border border-gray-200/80 space-y-2 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-base">{getIcon(channel)}</span>
+                      <span className="font-mono text-xs font-black text-[var(--burgundy-800)] bg-white px-2 py-0.5 rounded-md border border-gray-200">
+                        {count} คน ({pct}%)
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-bold text-gray-900 block truncate" title={channel}>
+                        {channel}
+                      </span>
+                      <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden mt-1.5">
+                        <div
+                          className="h-full bg-gradient-to-r from-[var(--burgundy-600)] to-[var(--burgundy-800)] rounded-full transition-all duration-500"
+                          style={{ width: `${Math.max(pct, count > 0 ? 8 : 0)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </section>
+      )}
 
       {/* ============ SECTION 3: RECENT REGISTRATIONS ============ */}
       <section className="editorial-card p-5 sm:p-6 space-y-4">

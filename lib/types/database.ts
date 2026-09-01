@@ -63,6 +63,7 @@ export interface Registration {
   faculty: string | null;
   academic_year: string | null;
   donation_experience: DonationExperience;
+  pr_channel?: string | null;
   slot_id: string | null;
   status: RegistrationStatus;
   source: RegistrationSource;
@@ -140,4 +141,5 @@ export interface DashboardKPIs {
     bookedCount: number;
     checkedInCount: number;
   }>;
+  prChannelBreakdown?: Record<string, number>;
 }
