@@ -18,7 +18,7 @@ export async function GET(
     const slots = await getTimeSlots(event.id);
     return NextResponse.json({ event, slots }, {
       headers: {
-        'Cache-Control': 'public, max-age=5, s-maxage=5, stale-while-revalidate=10',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
       },
     });
 

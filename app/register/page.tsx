@@ -85,7 +85,7 @@ function RegisterContent() {
     let ignore = false;
     async function fetchSlots() {
       try {
-        const res = await fetch('/api/events/mumt-2026/slots');
+        const res = await fetch('/api/events/mumt-2026/slots', { cache: 'no-store' });
         if (ignore) return;
         if (res.ok) {
           const data = await res.json();
@@ -617,27 +617,25 @@ function RegisterContent() {
                     </div>
                   </div>
 
-                  {/* If Walk-in mode, show PDPA Consent here in Step 2 */}
+                  {/* If Walk-in mode, show PDPA Consent here in Step 2 (Frameless) */}
                   {isWalkInMode && (
-                    <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50/80 p-3.5 space-y-2.5">
-                      <div className="flex items-start gap-2.5">
-                        <ShieldCheck className="h-4.5 w-4.5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
-                        <div className="space-y-1">
-                          <h4 className="text-xs font-bold text-gray-900">
-                            {tReg.privacyNotice.title[language]}
-                          </h4>
-                          <p className="text-[11px] text-gray-600 leading-relaxed break-words">
-                            {tReg.privacyNotice.body[language]}
-                          </p>
-                        </div>
+                    <div className="mt-5 pt-4 border-t border-[var(--rose-100)] space-y-2.5">
+                      <div className="flex items-start gap-2 text-[var(--burgundy-700)]">
+                        <ShieldCheck className="h-4.5 w-4.5 shrink-0 mt-0.5" />
+                        <h4 className="text-xs font-bold text-gray-900">
+                          {tReg.privacyNotice.title[language]}
+                        </h4>
                       </div>
+                      <p className="text-[11.5px] text-gray-600 leading-relaxed break-words pl-6.5">
+                        {tReg.privacyNotice.body[language]}
+                      </p>
 
-                      <label className="flex items-start gap-2.5 p-2.5 rounded-lg border border-gray-200 bg-white cursor-pointer select-none shadow-2xs hover:border-[var(--burgundy-700)] transition-all">
+                      <label className="flex items-start gap-2.5 pt-1 pl-6.5 cursor-pointer select-none">
                         <input
                           type="checkbox"
                           checked={formData.privacyAccepted}
                           onChange={(e) => setFormData({ ...formData, privacyAccepted: e.target.checked })}
-                          className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0"
+                          className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0 rounded cursor-pointer"
                         />
                         <span className="text-xs leading-relaxed font-bold text-gray-800 break-words">
                           {tReg.privacyNotice.accept[language]}
@@ -727,26 +725,24 @@ function RegisterContent() {
                     </div>
                   )}
 
-                  {/* PRIVACY CONSENT */}
-                  <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50/80 p-3.5 space-y-2.5">
-                    <div className="flex items-start gap-2.5">
-                      <ShieldCheck className="h-4.5 w-4.5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
-                      <div className="space-y-1">
-                        <h4 className="text-xs font-bold text-gray-900">
-                          {tReg.privacyNotice.title[language]}
-                        </h4>
-                        <p className="text-[11px] text-gray-600 leading-relaxed break-words">
-                          {tReg.privacyNotice.body[language]}
-                        </p>
-                      </div>
+                  {/* PRIVACY CONSENT - Frameless */}
+                  <div className="mt-5 pt-4 border-t border-[var(--rose-100)] space-y-2.5">
+                    <div className="flex items-start gap-2 text-[var(--burgundy-700)]">
+                      <ShieldCheck className="h-4.5 w-4.5 shrink-0 mt-0.5" />
+                      <h4 className="text-xs font-bold text-gray-900">
+                        {tReg.privacyNotice.title[language]}
+                      </h4>
                     </div>
+                    <p className="text-[11.5px] text-gray-600 leading-relaxed break-words pl-6.5">
+                      {tReg.privacyNotice.body[language]}
+                    </p>
 
-                    <label className="flex items-start gap-2.5 p-2.5 rounded-lg border border-gray-200 bg-white cursor-pointer select-none shadow-2xs hover:border-[var(--burgundy-700)] transition-all">
+                    <label className="flex items-start gap-2.5 pt-1 pl-6.5 cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={formData.privacyAccepted}
                         onChange={(e) => setFormData({ ...formData, privacyAccepted: e.target.checked })}
-                        className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0"
+                        className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0 rounded cursor-pointer"
                       />
                       <span className="text-xs leading-relaxed font-bold text-gray-800 break-words">
                         {tReg.privacyNotice.accept[language]}
