@@ -43,13 +43,11 @@ async function main() {
     WHERE id = ${eventId} OR slug = 'mumt-2026';
   `;
 
-  // 2. Define 5 Official Slots with UNLIMITED capacity (9999)
+  // 2. Define 3 Official Wide Arrival Windows with UNLIMITED capacity (9999)
   const officialSlots = [
-    { id: '11111111-1111-1111-1111-111111111101', start: '2026-09-16T09:00:00+07:00', end: '2026-09-16T10:00:00+07:00', cap: 9999 },
-    { id: '11111111-1111-1111-1111-111111111102', start: '2026-09-16T10:00:00+07:00', end: '2026-09-16T11:00:00+07:00', cap: 9999 },
-    { id: '11111111-1111-1111-1111-111111111103', start: '2026-09-16T11:00:00+07:00', end: '2026-09-16T12:00:00+07:00', cap: 9999 },
-    { id: '11111111-1111-1111-1111-111111111104', start: '2026-09-16T12:00:00+07:00', end: '2026-09-16T13:00:00+07:00', cap: 9999 },
-    { id: '11111111-1111-1111-1111-111111111105', start: '2026-09-16T13:00:00+07:00', end: '2026-09-16T14:00:00+07:00', cap: 9999 },
+    { id: '11111111-1111-1111-1111-111111111101', start: '2026-09-16T09:00:00+07:00', end: '2026-09-16T11:00:00+07:00', cap: 9999 },
+    { id: '11111111-1111-1111-1111-111111111102', start: '2026-09-16T11:00:00+07:00', end: '2026-09-16T13:00:00+07:00', cap: 9999 },
+    { id: '11111111-1111-1111-1111-111111111103', start: '2026-09-16T13:00:00+07:00', end: '2026-09-16T14:00:00+07:00', cap: 9999 },
   ];
 
   for (const slot of officialSlots) {
@@ -70,13 +68,13 @@ async function main() {
   await sql`
     UPDATE registrations
     SET slot_id = '11111111-1111-1111-1111-111111111101'
-    WHERE event_id = ${eventId} AND slot_id IS NOT NULL AND slot_id NOT IN (${officialIds[0]}, ${officialIds[1]}, ${officialIds[2]}, ${officialIds[3]}, ${officialIds[4]});
+    WHERE event_id = ${eventId} AND slot_id IS NOT NULL AND slot_id NOT IN (${officialIds[0]}, ${officialIds[1]}, ${officialIds[2]});
   `;
 
   // 4. Delete obsolete slots
   await sql`
     DELETE FROM time_slots
-    WHERE event_id = ${eventId} AND id NOT IN (${officialIds[0]}, ${officialIds[1]}, ${officialIds[2]}, ${officialIds[3]}, ${officialIds[4]});
+    WHERE event_id = ${eventId} AND id NOT IN (${officialIds[0]}, ${officialIds[1]}, ${officialIds[2]});
   `;
 
   // 5. Recalculate booked_count on all slots
