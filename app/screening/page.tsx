@@ -320,7 +320,7 @@ export default function ScreeningPage() {
             </div>
 
             {/* Category Tabs (3 Categories) */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
               {SCREENING_CATEGORIES.map((cat, idx) => {
                 const isActive = idx === currentCategoryIndex;
                 const isDone = OFFICIAL_SCREENING_QUESTIONS.filter((q) => q.category === cat.id).every(
@@ -334,21 +334,21 @@ export default function ScreeningPage() {
                     key={cat.id}
                     type="button"
                     onClick={() => setCurrentCategoryIndex(idx)}
-                    className={`p-4 rounded-xl border text-left text-xs sm:text-sm font-bold transition-all flex flex-col justify-between cursor-pointer ${
+                    className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between cursor-pointer ${
                       isActive
-                        ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs ring-2 ring-[var(--burgundy-700)]'
+                        ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-2xs ring-1.5 ring-[var(--burgundy-700)]'
                         : isDone
                         ? 'border-emerald-200 bg-emerald-50/50 text-emerald-900'
                         : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-1 mb-1.5">
-                      <span className="text-[11px] font-black uppercase text-gray-400 font-mono">
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <span className="text-[10px] font-bold uppercase text-gray-400 font-mono">
                         {isTh ? `หมวด ${idx + 1}` : `Part ${idx + 1}`}
                       </span>
-                      {isDone && <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
+                      {isDone && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />}
                     </div>
-                    <span className="font-black text-sm sm:text-base leading-snug break-words">{shortTitle}</span>
+                    <span className="font-bold text-xs sm:text-sm leading-snug break-words">{shortTitle}</span>
                   </button>
                 );
               })}
@@ -356,21 +356,21 @@ export default function ScreeningPage() {
           </div>
 
           {/* Current Category Questions Card */}
-          <div className="editorial-card p-6 sm:p-8 space-y-6">
-            <div className="space-y-1.5 border-b border-[var(--line)] pb-4">
-              <span className="text-xs font-mono font-bold text-[var(--burgundy-700)] uppercase block">
+          <div className="editorial-card p-5 sm:p-7 space-y-5">
+            <div className="space-y-1 border-b border-[var(--line)] pb-3">
+              <span className="text-[11px] font-mono font-bold text-[var(--burgundy-700)] uppercase block">
                 PART {currentCategoryIndex + 1} OF {SCREENING_CATEGORIES.length}
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-editorial-ink leading-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-editorial-ink leading-snug">
                 {isEn ? (activeCategory.titleEn || activeCategory.title) : activeCategory.title}
               </h2>
-              <p className="text-xs sm:text-sm text-editorial-muted leading-relaxed">
+              <p className="text-xs sm:text-[13px] text-editorial-muted leading-relaxed">
                 {isEn ? (activeCategory.descEn || activeCategory.desc) : activeCategory.desc}
               </p>
             </div>
 
             {/* Question Items */}
-            <div className="space-y-5">
+            <div className="space-y-3.5">
               {categoryQuestions.map((q) => {
                 const currentVal = answers[q.id];
                 const qText = isEn ? (q.questionEn || q.question) : q.question;
@@ -379,7 +379,7 @@ export default function ScreeningPage() {
                 return (
                   <div
                     key={q.id}
-                    className={`p-4 sm:p-6 rounded-2xl border transition-all ${
+                    className={`p-3.5 sm:p-4 rounded-xl border transition-all ${
                       currentVal === undefined
                         ? 'border-gray-200 bg-white hover:border-gray-300'
                         : currentVal === q.idealAnswer
@@ -387,18 +387,18 @@ export default function ScreeningPage() {
                         : 'border-amber-200 bg-amber-50/30'
                     }`}
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                      <div className="space-y-1 flex-1">
-                        <div className="flex items-start gap-3">
-                          <span className="h-7 w-7 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center text-xs sm:text-sm font-mono font-bold shrink-0 mt-0.5">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="space-y-0.5 flex-1">
+                        <div className="flex items-start gap-2.5">
+                          <span className="h-6 w-6 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5">
                             {q.number}
                           </span>
                           <div>
-                            <p className="text-base sm:text-lg font-extrabold text-[var(--ink)] leading-snug break-words">
+                            <p className="text-sm sm:text-[15px] font-bold text-[var(--ink)] leading-snug break-words">
                               {qText}
                             </p>
                             {qSub && (
-                              <p className="text-xs sm:text-sm text-[var(--muted)] font-medium mt-1.5 leading-relaxed break-words">
+                              <p className="text-xs text-[var(--muted)] font-normal mt-1 leading-normal break-words">
                                 {qSub}
                               </p>
                             )}
@@ -407,13 +407,13 @@ export default function ScreeningPage() {
                       </div>
 
                       {/* Yes / No Choice Buttons */}
-                      <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center mt-2 sm:mt-0">
+                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-center mt-1 sm:mt-0">
                         <button
                           type="button"
                           onClick={() => handleSelectAnswer(q.id, true)}
-                          className={`px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+                          className={`px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                             currentVal === true
-                              ? 'bg-[var(--burgundy-700)] text-white shadow-md scale-105'
+                              ? 'bg-[var(--burgundy-700)] text-white shadow-xs scale-102'
                               : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                           }`}
                         >
@@ -422,9 +422,9 @@ export default function ScreeningPage() {
                         <button
                           type="button"
                           onClick={() => handleSelectAnswer(q.id, false)}
-                          className={`px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer ${
+                          className={`px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                             currentVal === false
-                              ? 'bg-[var(--burgundy-700)] text-white shadow-md scale-105'
+                              ? 'bg-[var(--burgundy-700)] text-white shadow-xs scale-102'
                               : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                           }`}
                         >
@@ -438,12 +438,12 @@ export default function ScreeningPage() {
             </div>
 
             {/* Category Navigation Footer */}
-            <div className="pt-6 border-t border-[var(--line)] flex items-center justify-between">
+            <div className="pt-5 border-t border-[var(--line)] flex items-center justify-between">
               {currentCategoryIndex > 0 ? (
                 <button
                   type="button"
                   onClick={handlePrevCategory}
-                  className="editorial-btn-secondary text-xs sm:text-sm py-3 px-5 cursor-pointer"
+                  className="editorial-btn-secondary text-xs py-2.5 px-4 cursor-pointer rounded-xl"
                 >
                   <span>{isTh ? '← หมวดก่อนหน้า' : '← Previous'}</span>
                 </button>
@@ -455,7 +455,7 @@ export default function ScreeningPage() {
                 <button
                   type="button"
                   onClick={handleNextCategory}
-                  className="editorial-btn-primary text-xs sm:text-sm py-3 px-6 ml-auto cursor-pointer"
+                  className="editorial-btn-primary text-xs sm:text-sm font-bold py-2.5 px-5 ml-auto cursor-pointer rounded-xl"
                 >
                   <span>{isTh ? 'หมวดถัดไป →' : 'Next Part →'}</span>
                 </button>
@@ -463,7 +463,7 @@ export default function ScreeningPage() {
                 <button
                   type="button"
                   onClick={handleEvaluate}
-                  className="editorial-btn-primary text-xs sm:text-sm py-3.5 px-8 ml-auto flex items-center gap-2 cursor-pointer"
+                  className="editorial-btn-primary text-xs sm:text-sm font-bold py-2.5 px-6 ml-auto flex items-center gap-1.5 cursor-pointer rounded-xl"
                 >
                   <ShieldCheck className="h-4 w-4" />
                   <span>{isTh ? 'สรุปผลการประเมินความพร้อม' : 'Calculate Readiness'}</span>

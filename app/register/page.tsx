@@ -414,16 +414,16 @@ function RegisterContent() {
               
               {/* STEP 1: PERSONAL INFO */}
               {step === 1 && (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   <div className="border-b border-[var(--rose-100)] pb-2 flex items-baseline justify-between">
-                    <h3 className="text-sm sm:text-base font-black text-[var(--burgundy-700)] uppercase tracking-wider">
+                    <h3 className="text-sm font-bold text-[var(--burgundy-700)] uppercase tracking-wider font-mono">
                       {tReg.section1[language]}
                     </h3>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                      <label htmlFor="reg-firstName" className="block text-sm font-bold text-editorial-ink mb-1.5">
+                      <label htmlFor="reg-firstName" className="block text-xs font-bold text-gray-700 mb-1">
                         {tReg.firstName[language]} <span className="text-red-600">*</span>
                       </label>
                       <input
@@ -433,12 +433,12 @@ function RegisterContent() {
                         placeholder={tReg.firstNamePlaceholder[language]}
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                        className="editorial-input text-base py-3 px-3.5"
+                        className="editorial-input text-sm py-2.5 px-3 rounded-xl"
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="reg-lastName" className="block text-sm font-bold text-editorial-ink mb-1.5">
+                      <label htmlFor="reg-lastName" className="block text-xs font-bold text-gray-700 mb-1">
                         {tReg.lastName[language]} <span className="text-red-600">*</span>
                       </label>
                       <input
@@ -448,13 +448,13 @@ function RegisterContent() {
                         placeholder={tReg.lastNamePlaceholder[language]}
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                        className="editorial-input text-base py-3 px-3.5"
+                        className="editorial-input text-sm py-2.5 px-3 rounded-xl"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="reg-phone" className="block text-sm font-bold text-editorial-ink mb-1.5">
+                    <label htmlFor="reg-phone" className="block text-xs font-bold text-gray-700 mb-1">
                       {tReg.phone[language]} <span className="text-red-600">*</span>
                     </label>
                     <input
@@ -464,9 +464,9 @@ function RegisterContent() {
                       placeholder={tReg.phonePlaceholder[language]}
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="editorial-input text-base font-mono py-3 px-3.5"
+                      className="editorial-input text-sm font-mono py-2.5 px-3 rounded-xl"
                     />
-                    <p className="mt-1.5 text-xs sm:text-sm text-editorial-muted font-medium flex items-center flex-wrap gap-1">
+                    <p className="mt-1 text-[11px] text-editorial-muted font-medium flex items-center flex-wrap gap-1">
                       <span>{tReg.phoneHelp[language]}</span>
                       <Link href="/lookup" className="font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-0.5">
                         ({tReg.forgotPassLink[language]})
@@ -475,7 +475,7 @@ function RegisterContent() {
                   </div>
 
                   <div>
-                    <label htmlFor="reg-email" className="block text-sm font-bold text-editorial-ink mb-1.5">
+                    <label htmlFor="reg-email" className="block text-xs font-bold text-gray-700 mb-1">
                       {tReg.email[language]}
                     </label>
                     <input
@@ -484,9 +484,9 @@ function RegisterContent() {
                       placeholder={tReg.emailPlaceholder[language]}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="editorial-input text-base py-3 px-3.5"
+                      className="editorial-input text-sm py-2.5 px-3 rounded-xl"
                     />
-                    <p className="mt-1.5 text-xs sm:text-sm text-editorial-muted font-medium">
+                    <p className="mt-1 text-[11px] text-editorial-muted font-medium">
                       {tReg.emailHelp[language]}
                     </p>
                   </div>
@@ -495,18 +495,18 @@ function RegisterContent() {
 
               {/* STEP 2: FACULTY & AFFILIATION */}
               {step === 2 && (
-                <div className="space-y-5">
+                <div className="space-y-4">
                   <div className="border-b border-[var(--rose-100)] pb-2 flex items-baseline justify-between">
-                    <h3 className="text-sm sm:text-base font-black text-[var(--burgundy-700)] uppercase tracking-wider">
+                    <h3 className="text-sm font-bold text-[var(--burgundy-700)] uppercase tracking-wider font-mono">
                       {tReg.section2[language]}
                     </h3>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-editorial-ink mb-2">
+                    <label className="block text-xs font-bold text-gray-700 mb-1.5">
                       {tReg.participantType[language]} <span className="text-red-600">*</span>
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                       {PARTICIPANT_TYPES.map((type) => (
                         <button
                           key={type.id}
@@ -520,13 +520,13 @@ function RegisterContent() {
                               academicYear: isGeneral ? '' : formData.academicYear
                             });
                           }}
-                          className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+                          className={`py-2.5 px-3 rounded-xl border text-center transition-all cursor-pointer flex items-center justify-center min-h-[46px] ${
                             formData.participantType === type.id
-                              ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-2 ring-[var(--burgundy-700)] shadow-xs'
-                              : 'border-gray-200 hover:border-gray-300 text-editorial-ink bg-white'
+                              ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1.5 ring-[var(--burgundy-700)] shadow-2xs font-bold'
+                              : 'border-gray-200 hover:border-gray-300 text-editorial-ink bg-white font-medium'
                           }`}
                         >
-                          <p className="text-sm sm:text-base font-black leading-snug break-words">{type.name}</p>
+                          <span className="text-xs sm:text-[13px] leading-tight break-words">{type.name}</span>
                         </button>
                       ))}
                     </div>
@@ -535,14 +535,14 @@ function RegisterContent() {
                   {/* Faculty selector — only for Students and University Staff */}
                   {formData.participantType !== 'GENERAL_PUBLIC' && (
                     <div>
-                      <label htmlFor="reg-faculty" className="block text-sm font-bold text-editorial-ink mb-1.5">
+                      <label htmlFor="reg-faculty" className="block text-xs font-bold text-gray-700 mb-1">
                         {tReg.faculty[language]} <span className="text-red-600">*</span>
                       </label>
                       <select
                         id="reg-faculty"
                         value={formData.faculty}
                         onChange={(e) => setFormData({ ...formData, faculty: e.target.value })}
-                        className="editorial-input text-base py-3 px-3.5"
+                        className="editorial-input text-xs sm:text-sm py-2.5 px-3 rounded-xl"
                       >
                         <option value="">-- {tReg.selectFaculty[language]} --</option>
                         {MAHIDOL_FACULTIES.map((fac) => (
@@ -556,14 +556,14 @@ function RegisterContent() {
 
                   {formData.participantType === 'STUDENT' && (
                     <div>
-                      <label htmlFor="reg-academicYear" className="block text-sm font-bold text-editorial-ink mb-1.5">
+                      <label htmlFor="reg-academicYear" className="block text-xs font-bold text-gray-700 mb-1">
                         {tReg.academicYear[language]} <span className="text-red-600">*</span>
                       </label>
                       <select
                         id="reg-academicYear"
                         value={formData.academicYear}
                         onChange={(e) => setFormData({ ...formData, academicYear: e.target.value })}
-                        className="editorial-input text-base py-3 px-3.5"
+                        className="editorial-input text-xs sm:text-sm py-2.5 px-3 rounded-xl"
                       >
                         <option value="">-- {tReg.selectYear[language]} --</option>
                         {ACADEMIC_YEARS.map((yr) => (
@@ -576,10 +576,10 @@ function RegisterContent() {
                   )}
 
                   <div>
-                    <label className="block text-sm font-bold text-editorial-ink mb-2">
+                    <label className="block text-xs font-bold text-gray-700 mb-1.5">
                       {tReg.donationExp[language]} <span className="text-red-600">*</span>
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {[
                         { 
                           id: 'FIRST_TIME', 
@@ -600,16 +600,16 @@ function RegisterContent() {
                             key={exp.id}
                             type="button"
                             onClick={() => setFormData({ ...formData, donationExperience: exp.id })}
-                            className={`p-4 rounded-xl border text-left transition-all flex items-start gap-3.5 cursor-pointer ${
+                            className={`p-3.5 rounded-xl border text-left transition-all flex items-start gap-3 cursor-pointer ${
                               formData.donationExperience === exp.id
-                                ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-2 ring-[var(--burgundy-700)] shadow-xs'
+                                ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1.5 ring-[var(--burgundy-700)] shadow-2xs'
                                 : 'border-gray-200 hover:border-gray-300 text-[var(--ink)] bg-white'
                             }`}
                           >
-                            <ExpIcon className="h-5 w-5 shrink-0 mt-0.5 text-[var(--burgundy-700)]" />
+                            <ExpIcon className="h-4 w-4 shrink-0 mt-0.5 text-[var(--burgundy-700)]" />
                             <div>
-                              <span className="text-sm sm:text-base font-black block leading-snug break-words">{exp.title}</span>
-                              <span className="text-xs sm:text-sm text-gray-500 block font-normal mt-1 leading-relaxed break-words">{exp.desc}</span>
+                              <span className="text-xs sm:text-sm font-bold block leading-snug">{exp.title}</span>
+                              <span className="text-[11px] text-gray-500 block font-normal mt-0.5 leading-normal">{exp.desc}</span>
                             </div>
                           </button>
                         );
@@ -619,27 +619,27 @@ function RegisterContent() {
 
                   {/* If Walk-in mode, show PDPA Consent here in Step 2 */}
                   {isWalkInMode && (
-                    <div className="mt-5 rounded-2xl border border-gray-200 bg-gray-50/80 p-5 space-y-3.5">
-                      <div className="flex items-start gap-3">
-                        <ShieldCheck className="h-5 w-5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
-                        <div className="space-y-1.5">
-                          <h4 className="text-sm sm:text-base font-black text-gray-900">
+                    <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50/80 p-3.5 space-y-2.5">
+                      <div className="flex items-start gap-2.5">
+                        <ShieldCheck className="h-4.5 w-4.5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
+                        <div className="space-y-1">
+                          <h4 className="text-xs font-bold text-gray-900">
                             {tReg.privacyNotice.title[language]}
                           </h4>
-                          <p className="text-xs sm:text-sm text-gray-700 leading-relaxed break-words">
+                          <p className="text-[11px] text-gray-600 leading-relaxed break-words">
                             {tReg.privacyNotice.body[language]}
                           </p>
                         </div>
                       </div>
 
-                      <label className="flex items-start gap-3 p-3.5 rounded-xl border border-gray-200 bg-white cursor-pointer select-none shadow-2xs hover:border-[var(--burgundy-700)] transition-all">
+                      <label className="flex items-start gap-2.5 p-2.5 rounded-lg border border-gray-200 bg-white cursor-pointer select-none shadow-2xs hover:border-[var(--burgundy-700)] transition-all">
                         <input
                           type="checkbox"
                           checked={formData.privacyAccepted}
                           onChange={(e) => setFormData({ ...formData, privacyAccepted: e.target.checked })}
-                          className="mt-1 h-4 w-4 accent-[var(--burgundy-700)] shrink-0"
+                          className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0"
                         />
-                        <span className="text-xs sm:text-sm leading-relaxed font-bold text-gray-900 break-words">
+                        <span className="text-xs leading-relaxed font-bold text-gray-800 break-words">
                           {tReg.privacyNotice.accept[language]}
                           <span className="text-red-600 font-bold ml-1">*</span>
                         </span>
@@ -651,35 +651,35 @@ function RegisterContent() {
 
               {/* STEP 3: TIME SLOT SELECTION (Advance Mode Only) */}
               {!isWalkInMode && step === 3 && (
-                <div className="space-y-5">
-                  <div className="space-y-1.5 border-b border-[var(--rose-100)] pb-2">
-                    <h3 className="text-sm sm:text-base font-black text-[var(--burgundy-700)] uppercase tracking-wider">
+                <div className="space-y-4">
+                  <div className="space-y-1 border-b border-[var(--rose-100)] pb-2">
+                    <h3 className="text-sm font-bold text-[var(--burgundy-700)] uppercase tracking-wider font-mono">
                       {tReg.section3[language]}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed break-words">
+                    <p className="text-xs text-[var(--muted)] leading-relaxed break-words">
                       {tReg.slotNotice[language]}
                     </p>
                   </div>
 
                   {/* 100 Exclusive Gifts Notice */}
-                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-200/80 space-y-1.5 shadow-xs">
-                    <div className="flex items-center gap-2 font-black text-amber-950 text-xs sm:text-sm">
-                      <Sparkles className="h-4.5 w-4.5 text-amber-600 shrink-0" />
+                  <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-200/80 space-y-1 shadow-2xs">
+                    <div className="flex items-center gap-2 font-bold text-amber-950 text-xs">
+                      <Sparkles className="h-4 w-4 text-amber-600 shrink-0" />
                       <span className="break-words">
                         🎁 {isTh ? 'สิทธิพิเศษ: ผู้ลงทะเบียน 100 ท่านแรกที่เช็กอินตรงเวลาและบริจาคสำเร็จ จะได้รับของที่ระลึกสุดพิเศษ' : 'Special: First 100 on-time check-in donors who complete donation will receive exclusive souvenirs'}
                       </span>
                     </div>
-                    <p className="text-xs sm:text-sm text-amber-900 leading-relaxed font-medium break-words">
+                    <p className="text-[11px] text-amber-900 leading-relaxed font-medium break-words">
                       {isTh ? 'โปรดเลือกช่วงเวลาที่สะดวก และมาถึงเพื่อเช็กอินภายในรอบเวลาที่ลงทะเบียนไว้' : 'Please select your preferred time slot and arrive for check-in on time.'}
                     </p>
                   </div>
 
                   {slotsLoading ? (
-                    <div className="py-8 text-center text-sm font-bold text-editorial-muted">
+                    <div className="py-6 text-center text-xs font-bold text-editorial-muted">
                       {tReg.errSlotLoad[language]}
                     </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-2.5">
                       {timeSlots.map((slot) => {
                         const isSelected = formData.timeSlotId === slot.id;
                         const isSelectable = isTimeSlotSelectable(slot);
@@ -692,19 +692,19 @@ function RegisterContent() {
                               if (!isSelectable) return;
                               setFormData({ ...formData, timeSlotId: slot.id });
                             }}
-                            className={`w-full p-4 sm:p-5 rounded-xl border text-left text-xs sm:text-sm font-bold transition-all flex items-center justify-between cursor-pointer ${
+                            className={`w-full p-3.5 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
                               !isSelectable
                                 ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed opacity-75'
                                 : isSelected
-                                ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-2 ring-[var(--burgundy-700)] shadow-sm'
+                                ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1.5 ring-[var(--burgundy-700)] shadow-2xs'
                                 : 'border-gray-200 bg-white hover:border-[var(--burgundy-700)] text-editorial-ink'
                             }`}
                           >
-                            <div className="flex items-center gap-3.5">
-                              <Clock className={`h-5 w-5 ${isSelected ? 'text-[var(--burgundy-700)]' : 'text-gray-400'}`} />
+                            <div className="flex items-center gap-3">
+                              <Clock className={`h-4.5 w-4.5 ${isSelected ? 'text-[var(--burgundy-700)]' : 'text-gray-400'}`} />
                               <div>
-                                <span className="text-base sm:text-lg font-black block font-mono">{slot.timeSlot}</span>
-                                <span className="text-xs sm:text-sm font-normal text-gray-600 mt-0.5 block">
+                                <span className="text-sm font-bold block font-mono">{slot.timeSlot}</span>
+                                <span className="text-[11px] font-normal text-gray-500 block">
                                   {isTh ? 'รอบเวลาแนะนำเดินทางมาถึง' : 'Recommended Arrival Window'}
                                 </span>
                               </div>
@@ -712,13 +712,13 @@ function RegisterContent() {
 
                             <div className="flex items-center gap-2">
                               {!isSelectable ? (
-                                <span className="text-xs sm:text-sm font-bold text-gray-400">{isTh ? 'เต็มแล้ว' : 'Full'}</span>
+                                <span className="text-[11px] font-bold text-gray-400">{isTh ? 'เต็มแล้ว' : 'Full'}</span>
                               ) : isSelected ? (
-                                <div className="h-7 w-7 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs">
-                                  <Check className="h-4 w-4" />
+                                <div className="h-6 w-6 rounded-full bg-[var(--burgundy-700)] text-white flex items-center justify-center shadow-xs">
+                                  <Check className="h-3.5 w-3.5" />
                                 </div>
                               ) : (
-                                <span className="text-xs sm:text-sm font-bold text-gray-400">{isTh ? 'เลือกช่วงเวลานี้' : 'Select'}</span>
+                                <span className="text-[11px] font-bold text-gray-400">{isTh ? 'เลือกช่วงเวลานี้' : 'Select'}</span>
                               )}
                             </div>
                           </button>
@@ -728,27 +728,27 @@ function RegisterContent() {
                   )}
 
                   {/* PRIVACY CONSENT */}
-                  <div className="mt-5 rounded-2xl border border-gray-200 bg-gray-50/80 p-5 space-y-3.5">
-                    <div className="flex items-start gap-3">
-                      <ShieldCheck className="h-5 w-5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
-                      <div className="space-y-1.5">
-                        <h4 className="text-sm sm:text-base font-black text-gray-900">
+                  <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50/80 p-3.5 space-y-2.5">
+                    <div className="flex items-start gap-2.5">
+                      <ShieldCheck className="h-4.5 w-4.5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-gray-900">
                           {tReg.privacyNotice.title[language]}
                         </h4>
-                        <p className="text-xs sm:text-sm text-gray-700 leading-relaxed break-words">
+                        <p className="text-[11px] text-gray-600 leading-relaxed break-words">
                           {tReg.privacyNotice.body[language]}
                         </p>
                       </div>
                     </div>
 
-                    <label className="flex items-start gap-3 p-3.5 rounded-xl border border-gray-200 bg-white cursor-pointer select-none shadow-2xs hover:border-[var(--burgundy-700)] transition-all">
+                    <label className="flex items-start gap-2.5 p-2.5 rounded-lg border border-gray-200 bg-white cursor-pointer select-none shadow-2xs hover:border-[var(--burgundy-700)] transition-all">
                       <input
                         type="checkbox"
                         checked={formData.privacyAccepted}
                         onChange={(e) => setFormData({ ...formData, privacyAccepted: e.target.checked })}
-                        className="mt-1 h-4 w-4 accent-[var(--burgundy-700)] shrink-0"
+                        className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0"
                       />
-                      <span className="text-xs sm:text-sm leading-relaxed font-bold text-gray-900 break-words">
+                      <span className="text-xs leading-relaxed font-bold text-gray-800 break-words">
                         {tReg.privacyNotice.accept[language]}
                         <span className="text-red-600 font-bold ml-1">*</span>
                       </span>
@@ -759,31 +759,31 @@ function RegisterContent() {
 
               {/* FINAL STEP: REVIEW & CONFIRMATION SUMMARY */}
               {((isWalkInMode && step === 3) || (!isWalkInMode && step === 4)) && (
-                <div className="space-y-6 animate-in fade-in-50 duration-200">
-                  <div className="space-y-1.5 border-b border-[var(--rose-100)] pb-3">
-                    <h3 className="flex items-center gap-2 text-sm sm:text-base font-black text-[var(--burgundy-700)] uppercase font-mono">
-                      <CheckCircle2 className="h-5 w-5 shrink-0" />
+                <div className="space-y-5 animate-in fade-in-50 duration-200">
+                  <div className="space-y-1 border-b border-[var(--rose-100)] pb-2.5">
+                    <h3 className="flex items-center gap-2 text-sm font-bold text-[var(--burgundy-700)] uppercase font-mono">
+                      <CheckCircle2 className="h-4.5 w-4.5 shrink-0" />
                       <span>{tReg.reviewHeading[language]}</span>
                     </h3>
-                    <p className="text-xs sm:text-sm text-[var(--muted)] font-medium leading-relaxed break-words">
+                    <p className="text-xs text-[var(--muted)] font-medium leading-relaxed break-words">
                       {tReg.reviewPrompt[language]}
                     </p>
                   </div>
 
                   {/* Summary Card */}
-                  <div className="rounded-2xl border border-[var(--line)] bg-[var(--bg)] p-5 sm:p-7 space-y-5 shadow-2xs">
+                  <div className="rounded-2xl border border-[var(--line)] bg-[var(--bg)] p-4 sm:p-5 space-y-4 shadow-2xs">
                     
                     {/* Section: Donor Info */}
-                    <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] pb-4">
-                      <div className="space-y-1.5">
-                        <span className="text-xs font-bold text-[var(--muted)] uppercase tracking-wider block">
+                    <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] pb-3">
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider block">
                           {isTh ? 'ผู้ลงทะเบียนบริจาค' : 'Donor Information'}
                         </span>
-                        <h4 className="text-lg sm:text-xl font-black text-[var(--ink)] flex items-center gap-2 break-words">
-                          <User className="h-5 w-5 text-[var(--burgundy-700)] shrink-0" />
+                        <h4 className="text-base sm:text-lg font-black text-[var(--ink)] flex items-center gap-2 break-words">
+                          <User className="h-4 w-4 text-[var(--burgundy-700)] shrink-0" />
                           <span>{formData.firstName} {formData.lastName}</span>
                         </h4>
-                        <div className="flex items-center gap-3 text-xs sm:text-sm text-[var(--muted)] flex-wrap pt-0.5">
+                        <div className="flex items-center gap-3 text-xs text-[var(--muted)] flex-wrap pt-0.5">
                           <span className="font-mono font-bold text-gray-700">📞 {formData.phone}</span>
                           {formData.email && (
                             <span className="text-gray-600">✉️ {formData.email}</span>
@@ -793,21 +793,21 @@ function RegisterContent() {
                       <button
                         type="button"
                         onClick={() => setStep(1)}
-                        className="text-xs sm:text-sm font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                        className="text-xs font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <Edit3 className="h-3.5 w-3.5" />
+                        <Edit3 className="h-3 w-3" />
                         <span>{tReg.btnEdit[language]}</span>
                       </button>
                     </div>
 
                     {/* Section: Affiliation & Status */}
-                    <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] pb-4">
-                      <div className="space-y-1.5">
-                        <span className="text-xs font-bold text-[var(--muted)] uppercase tracking-wider block">
+                    <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] pb-3">
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider block">
                           {isTh ? 'สังกัดและสถานะ' : 'Affiliation & Status'}
                         </span>
-                        <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
-                          <span className="px-3 py-1 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-800)] font-black border border-[var(--burgundy-200)]">
+                        <div className="flex items-center gap-2 flex-wrap text-xs">
+                          <span className="px-2.5 py-0.5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-800)] font-bold border border-[var(--burgundy-200)]">
                             {formData.participantType === 'STUDENT' ? (isTh ? 'นักศึกษา ม.มหิดล' : 'Mahidol Student') : formData.participantType === 'STAFF' ? (isTh ? 'บุคลากร ม.มหิดล' : 'Mahidol Staff') : (isTh ? 'บุคคลทั่วไป' : 'General Public')}
                           </span>
                           {formData.participantType !== 'GENERAL_PUBLIC' && formData.faculty && (
@@ -820,15 +820,15 @@ function RegisterContent() {
                             <span className="text-gray-500 font-medium">({formData.academicYear})</span>
                           )}
                         </div>
-                        <div className="pt-1 text-xs sm:text-sm font-bold text-emerald-800 flex items-center gap-1.5">
+                        <div className="pt-0.5 text-xs font-bold text-emerald-800 flex items-center gap-1.5">
                           {formData.donationExperience === 'FIRST_TIME' ? (
                             <>
-                              <Sparkles className="h-4 w-4 text-amber-600" />
+                              <Sparkles className="h-3.5 w-3.5 text-amber-600" />
                               <span>{tReg.expFirst[language]}</span>
                             </>
                           ) : (
                             <>
-                              <Heart className="h-4 w-4 text-red-600 fill-red-600" />
+                              <Heart className="h-3.5 w-3.5 text-red-600 fill-red-600" />
                               <span>{tReg.expRegular[language]}</span>
                             </>
                           )}
@@ -837,31 +837,31 @@ function RegisterContent() {
                       <button
                         type="button"
                         onClick={() => setStep(2)}
-                        className="text-xs sm:text-sm font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                        className="text-xs font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <Edit3 className="h-3.5 w-3.5" />
+                        <Edit3 className="h-3 w-3" />
                         <span>{tReg.btnEdit[language]}</span>
                       </button>
                     </div>
 
                     {/* Section: Arrival Window & Venue */}
                     <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-1.5">
-                        <span className="text-xs font-bold text-[var(--muted)] uppercase tracking-wider block">
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider block">
                           {isWalkInMode 
                             ? (isTh ? 'เวลาลงทะเบียนและสถานที่' : 'Registration Time & Venue')
                             : (isTh ? 'รอบเวลาและสถานที่' : 'Time Window & Venue')}
                         </span>
-                        <div className="flex items-center gap-2 font-mono font-black text-sm sm:text-base text-[var(--burgundy-800)]">
-                          <Clock className="h-4.5 w-4.5 text-[var(--burgundy-700)] shrink-0" />
+                        <div className="flex items-center gap-2 font-mono font-black text-sm text-[var(--burgundy-800)]">
+                          <Clock className="h-4 w-4 text-[var(--burgundy-700)] shrink-0" />
                           <span>
                             {isWalkInMode 
                               ? (isTh ? `เวลาลงทะเบียน: ${formatBangkokTime(new Date())}` : `Registration Time: ${formatBangkokTime(new Date())}`)
                               : (selectedSlotObj?.timeSlot || '09:00 – 14:00 น.')}
                           </span>
                         </div>
-                        <div className="flex items-start gap-1.5 text-xs sm:text-sm text-gray-600 pt-0.5">
-                          <MapPin className="h-4 w-4 text-gray-400 shrink-0 mt-0.5" />
+                        <div className="flex items-start gap-1.5 text-xs text-gray-600 pt-0.5">
+                          <MapPin className="h-3.5 w-3.5 text-gray-400 shrink-0 mt-0.5" />
                           <span className="break-words">
                             {isEn 
                               ? 'Room 217, Sirividhaya Building, Faculty of Liberal Arts, Mahidol Salaya' 
@@ -873,9 +873,9 @@ function RegisterContent() {
                         <button
                           type="button"
                           onClick={() => setStep(3)}
-                          className="text-xs sm:text-sm font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                          className="text-xs font-bold text-[var(--burgundy-700)] hover:underline inline-flex items-center gap-1 cursor-pointer"
                         >
-                          <Edit3 className="h-3.5 w-3.5" />
+                          <Edit3 className="h-3 w-3" />
                           <span>{tReg.btnEdit[language]}</span>
                         </button>
                       )}
@@ -884,8 +884,8 @@ function RegisterContent() {
                   </div>
 
                   {/* Assurance Notice */}
-                  <div className="p-4 rounded-xl bg-emerald-50/80 border border-emerald-200 text-emerald-900 text-xs sm:text-sm font-medium flex items-start gap-2.5">
-                    <ShieldCheck className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200 text-emerald-900 text-xs font-medium flex items-start gap-2.5">
+                    <ShieldCheck className="h-4 w-4 text-emerald-700 shrink-0 mt-0.5" />
                     <span className="break-words">
                       {isTh
                         ? 'เมื่อกดยืนยัน ระบบจะสร้างตั๋ว Digital Ticket Pass และ QR Code สำหรับแสดงต่อเจ้าหน้าที่ทันที'
@@ -896,14 +896,14 @@ function RegisterContent() {
               )}
 
               {/* WIZARD ACTIONS */}
-              <div className="pt-6 border-t border-[var(--line)] flex items-center justify-between">
+              <div className="pt-5 border-t border-[var(--line)] flex items-center justify-between">
                 {step > 1 ? (
                   <button
                     type="button"
                     onClick={handlePrev}
-                    className="editorial-btn-secondary text-xs sm:text-sm py-3 px-5 inline-flex items-center gap-1.5 cursor-pointer"
+                    className="editorial-btn-secondary text-xs py-2.5 px-4 inline-flex items-center gap-1.5 cursor-pointer rounded-xl"
                   >
-                    <ArrowLeft className="h-4 w-4" />
+                    <ArrowLeft className="h-3.5 w-3.5" />
                     <span>{tReg.btnBack[language]}</span>
                   </button>
                 ) : (
@@ -915,23 +915,23 @@ function RegisterContent() {
                     key="wizard-next-btn"
                     type="button"
                     onClick={handleNext}
-                    className="editorial-btn-primary text-xs sm:text-sm font-extrabold py-3.5 px-8 ml-auto inline-flex items-center gap-2 cursor-pointer shadow-md shadow-red-950/20 active:scale-95 transition-all"
+                    className="editorial-btn-primary text-xs sm:text-sm font-bold py-2.5 px-6 ml-auto inline-flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-98 transition-all rounded-xl"
                   >
                     <span>{step === (totalSteps - 1) ? tReg.btnReview[language] : tReg.btnNext[language]}</span>
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </button>
                 ) : (
                   <button
                     key="wizard-submit-btn"
                     type="submit"
                     disabled={loading}
-                    className="editorial-btn-primary text-xs sm:text-sm font-extrabold py-3.5 px-8 sm:px-10 ml-auto inline-flex items-center gap-2 cursor-pointer shadow-md shadow-red-950/20 active:scale-95 transition-all"
+                    className="editorial-btn-primary text-xs sm:text-sm font-bold py-2.5 px-6 ml-auto inline-flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-98 transition-all rounded-xl"
                   >
                     {loading ? (
                       <span>{tReg.btnSubmitting[language]}</span>
                     ) : (
                       <>
-                        <Heart className="h-4 w-4 fill-white" />
+                        <Heart className="h-3.5 w-3.5 fill-white" />
                         <span>{tReg.btnSubmitAndGetTicket[language]}</span>
                       </>
                     )}

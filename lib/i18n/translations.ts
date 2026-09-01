@@ -83,15 +83,15 @@ export const TRANSLATIONS = {
     participantType: { th: 'ประเภทผู้เข้าร่วม', en: 'Participant Category' },
     typeStudent: { th: 'นักศึกษา ม.มหิดล', en: 'Mahidol Student' },
     typeStaff: { th: 'บุคลากร ม.มหิดล', en: 'Mahidol Staff' },
-    typeGeneral: { th: 'บุคคลทั่วไป / ประชาชน', en: 'General Public' },
+    typeGeneral: { th: 'บุคคลทั่วไป', en: 'General Public' },
     faculty: { th: 'คณะ / ส่วนงาน / หน่วยงาน', en: 'Faculty / Department / Affiliation' },
     selectFaculty: { th: 'เลือกคณะ / หน่วยงาน', en: 'Select Faculty / Organization' },
     academicYear: { th: 'ระดับชั้นปีการศึกษา', en: 'Academic Year' },
     selectYear: { th: 'เลือกระดับชั้นปี', en: 'Select Academic Year' },
     donationExp: { th: 'ประสบการณ์การบริจาคโลหิต', en: 'Blood Donation Experience' },
-    expFirst: { th: 'ครั้งแรกในชีวิต (First-time Donor)', en: 'First Time in Life (First-time Donor)' },
+    expFirst: { th: 'บริจาคครั้งแรก', en: 'First-time Donor' },
     expFirstDesc: { th: 'ยังไม่เคยบริจาคโลหิตมาก่อน', en: 'Never donated blood before' },
-    expRegular: { th: 'เคยบริจาคแล้ว (Regular Donor)', en: 'Regular Donor' },
+    expRegular: { th: 'เคยบริจาคแล้ว', en: 'Regular Donor' },
     expRegularDesc: { th: 'เคยบริจาคโลหิตมาแล้วอย่างน้อย 1 ครั้ง', en: 'Have donated blood at least once before' },
     
     // Step 3 Form
