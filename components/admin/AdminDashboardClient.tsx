@@ -129,7 +129,7 @@ export function AdminDashboardClient({
       title: 'บริจาคสำเร็จ', 
       value: kpis.completedCount.toLocaleString('th-TH'), 
       unit: 'ยูนิต', 
-      detail: `รับของที่ระลึกแล้ว ${kpis.completedCount} คน`, 
+      detail: `บริจาคโลหิตสำเร็จสมบูรณ์ ${kpis.completedCount} คน`, 
       icon: Heart,
       color: 'bg-emerald-50 text-emerald-900 border-emerald-200' 
     },
@@ -364,7 +364,7 @@ export function AdminDashboardClient({
               <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50/70 border border-emerald-200">
                 <div className="flex items-center gap-2 text-emerald-900">
                   <span className="h-2 w-2 rounded-full bg-emerald-600" />
-                  <span>3. บริจาคสำเร็จ (รับของที่ระลึก)</span>
+                  <span>3. บริจาคสำเร็จ (Completed)</span>
                 </div>
                 <span className="font-mono text-sm font-black text-emerald-950">
                   {kpis.completedCount} คน

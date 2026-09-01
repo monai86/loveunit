@@ -534,7 +534,7 @@ export function getRegistrationStatusBadge(status: RegistrationStatus): { label:
     case 'IN_PROCESS':
       return { label: 'กำลังบริจาค', colorClass: 'bg-purple-50 text-purple-800 border-purple-200' };
     case 'COMPLETED':
-      return { label: 'บริจาคสำเร็จ · รับของที่ระลึกแล้ว', colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200' };
+      return { label: 'บริจาคสำเร็จ (COMPLETED)', colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200' };
     case 'CANCELLED':
       return { label: 'ยกเลิกแล้ว', colorClass: 'bg-gray-100 text-gray-700 border-gray-200' };
     case 'NO_SHOW':

@@ -659,19 +659,6 @@ function RegisterContent() {
                     </p>
                   </div>
 
-                  {/* 100 Exclusive Gifts Notice */}
-                  <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-rose-50 border border-amber-200/80 space-y-1 shadow-2xs">
-                    <div className="flex items-center gap-2 font-bold text-amber-950 text-xs">
-                      <Sparkles className="h-4 w-4 text-amber-600 shrink-0" />
-                      <span className="break-words">
-                        🎁 {isTh ? 'สิทธิพิเศษ: ผู้ลงทะเบียน 100 ท่านแรกที่เช็กอินตรงเวลาและบริจาคสำเร็จ จะได้รับของที่ระลึกสุดพิเศษ' : 'Special: First 100 on-time check-in donors who complete donation will receive exclusive souvenirs'}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-amber-900 leading-relaxed font-medium break-words">
-                      {isTh ? 'โปรดเลือกช่วงเวลาที่สะดวก และมาถึงเพื่อเช็กอินภายในรอบเวลาที่ลงทะเบียนไว้' : 'Please select your preferred time slot and arrive for check-in on time.'}
-                    </p>
-                  </div>
-
                   {slotsLoading ? (
                     <div className="py-6 text-center text-xs font-bold text-editorial-muted">
                       {tReg.errSlotLoad[language]}

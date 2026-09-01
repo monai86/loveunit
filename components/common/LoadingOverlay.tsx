@@ -34,7 +34,7 @@ const VARIANT_CONFIGS: Record<LoadingVariant, {
     badge: 'ระบบหน้างาน',
     subtitle: 'ตรวจสอบข้อมูลผู้ลงทะเบียนบริจาคโลหิต',
     statusText: 'กำลังอ่านและประมวลผล QR Code...',
-    hint: 'ตรวจสอบสถานะการนัดหมายและสิทธิ์รับของที่ระลึก',
+    hint: 'ตรวจสอบสถานะการนัดหมายและการลงทะเบียน',
   },
   'staff-checkin': {
     title: 'MUMT LoveUnit',

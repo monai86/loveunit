@@ -78,12 +78,12 @@ export function HomeSectionsClient() {
         },
         { 
           num: '05', 
-          title: 'รับของที่ระลึก & อาหารว่าง', 
-          desc: 'รับของที่ระลึกพิเศษ และของว่างบำรุงสุขภาพ', 
+          title: 'อาหารว่าง & ดูแลหลังบริจาค', 
+          desc: 'พักผ่อน 10-15 นาที พร้อมรับของว่างและเครื่องดื่มบำรุงสุขภาพ', 
           duration: 'หลังบริจาค',
-          action: 'ดูของที่ระลึก',
-          href: '/poster',
-          icon: Gift,
+          action: 'คำแนะนำหลังบริจาค',
+          href: '/prepare',
+          icon: HeartPulse,
           accent: 'from-emerald-500 to-teal-700'
         },
       ]
@@ -130,12 +130,12 @@ export function HomeSectionsClient() {
         },
         { 
           num: '05', 
-          title: 'Souvenir & Refreshments', 
-          desc: 'Receive limited edition gift & snacks', 
+          title: 'Refreshments & Care', 
+          desc: 'Rest 10-15 mins with nourishing snacks & drinks', 
           duration: 'Post-donation',
-          action: 'View Gifts',
-          href: '/poster',
-          icon: Gift,
+          action: 'Post-Donation Guide',
+          href: '/prepare',
+          icon: HeartPulse,
           accent: 'from-emerald-500 to-teal-700'
         },
       ];
@@ -287,18 +287,18 @@ export function HomeSectionsClient() {
           </div>
 
           <div className="flex items-start gap-3.5 border-t md:border-t-0 md:border-l border-[var(--line)] pt-3 md:pt-0 md:pl-4">
-            <div className="p-3 rounded-xl bg-amber-100 text-amber-900">
-              <Gift className="h-6 w-6 text-amber-700" />
+            <div className="p-3 rounded-xl bg-emerald-100 text-emerald-900">
+              <HeartPulse className="h-6 w-6 text-emerald-700" />
             </div>
             <div>
               <span className="text-xs font-bold text-[var(--muted)] block">
-                {isTh ? 'ของที่ระลึก & สิทธิประโยชน์' : 'Donor Gifts & Refreshments'}
+                {isTh ? 'การดูแล & อาหารว่าง' : 'Care & Refreshments'}
               </span>
-              <span className="text-sm font-black text-amber-950">
-                {isTh ? 'ของที่ระลึก Limited Edition' : 'Limited Edition Souvenir'}
+              <span className="text-sm font-black text-emerald-950">
+                {isTh ? 'อาหารว่าง & เครื่องดื่มบำรุงสุขภาพ' : 'Nourishing Snacks & Drinks'}
               </span>
-              <span className="text-xs text-amber-800 block">
-                {isTh ? 'และอาหารว่างเครื่องดื่มบำรุงสุขภาพ' : 'and recovery snacks & drinks'}
+              <span className="text-xs text-emerald-800 block">
+                {isTh ? 'พร้อมจุดพักผ่อนและดูแลหลังบริจาค' : 'with rest area & medical care'}
               </span>
             </div>
           </div>

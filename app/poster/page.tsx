@@ -15,6 +15,7 @@ import {
   Clock, 
   MapPin, 
   Gift,
+  HeartPulse,
   IdCard,
   Share2,
   Check
@@ -251,12 +252,12 @@ export default function PosterPage() {
         </div>
 
         <div className="flex items-start gap-3">
-          <div className="p-2.5 rounded-xl bg-white text-[var(--burgundy-700)] shadow-xs">
-            <Gift className="h-5 w-5" />
+          <div className="p-2.5 rounded-xl bg-white text-emerald-700 shadow-xs">
+            <HeartPulse className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-[var(--muted)] block">{isTh ? 'ของที่ระลึก' : 'Donor Gift'}</span>
-            <span className="text-xs font-black text-amber-900">{isTh ? 'Limited Edition MUMT' : 'Limited Edition'}</span>
+            <span className="text-[11px] font-bold text-[var(--muted)] block">{isTh ? 'การดูแล & อาหารว่าง' : 'Care & Refreshments'}</span>
+            <span className="text-xs font-black text-emerald-900">{isTh ? 'อาหารว่างบำรุงสุขภาพ' : 'Recovery Care'}</span>
           </div>
         </div>
       </div>
@@ -435,7 +436,7 @@ export default function PosterPage() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="h-5 w-5 rounded-full bg-[var(--rose-100)] text-[var(--burgundy-700)] flex items-center justify-center shrink-0 text-[10px]">3</span>
-                <span>{isTh ? <strong>รับของที่ระลึกสุดพิเศษ!</strong> : <strong>Special Souvenirs!</strong>} {isTh ? 'สำหรับผู้เข้าร่วมกิจกรรมและผู้บริจาคโลหิตทุกท่าน' : 'For all participating blood donors.'}</span>
+                <span>{isTh ? <strong>พักผ่อนและรับอาหารว่าง:</strong> : <strong>Rest & Refreshments:</strong>} {isTh ? 'รับอาหารว่างและเครื่องดื่มบำรุงสุขภาพ พร้อมจุดพักผ่อนสังเกตอาการ' : 'Enjoy recovery drinks, snacks, and medical supervision.'}</span>
               </li>
             </ul>
           </div>

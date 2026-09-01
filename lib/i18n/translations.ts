@@ -34,8 +34,8 @@ export const TRANSLATIONS = {
     ctaScreening: { th: 'ทำแบบประเมินสุขภาพตนเอง', en: 'Self-Screening' },
     statsTarget: { th: 'เป้าหมายผู้บริจาคโลหิต', en: 'Donor Target Goal' },
     statsUnits: { th: 'ยูนิต', en: 'Units' },
-    statsSouvenirTitle: { th: 'ของที่ระลึกสุดพิเศษ', en: 'Exclusive Souvenir' },
-    statsSouvenirDesc: { th: 'สำหรับผู้ลงทะเบียนออนไลน์ตรงเวลา 100 ท่านแรก และ Walk-in ที่บริจาคสำเร็จ 100 ท่านแรก', en: 'For the first 100 on-time online donors and first 100 completed walk-ins' },
+    statsSouvenirTitle: { th: 'อาหารว่าง & ดูแลสุขภาพ', en: 'Care & Refreshments' },
+    statsSouvenirDesc: { th: 'อาหารว่าง เครื่องดื่มบำรุงสุขภาพ และจุดนั่งพักผ่อนดูแลผู้บริจาคทุกท่าน', en: 'Nourishing snacks, beverages, and recovery care for all participants' },
   },
   register: {
     title: { th: 'ลงทะเบียนบริจาคโลหิตออนไลน์', en: 'Online Blood Donation Registration' },

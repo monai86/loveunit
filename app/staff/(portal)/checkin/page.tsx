@@ -832,114 +832,51 @@ export default function StaffCheckinPage() {
               </div>
             </div>
 
-            {/* Souvenir Status - High-visibility callout for staff */}
-            {(() => {
-              const isEligible = Boolean(registration.souvenirDetails?.eligible || registration.souvenirEligible);
-              if (!isEligible) return null;
-
-              return (
-                <div className="mt-3.5 rounded-2xl bg-gradient-to-r from-amber-50 via-amber-50/60 to-orange-50/80 border-2 border-amber-300/90 p-3.5 shadow-xs">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500 text-white shadow-xs shrink-0">
-                      <Gift className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-black bg-amber-400 text-amber-950 shadow-2xs">
-                          <Gift className="h-3 w-3" />
-                          <span>มีสิทธิ์รับของที่ระลึก</span>
-                        </span>
-                        {registration.souvenirDetails?.rank && (
-                          <span className="text-[11px] font-black text-amber-900 bg-amber-100/90 border border-amber-300 px-2 py-0.5 rounded-md">
-                            ลำดับที่ #{registration.souvenirDetails.rank}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs font-black text-amber-950 mt-1">
-                        {registration.souvenirDetails?.badgeText || 'ได้รับของที่ระลึกพิเศษ (100 สิทธิ์แรก)'}
-                      </p>
-                      <p className="text-[11px] font-bold text-amber-800/90 mt-0.5 flex items-center gap-1">
-                        <span>👉</span>
-                        <span>เจ้าหน้าที่: กรุณามอบของที่ระลึกให้ผู้บริจาคท่านนี้</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
             {/* Action Buttons */}
-            {(() => {
-              const isEligible = Boolean(registration.souvenirDetails?.eligible || registration.souvenirEligible);
-              return (
-                <div className="mt-5 space-y-2">
-                  {registration.status === 'REGISTERED' && (
-                    <button
-                      type="button"
-                      disabled={actionLoading}
-                      onClick={() => void handleStatusChange('CHECKED_IN')}
-                      className="min-h-12 w-full rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] active:scale-[0.99] px-4 text-xs font-black text-white shadow-md shadow-red-950/20 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer border border-white/20"
-                    >
-                      {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserCheck className="h-4 w-4" />}
-                      <span>ยืนยันเช็คอินเข้างาน (Confirm Check-in)</span>
-                    </button>
-                  )}
+            <div className="mt-5 space-y-2">
+              {registration.status === 'REGISTERED' && (
+                <button
+                  type="button"
+                  disabled={actionLoading}
+                  onClick={() => void handleStatusChange('CHECKED_IN')}
+                  className="min-h-12 w-full rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] active:scale-[0.99] px-4 text-xs font-black text-white shadow-md shadow-red-950/20 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer border border-white/20"
+                >
+                  {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserCheck className="h-4 w-4" />}
+                  <span>ยืนยันเช็คอินเข้างาน (Confirm Check-in)</span>
+                </button>
+              )}
 
-                  {registration.status === 'CHECKED_IN' && (
-                    <button
-                      type="button"
-                      disabled={actionLoading}
-                      onClick={() => void handleStatusChange('COMPLETED')}
-                      className={`min-h-12 w-full rounded-xl active:scale-[0.99] px-4 text-xs font-black text-white shadow-md transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer border ${
-                        isEligible
-                          ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-400/40'
-                          : 'bg-slate-800 hover:bg-slate-900 border-slate-700'
-                      }`}
-                    >
-                      {actionLoading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : isEligible ? (
-                        <Gift className="h-4 w-4 text-amber-300" />
-                      ) : (
-                        <CheckCircle2 className="h-4 w-4" />
-                      )}
-                      <span>
-                        {isEligible
-                          ? 'บันทึกบริจาคสำเร็จ & มอบของที่ระลึก'
-                          : 'บันทึกบริจาคสำเร็จ (Complete Donation)'}
-                      </span>
-                    </button>
+              {registration.status === 'CHECKED_IN' && (
+                <button
+                  type="button"
+                  disabled={actionLoading}
+                  onClick={() => void handleStatusChange('COMPLETED')}
+                  className="min-h-12 w-full rounded-xl active:scale-[0.99] px-4 text-xs font-black text-white shadow-md bg-emerald-600 hover:bg-emerald-700 border border-emerald-400/40 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {actionLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4" />
                   )}
+                  <span>บันทึกบริจาคสำเร็จ (Complete Donation)</span>
+                </button>
+              )}
 
-                  {registration.status === 'COMPLETED' && (
-                    <div className={`rounded-xl p-3.5 text-center flex items-center justify-center gap-2 font-black text-xs border ${
-                      isEligible 
-                        ? 'bg-gradient-to-r from-emerald-50 to-amber-50 border-emerald-300 text-emerald-950'
-                        : 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                    }`}>
-                      {isEligible ? (
-                        <Gift className="h-4 w-4 text-emerald-700 shrink-0" />
-                      ) : (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                      )}
-                      <span>
-                        {isEligible
-                          ? 'บันทึกการบริจาคและมอบของที่ระลึกแล้ว'
-                          : 'บันทึกการบริจาคโลหิตสำเร็จเรียบร้อย'}
-                      </span>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setRegistration(null)}
-                    className="min-h-11 w-full rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-xs font-bold text-slate-700 transition cursor-pointer"
-                  >
-                    สแกนคนถัดไป (Scan Next)
-                  </button>
+              {registration.status === 'COMPLETED' && (
+                <div className="rounded-xl p-3.5 text-center flex items-center justify-center gap-2 font-black text-xs border bg-emerald-50 border-emerald-200 text-emerald-900">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>บันทึกการบริจาคโลหิตสำเร็จเรียบร้อย</span>
                 </div>
-              );
-            })()}
+              )}
+
+              <button
+                type="button"
+                onClick={() => setRegistration(null)}
+                className="min-h-11 w-full rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-xs font-bold text-slate-700 transition cursor-pointer"
+              >
+                สแกนคนถัดไป (Scan Next)
+              </button>
+            </div>
           </section>
         </div>
       )}
@@ -1096,12 +1033,6 @@ export default function StaffCheckinPage() {
                             <span className={`rounded-md border px-2 py-0.5 text-[10px] font-bold ${statusInfo.colorClass}`}>
                               {statusInfo.label}
                             </span>
-                            {Boolean(donor.souvenirEligible || donor.souvenirDetails?.eligible) && (
-                              <span className="inline-flex items-center gap-1 rounded-md bg-amber-100 border border-amber-300 px-2 py-0.5 text-[10px] font-black text-amber-950 shadow-2xs">
-                                <Gift className="h-3 w-3 text-amber-700" />
-                                <span>มีสิทธิ์ของที่ระลึก</span>
-                              </span>
-                            )}
                           </div>
 
                           <div>

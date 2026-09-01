@@ -13,6 +13,7 @@ import {
   Wine, 
   ShieldCheck, 
   Gift,
+  HeartPulse,
   ChevronRight,
   Activity,
   ZoomIn,
@@ -221,16 +222,16 @@ export default function PreparePage() {
             </div>
           </div>
 
-          {/* Souvenir & Donor Care Banner */}
+          {/* Post-Donation Care & Refreshments Banner */}
           <div className="p-5 rounded-2xl bg-[var(--rose-100)] border border-[var(--line)] text-xs space-y-2">
             <div className="flex items-center gap-2 font-black text-[var(--burgundy-700)]">
-              <Gift className="h-5 w-5 text-[var(--burgundy-700)] shrink-0" />
-              <span>{isTh ? 'สิทธิประโยชน์และของที่ระลึกสุดพิเศษประจำโครงการ' : 'Donor Gifts & Refreshments'}</span>
+              <HeartPulse className="h-5 w-5 text-[var(--burgundy-700)] shrink-0" />
+              <span>{isTh ? 'การดูแลและอาหารว่างบำรุงสุขภาพหลังบริจาค' : 'Post-Donation Care & Refreshments'}</span>
             </div>
             <p className="text-[var(--ink)] leading-relaxed font-medium">
               {isTh
-                ? 'ผู้เข้าร่วมกิจกรรมบริจาคโลหิตทุกท่านจะได้รับของที่ระลึก Limited Edition โครงการ MUMT ครั้งที่ 9 พร้อมอาหารว่างและเครื่องดื่มบำรุงสุขภาพหลังบริจาคโลหิต'
-                : 'All participants will receive a 9th MUMT Limited Edition souvenir, along with recovery snacks and nutritious beverages after donation.'}
+                ? 'ผู้เข้าร่วมกิจกรรมทุกท่านจะได้รับอาหารว่างและเครื่องดื่มบำรุงสุขภาพ พร้อมพื้นที่นั่งพักผ่อนและทีมงานคอยดูแลสังเกตอาการหลังการบริจาคโลหิต'
+                : 'All participants will receive recovery refreshments and nutritious beverages, with a dedicated rest area and staff care post-donation.'}
             </p>
           </div>
 
