@@ -97,18 +97,18 @@ export const TRANSLATIONS = {
     // Step 3 Form
     section3: { th: '03. เลือกรอบเวลาเดินทาง', en: '03. Choose Arrival Time Slot' },
     slotNotice: {
-      th: '💡 รอบเวลาเป็นเวลาประมาณการเดินทางมาถึงจุดลงทะเบียน เพื่อช่วยกระจายความหนาแน่นของผู้บริจาค',
-      en: '💡 Time slots indicate estimated arrival time to help balance donor traffic throughout the day.'
+      th: '💡 เลือกรอบเวลาแนะนำการเดินทางมาถึงเพื่อช่วยกระจายความหนาแน่น ท่านสามารถเดินทางมาถึงและยืนยันตัวตนได้ตลอดช่วงเวลากิจกรรม (09:00 - 14:00 น.)',
+      en: '💡 Choose your estimated arrival window to balance donor traffic. You are welcome to arrive and verify attendance anytime during event hours (09:00 AM - 02:00 PM).'
     },
     privacyNotice: {
-      title: { th: 'ประกาศความเป็นส่วนตัวและการคุ้มครองข้อมูลส่วนบุคคล (PDPA)', en: 'Privacy Notice & Data Protection (PDPA)' },
+      title: { th: 'ประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA Consent)', en: 'Personal Data Protection Notice (PDPA)' },
       body: {
-        th: 'ข้อมูลของท่านจะถูกนำไปใช้เฉพาะเพื่อการบริหารจัดการกิจกรรมบริจาคโลหิต การยืนยันตัวตนหน้างาน การประสานงานกับภาคบริการโลหิตแห่งชาติที่ 4 จ.ราชบุรี สภากาชาดไทย และการส่งข้อมูลยืนยันเท่านั้น จะไม่มีการเปิดเผยต่อบุคคลภายนอกที่ไม่เกี่ยวข้อง',
-        en: 'Your information will strictly be used for blood donation event management, on-site identity verification, coordination with Regional Blood Centre 4 Ratchaburi Thai Red Cross Society, and sending confirmation passes only. It will not be shared with unauthorized third parties.'
+        th: 'ข้อมูลของท่าน (ชื่อ-นามสกุล, เบอร์โทรศัพท์, สังกัด) จะถูกเก็บรักษาอย่างปลอดภัยและนำไปใช้เฉพาะเพื่อการจัดสรรรอบเวลา ออกตั๋วลงทะเบียนออนไลน์ และการประสานงานหน้างานกับภาคบริการโลหิตแห่งชาติที่ 4 จ.ราชบุรี สภากาชาดไทย เท่านั้น โดยจะไม่มีการเปิดเผยต่อบุคคลภายนอก และจะลบข้อมูลออกจากระบบหลังเสร็จสิ้นโครงการภายใน 30 วัน (ทั้งนี้ แบบประเมินสุขภาพถูกประมวลผลบนเบราว์เซอร์ของท่าน ไม่มีการบันทึกประวัติสุขภาพลงฐานข้อมูล)',
+        en: 'Your information (name, phone, affiliation) is securely retained and used solely for arrival slot coordination, online ticket generation, and on-site check-in with Regional Blood Centre 4 Ratchaburi, Thai Red Cross Society. Data will not be shared with unauthorized third parties and will be purged 30 days post-event. Preliminary health screening is computed locally in your browser without saving medical history to databases.'
       },
       accept: {
-        th: 'ข้าพเจ้ายินยอมให้ใช้ข้อมูลส่วนบุคคลตามวัตถุประสงค์ของโครงการ และรับทราบคำแนะนำการเตรียมตัว',
-        en: 'I consent to the collection and use of my personal data for the event and acknowledge donor preparation guidelines.'
+        th: 'ข้าพเจ้าได้อ่านและยินยอมตามประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA) และรับทราบคำแนะนำการเตรียมตัว',
+        en: 'I have read and consent to the Personal Data Protection (PDPA) notice and acknowledge preparation guidelines.'
       }
     },
     

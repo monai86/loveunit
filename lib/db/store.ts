@@ -153,12 +153,13 @@ export const defaultContentBlocks: EventContentBlock[] = [
 ];
 
 export const defaultSlots: TimeSlot[] = [
-  // Official event window 09:00–14:00 น.: five 1-hour slots (Unlimited capacity).
-  { id: 'ts-1', event_id: defaultEvent.id, start_at: '2026-09-16T09:00:00+07:00', end_at: '2026-09-16T10:00:00+07:00', capacity: 9999, booked_count: 12, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-2', event_id: defaultEvent.id, start_at: '2026-09-16T10:00:00+07:00', end_at: '2026-09-16T11:00:00+07:00', capacity: 9999, booked_count: 28, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-3', event_id: defaultEvent.id, start_at: '2026-09-16T11:00:00+07:00', end_at: '2026-09-16T12:00:00+07:00', capacity: 9999, booked_count: 35, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-4', event_id: defaultEvent.id, start_at: '2026-09-16T12:00:00+07:00', end_at: '2026-09-16T13:00:00+07:00', capacity: 9999, booked_count: 18, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-5', event_id: defaultEvent.id, start_at: '2026-09-16T13:00:00+07:00', end_at: '2026-09-16T14:00:00+07:00', capacity: 9999, booked_count: 15, is_active: true, created_at: new Date().toISOString() },
+  // Official event arrival windows 09:00–14:00 น. (Unlimited capacity):
+  // 1. รอบช่วงเช้า 09:00 - 11:00 น.
+  // 2. รอบกลางวัน 11:00 - 13:00 น.
+  // 3. รอบบ่าย 13:00 - 14:00 น.
+  { id: 'ts-1', event_id: defaultEvent.id, start_at: '2026-09-16T09:00:00+07:00', end_at: '2026-09-16T11:00:00+07:00', capacity: 9999, booked_count: 40, is_active: true, created_at: new Date().toISOString() },
+  { id: 'ts-2', event_id: defaultEvent.id, start_at: '2026-09-16T11:00:00+07:00', end_at: '2026-09-16T13:00:00+07:00', capacity: 9999, booked_count: 53, is_active: true, created_at: new Date().toISOString() },
+  { id: 'ts-3', event_id: defaultEvent.id, start_at: '2026-09-16T13:00:00+07:00', end_at: '2026-09-16T14:00:00+07:00', capacity: 9999, booked_count: 15, is_active: true, created_at: new Date().toISOString() },
 ];
 
 export const inMemoryRegistrations: Registration[] = [

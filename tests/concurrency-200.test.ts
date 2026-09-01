@@ -28,7 +28,7 @@ async function runConcurrencyStressTest() {
 
   const registrationPromises = Array.from({ length: CONCURRENT_USERS }, (_, i) => {
     const paddedIndex = String(i + 1).padStart(3, '0');
-    const slotIndex = (i % 5) + 1;
+    const slotIndex = (i % 3) + 1;
     return registerDonorAtomic({
       eventId: event.id,
       firstName: `ทดสอบ${paddedIndex}`,

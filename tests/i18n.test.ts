@@ -62,8 +62,8 @@ describe('i18n Unified Translation Dictionary', () => {
     assert.ok(ACADEMIC_YEARS.length > 0, 'ACADEMIC_YEARS should not be empty');
   });
 
-  it('should ensure all 24 screening questions and categories have English translations', () => {
-    assert.strictEqual(SCREENING_CATEGORIES.length, 4);
+  it('should ensure all 10 essential screening questions and categories have English translations', () => {
+    assert.strictEqual(SCREENING_CATEGORIES.length, 3);
     for (const cat of SCREENING_CATEGORIES) {
       assert.ok(cat.title && cat.title.length > 0, 'Category title missing');
       assert.ok(cat.titleEn && cat.titleEn.length > 0, 'Category titleEn missing');
@@ -71,7 +71,7 @@ describe('i18n Unified Translation Dictionary', () => {
       assert.ok(cat.descEn && cat.descEn.length > 0, 'Category descEn missing');
     }
 
-    assert.strictEqual(OFFICIAL_SCREENING_QUESTIONS.length, 24);
+    assert.strictEqual(OFFICIAL_SCREENING_QUESTIONS.length, 10);
     for (const q of OFFICIAL_SCREENING_QUESTIONS) {
       assert.ok(q.question && q.question.length > 0, `Question ${q.id} missing th question`);
       assert.ok(q.questionEn && q.questionEn.length > 0, `Question ${q.id} missing en question`);
@@ -90,11 +90,11 @@ describe('i18n Unified Translation Dictionary', () => {
 
     const thResult = evaluateScreeningAnswers(perfectAnswers, 'th');
     assert.strictEqual(thResult.status, 'ELIGIBLE');
-    assert.strictEqual(thResult.summaryBadge, 'พร้อมบริจาคโลหิต 🩸');
+    assert.strictEqual(thResult.summaryBadge, 'พร้อมบริจาคโลหิต');
 
     const enResult = evaluateScreeningAnswers(perfectAnswers, 'en');
     assert.strictEqual(enResult.status, 'ELIGIBLE');
-    assert.strictEqual(enResult.summaryBadge, 'Ready to Donate 🩸');
+    assert.strictEqual(enResult.summaryBadge, 'Ready to Donate');
     assert.ok(enResult.summaryTitle.includes('Congratulations'));
   });
 });

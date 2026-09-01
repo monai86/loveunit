@@ -74,10 +74,10 @@ export function DonorTicketPass({
   const effectiveResetLabel = resetLabel || (isTh ? "ค้นหาใหม่" : "New Search");
   const timeLabelText = isWalkIn
     ? (isTh ? "เวลาลงทะเบียน (Walk-in)" : "Walk-in Registration Time")
-    : (isTh ? "รอบเวลาที่นัดหมาย" : "Appointment Time");
+    : (isTh ? "รอบเวลาแนะนำเดินทางมาถึง" : "Arrival Time Window");
   const timeCanvasLabel = isWalkIn
     ? (isTh ? "เวลาลงทะเบียน Walk-in" : "WALK-IN TIME")
-    : (isTh ? "รอบเวลาที่นัดหมาย" : "APPOINTMENT TIME");
+    : (isTh ? "รอบเวลาเดินทางมาถึง" : "ARRIVAL WINDOW");
 
   const copyCode = async () => {
     try {
@@ -432,6 +432,11 @@ export function DonorTicketPass({
                   <span>{timeLabelText}</span>
                 </div>
                 <p className="text-base font-black text-[#7A1222]">{timeSlot}</p>
+                {!isWalkIn && (
+                  <p className="text-[10.5px] text-gray-500 font-medium leading-tight">
+                    {isTh ? "💡 เดินทางมาถึงได้ตลอดช่วงเวลา 09:00 - 14:00 น." : "💡 Flexible arrival anytime 09:00 AM - 02:00 PM"}
+                  </p>
+                )}
               </div>
 
               {/* Venue */}

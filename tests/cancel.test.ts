@@ -21,7 +21,7 @@ async function runCancelTests() {
   console.log('🧪 Starting Cancel Flow Test Suite...\n');
 
   const slot1 = defaultSlots.find((s) => s.id === 'ts-1')!;
-  const slot5 = defaultSlots.find((s) => s.id === 'ts-5')!;
+  const slot3 = defaultSlots.find((s) => s.id === 'ts-3')!;
 
   // ---- Test 1: cancel a REGISTERED registration frees the seat + audits ----
   console.log('Test 1: Cancel REGISTERED → CANCELLED, booked_count decremented, audit written');
@@ -99,7 +99,7 @@ async function runCancelTests() {
 
   // ---- Test 3: cannot cancel COMPLETED; unknown id rejected ----
   console.log('Test 3: COMPLETED cannot be cancelled; unknown id rejected');
-  const before5 = slot5.booked_count;
+  const before3 = slot3.booked_count;
   const regC = await registerDonorAtomic({
     eventId: defaultEvent.id,
     firstName: 'เสร็จ',
@@ -107,7 +107,7 @@ async function runCancelTests() {
     phone: '0900000005',
     participantType: 'GENERAL_PUBLIC',
     donationExperience: 'RETURNING',
-    slotId: 'ts-5',
+    slotId: 'ts-3',
   });
   assert.strictEqual(regC.success, true);
   const idC = regC.registration!.id;
@@ -122,7 +122,7 @@ async function runCancelTests() {
   const cancelDone = await cancelRegistration(idC, 'u-admin');
   assert.strictEqual(cancelDone.success, false, 'COMPLETED registration must not be cancellable');
   assert.match(cancelDone.message || '', /COMPLETED/, 'error names the blocking status');
-  assert.strictEqual(slot5.booked_count, before5 + 1, 'no capacity change for a rejected cancel');
+  assert.strictEqual(slot3.booked_count, before3 + 1, 'no capacity change for a rejected cancel');
 
   const cancelMissing = await cancelRegistration('reg-does-not-exist');
   assert.strictEqual(cancelMissing.success, false, 'unknown registration id must fail');
@@ -131,16 +131,16 @@ async function runCancelTests() {
 
   // ---- Test 4: admin deletion removes an uncompleted donor and releases seat ----
   console.log('Test 4: Delete an uncompleted donor permanently releases the seat');
-  const beforeDelete = slot5.booked_count;
+  const beforeDelete = slot3.booked_count;
   const regD = await registerDonorAtomic({
     eventId: defaultEvent.id, firstName: 'ลบ', lastName: 'ถาวร', phone: '0900000006',
-    participantType: 'GENERAL_PUBLIC', donationExperience: 'FIRST_TIME', slotId: 'ts-5',
+    participantType: 'GENERAL_PUBLIC', donationExperience: 'FIRST_TIME', slotId: 'ts-3',
   });
   assert.strictEqual(regD.success, true);
   const deleted = await deleteDonorRegistration(regD.registration!.id, 'u-admin');
   assert.strictEqual(deleted.success, true);
   assert.strictEqual(inMemoryRegistrations.some((r) => r.id === regD.registration!.id), false, 'deleted donor is removed from the list');
-  assert.strictEqual(slot5.booked_count, beforeDelete, 'deletion releases the slot seat');
+  assert.strictEqual(slot3.booked_count, beforeDelete, 'deletion releases the slot seat');
   console.log('✓ donor record is deleted and seat released\n');
 
   console.log('🎉 ALL CANCEL FLOW TESTS PASSED SUCCESSFULLY!');

@@ -12,7 +12,9 @@ import {
   Heart, 
   Info, 
   ChevronRight,
-  Clock
+  Clock,
+  Sparkles,
+  Stethoscope
 } from 'lucide-react';
 import { 
   OFFICIAL_SCREENING_QUESTIONS, 
@@ -78,7 +80,7 @@ export default function ScreeningPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-10">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-8">
       
       {/* Header */}
       <div className="pb-6 border-b border-[var(--line)]">
@@ -86,7 +88,7 @@ export default function ScreeningPage() {
           <Link href="/" className="hover:text-[var(--burgundy-600)]">{isTh ? 'หน้าแรก' : 'Home'}</Link>
           <ChevronRight className="h-3.5 w-3.5" />
           <span className="text-[var(--burgundy-700)]">
-            {isTh ? 'แบบประเมินสุขภาพตนเองก่อนบริจาคโลหิต' : 'Self-Screening Assessment'}
+            {isTh ? 'แบบประเมินความพร้อมตนเองก่อนบริจาคโลหิต' : 'Self-Screening Readiness Assessment'}
           </span>
         </nav>
 
@@ -94,15 +96,44 @@ export default function ScreeningPage() {
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
               <ShieldCheck className="h-4 w-4 text-white" />
-              <span>{isTh ? 'มาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (2567)' : 'National Blood Centre Standard, Thai Red Cross (2024)'}</span>
+              <span>{isTh ? 'เกณฑ์มาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (ฉบับย่อ 10 ข้อหลัก)' : 'National Blood Centre Criteria (Essential 10-Item Quick Check)'}</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
-              {isTh ? 'แบบประเมินสุขภาพตนเอง' : 'Donor Self-Screening'}
+            <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)] tracking-tight">
+              {isTh ? 'แบบประเมินความพร้อมตนเองก่อนบริจาคโลหิต' : 'Donor Pre-Screening Readiness'}
             </h1>
-            <p className="text-[15px] leading-relaxed text-[var(--muted)] font-medium max-w-2xl">
+            <p className="text-[15px] leading-relaxed text-[var(--muted)] font-medium max-w-3xl">
               {isTh
-                ? 'ตรวจเช็กความพร้อมของร่างกาย โรคประจำตัว ยา และหัตถการต่างๆ ก่อนเดินทางมาบริจาค เพื่อความปลอดภัยสูงสุดของทั้งตัวท่านและผู้ป่วย'
-                : 'Evaluate your physical readiness, health history, medications, and risk factors before donating blood for maximum donor and patient safety.'}
+                ? 'ตรวจเช็กความพร้อมของร่างกาย โรคประจำตัว ยา และหัตถการสำคัญล่วงหน้าก่อนเดินทาง เพื่อประเมินตนเองอย่างรวดเร็ว (ใช้เวลาประมาณ 1 นาที)'
+                : 'Evaluate your health readiness, medications, and recent procedures before traveling to ensure safe blood donation (approx. 1 minute).'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* MANDATORY CLINICAL & ON-SITE SCREENING DISCLAIMER BANNER */}
+      <div className="p-5 sm:p-6 rounded-2xl bg-amber-50/90 border-2 border-amber-300 text-amber-950 shadow-sm space-y-2.5">
+        <div className="flex items-start gap-3">
+          <div className="p-2 rounded-xl bg-amber-500 text-white shrink-0 mt-0.5 shadow-xs">
+            <Stethoscope className="h-5 w-5" />
+          </div>
+          <div className="space-y-1 text-xs sm:text-sm">
+            <h3 className="font-black text-amber-900 flex items-center gap-1.5 text-sm sm:text-base">
+              <span>{isTh ? '⚠️ คำชี้แจงสำคัญก่อนทำแบบประเมิน' : '⚠️ Important Clinical & Operational Disclaimer'}</span>
+            </h3>
+            <p className="leading-relaxed text-amber-900/90 font-medium">
+              {isTh ? (
+                <>
+                  แบบประเมินนี้เป็นเพียง <strong>การเตรียมความพร้อมเบื้องต้นด้วยตนเอง (แนะนำให้ทำก่อนเดินทางไม่เกิน 24 ชั่วโมง)</strong> โดยไม่มีการบันทึกประวัติสุขภาพเข้าสู่ฐานข้อมูลสภากาชาดไทย
+                  <br className="hidden sm:block" />
+                  <strong>ผู้บริจาคทุกท่านจะต้องเข้ารับการตรวจคัดกรอง ซักประวัติสุขภาพ และตรวจวัดความเข้มข้นของโลหิตโดยเจ้าหน้าที่สภากาชาดหน้างานอีกครั้งก่อนการเจาะบริจาคจริง</strong>
+                </>
+              ) : (
+                <>
+                  This self-assessment is for <strong>preliminary readiness screening only (recommended within 24 hours prior to donation)</strong>. Responses are not stored in Thai Red Cross databases.
+                  <br className="hidden sm:block" />
+                  <strong>All donors must undergo formal health screening, medical questionnaire review, and on-site hemoglobin testing with Thai Red Cross medical staff before actual donation.</strong>
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -160,7 +191,7 @@ export default function ScreeningPage() {
                   className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] text-white font-extrabold px-6 py-3 text-sm shadow-md shadow-red-950/20 transition-all active:scale-95 border border-white/20"
                 >
                   <Heart className="h-4 w-4 fill-white" />
-                  <span>{isTh ? 'ดำเนินการลงทะเบียนจองรอบเวลา' : 'Proceed to Registration'}</span>
+                  <span>{isTh ? 'ดำเนินการเลือกรอบเวลาเดินทาง' : 'Proceed to Reserve Arrival Slot'}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               ) : (
@@ -182,6 +213,16 @@ export default function ScreeningPage() {
                 <span>{isTh ? 'ทำแบบประเมินใหม่อีกครั้ง' : 'Retake Assessment'}</span>
               </button>
             </div>
+          </div>
+
+          {/* On-Site Screening Reminder Note */}
+          <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-xs text-[var(--muted)] flex items-center gap-2.5 font-medium">
+            <Info className="h-4 w-4 text-blue-600 shrink-0" />
+            <span>
+              {isTh
+                ? 'คำเตือน: ในวันงาน ขอให้เตรียมบัตรประชาชนตัวจริงเพื่อแสดงต่อเจ้าหน้าที่คัดกรองและเจาะตรวจความเข้มข้นเลือดก่อนบริจาค'
+                : 'Reminder: Please bring your physical National ID card or Passport for official identity verification and blood screening on-site.'}
+            </span>
           </div>
 
           {/* Flagged Issues Breakdown (If any) */}
@@ -279,8 +320,8 @@ export default function ScreeningPage() {
               />
             </div>
 
-            {/* Category Tabs */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+            {/* Category Tabs (3 Categories) */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2">
               {SCREENING_CATEGORIES.map((cat, idx) => {
                 const isActive = idx === currentCategoryIndex;
                 const isDone = OFFICIAL_SCREENING_QUESTIONS.filter((q) => q.category === cat.id).every(
@@ -294,7 +335,7 @@ export default function ScreeningPage() {
                     key={cat.id}
                     type="button"
                     onClick={() => setCurrentCategoryIndex(idx)}
-                    className={`p-3 rounded-xl border text-left text-xs font-bold transition-all flex flex-col justify-between cursor-pointer ${
+                    className={`p-3.5 rounded-xl border text-left text-xs font-bold transition-all flex flex-col justify-between cursor-pointer ${
                       isActive
                         ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-xs ring-1 ring-[var(--burgundy-700)]'
                         : isDone
@@ -319,7 +360,7 @@ export default function ScreeningPage() {
           <div className="editorial-card p-6 sm:p-8 space-y-6">
             <div className="space-y-1 border-b border-[var(--line)] pb-4">
               <span className="text-[11px] font-mono font-bold text-[var(--burgundy-700)] uppercase block">
-                CATEGORY {currentCategoryIndex + 1} OF {SCREENING_CATEGORIES.length}
+                PART {currentCategoryIndex + 1} OF {SCREENING_CATEGORIES.length}
               </span>
               <h2 className="text-xl font-black text-editorial-ink">
                 {isEn ? (activeCategory.titleEn || activeCategory.title) : activeCategory.title}
@@ -426,7 +467,7 @@ export default function ScreeningPage() {
                   className="editorial-btn-primary text-xs py-3.5 px-8 ml-auto flex items-center gap-2 cursor-pointer"
                 >
                   <ShieldCheck className="h-4 w-4" />
-                  <span>{isTh ? 'สรุปผลการประเมินสุขภาพ' : 'Calculate Readiness'}</span>
+                  <span>{isTh ? 'สรุปผลการประเมินความพร้อม' : 'Calculate Readiness'}</span>
                 </button>
               )}
             </div>
