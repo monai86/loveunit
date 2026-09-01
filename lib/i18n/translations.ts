@@ -110,7 +110,7 @@ export const TRANSLATIONS = {
         en: 'Faculty of Medical Technology, Mahidol University, together with Regional Blood Centre 4 Ratchaburi, Thai Red Cross Society, respects your privacy under the Personal Data Protection Act B.E. 2562 (PDPA). Your information (name, phone, affiliation) is processed solely for arrival scheduling, digital ticket generation, identity verification, and on-site event coordination without unauthorized third-party disclosure, and will be securely deleted within 30 days post-event. Preliminary health screening is computed locally on your device without storing health records in databases.'
       },
       accept: {
-        th: 'ข้าพเจ้าได้อ่านและยินยอมตาม\u200Bประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA) \u200Bและรับทราบ\u200Bคำแนะนำการเตรียมตัว',
+        th: 'ข้าพเจ้าได้อ่านและยินยอมตามประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA) และรับทราบคำแนะนำการเตรียมตัว',
         en: 'I have read and consent to the Personal Data Protection (PDPA) notice and acknowledge preparation guidelines.'
       }
     },

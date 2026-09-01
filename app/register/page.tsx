@@ -722,8 +722,19 @@ function RegisterContent() {
                             className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0 rounded cursor-pointer"
                           />
                           <span className="text-xs leading-relaxed font-bold text-gray-800">
-                            {tReg.privacyNotice.accept[language]}
-                            <span className="text-red-600 font-bold ml-1 inline-block">*</span>
+                            {isTh ? (
+                              <>
+                                <span>ข้าพเจ้าได้อ่านและยินยอมตามประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>{' '}
+                                <span className="inline-block whitespace-nowrap">
+                                  และรับทราบคำแนะนำการเตรียมตัว <span className="text-red-600 font-bold">*</span>
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span>{tReg.privacyNotice.accept[language]}</span>
+                                <span className="text-red-600 font-bold ml-1 inline-block">*</span>
+                              </>
+                            )}
                           </span>
                         </label>
                       </div>
@@ -871,8 +882,19 @@ function RegisterContent() {
                         className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0 rounded cursor-pointer"
                       />
                       <span className="text-xs leading-relaxed font-bold text-gray-800">
-                        {tReg.privacyNotice.accept[language]}
-                        <span className="text-red-600 font-bold ml-1 inline-block">*</span>
+                        {isTh ? (
+                          <>
+                            <span>ข้าพเจ้าได้อ่านและยินยอมตามประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>{' '}
+                            <span className="inline-block whitespace-nowrap">
+                              และรับทราบคำแนะนำการเตรียมตัว <span className="text-red-600 font-bold">*</span>
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span>{tReg.privacyNotice.accept[language]}</span>
+                            <span className="text-red-600 font-bold ml-1 inline-block">*</span>
+                          </>
+                        )}
                       </span>
                     </label>
                   </div>
