@@ -101,10 +101,10 @@ export const TRANSLATIONS = {
       en: '💡 Choose your estimated arrival window to balance donor traffic. You are welcome to arrive and verify attendance anytime during event hours (09:00 AM - 02:00 PM).'
     },
     privacyNotice: {
-      title: { th: 'ประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA Consent)', en: 'Personal Data Protection Notice (PDPA)' },
+      title: { th: 'ประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA Privacy Notice)', en: 'Personal Data Protection Notice (PDPA)' },
       body: {
-        th: 'ข้อมูลของท่าน (ชื่อ-นามสกุล, เบอร์โทรศัพท์, สังกัด) จะถูกเก็บรักษาอย่างปลอดภัยและนำไปใช้เฉพาะเพื่อการจัดสรรรอบเวลา ออกตั๋วลงทะเบียนออนไลน์ และการประสานงานหน้างานกับภาคบริการโลหิตแห่งชาติที่ 4 จ.ราชบุรี สภากาชาดไทย เท่านั้น โดยจะไม่มีการเปิดเผยต่อบุคคลภายนอก และจะลบข้อมูลออกจากระบบหลังเสร็จสิ้นโครงการภายใน 30 วัน (ทั้งนี้ แบบประเมินสุขภาพถูกประมวลผลบนเบราว์เซอร์ของท่าน ไม่มีการบันทึกประวัติสุขภาพลงฐานข้อมูล)',
-        en: 'Your information (name, phone, affiliation) is securely retained and used solely for arrival slot coordination, online ticket generation, and on-site check-in with Regional Blood Centre 4 Ratchaburi, Thai Red Cross Society. Data will not be shared with unauthorized third parties and will be purged 30 days post-event. Preliminary health screening is computed locally in your browser without saving medical history to databases.'
+        th: 'คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จ.ราชบุรี สภากาชาดไทย ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA) ข้อมูลของท่าน (ชื่อ-นามสกุล, เบอร์โทรศัพท์, สังกัด) จะถูกจัดเก็บและใช้เฉพาะเพื่อการจัดสรรรอบเวลา ออกตั๋วลงทะเบียนออนไลน์ (Digital Ticket Pass) ยืนยันตัวตน และประสานงานหน้างานเท่านั้น โดยไม่มีการเปิดเผยต่อบุคคลภายนอก และจะลบทำลายข้อมูลออกจากระบบภายใน 30 วันหลังเสร็จสิ้นโครงการ (ทั้งนี้ แบบประเมินสุขภาพเบื้องต้นถูกประมวลผลบนอุปกรณ์ของท่านโดยตรง ไม่มีการบันทึกประวัติสุขภาพลงฐานข้อมูล)',
+        en: 'Faculty of Medical Technology, Mahidol University, together with Regional Blood Centre 4 Ratchaburi, Thai Red Cross Society, respects your privacy under the Personal Data Protection Act B.E. 2562 (PDPA). Your information (name, phone, affiliation) is processed solely for arrival scheduling, digital ticket generation, identity verification, and on-site event coordination without unauthorized third-party disclosure, and will be securely deleted within 30 days post-event. Preliminary health screening is computed locally on your device without storing health records in databases.'
       },
       accept: {
         th: 'ข้าพเจ้าได้อ่านและยินยอมตามประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA) และรับทราบคำแนะนำการเตรียมตัว',
