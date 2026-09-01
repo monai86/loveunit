@@ -710,7 +710,7 @@ function RegisterContent() {
                             {tReg.privacyNotice.title[language]}
                           </h4>
                         </div>
-                        <p className="text-[11.5px] text-gray-600 leading-relaxed break-words pl-6.5">
+                        <p className="text-[11.5px] text-gray-600 leading-relaxed pl-6.5">
                           {tReg.privacyNotice.body[language]}
                         </p>
 
@@ -724,7 +724,8 @@ function RegisterContent() {
                           <span className="text-xs leading-relaxed font-bold text-gray-800">
                             {isTh ? (
                               <>
-                                <span>ข้าพเจ้าได้อ่านและยินยอมตามประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>{' '}
+                                <span className="inline-block whitespace-nowrap">ข้าพเจ้าได้อ่านและยินยอมตาม</span>{' '}
+                                <span className="inline-block whitespace-nowrap">ประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>{' '}
                                 <span className="inline-block whitespace-nowrap">
                                   และรับทราบคำแนะนำการเตรียมตัว <span className="text-red-600 font-bold">*</span>
                                 </span>
@@ -870,7 +871,7 @@ function RegisterContent() {
                         {tReg.privacyNotice.title[language]}
                       </h4>
                     </div>
-                    <p className="text-[11.5px] text-gray-600 leading-relaxed break-words pl-6.5">
+                    <p className="text-[11.5px] text-gray-600 leading-relaxed pl-6.5">
                       {tReg.privacyNotice.body[language]}
                     </p>
 
@@ -884,7 +885,8 @@ function RegisterContent() {
                       <span className="text-xs leading-relaxed font-bold text-gray-800">
                         {isTh ? (
                           <>
-                            <span>ข้าพเจ้าได้อ่านและยินยอมตามประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>{' '}
+                            <span className="inline-block whitespace-nowrap">ข้าพเจ้าได้อ่านและยินยอมตาม</span>{' '}
+                            <span className="inline-block whitespace-nowrap">ประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>{' '}
                             <span className="inline-block whitespace-nowrap">
                               และรับทราบคำแนะนำการเตรียมตัว <span className="text-red-600 font-bold">*</span>
                             </span>
