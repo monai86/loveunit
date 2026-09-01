@@ -423,22 +423,11 @@ export function AdminDashboardClient({
               .map(([channel, count]) => {
                 const total = Object.values(kpis.prChannelBreakdown!).reduce((a, b) => a + b, 0);
                 const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-                
-                const getIcon = (ch: string) => {
-                  if (ch.includes('Instagram')) return '📸';
-                  if (ch.includes('Facebook')) return '📘';
-                  if (ch.includes('LINE')) return '💬';
-                  if (ch.includes('TikTok')) return '🎵';
-                  if (ch.includes('Poster') || ch.includes('โปสเตอร์')) return '📢';
-                  if (ch.includes('PR_Walk') || ch.includes('เดิน')) return '🚶';
-                  if (ch.includes('Referral') || ch.includes('เพื่อน') || ch.includes('รู้จัก')) return '👥';
-                  return '🌐';
-                };
 
                 return (
                   <div key={channel} className="p-3.5 rounded-xl bg-gray-50/80 border border-gray-200/80 space-y-2 shadow-2xs">
                     <div className="flex items-center justify-between">
-                      <span className="text-base">{getIcon(channel)}</span>
+                      <span className="h-2 w-2 rounded-full bg-[var(--burgundy-700)] shrink-0" />
                       <span className="font-mono text-xs font-black text-[var(--burgundy-800)] bg-white px-2 py-0.5 rounded-md border border-gray-200">
                         {count} คน ({pct}%)
                       </span>

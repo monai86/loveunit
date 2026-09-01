@@ -165,8 +165,14 @@ export async function getDashboardKPIs(eventId: string) {
     const prChannelBreakdown: Record<string, number> = {};
     for (const r of regs) {
       if (r.status !== 'CANCELLED') {
-        const channel = r.prChannel || 'ไม่ได้ระบุ';
-        prChannelBreakdown[channel] = (prChannelBreakdown[channel] || 0) + 1;
+        if (!r.prChannel) {
+          prChannelBreakdown['ไม่ได้ระบุ'] = (prChannelBreakdown['ไม่ได้ระบุ'] || 0) + 1;
+        } else {
+          const channels = r.prChannel.split(',').map(s => s.trim()).filter(Boolean);
+          for (const ch of channels) {
+            prChannelBreakdown[ch] = (prChannelBreakdown[ch] || 0) + 1;
+          }
+        }
       }
     }
 

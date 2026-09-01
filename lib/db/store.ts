@@ -707,8 +707,14 @@ export async function getDashboardKPIs(_eventId: string): Promise<DashboardKPIs>
     const prChannelBreakdown: Record<string, number> = {};
     for (const r of regs) {
       if (r.status !== 'CANCELLED') {
-        const channel = r.pr_channel || 'ไม่ได้ระบุ';
-        prChannelBreakdown[channel] = (prChannelBreakdown[channel] || 0) + 1;
+        if (!r.pr_channel) {
+          prChannelBreakdown['ไม่ได้ระบุ'] = (prChannelBreakdown['ไม่ได้ระบุ'] || 0) + 1;
+        } else {
+          const channels = r.pr_channel.split(',').map(s => s.trim()).filter(Boolean);
+          for (const ch of channels) {
+            prChannelBreakdown[ch] = (prChannelBreakdown[ch] || 0) + 1;
+          }
+        }
       }
     }
 

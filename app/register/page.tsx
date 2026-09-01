@@ -50,6 +50,17 @@ function RegisterContent() {
     { id: 'GENERAL_PUBLIC', name: tReg.typeGeneral[language] },
   ];
 
+  const PR_CHANNEL_OPTIONS = [
+    { id: 'Instagram', th: 'Instagram', en: 'Instagram' },
+    { id: 'Facebook', th: 'Facebook', en: 'Facebook' },
+    { id: 'LINE', th: 'LINE / OpenChat', en: 'LINE / OpenChat' },
+    { id: 'TikTok', th: 'TikTok', en: 'TikTok' },
+    { id: 'Poster', th: 'โปสเตอร์ / ป้ายประชาสัมพันธ์', en: 'Poster / Banner' },
+    { id: 'PR_Walk', th: 'การเดินประชาสัมพันธ์ในมหาวิทยาลัย', en: 'On-campus PR Troop' },
+    { id: 'Referral', th: 'เพื่อน / อาจารย์ / คนรู้จักแนะนำ', en: 'Friend / Referral' },
+    { id: 'Other', th: 'อื่นๆ', en: 'Other' },
+  ];
+
   // Wizard state
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -64,9 +75,20 @@ function RegisterContent() {
   const [waitlistLoading, setWaitlistLoading] = useState(false);
   const [waitlistMessage, setWaitlistMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // PR Channel state
-  const [selectedPrChannel, setSelectedPrChannel] = useState<string>('');
+  // PR Channel multi-select state
+  const [selectedPrChannels, setSelectedPrChannels] = useState<string[]>([]);
   const [customPrChannel, setCustomPrChannel] = useState<string>('');
+
+  const getFormattedPrChannel = () => {
+    return selectedPrChannels
+      .map((c) => {
+        if (c === 'Other') return customPrChannel.trim() || (isTh ? 'อื่นๆ' : 'Other');
+        const match = PR_CHANNEL_OPTIONS.find((o) => o.id === c);
+        return match ? (isTh ? match.th : match.en) : c;
+      })
+      .filter(Boolean)
+      .join(', ');
+  };
 
   // Form Fields
   const [formData, setFormData] = useState({
@@ -78,7 +100,6 @@ function RegisterContent() {
     faculty: MAHIDOL_FACULTIES[0].name,
     academicYear: ACADEMIC_YEARS[0].value,
     donationExperience: 'FIRST_TIME',
-    prChannel: '',
     timeSlotId: '',
     privacyAccepted: false,
   });
@@ -199,8 +220,10 @@ function RegisterContent() {
     setLoading(true);
     try {
       const { timeSlotId, ...rest } = formData;
+      const formattedPr = getFormattedPrChannel();
       const payload = {
         ...rest,
+        prChannel: formattedPr || undefined,
         slotId: isWalkInMode ? undefined : timeSlotId,
         source: isWalkInMode ? 'WALK_IN' : 'ONLINE',
       };
@@ -622,107 +645,94 @@ function RegisterContent() {
                     </div>
                   </div>
 
-                  {/* PR Source / Acquisition Channel (Optional) */}
-                  <div className="pt-2">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-xs font-bold text-gray-700">
-                        {tReg.prSource[language]}
-                      </label>
-                      <span className="text-[11px] text-gray-400 font-medium">
-                        {tReg.prSourceOptional[language]}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      {[
-                        { id: 'Instagram', label: 'Instagram', icon: '📸' },
-                        { id: 'Facebook', label: 'Facebook', icon: '📘' },
-                        { id: 'LINE', label: 'LINE / OpenChat', icon: '💬' },
-                        { id: 'TikTok', label: 'TikTok', icon: '🎵' },
-                        { id: 'Poster', label: isTh ? 'โปสเตอร์ / ป้าย' : 'Poster / Banner', icon: '📢' },
-                        { id: 'PR_Walk', label: isTh ? 'ขบวนเดิน PR ในมอ' : 'On-campus PR', icon: '🚶' },
-                        { id: 'Referral', label: isTh ? 'เพื่อน / คนรู้จัก' : 'Friend Referral', icon: '👥' },
-                        { id: 'Other', label: isTh ? 'อื่นๆ' : 'Other', icon: '🌐' },
-                      ].map((pr) => {
-                        const isSelected = selectedPrChannel === pr.id;
-                        return (
-                          <button
-                            key={pr.id}
-                            type="button"
-                            onClick={() => {
-                              if (isSelected) {
-                                setSelectedPrChannel('');
-                                setFormData({ ...formData, prChannel: '' });
-                              } else {
-                                setSelectedPrChannel(pr.id);
-                                if (pr.id !== 'Other') {
-                                  setFormData({ ...formData, prChannel: pr.id });
-                                } else {
-                                  setFormData({ ...formData, prChannel: customPrChannel.trim() || (isTh ? 'อื่นๆ' : 'Other') });
-                                }
-                              }
-                            }}
-                            className={`py-2 px-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer select-none ${
-                              isSelected
-                                ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] ring-1.5 ring-[var(--burgundy-700)] shadow-2xs font-black'
-                                : 'border-gray-200 hover:border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
-                            }`}
-                          >
-                            <span className="text-sm">{pr.icon}</span>
-                            <span className="truncate">{pr.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {selectedPrChannel === 'Other' && (
-                      <div className="mt-2.5 animate-in fade-in-50 duration-150">
-                        <input
-                          type="text"
-                          value={customPrChannel}
-                          onChange={(e) => {
-                            setCustomPrChannel(e.target.value);
-                            setFormData({ ...formData, prChannel: e.target.value.trim() || (isTh ? 'อื่นๆ' : 'Other') });
-                          }}
-                          placeholder={tReg.prOtherPlaceholder[language]}
-                          maxLength={100}
-                          className="editorial-input text-xs sm:text-sm py-2 px-3 rounded-xl"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* If Walk-in mode, show PDPA Consent here in Step 2 (Frameless) */}
+                  {/* If Walk-in mode, show PR Source & PDPA Consent here in Step 2 */}
                   {isWalkInMode && (
-                    <div className="mt-5 pt-4 border-t border-[var(--rose-100)] space-y-2.5">
-                      <div className="flex items-start gap-2 text-[var(--burgundy-700)]">
-                        <ShieldCheck className="h-4.5 w-4.5 shrink-0 mt-0.5" />
-                        <h4 className="text-xs font-bold text-gray-900">
-                          {tReg.privacyNotice.title[language]}
-                        </h4>
-                      </div>
-                      <p className="text-[11.5px] text-gray-600 leading-relaxed break-words pl-6.5">
-                        {tReg.privacyNotice.body[language]}
-                      </p>
+                    <>
+                      {/* PR Source / Acquisition Channel (Multi-select / Optional) */}
+                      <div className="mt-5 pt-4 border-t border-[var(--rose-100)] space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-xs font-bold text-gray-800">
+                            {tReg.prSource[language]}
+                          </label>
+                          <span className="text-[11px] text-gray-400 font-medium">
+                            {isTh ? '(เลือกได้มากกว่า 1 ข้อ · ไม่บังคับ)' : '(Multi-select · Optional)'}
+                          </span>
+                        </div>
 
-                      <label className="flex items-start gap-2.5 pt-1 pl-6.5 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={formData.privacyAccepted}
-                          onChange={(e) => setFormData({ ...formData, privacyAccepted: e.target.checked })}
-                          className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0 rounded cursor-pointer"
-                        />
-                        <span className="text-xs leading-relaxed font-bold text-gray-800 break-words">
-                          {tReg.privacyNotice.accept[language]}
-                          <span className="text-red-600 font-bold ml-1">*</span>
-                        </span>
-                      </label>
-                    </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {PR_CHANNEL_OPTIONS.map((opt) => {
+                            const isChecked = selectedPrChannels.includes(opt.id);
+                            return (
+                              <label
+                                key={opt.id}
+                                className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs cursor-pointer transition-all select-none ${
+                                  isChecked
+                                    ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-900)] font-bold shadow-2xs'
+                                    : 'border-gray-200 hover:border-gray-300 text-gray-700 bg-white'
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    const updated = e.target.checked
+                                      ? [...selectedPrChannels, opt.id]
+                                      : selectedPrChannels.filter((c) => c !== opt.id);
+                                    setSelectedPrChannels(updated);
+                                  }}
+                                  className="h-4 w-4 accent-[var(--burgundy-700)] rounded cursor-pointer shrink-0"
+                                />
+                                <span className="leading-snug">{isTh ? opt.th : opt.en}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
+
+                        {selectedPrChannels.includes('Other') && (
+                          <div className="mt-2 animate-in fade-in-50 duration-150">
+                            <input
+                              type="text"
+                              value={customPrChannel}
+                              onChange={(e) => setCustomPrChannel(e.target.value)}
+                              placeholder={tReg.prOtherPlaceholder[language]}
+                              maxLength={100}
+                              className="editorial-input text-xs sm:text-sm py-2 px-3 rounded-xl"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Walk-in PDPA Consent */}
+                      <div className="mt-4 pt-3 border-t border-[var(--rose-100)] space-y-2.5">
+                        <div className="flex items-start gap-2 text-[var(--burgundy-700)]">
+                          <ShieldCheck className="h-4.5 w-4.5 shrink-0 mt-0.5" />
+                          <h4 className="text-xs font-bold text-gray-900">
+                            {tReg.privacyNotice.title[language]}
+                          </h4>
+                        </div>
+                        <p className="text-[11.5px] text-gray-600 leading-relaxed break-words pl-6.5">
+                          {tReg.privacyNotice.body[language]}
+                        </p>
+
+                        <label className="flex items-start gap-2.5 pt-1 pl-6.5 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={formData.privacyAccepted}
+                            onChange={(e) => setFormData({ ...formData, privacyAccepted: e.target.checked })}
+                            className="mt-0.5 h-4 w-4 accent-[var(--burgundy-700)] shrink-0 rounded cursor-pointer"
+                          />
+                          <span className="text-xs leading-relaxed font-bold text-gray-800 break-words">
+                            {tReg.privacyNotice.accept[language]}
+                            <span className="text-red-600 font-bold ml-1">*</span>
+                          </span>
+                        </label>
+                      </div>
+                    </>
                   )}
                 </div>
               )}
 
-              {/* STEP 3: TIME SLOT SELECTION (Advance Mode Only) */}
+              {/* STEP 3: TIME SLOT SELECTION & PR CHANNEL (Advance Mode Only) */}
               {!isWalkInMode && step === 3 && (
                 <div className="space-y-4">
                   <div className="space-y-1 border-b border-[var(--rose-100)] pb-2">
@@ -786,6 +796,60 @@ function RegisterContent() {
                       })}
                     </div>
                   )}
+
+                  {/* PR Source / Channel Survey - Clean Multi-select Checkboxes */}
+                  <div className="mt-5 pt-4 border-t border-[var(--rose-100)] space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-bold text-gray-800">
+                        {tReg.prSource[language]}
+                      </label>
+                      <span className="text-[11px] text-gray-400 font-medium">
+                        {isTh ? '(เลือกได้มากกว่า 1 ข้อ · ไม่บังคับ)' : '(Multi-select · Optional)'}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {PR_CHANNEL_OPTIONS.map((opt) => {
+                        const isChecked = selectedPrChannels.includes(opt.id);
+                        return (
+                          <label
+                            key={opt.id}
+                            className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs cursor-pointer transition-all select-none ${
+                              isChecked
+                                ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-900)] font-bold shadow-2xs'
+                                : 'border-gray-200 hover:border-gray-300 text-gray-700 bg-white'
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                const updated = e.target.checked
+                                  ? [...selectedPrChannels, opt.id]
+                                  : selectedPrChannels.filter((c) => c !== opt.id);
+                                setSelectedPrChannels(updated);
+                              }}
+                              className="h-4 w-4 accent-[var(--burgundy-700)] rounded cursor-pointer shrink-0"
+                            />
+                            <span className="leading-snug">{isTh ? opt.th : opt.en}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    {selectedPrChannels.includes('Other') && (
+                      <div className="mt-2 animate-in fade-in-50 duration-150">
+                        <input
+                          type="text"
+                          value={customPrChannel}
+                          onChange={(e) => setCustomPrChannel(e.target.value)}
+                          placeholder={tReg.prOtherPlaceholder[language]}
+                          maxLength={100}
+                          className="editorial-input text-xs sm:text-sm py-2 px-3 rounded-xl"
+                        />
+                      </div>
+                    )}
+                  </div>
 
                   {/* PRIVACY CONSENT - Frameless */}
                   <div className="mt-5 pt-4 border-t border-[var(--rose-100)] space-y-2.5">
@@ -891,10 +955,10 @@ function RegisterContent() {
                             </>
                           )}
                         </div>
-                        {formData.prChannel && (
-                          <div className="pt-1 text-[11px] text-gray-500 font-medium flex items-center gap-1">
-                            <span>📢 {isTh ? 'ทราบข่าวจาก:' : 'Heard via:'}</span>
-                            <span className="font-bold text-gray-700">{formData.prChannel}</span>
+                        {getFormattedPrChannel() && (
+                          <div className="pt-1 text-[11px] text-gray-500 font-medium flex items-center gap-1.5 flex-wrap">
+                            <span className="font-bold text-gray-600">📢 {isTh ? 'ทราบข่าวจาก:' : 'Heard via:'}</span>
+                            <span className="font-semibold text-gray-800">{getFormattedPrChannel()}</span>
                           </div>
                         )}
                       </div>
