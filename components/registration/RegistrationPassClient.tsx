@@ -93,10 +93,10 @@ export function RegistrationPassClient({
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-rose-100 text-[#A6192E] shadow-xs ring-4 ring-rose-50">
             <XCircle className="h-7 w-7" />
           </div>
-          <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl font-display">
+          <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl lg:text-4xl font-display">
             {isTh ? 'รหัสลงทะเบียนนี้ถูกยกเลิกแล้ว' : 'Registration Cancelled'}
           </h1>
-          <p className="text-xs sm:text-sm text-[var(--muted)] font-medium max-w-md mx-auto">
+          <p className="text-sm sm:text-base text-[var(--muted)] font-medium max-w-lg mx-auto leading-relaxed break-words">
             {isTh
               ? `รหัส ${registrationCode} ได้ถูกยกเลิกแล้ว ไม่สามารถนำมาใช้สแกนเช็กอินในวันงานได้ หากต้องการเข้าร่วมกิจกรรม สามารถลงทะเบียนใหม่ได้ทันที`
               : `Code ${registrationCode} has been cancelled and cannot be used for check-in on event day.`}
@@ -107,10 +107,10 @@ export function RegistrationPassClient({
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 shadow-xs ring-4 ring-emerald-50">
             <CheckCircle2 className="h-7 w-7" />
           </div>
-          <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl font-display">
+          <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl lg:text-4xl font-display">
             {isTh ? 'ลงทะเบียนบริจาคโลหิตสำเร็จ!' : 'Registration Successful!'}
           </h1>
-          <p className="text-xs sm:text-sm text-[var(--muted)] font-medium max-w-md mx-auto">
+          <p className="text-sm sm:text-base text-[var(--muted)] font-medium max-w-lg mx-auto leading-relaxed break-words">
             {isTh
               ? 'ยินดีต้อนรับสู่ MUMT LoveUnit ครั้งที่ 9 กรุณาบันทึกภาพตั๋วนี้เพื่อนำไปแสดงต่อเจ้าหน้าที่ในวันงาน'
               : 'Welcome to 9th MUMT LoveUnit! Please save this pass to present to staff on event day.'}

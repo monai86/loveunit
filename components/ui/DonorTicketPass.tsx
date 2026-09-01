@@ -397,73 +397,73 @@ export function DonorTicketPass({
           </div>
 
           {/* Symmetrical 2-Column Details Grid */}
-          <section aria-labelledby="appointment-details" className="space-y-3">
+          <section aria-labelledby="appointment-details" className="space-y-3.5">
             <div className="border-b border-gray-100 pb-2.5">
               <h3
                 id="appointment-details"
-                className="text-sm font-black text-gray-900 flex items-center gap-1.5 font-display"
+                className="text-base sm:text-lg font-black text-gray-900 flex items-center gap-1.5 font-display"
               >
                 <span>{isTh ? "รายละเอียดการนัดหมาย" : "Appointment Details"}</span>
               </h3>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
               {/* Donor Name */}
-              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <User className="h-3.5 w-3.5 text-[#A6192E]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-500">
+                  <User className="h-4 w-4 text-[#A6192E]" />
                   <span>{isTh ? "ผู้ลงทะเบียน" : "Donor Name"}</span>
                 </div>
-                <p className="text-sm font-black text-gray-900">{name}</p>
+                <p className="text-base font-black text-gray-900 break-words">{name}</p>
               </div>
 
               {/* Event Date */}
-              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <Calendar className="h-3.5 w-3.5 text-[#A6192E]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-500">
+                  <Calendar className="h-4 w-4 text-[#A6192E]" />
                   <span>{isTh ? "วันจัดกิจกรรม" : "Event Date"}</span>
                 </div>
-                <p className="text-sm font-black text-gray-900">{defaultDate}</p>
+                <p className="text-base font-black text-gray-900">{defaultDate}</p>
               </div>
 
               {/* Time Slot / Walk-in Time */}
-              <div className="rounded-xl border border-red-100 bg-[#FDF2F3]/70 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#A6192E]">
-                  <Clock className="h-3.5 w-3.5" />
+              <div className="rounded-xl border border-red-100 bg-[#FDF2F3]/70 p-4 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#A6192E]">
+                  <Clock className="h-4 w-4" />
                   <span>{timeLabelText}</span>
                 </div>
-                <p className="text-base font-black text-[#7A1222]">{timeSlot}</p>
+                <p className="text-lg font-black text-[#7A1222] font-mono">{timeSlot}</p>
                 {!isWalkIn && (
-                  <p className="text-[10.5px] text-gray-500 font-medium leading-tight">
+                  <p className="text-xs text-gray-600 font-medium leading-relaxed break-words mt-1">
                     {isTh ? "💡 เดินทางมาถึงได้ตลอดช่วงเวลา 09:00 - 14:00 น." : "💡 Flexible arrival anytime 09:00 AM - 02:00 PM"}
                   </p>
                 )}
               </div>
 
               {/* Venue */}
-              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <MapPin className="h-3.5 w-3.5 text-[#A6192E]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-500">
+                  <MapPin className="h-4 w-4 text-[#A6192E]" />
                   <span>{isTh ? "สถานที่จัดกิจกรรม" : "Event Venue"}</span>
                 </div>
-                <p className="text-xs font-bold text-gray-900 leading-snug">{defaultVenue}</p>
+                <p className="text-sm font-bold text-gray-900 leading-snug break-words">{defaultVenue}</p>
               </div>
 
               {/* Phone */}
-              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <Phone className="h-3.5 w-3.5 text-[#A6192E]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-500">
+                  <Phone className="h-4 w-4 text-[#A6192E]" />
                   <span>{isTh ? "เบอร์โทรศัพท์" : "Phone Number"}</span>
                 </div>
-                <p className="text-xs font-bold text-gray-900">{phone || "—"}</p>
+                <p className="text-sm sm:text-base font-bold text-gray-900 font-mono">{phone || "—"}</p>
               </div>
 
               {/* Faculty */}
-              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500">
-                  <Building2 className="h-3.5 w-3.5 text-[#A6192E]" />
+              <div className="rounded-xl border border-gray-100 bg-gray-50/70 p-4 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-gray-500">
+                  <Building2 className="h-4 w-4 text-[#A6192E]" />
                   <span>{isTh ? "คณะ / สังกัด" : "Affiliation / Faculty"}</span>
                 </div>
-                <p className="text-xs font-bold text-gray-900 leading-snug">{faculty || (isTh ? "บุคคลทั่วไป" : "General Public")}</p>
+                <p className="text-sm font-bold text-gray-900 leading-snug break-words">{faculty || (isTh ? "บุคคลทั่วไป" : "General Public")}</p>
               </div>
             </div>
           </section>
@@ -476,10 +476,10 @@ export function DonorTicketPass({
             {isConfirmed && status !== 'CANCELLED' ? (
               <>
                 <div>
-                  <h3 id="ticket-qr-heading" className="text-sm font-black text-gray-900 font-display">
+                  <h3 id="ticket-qr-heading" className="text-base sm:text-lg font-black text-gray-900 font-display">
                     {isTh ? "QR Code สำหรับเช็กอิน" : "Check-in QR Code"}
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
                     {isTh ? "แสดง QR Code นี้ต่อเจ้าหน้าที่ ณ จุดลงทะเบียนในวันงาน" : "Please present this QR Code to staff at the venue on event day"}
                   </p>
                 </div>
@@ -487,35 +487,35 @@ export function DonorTicketPass({
                 <div className="flex justify-center">
                   <div
                     ref={qrRef}
-                    className="rounded-2xl border border-gray-200 bg-white p-3.5 shadow-sm"
+                    className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm"
                   >
                     {qrToken ? (
                       <QRCodeSVG
                         value={qrToken}
-                        size={160}
+                        size={170}
                         level="M"
                         title={isTh ? "QR Code สำหรับเช็กอิน" : "Check-in QR Code"}
                         imageSettings={{
                           src: "/images/logo.png",
-                          height: 28,
-                          width: 28,
+                          height: 30,
+                          width: 30,
                           excavate: true,
                         }}
                       />
                     ) : (
-                      <div className="flex h-40 w-40 items-center justify-center bg-gray-50 text-xs font-bold text-gray-400">
+                      <div className="flex h-44 w-44 items-center justify-center bg-gray-50 text-xs sm:text-sm font-bold text-gray-400">
                         {isTh ? "กำลังสร้าง QR Code..." : "Generating QR..."}
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
                   <button
                     type="button"
                     onClick={downloadTicket}
                     disabled={downloading}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[#C5222F] to-[#A6192E] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-red-900/15 transition-all hover:from-[#B01B27] hover:to-[#911426] active:scale-98 disabled:opacity-60 cursor-pointer"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-[#C5222F] to-[#A6192E] px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-md shadow-red-900/15 transition-all hover:from-[#B01B27] hover:to-[#911426] active:scale-98 disabled:opacity-60 cursor-pointer"
                   >
                     <Download className="h-4 w-4" />
                     <span>{downloading ? (isTh ? "กำลังบันทึกภาพ..." : "Saving...") : (isTh ? "บันทึกภาพตั๋ว" : "Download Pass")}</span>
@@ -524,7 +524,7 @@ export function DonorTicketPass({
                   <button
                     type="button"
                     onClick={shareTicket}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-bold text-[#A6192E] transition-all hover:bg-rose-100 active:scale-98 cursor-pointer"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-bold text-[#A6192E] transition-all hover:bg-rose-100 active:scale-98 cursor-pointer"
                   >
                     <Share2 className="h-4 w-4" />
                     <span>{isTh ? "แชร์ตั๋ว" : "Share"}</span>
@@ -534,7 +534,7 @@ export function DonorTicketPass({
                     href={getGoogleCalendarUrl()}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98"
                   >
                     <CalendarPlus className="h-4 w-4 text-blue-600" />
                     <span>Google Calendar</span>
@@ -543,7 +543,7 @@ export function DonorTicketPass({
                   <button
                     type="button"
                     onClick={downloadIcs}
-                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98 cursor-pointer"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-bold text-gray-700 shadow-2xs transition-all hover:bg-gray-50 active:scale-98 cursor-pointer"
                   >
                     <Calendar className="h-4 w-4 text-indigo-600" />
                     <span>Apple Calendar (.ics)</span>
@@ -551,14 +551,14 @@ export function DonorTicketPass({
                 </div>
               </>
             ) : (
-              <div className="py-6 px-4 rounded-2xl bg-rose-50/80 border border-rose-200 text-center space-y-2">
+              <div className="py-6 px-4 rounded-2xl bg-rose-50/80 border border-rose-200 text-center space-y-2.5">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-700 font-black text-xl shadow-2xs">
                   ✕
                 </div>
-                <h3 className="text-base font-black text-rose-950 font-display">
+                <h3 className="text-lg font-black text-rose-950 font-display">
                   {isTh ? "ตั๋วลงทะเบียนนี้ถูกยกเลิกแล้ว" : "Registration Cancelled"}
                 </h3>
-                <p className="text-xs text-rose-800 max-w-sm mx-auto font-medium">
+                <p className="text-xs sm:text-sm text-rose-800 max-w-sm mx-auto font-medium leading-relaxed break-words">
                   {isTh 
                     ? "รหัสและ QR Code นี้ถูกยกเลิกแล้ว ไม่สามารถนำมาใช้สแกนเช็กอินในวันงานได้ หากต้องการเข้าร่วมกิจกรรม กรุณาลงทะเบียนใหม่อีกครั้ง"
                     : "This registration and QR Code have been voided and cannot be used for check-in on event day."}
@@ -566,10 +566,10 @@ export function DonorTicketPass({
                 <div className="pt-3">
                   <Link
                     href="/register"
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#A6192E] px-4 py-2 text-xs font-bold text-white hover:bg-[#8F1426] transition-all shadow-xs"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#A6192E] px-5 py-2.5 text-xs sm:text-sm font-bold text-white hover:bg-[#8F1426] transition-all shadow-xs"
                   >
                     <span>{isTh ? "ลงทะเบียนใหม่" : "Register Again"}</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
               </div>
@@ -577,64 +577,64 @@ export function DonorTicketPass({
           </section>
 
           {/* Symmetrical 2x2 Preparation Tips Grid */}
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-[#A6192E]" />
-              <p className="text-xs font-black text-gray-900">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4.5 w-4.5 text-[#A6192E]" />
+              <p className="text-sm sm:text-base font-black text-gray-900">
                 {isTh ? "ข้อแนะนำการเตรียมความพร้อม" : "Donor Preparation Tips"}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 text-xs">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 text-xs sm:text-sm">
               {/* ID Card */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
-                <ShieldCheck className="h-4 w-4 text-[#A6192E] mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 rounded-xl border border-red-100 bg-white p-3.5 shadow-2xs">
+                <ShieldCheck className="h-4.5 w-4.5 text-[#A6192E] mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-gray-900">
+                  <p className="font-bold text-gray-900 text-sm sm:text-base">
                     <strong className="text-[#A6192E]">
                       {isTh ? "อย่าลืมนำบัตรประชาชนมาด้วย" : "Bring National ID Card"}
                     </strong>
                   </p>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-xs text-gray-600 mt-0.5">
                     {isTh ? "หรือบัตรผู้บริจาคโลหิตตัวจริง" : "Or original donor passport"}
                   </p>
                 </div>
               </div>
 
               {/* Water */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
-                <Droplets className="h-4 w-4 text-sky-600 mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 rounded-xl border border-red-100 bg-white p-3.5 shadow-2xs">
+                <Droplets className="h-4.5 w-4.5 text-sky-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-gray-900">
+                  <p className="font-bold text-gray-900 text-sm sm:text-base">
                     {isTh ? "ดื่มน้ำ 3–4 แก้วก่อนมา" : "Drink 3-4 glasses of water"}
                   </p>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-xs text-gray-600 mt-0.5">
                     {isTh ? "ช่วยให้ระบบไหลเวียนโลหิตดีขึ้น" : "30 mins before donating"}
                   </p>
                 </div>
               </div>
 
               {/* Sleep */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
-                <Moon className="h-4 w-4 text-indigo-600 mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 rounded-xl border border-red-100 bg-white p-3.5 shadow-2xs">
+                <Moon className="h-4.5 w-4.5 text-indigo-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-gray-900">
+                  <p className="font-bold text-gray-900 text-sm sm:text-base">
                     {isTh ? "นอนหลับพักผ่อน 6–8 ชม." : "Sleep 6-8 hours"}
                   </p>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-xs text-gray-600 mt-0.5">
                     {isTh ? "ไม่อดนอนในคืนก่อนวันบริจาค" : "At least 5 hours prior"}
                   </p>
                 </div>
               </div>
 
               {/* Food */}
-              <div className="flex items-start gap-2.5 rounded-xl border border-red-100 bg-white p-3 shadow-2xs">
-                <Utensils className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+              <div className="flex items-start gap-3 rounded-xl border border-red-100 bg-white p-3.5 shadow-2xs">
+                <Utensils className="h-4.5 w-4.5 text-amber-600 mt-0.5 shrink-0" />
                 <div>
-                  <p className="font-bold text-gray-900">
+                  <p className="font-bold text-gray-900 text-sm sm:text-base">
                     {isTh ? "งดอาหารไขมันสูง & แอลกอฮอล์" : "Avoid high-fat food & alcohol"}
                   </p>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-xs text-gray-600 mt-0.5">
                     {isTh ? "ทานอาหารมื้อหลักล่วงหน้า" : "At least 6 hours before"}
                   </p>
                 </div>
@@ -651,7 +651,7 @@ export function DonorTicketPass({
           <button
             type="button"
             onClick={onReset}
-            className="editorial-btn-secondary min-h-11 flex-1 py-3 text-xs font-bold cursor-pointer"
+            className="editorial-btn-secondary min-h-12 flex-1 py-3 px-5 text-sm font-bold cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>{effectiveResetLabel}</span>
@@ -661,7 +661,7 @@ export function DonorTicketPass({
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-xs font-bold text-[#A6192E] shadow-2xs hover:bg-rose-100 hover:border-rose-300 active:scale-98 transition-all cursor-pointer"
+            className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl border border-rose-200 bg-rose-50/80 px-5 py-3 text-sm font-bold text-[#A6192E] shadow-2xs hover:bg-rose-100 hover:border-rose-300 active:scale-98 transition-all cursor-pointer"
           >
             <XCircle className="h-4 w-4" />
             <span>{cancelLabel || (isTh ? "ขอยกเลิกการลงทะเบียน" : "Cancel Registration")}</span>
@@ -669,7 +669,7 @@ export function DonorTicketPass({
         )}
         <Link
           href={primaryAction?.href || "/"}
-          className="editorial-btn-primary min-h-11 flex-1 py-3 text-xs font-bold"
+          className="editorial-btn-primary min-h-12 flex-1 py-3 px-5 text-sm font-bold"
         >
           <span>{primaryAction?.label || (isTh ? "กลับสู่หน้าแรก" : "Back to Home")}</span>
           {primaryAction?.icon || <ArrowRight className="h-4 w-4" />}
