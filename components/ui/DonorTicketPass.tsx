@@ -46,14 +46,16 @@ export interface DonorTicketPassProps {
   primaryAction?: { href: string; label: string; icon?: React.ReactNode };
 }
 
+import { EVENT_CONFIG, getFormattedVenue } from "@/lib/constants/event";
+
 export function DonorTicketPass({
   registrationCode,
   name,
   phone,
   faculty,
-  timeSlot = "09:00–14:00 น.",
-  date = "พุธที่ 16 กันยายน 2569",
-  venue = "ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา",
+  timeSlot = "09:00 – 14:00 น.",
+  date,
+  venue,
   qrToken,
   isConfirmed = true,
   status = "REGISTERED",
@@ -69,8 +71,8 @@ export function DonorTicketPass({
   const qrRef = useRef<HTMLDivElement>(null);
 
   const isWalkIn = isWalkInRecord(registrationCode);
-  const defaultDate = isEn ? "Wednesday, September 16, 2026" : date;
-  const defaultVenue = isEn ? "Meeting Room 217, Sirividhaya Building, Mahidol University Salaya" : venue;
+  const defaultDate = date || (isEn ? EVENT_CONFIG.dateEn : EVENT_CONFIG.dateTh);
+  const defaultVenue = venue || getFormattedVenue(isEn ? 'en' : 'th');
   const effectiveResetLabel = resetLabel || (isTh ? "ค้นหาใหม่" : "New Search");
   const timeLabelText = isWalkIn
     ? (isTh ? "เวลาลงทะเบียน (Walk-in)" : "Walk-in Registration Time")

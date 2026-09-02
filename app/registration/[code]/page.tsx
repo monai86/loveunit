@@ -6,7 +6,7 @@ import { getRegistrationByCode } from '@/services/registration-service';
 import { formatTimeRange, formatBangkokTime, isWalkInRecord, pickField } from '@/lib/utils/format';
 import { RegistrationPoster } from '@/components/registration/RegistrationPoster';
 import { RegistrationPassClient } from '@/components/registration/RegistrationPassClient';
-import { Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface PageProps {
   params: Promise<{ code: string }>;
@@ -14,6 +14,8 @@ interface PageProps {
 }
 
 export const dynamic = 'force-dynamic';
+
+import { EVENT_CONFIG, getFormattedVenue } from '@/lib/constants/event';
 
 export default async function RegistrationDetailPage({ params, searchParams }: PageProps) {
   const { code } = await params;
@@ -50,10 +52,10 @@ export default async function RegistrationDetailPage({ params, searchParams }: P
               {regCode}
             </span>
             <h1 className="text-xl sm:text-2xl font-black text-gray-900 font-display">
-              ต้องใช้ลิงก์ยืนยันตัวตนเพื่อเปิดดูตั๋ว (Private Pass)
+              ต้องใช้สิทธิ์ยืนยันตัวตนเพื่อเปิดดูตั๋ว (Private Pass)
             </h1>
             <p className="text-xs sm:text-sm text-gray-600 max-w-md mx-auto leading-relaxed">
-              หมายเลขลงทะเบียนนี้เป็นข้อมูลส่วนบุคคล เพื่อความปลอดภัยและการคุ้มครองข้อมูล (PDPA) ท่านสามารถเปิดดูตั๋วและ QR Code ได้ผ่านลิงก์ที่ได้รับในอีเมล หรือขอรับ Magic Link ใหม่ผ่านหน้าค้นหาตั๋ว
+              หมายเลขลงทะเบียนนี้เป็นข้อมูลส่วนบุคคล เพื่อความปลอดภัยและการคุ้มครองข้อมูล (PDPA) ท่านสามารถเปิดดูตั๋วและ QR Code ได้ผ่านการค้นหาด้วยเบอร์โทรศัพท์ที่ลงทะเบียนไว้ หรือผ่านลิงก์ที่ได้รับในอีเมล
             </p>
           </div>
 
@@ -62,8 +64,8 @@ export default async function RegistrationDetailPage({ params, searchParams }: P
               href="/lookup"
               className="editorial-btn-primary min-h-11 flex-1 py-3 text-xs font-bold justify-center"
             >
-              <Mail className="h-4 w-4" />
-              <span>ขอรับลิงก์ยืนยันตัวตนทางอีเมล</span>
+              <Phone className="h-4 w-4" />
+              <span>ค้นหาตั๋วด้วยเบอร์โทรศัพท์ / อีเมล</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -88,7 +90,7 @@ export default async function RegistrationDetailPage({ params, searchParams }: P
   const regTime = pickField<string>(regObj, 'registeredAt', 'registered_at') || pickField<string>(regObj, 'createdAt', 'created_at');
   const timeSlot = isWalkIn
     ? (regTime ? formatBangkokTime(regTime) : formatBangkokTime(new Date()))
-    : (slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : '09:00 – 14:00 น.');
+    : (slot ? formatTimeRange(slot.startAt || slot.start_at || '', slot.endAt || slot.end_at || '') : EVENT_CONFIG.timeLabelTh);
   const facultyName = pickField<string>(regObj, 'faculty', 'faculty') || 'มหาวิทยาลัยมหิดล';
 
   return (
@@ -102,8 +104,8 @@ export default async function RegistrationDetailPage({ params, searchParams }: P
         phone={phone}
         faculty={facultyName}
         timeSlot={timeSlot}
-        date="พุธที่ 16 กันยายน 2569"
-        venue="ห้องประชุม 217 - 218 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา"
+        date={EVENT_CONFIG.dateTh}
+        venue={getFormattedVenue('th')}
         qrToken={qrToken}
         initialStatus={regObj.status || 'REGISTERED'}
       />

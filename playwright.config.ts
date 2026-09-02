@@ -46,8 +46,9 @@ const chromiumExecutable = findChromiumExecutable();
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
+  workers: process.env.CI ? 2 : 3,
   timeout: 60_000,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   reporter: process.env.CI ? 'github' : [['list']],
   use: {
     baseURL: process.env.E2E_BASE_URL || 'http://localhost:3003',
@@ -57,4 +58,10 @@ export default defineConfig({
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
   ],
+  webServer: {
+    command: 'npx next start -p 3003',
+    port: 3003,
+    reuseExistingServer: true,
+    timeout: 60_000,
+  },
 });

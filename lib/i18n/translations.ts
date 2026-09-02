@@ -1,3 +1,5 @@
+import { EVENT_CONFIG, getFormattedVenue } from '@/lib/constants/event';
+
 export type Language = 'th' | 'en';
 
 export const TRANSLATIONS = {
@@ -12,21 +14,21 @@ export const TRANSLATIONS = {
     registerWalkIn: { th: 'ลงทะเบียน Walk-in', en: 'Walk-in Register' },
     lookup: { th: 'ค้นหาตั๋ว/QR', en: 'Find My QR' },
     brandSub: { th: 'เติมรักให้เต็ม Unit · ต่อชีวิตด้วยโลหิตคุณ', en: 'Give Blood · Share Love · Save Lives' },
-    eventBadge: { th: 'ครั้งที่ 9', en: '9th Edition' },
+    eventBadge: { th: EVENT_CONFIG.editionLabelTh, en: EVENT_CONFIG.editionLabelEn },
   },
   home: {
-    badge: { th: 'ครั้งที่ 9 · MUMT Blood Donation 2026', en: '9th · MUMT Blood Donation 2026' },
+    badge: { th: `${EVENT_CONFIG.editionLabelTh} · ${EVENT_CONFIG.name}`, en: `${EVENT_CONFIG.editionLabelEn} · ${EVENT_CONFIG.name}` },
     title1a: { th: 'เติมรักให้เต็ม', en: 'Fill Your' },
     title1b: { th: 'UNIT', en: 'Unit' },
     title1c: { th: '', en: 'with Love' },
     title2: { th: 'ต่อชีวิตด้วยโลหิตคุณ', en: 'Save Lives with Your Blood' },
     description: {
-      th: 'โครงการบริจาคโลหิต MUMT LoveUnit ครั้งที่ 9 จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี สภากาชาดไทย ณ อาคารสิริวิทยา ม.มหิดล ศาลายา',
-      en: 'Join the 9th MUMT Love Unit Blood Donation! Organized by the Faculty of Medical Technology, Mahidol University, together with Regional Blood Centre 4 Ratchaburi, Thai Red Cross Society at Sirividhaya Building, Mahidol University Salaya.'
+      th: `โครงการบริจาคโลหิต MUMT LoveUnit ${EVENT_CONFIG.editionLabelTh} จัดโดย ${EVENT_CONFIG.organizers[0].name} ร่วมกับ ${EVENT_CONFIG.organizers[1].name} ณ ${EVENT_CONFIG.venue.building} ${EVENT_CONFIG.venue.faculty} ${EVENT_CONFIG.venue.university} ${EVENT_CONFIG.venue.campus}`,
+      en: `Join the 9th MUMT Love Unit Blood Donation! Organized by the Faculty of Medical Technology, Mahidol University, together with Regional Blood Centre 4 Ratchaburi, Thai Red Cross Society at Sirividhaya Building, Mahidol University Salaya.`
     },
-    venue: { th: 'ห้องประชุม 217 - 218 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา', en: 'Meeting Room 217 - 218, Sirividhaya Building, Mahidol University Salaya' },
-    date: { th: 'วันพุธที่ 16 กันยายน 2569', en: 'Wednesday, September 16, 2026' },
-    time: { th: '09:00 - 14:00 น.', en: '09:00 AM - 02:00 PM' },
+    venue: { th: getFormattedVenue('th'), en: getFormattedVenue('en') },
+    date: { th: EVENT_CONFIG.dateTh, en: EVENT_CONFIG.dateEn },
+    time: { th: EVENT_CONFIG.timeLabelTh, en: EVENT_CONFIG.timeLabelEn },
     ctaRegister: { th: 'ลงทะเบียนบริจาคโลหิตออนไลน์', en: 'Register Online' },
     ctaRegisterWalkIn: { th: 'ลงทะเบียน Walk-in หน้างาน', en: 'Walk-in Registration' },
     ctaLookup: { th: 'ค้นหาตั๋ว / QR Code ของฉัน', en: 'Find My QR Code Pass' },

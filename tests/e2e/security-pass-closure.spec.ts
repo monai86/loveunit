@@ -65,19 +65,31 @@ test.describe('MUMT LoveUnit - Security Closure & Real Production E2E Verificati
     const freshPage = await freshContext.newPage();
     const targetPassUrl = new URL(`/registration/${regCode}`, page.url()).href;
     await freshPage.goto(targetPassUrl);
-    await expect(freshPage.getByText('ต้องใช้ลิงก์ยืนยันตัวตนเพื่อเปิดดูตั๋ว (Private Pass)')).toBeVisible();
+    await expect(freshPage.getByText(/Private Pass/)).toBeVisible();
     // Ticket actions must NOT be present on locked view
     await expect(freshPage.getByRole('button', { name: /บันทึกภาพตั๋ว/ })).not.toBeVisible();
     // Verify direct link to /lookup is present
-    await expect(freshPage.getByRole('link', { name: /ขอรับลิงก์ยืนยันตัวตนทางอีเมล/ })).toBeVisible();
+    await expect(freshPage.getByRole('link', { name: /ค้นหาตั๋วด้วยเบอร์โทรศัพท์/ })).toBeVisible();
     await freshContext.close();
 
-    // 6. Navigate to /lookup
+    // 6. Navigate to /lookup and test direct phone search and email search tabs
     await page.goto('/lookup');
     await expect(page.getByText('ค้นหาตั๋วและ QR Code ของฉัน')).toBeVisible();
+
+    // Test direct Phone search (instant ticket pass display, no SMS needed)
+    await page.getByRole('tab', { name: /เบอร์โทรศัพท์/ }).click();
+    await page.getByPlaceholder(/081-234-5678/).fill(phone);
+    await page.getByRole('button', { name: /ค้นหาตั๋วของฉัน/ }).click();
+    // DonorTicketPass must be displayed immediately
+    await expect(page.getByRole('button', { name: /บันทึกภาพตั๋ว/ })).toBeVisible();
+    await expect(page.getByText(regCode)).toBeVisible();
+
+    // Reset and switch to Email search tab
+    await page.getByRole('button', { name: '← ค้นหาตั๋วอื่น' }).click();
+    await page.getByRole('tab', { name: /อีเมล/ }).click();
     await page.getByPlaceholder(/เช่น somchai@student.mahidol.edu/).fill(email);
-    await page.getByRole('button', { name: /ส่งลิงก์ยืนยันตัวตนเข้าอีเมล/ }).click();
-    await expect(page.getByText('ส่งลิงก์ยืนยันตัวตนเรียบร้อยแล้ว')).toBeVisible();
+    await page.getByRole('button', { name: /ส่งลิงก์เปิดดูตั๋วเข้าอีเมล/ }).click();
+    await expect(page.getByText('ส่งลิงก์เปิดดูตั๋วเรียบร้อยแล้ว')).toBeVisible();
 
     // 7. Verify /location page
     await page.goto('/location');

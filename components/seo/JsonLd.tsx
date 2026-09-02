@@ -1,33 +1,37 @@
 import React from 'react';
+import { EVENT_CONFIG } from '@/lib/constants/event';
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://loveunit.vercel.app';
 
 export function JsonLd() {
+  const mainOrganizer = EVENT_CONFIG.organizers[0];
+  const mobilePartner = EVENT_CONFIG.organizers[1];
+
   const eventSchema = {
     '@context': 'https://schema.org',
     '@type': 'Event',
-    name: 'MUMT Blood Donation 2026 — เติมรักให้เต็ม Unit ต่อชีวิตด้วยโลหิตคุณ ครั้งที่ 9',
-    alternateName: 'MUMT LoveUnit ครั้งที่ 9',
-    description: 'กิจกรรมบริจาคโลหิตประจำปี 2026 จัดโดย คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี สภากาชาดไทย',
-    startDate: '2026-09-16T09:00:00+07:00',
-    endDate: '2026-09-16T14:00:00+07:00',
+    name: `${EVENT_CONFIG.name} — ${EVENT_CONFIG.thaiName}`,
+    alternateName: `MUMT LoveUnit ${EVENT_CONFIG.editionLabelTh}`,
+    description: `กิจกรรมบริจาคโลหิตประจำปี 2026 จัดโดย ${mainOrganizer.name} ร่วมกับ ${mobilePartner.name}`,
+    startDate: `${EVENT_CONFIG.dateIso}T${EVENT_CONFIG.startTime}:00+07:00`,
+    endDate: `${EVENT_CONFIG.dateIso}T${EVENT_CONFIG.endTime}:00+07:00`,
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     location: {
       '@type': 'Place',
-      name: 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ศาลายา',
+      name: `${EVENT_CONFIG.venue.rooms} (${EVENT_CONFIG.venue.floor}) ${EVENT_CONFIG.venue.building} ${EVENT_CONFIG.venue.faculty} ${EVENT_CONFIG.venue.university} ${EVENT_CONFIG.venue.campus}`,
       address: {
         '@type': 'PostalAddress',
-        streetAddress: '999 ถนนพุทธมณฑลสาย 4 ตำบลศาลายา',
-        addressLocality: 'อำเภอพุทธมณฑล',
-        addressRegion: 'จังหวัดนครปฐม',
-        postalCode: '73170',
-        addressCountry: 'TH',
+        streetAddress: `${EVENT_CONFIG.venue.address.street} ${EVENT_CONFIG.venue.address.subdistrict}`,
+        addressLocality: EVENT_CONFIG.venue.address.district,
+        addressRegion: EVENT_CONFIG.venue.address.province,
+        postalCode: EVENT_CONFIG.venue.address.postalCode,
+        addressCountry: EVENT_CONFIG.venue.address.country,
       },
       geo: {
         '@type': 'GeoCoordinates',
-        latitude: '13.7937',
-        longitude: '100.3242',
+        latitude: EVENT_CONFIG.venue.geo.latitude,
+        longitude: EVENT_CONFIG.venue.geo.longitude,
       },
     },
     image: [
@@ -37,8 +41,8 @@ export function JsonLd() {
     ],
     organizer: {
       '@type': 'EducationalOrganization',
-      name: 'คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล (Faculty of Medical Technology, Mahidol University)',
-      url: 'https://mt.mahidol.ac.th',
+      name: `${mainOrganizer.name} (${mainOrganizer.nameEn})`,
+      url: mainOrganizer.url || 'https://mt.mahidol.ac.th',
       logo: `${BASE_URL}/images/logo.png`,
     },
     offers: {
@@ -51,34 +55,26 @@ export function JsonLd() {
     },
     performer: {
       '@type': 'Organization',
-      name: 'ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี สภากาชาดไทย',
+      name: mobilePartner.name,
     },
   };
 
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'MedicalOrganization',
-    name: 'คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล',
+    name: mainOrganizer.name,
     url: BASE_URL,
     logo: `${BASE_URL}/images/logo.png`,
-    contactPoint: [
-      {
-        '@type': 'ContactPoint',
-        telephone: '+66-9-6986-6245',
-        contactType: 'customer service',
-        availableLanguage: ['Thai', 'English'],
-      },
-      {
-        '@type': 'ContactPoint',
-        telephone: '+66-6-5627-4319',
-        contactType: 'customer service',
-        availableLanguage: ['Thai', 'English'],
-      },
-    ],
+    contactPoint: EVENT_CONFIG.contacts.map((c) => ({
+      '@type': 'ContactPoint',
+      telephone: `+66-${c.phone.replace(/^0/, '')}`,
+      contactType: 'customer service',
+      availableLanguage: ['Thai', 'English'],
+    })),
     sameAs: [
-      'https://www.instagram.com/mumt_loveunit/',
-      'https://www.tiktok.com/@mumt_loveunit',
-      'https://www.facebook.com/profile.php?id=100064643707063',
+      EVENT_CONFIG.social.instagram,
+      EVENT_CONFIG.social.tiktok,
+      EVENT_CONFIG.social.facebook,
     ],
   };
 

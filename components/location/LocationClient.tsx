@@ -64,6 +64,8 @@ const TRAVEL_GUIDE_INFOGRAPHICS = [
 
 type TransitTab = 'BUS' | 'TRAM' | 'SHUTTLE' | 'TRAIN' | 'CAR';
 
+import { EVENT_CONFIG } from '@/lib/constants/event';
+
 export function LocationClient({
   locationInfographic,
   transportInfographic: _transportInfographic,
@@ -82,7 +84,11 @@ export function LocationClient({
         <div className="max-w-2xl space-y-2">
           <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
             <Building2 className="h-3.5 w-3.5 text-white" />
-            <span>{isTh ? 'อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา' : 'Sirividhaya Building, Mahidol University Salaya'}</span>
+            <span>
+              {isTh
+                ? `${EVENT_CONFIG.venue.building} ${EVENT_CONFIG.venue.faculty} ${EVENT_CONFIG.venue.university} ${EVENT_CONFIG.venue.campus}`
+                : `${EVENT_CONFIG.venue.buildingEn}, ${EVENT_CONFIG.venue.facultyEn}, ${EVENT_CONFIG.venue.universityEn} ${EVENT_CONFIG.venue.campusEn}`}
+            </span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
             {isTh ? 'สถานที่จัดงานและการเดินทาง' : 'Venue & Campus Directions'}
@@ -96,7 +102,7 @@ export function LocationClient({
 
         <div className="flex items-center gap-2 shrink-0">
           <a
-            href="https://www.google.com/maps/search/?api=1&query=อาคารสิริวิทยา+คณะศิลปศาสตร์+มหาวิทยาลัยมหิดล+ศาลายา"
+            href={EVENT_CONFIG.venue.googleMapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-4 py-2.5 text-xs shadow-md transition-all cursor-pointer"
@@ -130,12 +136,14 @@ export function LocationClient({
                 <MapPin className="h-5 w-5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-black text-sm text-[var(--burgundy-700)]">
-                    {isTh ? 'ห้องประชุม 217 - 218 (ชั้น 2)' : 'Meeting Room 217 - 218 (2nd Floor)'}
+                    {isTh
+                      ? `${EVENT_CONFIG.venue.rooms} (${EVENT_CONFIG.venue.floor})`
+                      : `${EVENT_CONFIG.venue.roomsEn} (${EVENT_CONFIG.venue.floorEn})`}
                   </h3>
                   <p className="text-xs text-[var(--muted)] mt-0.5 leading-relaxed">
                     {isTh
-                      ? 'อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา'
-                      : 'Sirividhaya Building, Faculty of Liberal Arts, Mahidol University Salaya'}
+                      ? `${EVENT_CONFIG.venue.building} ${EVENT_CONFIG.venue.faculty} ${EVENT_CONFIG.venue.university} ${EVENT_CONFIG.venue.campus}`
+                      : `${EVENT_CONFIG.venue.buildingEn}, ${EVENT_CONFIG.venue.facultyEn}, ${EVENT_CONFIG.venue.universityEn} ${EVENT_CONFIG.venue.campusEn}`}
                   </p>
                 </div>
               </div>
@@ -147,7 +155,9 @@ export function LocationClient({
                     {isTh ? 'เวลาเปิดรับบริจาค' : 'Operating Schedule'}
                   </h3>
                   <p className="text-xs text-[var(--burgundy-700)] font-bold mt-0.5">
-                    {isTh ? 'วันพุธที่ 16 กันยายน 2569 (09:00 - 14:00 น.)' : 'Wednesday, September 16, 2026 (09:00 – 14:00)'}
+                    {isTh
+                      ? `${EVENT_CONFIG.dateTh} (${EVENT_CONFIG.timeLabelTh})`
+                      : `${EVENT_CONFIG.dateEn} (${EVENT_CONFIG.timeLabelEn})`}
                   </p>
                 </div>
               </div>
@@ -158,8 +168,14 @@ export function LocationClient({
                   <span>{isTh ? 'ฝ่ายประสานงานเส้นทางและดูแลผู้บริจาค:' : 'Direct Helpline & Assistance:'}</span>
                 </div>
                 <div className="pl-5 space-y-1 text-gray-600">
-                  <p>• {isTh ? 'เปา' : 'Pao'}: <a href="tel:0969866245" className="text-[var(--burgundy-700)] font-bold underline">09-6986-6245</a></p>
-                  <p>• {isTh ? 'แตงโม' : 'Tangmo'}: <a href="tel:0656274319" className="text-[var(--burgundy-700)] font-bold underline">06-5627-4319</a></p>
+                  {EVENT_CONFIG.contacts.map((c) => (
+                    <p key={c.tel}>
+                      • {isTh ? c.name : c.nameEn}:{' '}
+                      <a href={`tel:${c.tel}`} className="text-[var(--burgundy-700)] font-bold underline">
+                        {c.phone}
+                      </a>
+                    </p>
+                  ))}
                 </div>
                 <div className="pt-2">
                   <SocialLinks />

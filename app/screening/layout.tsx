@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
+import { OFFICIAL_SCREENING_QUESTIONS } from '@/lib/constants/screening-rules';
+
+const count = OFFICIAL_SCREENING_QUESTIONS.length;
 
 export const metadata: Metadata = {
-  title: 'แบบประเมินความพร้อมก่อนบริจาคโลหิต 24 ข้อ (Self-Screening)',
-  description: 'เช็กความพร้อมและคุณสมบัติเบื้องต้นของผู้บริจาคโลหิตตามเกณฑ์มาตรฐานของศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย 24 ข้อ ทราบผลทันที',
+  title: `แบบประเมินความพร้อมก่อนบริจาคโลหิตเบื้องต้น ${count} ข้อ (Self-Screening)`,
+  description: `ประเมินความพร้อมและคุณสมบัติเบื้องต้นของผู้บริจาคโลหิตตามแนวทางศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย ${count} ข้อ ก่อนเดินทางมาจุดรับบริจาค (ไม่ใช่การวินิจฉัยทางการแพทย์)`,
   alternates: {
     canonical: '/screening',
   },
   openGraph: {
-    title: 'แบบประเมินตนเอง 24 ข้อก่อนบริจาคโลหิต | MUMT Blood Donation 2026',
-    description: 'ประเมินสุขภาพและความพร้อมของตนเองก่อนเดินทางมาบริจาคโลหิต เพื่อความปลอดภัยและมั่นใจ',
+    title: `แบบประเมินตนเองเบื้องต้น ${count} ข้อก่อนบริจาคโลหิต | MUMT Blood Donation 2026`,
+    description: `ประเมินสุขภาพและความพร้อมของตนเองเบื้องต้นก่อนเดินทางมาบริจาคโลหิต เพื่อความปลอดภัยและมั่นใจ`,
     url: '/screening',
   },
 };

@@ -199,8 +199,8 @@ export default function KnowledgePage() {
 
             <p className="text-sm leading-relaxed text-[var(--ink)] font-medium">
               {isTh
-                ? 'ประเทศไทยดำเนินการตรวจคัดกรองโลหิตบริจาคทุกยูนิตแบบรวมศูนย์ (Centralized Testing) ภายใต้การกำกับของศูนย์บริการโลหิตแห่งชาติและภาคบริการโลหิตแห่งชาติ 12 แห่งทั่วประเทศ โดยปฏิบัติตามมาตรฐานสากลขององค์การอนามัยโลก (WHO Guidance) เพื่อให้มั่นใจว่าโลหิตทุกถุงปลอดภัยสูงสุดก่อนจ่ายให้แก่ผู้ป่วย:'
-                : 'Thailand enforces 100% centralized donor blood testing under the National Blood Centre and 12 Regional Blood Centres, strictly complying with WHO international blood safety standards to guarantee zero-risk blood products for patients:'}
+                ? 'ประเทศไทยดำเนินการตรวจคัดกรองโลหิตบริจาคทุกยูนิตแบบรวมศูนย์ (Centralized Testing) ภายใต้การกำกับของศูนย์บริการโลหิตแห่งชาติและภาคบริการโลหิตแห่งชาติ 12 แห่งทั่วประเทศ โดยปฏิบัติตามมาตรฐานสากลขององค์การอนามัยโลก (WHO Guidance) เพื่อเพิ่มความปลอดภัยของโลหิตบริจาคก่อนจ่ายให้แก่ผู้ป่วย:'
+                : 'Thailand enforces centralized donor blood testing under the National Blood Centre and 12 Regional Blood Centres, strictly complying with WHO international blood safety standards to enhance the safety of blood products for patients:'}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
@@ -281,7 +281,7 @@ export default function KnowledgePage() {
                   </li>
                   <li className="flex items-start gap-1.5">
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{isTh ? 'ลดระยะเวลา Window Period สู่ระดับต่ำสุด ปลอดภัยสูงสุด' : 'Minimizes diagnostic window periods to absolute lowest thresholds'}</span>
+                    <span>{isTh ? 'ลดระยะเวลา Window Period เพื่อเพิ่มความปลอดภัยของโลหิตบริจาค' : 'Significantly reduces diagnostic window periods to enhance transfusion safety'}</span>
                   </li>
                 </ul>
               </div>
@@ -400,7 +400,7 @@ export default function KnowledgePage() {
               </div>
               <p className="text-[11px] text-[var(--muted)] leading-relaxed">
                 {isTh
-                  ? '* หมายเหตุ: ค่าระยะฟักตัว (Diagnostic Window Period) เป็นค่าประมาณการเปรียบเทียบตามมาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (บทที่ 4 การทดสอบโลหิตบริจาค, 2568) และแนวทางองค์การอนามัยโลก (WHO Blood Transfusion Safety, 2009 / Busch et al.) การตรวจคัดกรองในห้องปฏิบัติการใช้เสริมสร้างความปลอดภัยสูงสุดแต่ไม่สามารถทดแทนการคัดกรองประวัติสุขภาพตนเองได้อย่างสมบูรณ์'
+                  ? '* หมายเหตุ: ค่าระยะฟักตัว (Diagnostic Window Period) เป็นค่าประมาณการเปรียบเทียบตามมาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (บทที่ 4 การทดสอบโลหิตบริจาค, 2568) และแนวทางองค์การอนามัยโลก (WHO Blood Transfusion Safety, 2009 / Busch et al.) การตรวจคัดกรองในห้องปฏิบัติการช่วยเพิ่มความปลอดภัยของโลหิตบริจาคแต่ไม่สามารถทดแทนการคัดกรองประวัติสุขภาพตนเองได้อย่างสมบูรณ์'
                   : '* Note: Diagnostic window periods are estimated comparative ranges based on Thai Red Cross Society Standards (Chapter 4, 2025) and WHO Blood Transfusion Safety Guidelines (2009 / Busch et al.). Laboratory testing complements but does not replace donor behavioral self-deferral.'}
               </p>
             </div>

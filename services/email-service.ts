@@ -6,6 +6,7 @@
 import nodemailer from 'nodemailer';
 import QRCode from 'qrcode';
 import { formatTimeRange, formatBangkokTime, isWalkInRecord } from '@/lib/utils/format';
+import { EVENT_CONFIG, getFormattedVenue } from '@/lib/constants/event';
 
 export interface ConfirmationInput {
   to: string;
@@ -109,8 +110,8 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
     : 'รอบเวลาเดินทาง';
 
   const appUrl = getPublicAppUrl();
-  const eventDate = escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569');
-  const venue = escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา');
+  const eventDate = escapeHtml(input.eventDateLabel || EVENT_CONFIG.dateTh);
+  const venue = escapeHtml(input.venueName || getFormattedVenue('th'));
   const recipient = escapeHtml(`${input.firstName} ${input.lastName}`);
   const phone = escapeHtml(input.phone || '—');
   const faculty = escapeHtml(input.faculty || 'บุคคลทั่วไป');
@@ -352,8 +353,8 @@ function buildText(input: ConfirmationInput): string {
     ? (input.registeredAt ? formatBangkokTime(input.registeredAt) : formatBangkokTime(new Date()))
     : (input.slot ? formatTimeRange(input.slot.startAt || input.slot.start_at || '', input.slot.endAt || input.slot.end_at || '') : '09:00 – 14:00 น.');
   const appUrl = getPublicAppUrl();
-  const eventDate = input.eventDateLabel || 'พุธ 16 กันยายน 2569';
-  const venue = input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา';
+  const eventDate = input.eventDateLabel || EVENT_CONFIG.dateTh;
+  const venue = input.venueName || getFormattedVenue('th');
   const recipient = `${input.firstName} ${input.lastName}`;
   const phone = input.phone || '—';
   const faculty = input.faculty || 'บุคคลทั่วไป (General Public)';
@@ -416,8 +417,8 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
     : '09:00 – 14:00 น.';
   const timeLabel = 'รอบเวลาเดินทาง';
   const appUrl = getPublicAppUrl();
-  const eventDate = escapeHtml(input.eventDateLabel || 'พุธ 16 กันยายน 2569');
-  const venue = escapeHtml(input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา');
+  const eventDate = escapeHtml(input.eventDateLabel || EVENT_CONFIG.dateTh);
+  const venue = escapeHtml(input.venueName || getFormattedVenue('th'));
   const recipient = escapeHtml(`${input.firstName} ${input.lastName}`);
 
   return `<!DOCTYPE html>
@@ -640,8 +641,8 @@ function buildReminderText(input: ConfirmationInput): string {
     ? formatTimeRange(input.slot.startAt || input.slot.start_at || '', input.slot.endAt || input.slot.end_at || '')
     : '09:00 – 14:00 น.';
   const appUrl = getPublicAppUrl();
-  const eventDate = input.eventDateLabel || 'พุธ 16 กันยายน 2569';
-  const venue = input.venueName || 'ห้องประชุม 217 อาคารสิริวิทยา คณะเทคนิคการแพทย์ ม.มหิดล ศาลายา';
+  const eventDate = input.eventDateLabel || EVENT_CONFIG.dateTh;
+  const venue = input.venueName || getFormattedVenue('th');
   const recipient = `${input.firstName} ${input.lastName}`;
 
   return `MUMT LoveUnit 2026 · เตือนความพร้อมก่อนวันบริจาคโลหิต (2 Days to Go!)

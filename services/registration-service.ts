@@ -154,14 +154,27 @@ export async function getRegistrationByAccessToken(token: string) {
   throw new Error('DATABASE_URL is unconfigured in production environment.');
 }
 
+import {
+  generateOtpCode,
+  hashToken,
+  getSmsProvider,
+  maskPhoneNumber,
+  isValidThaiPhoneNumber,
+} from '@/services/sms-service';
+import {
+  createPhoneOtpToken as memoryCreatePhoneOtpToken,
+  consumePhoneOtpToken as memoryConsumePhoneOtpToken,
+} from '@/lib/db/store';
+
 export async function createVerificationToken(registrationId: string, contactTarget: string): Promise<string> {
   const token = generateAccessToken();
+  const tokenHash = hashToken(token, 'MAGIC');
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
   if (isDbActive() && db) {
     await db.insert(verificationTokens).values({
       registrationId,
-      token,
+      token: tokenHash,
       contactTarget,
       expiresAt,
     });
@@ -178,15 +191,17 @@ export async function createVerificationToken(registrationId: string, contactTar
 export async function consumeVerificationToken(token: string) {
   const tokenClean = token.trim();
   if (!tokenClean) return null;
+  const tokenHash = hashToken(tokenClean, 'MAGIC');
 
   if (isDbActive() && db) {
     const now = new Date();
+    // Match either hashed token or raw token (for backward compatibility)
     const [vt] = await db
       .select()
       .from(verificationTokens)
       .where(
         and(
-          eq(verificationTokens.token, tokenClean),
+          sql`(${verificationTokens.token} = ${tokenHash} OR ${verificationTokens.token} = ${tokenClean})`,
           sql`${verificationTokens.usedAt} IS NULL`,
           sql`${verificationTokens.expiresAt} > ${now}`
         )
@@ -212,6 +227,208 @@ export async function consumeVerificationToken(token: string) {
 
   if (isMemoryBackendAllowed()) {
     return await memoryConsumeVerificationToken(tokenClean);
+  }
+
+  throw new Error('DATABASE_URL is unconfigured in production environment.');
+}
+
+export async function requestPhoneOtpRecovery(phone: string, eventId: string): Promise<{
+  success: boolean;
+  message: string;
+  cooldownSeconds?: number;
+}> {
+  const phoneNormalized = normalizePhoneNumber(phone);
+  if (!phoneNormalized || !isValidThaiPhoneNumber(phoneNormalized)) {
+    return {
+      success: false,
+      message: 'กรุณากรอกหมายเลขโทรศัพท์มือถือ 9-10 หลักให้ถูกต้อง',
+    };
+  }
+
+  const genericSuccessMessage =
+    'หากหมายเลขโทรศัพท์นี้มีข้อมูลในระบบ ระบบได้ส่งรหัสยืนยัน (OTP) ไปยังเบอร์ของท่านแล้ว';
+
+  // 1. Look up active registration by normalized phone
+  let reg: { id: string } | null = null;
+
+  if (isDbActive() && db) {
+    const dbReg = await db.query.registrations.findFirst({
+      where: and(
+        eq(registrations.eventId, eventId),
+        eq(registrations.phoneNormalized, phoneNormalized),
+        ne(registrations.status, 'CANCELLED')
+      ),
+      columns: { id: true },
+      orderBy: (regs, { desc }) => [desc(regs.registeredAt)],
+    });
+    reg = dbReg || null;
+  } else if (isMemoryBackendAllowed()) {
+    const memReg = inMemoryRegistrations.find(
+      r =>
+        r.event_id === eventId &&
+        r.phone_normalized === phoneNormalized &&
+        r.status !== 'CANCELLED'
+    );
+    reg = memReg ? { id: memReg.id } : null;
+  }
+
+  // Enumeration resistance: if registration does not exist, return generic success
+  if (!reg) {
+    return {
+      success: true,
+      message: genericSuccessMessage,
+      cooldownSeconds: 60,
+    };
+  }
+
+  // 2. Check 60-second cooldown on existing active token
+  const now = new Date();
+  const cooldownThreshold = new Date(Date.now() - 60 * 1000);
+
+  if (isDbActive() && db) {
+    const recentToken = await db
+      .select({ createdAt: verificationTokens.createdAt })
+      .from(verificationTokens)
+      .where(
+        and(
+          eq(verificationTokens.registrationId, reg.id),
+          eq(verificationTokens.contactTarget, phoneNormalized),
+          sql`${verificationTokens.createdAt} > ${cooldownThreshold}`
+        )
+      )
+      .limit(1);
+
+    if (recentToken.length > 0) {
+      const elapsed = Math.floor((Date.now() - new Date(recentToken[0].createdAt).getTime()) / 1000);
+      const remaining = Math.max(1, 60 - elapsed);
+      return {
+        success: true,
+        message: `รหัสยืนยันเพิ่งถูกส่งไป กรุณารอ ${remaining} วินาทีก่อนขอใหม่`,
+        cooldownSeconds: remaining,
+      };
+    }
+  }
+
+  // 3. Generate 6-digit OTP and store hashed at rest (TTL = 5 minutes)
+  const otp = generateOtpCode();
+  const tokenHash = hashToken(otp, 'OTP');
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  if (isDbActive() && db) {
+    // Invalidate previous unused OTPs for this registration
+    await db
+      .update(verificationTokens)
+      .set({ usedAt: now })
+      .where(
+        and(
+          eq(verificationTokens.registrationId, reg.id),
+          eq(verificationTokens.contactTarget, phoneNormalized),
+          sql`${verificationTokens.usedAt} IS NULL`
+        )
+      );
+
+    await db.insert(verificationTokens).values({
+      registrationId: reg.id,
+      token: tokenHash,
+      contactTarget: phoneNormalized,
+      expiresAt,
+    });
+  } else if (isMemoryBackendAllowed()) {
+    await memoryCreatePhoneOtpToken(reg.id, phoneNormalized, tokenHash, 300);
+  }
+
+  // 4. Dispatch SMS
+  const smsProvider = getSmsProvider();
+  await smsProvider.sendOtp(phoneNormalized, otp);
+
+  return {
+    success: true,
+    message: genericSuccessMessage,
+    cooldownSeconds: 60,
+  };
+}
+
+export async function verifyPhoneOtpRecovery(phone: string, otp: string, eventId: string) {
+  const phoneNormalized = normalizePhoneNumber(phone);
+  const otpClean = otp.trim();
+
+  if (!phoneNormalized || !otpClean || otpClean.length !== 6) {
+    return {
+      success: false,
+      message: 'กรุณากรอกรหัส OTP 6 หลักให้ถูกต้อง',
+    };
+  }
+
+  const tokenHash = hashToken(otpClean, 'OTP');
+  const now = new Date();
+
+  if (isDbActive() && db) {
+    const [vt] = await db
+      .select({
+        id: verificationTokens.id,
+        registrationId: verificationTokens.registrationId,
+      })
+      .from(verificationTokens)
+      .where(
+        and(
+          eq(verificationTokens.token, tokenHash),
+          eq(verificationTokens.contactTarget, phoneNormalized),
+          sql`${verificationTokens.usedAt} IS NULL`,
+          sql`${verificationTokens.expiresAt} > ${now}`
+        )
+      )
+      .limit(1);
+
+    if (!vt) {
+      return {
+        success: false,
+        message: 'รหัส OTP ไม่ถูกต้องหรือหมดอายุการใช้งาน กรุณาตรวจสอบหรือขอรหัสใหม่',
+      };
+    }
+
+    // Mark token as used (single-use)
+    await db
+      .update(verificationTokens)
+      .set({ usedAt: now })
+      .where(eq(verificationTokens.id, vt.id));
+
+    const reg = await db.query.registrations.findFirst({
+      where: and(
+        eq(registrations.id, vt.registrationId),
+        eq(registrations.eventId, eventId),
+        ne(registrations.status, 'CANCELLED')
+      ),
+      with: {
+        timeSlot: true,
+        event: true,
+      },
+    });
+
+    if (!reg) {
+      return {
+        success: false,
+        message: 'ไม่พบข้อมูลการลงทะเบียนที่ตรงกับรหัสยืนยันนี้',
+      };
+    }
+
+    return {
+      success: true,
+      registration: reg,
+    };
+  }
+
+  if (isMemoryBackendAllowed()) {
+    const reg = await memoryConsumePhoneOtpToken(phoneNormalized, tokenHash);
+    if (!reg || reg.event_id !== eventId || reg.status === 'CANCELLED') {
+      return {
+        success: false,
+        message: 'รหัส OTP ไม่ถูกต้องหรือหมดอายุการใช้งาน กรุณาตรวจสอบหรือขอรหัสใหม่',
+      };
+    }
+    return {
+      success: true,
+      registration: reg,
+    };
   }
 
   throw new Error('DATABASE_URL is unconfigured in production environment.');

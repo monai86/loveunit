@@ -8,6 +8,8 @@ import { MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 import { SocialLinks } from '@/components/common/SocialLinks';
 import { useLanguage, TRANSLATIONS } from '@/lib/i18n/LanguageContext';
 
+import { EVENT_CONFIG, getFormattedVenue } from '@/lib/constants/event';
+
 export function Footer() {
   const pathname = usePathname();
   const { language, isTh } = useLanguage();
@@ -118,12 +120,10 @@ export function Footer() {
                 <MapPin className="h-4 w-4 shrink-0 text-[var(--burgundy-500)] mt-0.5" />
                 <div className="space-y-1">
                   <span className="leading-relaxed block">
-                    {isTh 
-                      ? 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล ศาลายา' 
-                      : 'Meeting Room 217, Sirividhaya Building, Mahidol University Salaya'}
+                    {getFormattedVenue(language)}
                   </span>
                   <a
-                    href="https://www.google.com/maps/search/?api=1&query=อาคารสิริวิทยา+คณะศิลปศาสตร์+มหาวิทยาลัยมหิดล+ศาลายา"
+                    href={EVENT_CONFIG.venue.googleMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-[var(--burgundy-600)] font-bold hover:underline inline-flex items-center gap-1"
@@ -137,15 +137,21 @@ export function Footer() {
               <div className="flex items-start gap-2.5">
                 <Phone className="h-4 w-4 shrink-0 text-[var(--burgundy-500)] mt-0.5" />
                 <div className="space-y-1 font-bold">
-                  <p>{isTh ? 'เปา' : 'Pao'}: <a href="tel:0969866245" className="hover:underline text-[var(--burgundy-600)] inline-block py-0.5">09-6986-6245</a></p>
-                  <p>{isTh ? 'แตงโม' : 'Tangmo'}: <a href="tel:0656274319" className="hover:underline text-[var(--burgundy-600)] inline-block py-0.5">06-5627-4319</a></p>
+                  {EVENT_CONFIG.contacts.map((c) => (
+                    <p key={c.tel}>
+                      {isTh ? c.name : c.nameEn}:{' '}
+                      <a href={`tel:${c.tel}`} className="hover:underline text-[var(--burgundy-600)] inline-block py-0.5">
+                        {c.phone}
+                      </a>
+                    </p>
+                  ))}
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5 min-w-0">
                 <Mail className="h-4 w-4 shrink-0 text-[var(--burgundy-500)] mt-0.5" />
-                <a href="mailto:mumt68blooddonation@gmail.com" className="font-bold hover:underline text-[var(--burgundy-600)] break-all min-w-0 inline-block py-1.5">
-                  mumt68blooddonation@gmail.com
+                <a href={`mailto:${EVENT_CONFIG.publicEmail}`} className="font-bold hover:underline text-[var(--burgundy-600)] break-all min-w-0 inline-block py-1.5">
+                  {EVENT_CONFIG.publicEmail}
                 </a>
               </div>
             </div>

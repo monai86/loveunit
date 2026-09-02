@@ -529,12 +529,38 @@ export async function createVerificationToken(registrationId: string, contactTar
   return token;
 }
 
+export async function createPhoneOtpToken(registrationId: string, phone: string, tokenHash: string, ttlSeconds = 300): Promise<void> {
+  const expiresAt = new Date(Date.now() + ttlSeconds * 1000).toISOString();
+  inMemoryVerificationTokens.push({
+    id: nextMemoryId('vt'),
+    registration_id: registrationId,
+    token: tokenHash,
+    contact_target: phone,
+    expires_at: expiresAt,
+    used_at: null,
+    created_at: new Date().toISOString(),
+  });
+}
+
 export async function consumeVerificationToken(token: string): Promise<Registration | null> {
   const tokenClean = token.trim();
   if (!tokenClean) return null;
   const now = Date.now();
   const vt = inMemoryVerificationTokens.find(
     t => t.token === tokenClean && !t.used_at && new Date(t.expires_at).getTime() > now
+  );
+  if (!vt) return null;
+  vt.used_at = new Date().toISOString();
+  const reg = inMemoryRegistrations.find(r => r.id === vt.registration_id);
+  if (!reg) return null;
+  const slot = defaultSlots.find(s => s.id === reg.slot_id);
+  return { ...reg, time_slot: slot || null, event: defaultEvent };
+}
+
+export async function consumePhoneOtpToken(phone: string, tokenHash: string): Promise<Registration | null> {
+  const now = Date.now();
+  const vt = inMemoryVerificationTokens.find(
+    t => (t.token === tokenHash || t.token === phone) && t.contact_target === phone && !t.used_at && new Date(t.expires_at).getTime() > now
   );
   if (!vt) return null;
   vt.used_at = new Date().toISOString();

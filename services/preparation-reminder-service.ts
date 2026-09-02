@@ -2,6 +2,7 @@ import { and, eq, isNotNull, ne } from 'drizzle-orm';
 import { db } from '@/db';
 import { auditLogs, registrations, timeSlots } from '@/db/schema';
 import { sendDonorPreparationReminder } from '@/services/email-service';
+import { EVENT_CONFIG, getFormattedVenue } from '@/lib/constants/event';
 
 const REMINDER_ACTION = 'DONOR_PREPARATION_REMINDER_SENT';
 
@@ -54,8 +55,8 @@ export async function sendPreparationRemindersForEvent(eventId: string) {
       registrationCode: recipient.registrationCode,
       qrToken: recipient.qrToken,
       slot: recipient.startAt && recipient.endAt ? { startAt: recipient.startAt.toISOString(), endAt: recipient.endAt.toISOString() } : null,
-      venueName: 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ มหาวิทยาลัยมหิดล วิทยาเขตศาลายา',
-      eventDateLabel: 'พุธ 16 กันยายน 2569 (09:00 – 14:00 น.)',
+      venueName: getFormattedVenue('th'),
+      eventDateLabel: `${EVENT_CONFIG.dateTh} (${EVENT_CONFIG.timeLabelTh})`,
     });
 
     if (delivery.status !== 'sent') {

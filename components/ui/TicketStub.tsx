@@ -4,6 +4,8 @@ import React from 'react';
 import Image from 'next/image';
 import { Heart } from 'lucide-react';
 
+import { EVENT_CONFIG } from '@/lib/constants/event';
+
 interface TicketStubProps {
   registrationCode?: string;
   name?: string;
@@ -16,11 +18,11 @@ interface TicketStubProps {
 }
 
 export function TicketStub({
-  registrationCode = 'MUMT2026-00012345',
+  registrationCode = 'LVU26-001',
   name = 'นายธนภัทร ใจดี',
-  date = '16 SEP 2026',
-  timeSlot = '09:00 - 14:00 น.',
-  venue = 'LA 217 อาคารสิริวิทยา',
+  date = '16 ก.ย. 2569',
+  timeSlot = EVENT_CONFIG.timeLabelTh,
+  venue = `${EVENT_CONFIG.venue.rooms} ${EVENT_CONFIG.venue.building}`,
   qrUrl,
   unitNumber = '09',
 }: TicketStubProps) {
