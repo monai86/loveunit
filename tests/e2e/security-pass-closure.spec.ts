@@ -63,7 +63,8 @@ test.describe('MUMT LoveUnit - Security Closure & Real Production E2E Verificati
     // 5. Test Bare Sequential Code URL in Fresh Incognito Context WITHOUT Cookie -> MUST BE LOCKED
     const freshContext = await page.context().browser()!.newContext();
     const freshPage = await freshContext.newPage();
-    await freshPage.goto(`http://localhost:3001/registration/${regCode}`);
+    const targetPassUrl = new URL(`/registration/${regCode}`, page.url()).href;
+    await freshPage.goto(targetPassUrl);
     await expect(freshPage.getByText('ต้องใช้ลิงก์ยืนยันตัวตนเพื่อเปิดดูตั๋ว (Private Pass)')).toBeVisible();
     // Ticket actions must NOT be present on locked view
     await expect(freshPage.getByRole('button', { name: /บันทึกภาพตั๋ว/ })).not.toBeVisible();

@@ -4,6 +4,7 @@
 // NOTE: This is an in-process correctness test, not an end-to-end distributed network load test.
 
 process.env.DATA_BACKEND = 'memory';
+process.env.DISABLE_RATE_LIMIT = 'true';
 
 import assert from 'node:assert/strict';
 import {
