@@ -57,6 +57,13 @@
       "when": 1788050000000,
       "tag": "0007_staff_application_password_hash",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788329418851,
+      "tag": "0008_parallel_sabra",
+      "breakpoints": true
     }
   ]
 }

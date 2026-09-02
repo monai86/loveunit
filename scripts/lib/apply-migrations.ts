@@ -25,7 +25,7 @@ export async function applyMigrations(db: MigrationExecutable, options: ApplyMig
   let total = 0;
   for (const file of files) {
     const content = readFileSync(path.join(migrationsDir, file), 'utf8');
-    const stmts = content.split('--> statement-breakpoint;').map((s) => s.trim()).filter(Boolean);
+    const stmts = content.split(/-->\s*statement-breakpoint;?/g).map((s) => s.trim()).filter(Boolean);
     if (verbose) console.log(`\n=== ${file} (${stmts.length} statements) ===`);
     for (const stmt of stmts) {
       try {
