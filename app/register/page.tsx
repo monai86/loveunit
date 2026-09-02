@@ -235,8 +235,10 @@ function RegisterContent() {
 
       const data = await res.json();
       const regCode = data.registration?.registrationCode || data.registration?.registration_code;
+      const accessToken = data.registration?.accessToken || data.registration?.access_token;
       if (res.ok && data.success && regCode) {
-        router.push(`/registration/${regCode}`);
+        const dest = data.redirectUrl || `/registration/${encodeURIComponent(regCode)}`;
+        router.push(dest);
       } else {
         setErrorMessage(data.message || data.error || (isTh ? 'เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง' : 'Registration error. Please try again.'));
         setLoading(false);

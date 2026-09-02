@@ -18,7 +18,8 @@ import {
   Activity,
   ZoomIn,
   X,
-  Download
+  Download,
+  BookOpen
 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
@@ -43,7 +44,7 @@ export default function PreparePage() {
           <div className="max-w-2xl space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
               <ShieldCheck className="h-4 w-4 text-white" />
-              <span>{isTh ? 'มาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย 2567' : 'National Blood Centre Standards, Thai Red Cross Society (2024)'}</span>
+              <span>{isTh ? 'เกณฑ์มาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (2567)' : 'National Blood Centre Standards, Thai Red Cross Society (2024)'}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
               {isTh ? 'คู่มือและการเตรียมตัวก่อนบริจาคโลหิต' : 'Donor Preparation & Guidelines'}
@@ -61,7 +62,7 @@ export default function PreparePage() {
               className="inline-flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold px-4 py-2.5 text-xs shadow-md transition-all cursor-pointer"
             >
               <ShieldCheck className="h-4 w-4" />
-              <span>{isTh ? 'ทำแบบประเมินตนเอง (Screening)' : 'Self-Screening Quiz'}</span>
+              <span>{isTh ? 'ทำแบบประเมินตนเอง (Pre-Screening)' : 'Self-Screening Quiz'}</span>
             </Link>
             <Link
               href="/register"
@@ -94,10 +95,11 @@ export default function PreparePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
                 <span className="text-xs sm:text-sm font-bold text-gray-500 block">{isTh ? 'อายุ' : 'Age'}</span>
-                <p className="text-base sm:text-lg font-black text-[var(--ink)]">{isTh ? '17 - 70 ปีบริบูรณ์' : '17 - 70 years old'}</p>
+                <p className="text-base sm:text-lg font-black text-[var(--ink)]">{isTh ? '17 - 65 ปี (หน่วยเคลื่อนที่)' : '17 - 65 years old (Mobile Unit)'}</p>
                 <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed break-words">
-                  {isTh ? '• อายุ 17 ปี ต้องมีหนังสือยินยอมจากผู้ปกครอง' : '• Age 17 requires written parental consent'}<br />
-                  {isTh ? '• ผู้บริจาคครั้งแรกอายุไม่เกิน 60 ปี' : '• First-time donors must be under 60'}
+                  {isTh ? '• อายุ 17 ปีบริบูรณ์ ต้องมีหนังสือยินยอมจากผู้ปกครอง' : '• Age 17 requires written parental consent'}<br />
+                  {isTh ? '• ผู้บริจาคครั้งแรกอายุไม่เกิน 60 ปี' : '• First-time donors must be under 60'}<br />
+                  {isTh ? '• ผู้บริจาคประจำอายุ 60–65 ปี (ผู้มีอายุ >65–70 ปี ต้องบริจาค ณ ศูนย์บริการโลหิตประจำที่)' : '• Regular donors aged 60–65 (Donors >65–70 must donate at fixed blood centres)'}
                 </p>
               </div>
 
@@ -111,18 +113,18 @@ export default function PreparePage() {
               </div>
 
               <div className="p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
-                <span className="text-xs sm:text-sm font-bold text-gray-500 block">{isTh ? 'ความเข้มข้นโลหิต' : 'Hemoglobin Level'}</span>
+                <span className="text-xs sm:text-sm font-bold text-gray-500 block">{isTh ? 'ความเข้มข้นโลหิต (Hb)' : 'Hemoglobin Level'}</span>
                 <p className="text-base sm:text-lg font-black text-[var(--ink)]">{isTh ? 'หญิง ≥ 12.5 / ชาย ≥ 13.0 g/dL' : 'Female ≥ 12.5 / Male ≥ 13.0 g/dL'}</p>
                 <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed break-words">
-                  {isTh ? '• ตรวจด้วยวิธีหยดเลือดในสารละลายทองแดง (CuSO4) หรือเครื่องตรวจ Hb อัตโนมัติ' : '• Screened via copper sulfate gravity or automated Hb spectrophotometry'}
+                  {isTh ? '• ตรวจคัดกรองด้วยเครื่อง POCT Hemoglobinometer (หรือเครื่องตรวจอัตโนมัติ) ฟรีหน้างาน' : '• Screened via POCT hemoglobinometer (or automated spectrophotometry) on-site'}
                 </p>
               </div>
 
               <div className="p-4 sm:p-5 rounded-xl bg-gray-50 border border-gray-200 space-y-1.5">
                 <span className="text-xs sm:text-sm font-bold text-gray-500 block">{isTh ? 'สัญญาณชีพ' : 'Vital Signs'}</span>
-                <p className="text-base sm:text-lg font-black text-[var(--ink)]">{isTh ? 'ความดัน 90-160 / 50-100 mmHg' : 'BP: 90-160 / 50-100 mmHg'}</p>
+                <p className="text-base sm:text-lg font-black text-[var(--ink)]">{isTh ? 'ความดัน 100–160 / 50–100 mmHg' : 'BP: 100–160 / 50–100 mmHg'}</p>
                 <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed break-words">
-                  {isTh ? '• ชีพจร 50 - 100 ครั้ง/นาที จังหวะสม่ำเสมอ' : '• Pulse: 50 - 100 bpm, regular'}<br />
+                  {isTh ? '• ชีพจร 50 - 100 ครั้ง/นาที จังหวะสม่ำเสมอ' : '• Pulse: 50 - 100 bpm, regular rhythm'}<br />
                   {isTh ? '• อุณหภูมิร่างกายไม่เกิน 37.5 °C' : '• Body Temperature: ≤ 37.5 °C'}
                 </p>
               </div>
@@ -147,8 +149,8 @@ export default function PreparePage() {
                   <span className="text-base font-black text-emerald-950 block">{isTh ? 'นอนหลับพักผ่อนให้เพียงพอ' : 'Get Adequate Sleep'}</span>
                   <span className="text-xs sm:text-sm text-emerald-900 font-normal leading-relaxed block break-words">
                     {isTh
-                      ? 'ควรนอนหลับติดต่อกันอย่างน้อย 5-6 ชั่วโมงในคืนก่อนวันบริจาค เพื่อให้ระบบไหลเวียนโลหิตทำงานอย่างมีเสถียรภาพ'
-                      : 'Sleep continuously for at least 5-6 hours the night before to maintain cardiovascular stability.'}
+                      ? 'ควรนอนหลับติดต่อกันอย่างน้อย 5 ชั่วโมงในคืนก่อนวันบริจาค เพื่อให้ระบบไหลเวียนโลหิตทำงานอย่างมีเสถียรภาพ'
+                      : 'Sleep continuously for at least 5 hours the night before to maintain cardiovascular stability.'}
                   </span>
                 </div>
               </li>
@@ -156,10 +158,10 @@ export default function PreparePage() {
               <li className="flex items-start gap-3.5 p-4 rounded-xl bg-blue-50/50 border border-blue-100">
                 <GlassWater className="h-6 w-6 text-blue-700 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <span className="text-base font-black text-blue-950 block">{isTh ? 'ดื่มน้ำเปล่า 3-4 แก้ว (500-600 มล.) ก่อนบริจาค 20-30 นาที' : 'Drink 3-4 Glasses of Water (500-600 mL)'}</span>
+                  <span className="text-base font-black text-blue-950 block">{isTh ? 'ดื่มน้ำเปล่า 300–500 มล. (2–3 แก้ว) ก่อนบริจาคประมาณ 30 นาที' : 'Drink 300–500 mL of Water (2–3 Glasses)'}</span>
                   <span className="text-xs sm:text-sm text-blue-900 font-normal leading-relaxed block break-words">
                     {isTh
-                      ? 'ช่วยเพิ่มปริมาณน้ำในกระแสเลือด (Plasma Volume) ป้องกันภาวะความดันโลหิตตกและอาการวิงเวียนศีรษะ'
+                      ? 'ช่วยเพิ่มปริมาณน้ำในกระแสเลือด (Plasma Volume) ป้องกันภาวะความดันโลหิตตกและลดโอกาสเกิดอาการวิงเวียนศีรษะ'
                       : 'Expands plasma volume, helps prevent vasovagal reactions, and makes veins easier to access.'}
                   </span>
                 </div>
@@ -168,11 +170,11 @@ export default function PreparePage() {
               <li className="flex items-start gap-3.5 p-4 rounded-xl bg-amber-50/50 border border-amber-100">
                 <Utensils className="h-6 w-6 text-amber-700 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <span className="text-base font-black text-amber-950 block">{isTh ? 'รับประทานอาหารมื้อหลัก แต่หลีกเลี่ยงอาหารไขมันสูง' : 'Eat Regular Meals, Avoid High-Fat Foods'}</span>
+                  <span className="text-base font-black text-amber-950 block">{isTh ? 'รับประทานอาหารมื้อหลัก แต่หลีกเลี่ยงอาหารไขมันสูงอย่างน้อย 6 ชั่วโมง' : 'Eat Regular Meals, Avoid High-Fat Foods for ≥ 6 Hours'}</span>
                   <span className="text-xs sm:text-sm text-amber-900 font-normal leading-relaxed block break-words">
                     {isTh
-                      ? 'ห้ามอดอาหารก่อนมาบริจาค แต่ควรงดอาหารที่มีไขมันสูง เช่น ข้าวมันไก่ ข้าวขาหมู แกงกะทิ ของทอด ภายใน 3-6 ชั่วโมงก่อนบริจาค เพื่อป้องกันพลาสมาขุ่นขาว'
-                      : 'Do not fast. Avoid greasy and high-fat foods (fried meals, rich curries) within 3-6 hours before donation to prevent lipemic plasma.'}
+                      ? 'ห้ามอดอาหารก่อนมาบริจาค แต่ควรงดอาหารที่มีไขมันสูง เช่น ข้าวมันไก่ ข้าวขาหมู แกงกะทิ ของทอด อย่างน้อย 6 ชั่วโมงก่อนบริจาค เพื่อป้องกันพลาสมาขุ่นขาว (Lipemic Plasma)'
+                      : 'Do not fast. Avoid greasy and high-fat foods (fried meals, rich curries) for at least 6 hours before donation to prevent lipemic plasma.'}
                   </span>
                 </div>
               </li>
@@ -180,7 +182,7 @@ export default function PreparePage() {
               <li className="flex items-start gap-3.5 p-4 rounded-xl bg-red-50/50 border border-red-100">
                 <Wine className="h-6 w-6 text-red-700 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
-                  <span className="text-base font-black text-red-950 block">{isTh ? 'งดแอลกอฮอล์ 24 ชม. และงดสูบบุหรี่ 1 ชม. ก่อนและหลังบริจาค' : 'Avoid Alcohol (24h) & Smoking (1h)'}</span>
+                  <span className="text-base font-black text-red-950 block">{isTh ? 'งดแอลกอฮอล์ 24 ชม. และงดสูบบุหรี่ 1 ชม. ก่อนและหลังบริจาค' : 'Avoid Alcohol (24h) & Smoking (1h Pre/Post)'}</span>
                   <span className="text-xs sm:text-sm text-red-900 font-normal leading-relaxed block break-words">
                     {isTh
                       ? 'แอลกอฮอล์ทำให้ร่างกายขาดน้ำ ส่วนบุหรี่ทำให้ระดับก๊าซคาร์บอนมอนอกไซด์ในเลือดสูงขึ้นและทำให้หลอดเลือดหดตัว'
@@ -222,17 +224,27 @@ export default function PreparePage() {
             </div>
           </div>
 
-          {/* Post-Donation Care & Refreshments Banner */}
-          <div className="p-5 rounded-2xl bg-[var(--rose-100)] border border-[var(--line)] text-xs space-y-2">
-            <div className="flex items-center gap-2 font-black text-[var(--burgundy-700)]">
-              <HeartPulse className="h-5 w-5 text-[var(--burgundy-700)] shrink-0" />
-              <span>{isTh ? 'การดูแลและอาหารว่างบำรุงสุขภาพหลังบริจาค' : 'Post-Donation Care & Refreshments'}</span>
+          {/* Reference Citation Card */}
+          <div className="rounded-2xl bg-white p-5 border border-[var(--line)] shadow-xs flex items-start gap-3.5 text-xs text-[var(--muted)] font-medium">
+            <BookOpen className="h-5 w-5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h4 className="font-bold text-[var(--ink)]">
+                {isTh ? 'แหล่งอ้างอิงและเกณฑ์มาตรฐานทางการแพทย์' : 'Authoritative Medical References'}
+              </h4>
+              <p className="leading-relaxed">
+                {isTh ? (
+                  <>
+                    1. ศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย — <em>มาตรฐานธนาคารเลือดและงานบริการโลหิต (ฉบับพิมพ์ครั้งที่ 5, พ.ศ. 2567)</em> บทที่ 2<br />
+                    2. ศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย — <em>คู่มือการรับบริจาคโลหิต (ฉบับพิมพ์ครั้งที่ 1, พ.ศ. 2564)</em>
+                  </>
+                ) : (
+                  <>
+                    1. National Blood Centre, Thai Red Cross Society — <em>Standards for Blood Banks and Transfusion Services, 5th Edition (2024)</em> Chapter 2<br />
+                    2. National Blood Centre, Thai Red Cross Society — <em>Blood Donation Manual, 1st Edition (2021)</em>
+                  </>
+                )}
+              </p>
             </div>
-            <p className="text-[var(--ink)] leading-relaxed font-medium">
-              {isTh
-                ? 'ผู้เข้าร่วมกิจกรรมทุกท่านจะได้รับอาหารว่างและเครื่องดื่มบำรุงสุขภาพ พร้อมพื้นที่นั่งพักผ่อนและทีมงานคอยดูแลสังเกตอาการหลังการบริจาคโลหิต'
-                : 'All participants will receive recovery refreshments and nutritious beverages, with a dedicated rest area and staff care post-donation.'}
-            </p>
           </div>
 
         </div>
@@ -250,7 +262,7 @@ export default function PreparePage() {
                 {isTh ? 'ไม่แน่ใจว่าตนเองพร้อมไหม?' : 'Not sure if you are eligible?'}
               </h3>
               <p className="text-xs text-[var(--muted)] font-medium leading-relaxed">
-                {isTh ? 'ทำแบบประเมินสุขภาพตนเอง 24 ข้อตามเกณฑ์สภากาชาดไทย ทราบผลทันทีใน 2 นาที' : 'Take our 24-question self-screening based on Thai Red Cross standards. Get instant results in 2 mins.'}
+                {isTh ? 'ทำแบบประเมินสุขภาพเบื้องต้น 10 ข้อหลักตามเกณฑ์สภากาชาดไทย ทราบผลทันทีใน 1 นาที' : 'Take our 10-question self-screening based on Thai Red Cross standards. Get preliminary guidance in 1 min.'}
               </p>
             </div>
             <Link
@@ -289,7 +301,7 @@ export default function PreparePage() {
               </div>
             </div>
             <p className="text-[11px] text-[var(--muted)] text-center font-medium">
-              {isTh ? 'เกณฑ์คุณสมบัติเบื้องต้น: อายุ 17-70 ปี, น้ำหนัก ≥45 กก.' : 'Basic Criteria: Age 17-70, Weight ≥45kg'}
+              {isTh ? 'เกณฑ์คุณสมบัติเบื้องต้น: อายุ 17-65 ปี, น้ำหนัก ≥45 กก.' : 'Basic Criteria: Age 17-65, Weight ≥45kg'}
             </p>
           </div>
 

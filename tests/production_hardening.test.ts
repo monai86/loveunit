@@ -17,10 +17,9 @@ async function runProductionHardeningTests() {
 
   // Test 1: Cryptographically Secure QR Tokens & Opaque Non-PII Format
   console.log('Test 1: QR Code Cryptographic Security & Opaque Token Structure');
-  const regCode = generateRegistrationCode();
-  const qrToken = generateQRToken(regCode);
-  assert.ok(qrToken.startsWith(`LVU26_QR_${regCode}_`), 'QR token must begin with standard prefix');
-  assert.ok(qrToken.length > 30, 'QR token must contain high entropy cryptographic randomness');
+  const qrToken = generateQRToken();
+  assert.ok(qrToken.startsWith('lvu_qr_'), 'QR token must begin with standard opaque prefix lvu_qr_');
+  assert.strictEqual(qrToken.length, 71, 'QR token must contain 256 bits of cryptographic entropy (prefix + 64 hex chars)');
   assert.strictEqual(qrToken.includes('somchai'), false, 'QR token must never contain name PII');
   assert.strictEqual(qrToken.includes('0812345678'), false, 'QR token must never contain phone PII');
   console.log('✓ Cryptographically secure opaque QR token verified\n');

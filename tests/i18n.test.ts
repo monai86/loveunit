@@ -90,11 +90,11 @@ describe('i18n Unified Translation Dictionary', () => {
 
     const thResult = evaluateScreeningAnswers(perfectAnswers, 'th');
     assert.strictEqual(thResult.status, 'ELIGIBLE');
-    assert.strictEqual(thResult.summaryBadge, 'พร้อมบริจาคโลหิต');
+    assert.strictEqual(thResult.summaryBadge, 'พร้อมรับการประเมินหน้างาน');
 
     const enResult = evaluateScreeningAnswers(perfectAnswers, 'en');
     assert.strictEqual(enResult.status, 'ELIGIBLE');
-    assert.strictEqual(enResult.summaryBadge, 'Ready to Donate');
-    assert.ok(enResult.summaryTitle.includes('Congratulations'));
+    assert.strictEqual(enResult.summaryBadge, 'Ready for On-site Screening');
+    assert.ok(enResult.summaryTitle.includes('Preliminary Self-Screening Complete'));
   });
 });

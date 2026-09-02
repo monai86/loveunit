@@ -635,7 +635,7 @@ export function DonorTicketPass({
                     {isTh ? "งดอาหารไขมันสูง & แอลกอฮอล์" : "Avoid high-fat food & alcohol"}
                   </p>
                   <p className="text-xs text-gray-600 mt-0.5">
-                    {isTh ? "ทานอาหารมื้อหลักล่วงหน้า" : "At least 6 hours before"}
+                    {isTh ? "หลีกเลี่ยงของทอด/กะทิอย่างน้อย 6 ชม." : "At least 6 hours before"}
                   </p>
                 </div>
               </div>

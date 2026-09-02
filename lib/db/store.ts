@@ -15,7 +15,7 @@ import {
   StaffProfile,
   StaffRole
 } from '@/lib/types/database';
-import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, nextRegistrationSequence, isRegistrationEligibleForSouvenir, getSouvenirEligibilityDetails, isWalkInRecord, type SouvenirEligibilityDetails } from '@/lib/utils/format';
+import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, generateAccessToken, nextRegistrationSequence, isRegistrationEligibleForSouvenir, getSouvenirEligibilityDetails, isWalkInRecord, type SouvenirEligibilityDetails } from '@/lib/utils/format';
 
 // Collision-safe id generator for in-memory records. Date.now() alone collides
 // when several records are created within the same millisecond (fast machines
@@ -103,7 +103,7 @@ export const defaultContentBlocks: EventContentBlock[] = [
     event_id: defaultEvent.id,
     content_key: 'preparation_infographic',
     title: 'การเตรียมตัวก่อนบริจาคโลหิต',
-    description: 'ข้อปฏิบัติ พักผ่อน 6-8 ชม. ดื่มน้ำ 3-4 แก้ว และงดอาหารไขมันสูง',
+    description: 'ข้อปฏิบัติ พักผ่อน 6-8 ชม. ดื่มน้ำ 3-4 แก้ว และงดอาหารไขมันสูงอย่างน้อย 6 ชั่วโมง',
     image_url: null,
     alt_text: 'การเตรียมตัวก่อนบริจาคโลหิต',
     display_order: 4,
@@ -152,69 +152,99 @@ export const defaultContentBlocks: EventContentBlock[] = [
   },
 ];
 
-export const defaultSlots: TimeSlot[] = [
-  // Official event arrival windows 09:00–14:00 น. (Unlimited capacity):
-  // 1. รอบช่วงเช้า 09:00 - 11:00 น.
-  // 2. รอบกลางวัน 11:00 - 13:00 น.
-  // 3. รอบบ่าย 13:00 - 14:00 น.
-  { id: 'ts-1', event_id: defaultEvent.id, start_at: '2026-09-16T09:00:00+07:00', end_at: '2026-09-16T11:00:00+07:00', capacity: 9999, booked_count: 40, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-2', event_id: defaultEvent.id, start_at: '2026-09-16T11:00:00+07:00', end_at: '2026-09-16T13:00:00+07:00', capacity: 9999, booked_count: 53, is_active: true, created_at: new Date().toISOString() },
-  { id: 'ts-3', event_id: defaultEvent.id, start_at: '2026-09-16T13:00:00+07:00', end_at: '2026-09-16T14:00:00+07:00', capacity: 9999, booked_count: 15, is_active: true, created_at: new Date().toISOString() },
-];
+const globalState = globalThis as unknown as {
+  __lvu_defaultSlots?: TimeSlot[];
+  __lvu_inMemoryRegistrations?: Registration[];
+  __lvu_inMemoryAuditLogs?: AuditLog[];
+  __lvu_inMemoryCheckinEvents?: CheckinEvent[];
+  __lvu_inMemoryVerificationTokens?: {
+    id: string;
+    registration_id: string;
+    token: string;
+    contact_target: string;
+    expires_at: string;
+    used_at: string | null;
+    created_at: string;
+  }[];
+};
 
-export const inMemoryRegistrations: Registration[] = [
-  {
-    id: 'reg-demo-1',
-    event_id: defaultEvent.id,
-    registration_code: 'MBD26-DEMO01',
-    qr_token: 'MBD26_QR_MBD26-DEMO01_test123',
-    first_name: 'สมชาย',
-    last_name: 'ใจดี',
-    phone: '081-234-5678',
-    phone_normalized: '0812345678',
-    email: 'somchai@mahidol.ac.th',
-    participant_type: 'STUDENT',
-    faculty: 'คณะเทคนิคการแพทย์',
-    academic_year: 'ปี 3',
-    donation_experience: 'FIRST_TIME',
-    slot_id: 'ts-1',
-    status: 'REGISTERED',
-    source: 'ONLINE',
-    privacy_accepted: true,
-    registered_at: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
-    checked_in_at: null,
-    completed_at: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'reg-demo-2',
-    event_id: defaultEvent.id,
-    registration_code: 'MBD26-DEMO02',
-    qr_token: 'MBD26_QR_MBD26-DEMO02_test456',
-    first_name: 'สมหญิง',
-    last_name: 'รักเรียน',
-    phone: '089-876-5432',
-    phone_normalized: '0898765432',
-    email: 'somying@gmail.com',
-    participant_type: 'GENERAL_PUBLIC',
-    faculty: null,
-    academic_year: null,
-    donation_experience: 'RETURNING',
-    slot_id: 'ts-2',
-    status: 'CHECKED_IN',
-    source: 'ONLINE',
-    privacy_accepted: true,
-    registered_at: new Date(Date.now() - 3600000 * 24 * 1).toISOString(),
-    checked_in_at: new Date(Date.now() - 1800000).toISOString(),
-    completed_at: null,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }
-];
+if (!globalState.__lvu_defaultSlots) {
+  globalState.__lvu_defaultSlots = [
+    // Official event arrival windows 09:00–14:00 น. (Unlimited capacity):
+    // 1. รอบช่วงเช้า 09:00 - 11:00 น.
+    // 2. รอบกลางวัน 11:00 - 13:00 น.
+    // 3. รอบบ่าย 13:00 - 14:00 น.
+    { id: 'ts-1', event_id: defaultEvent.id, start_at: '2026-09-16T09:00:00+07:00', end_at: '2026-09-16T11:00:00+07:00', capacity: 9999, booked_count: 40, is_active: true, created_at: new Date().toISOString() },
+    { id: 'ts-2', event_id: defaultEvent.id, start_at: '2026-09-16T11:00:00+07:00', end_at: '2026-09-16T13:00:00+07:00', capacity: 9999, booked_count: 53, is_active: true, created_at: new Date().toISOString() },
+    { id: 'ts-3', event_id: defaultEvent.id, start_at: '2026-09-16T13:00:00+07:00', end_at: '2026-09-16T14:00:00+07:00', capacity: 9999, booked_count: 15, is_active: true, created_at: new Date().toISOString() },
+  ];
+}
+export const defaultSlots: TimeSlot[] = globalState.__lvu_defaultSlots;
 
-const inMemoryAuditLogs: AuditLog[] = [];
-const inMemoryCheckinEvents: CheckinEvent[] = [];
+if (!globalState.__lvu_inMemoryRegistrations) {
+  globalState.__lvu_inMemoryRegistrations = [
+    {
+      id: 'reg-demo-1',
+      event_id: defaultEvent.id,
+      registration_code: 'MBD26-DEMO01',
+      qr_token: 'MBD26_QR_MBD26-DEMO01_test123',
+      access_token: 'lvu_sec_demo000000000000000000000000000000000000000000000000000000000001',
+      first_name: 'สมชาย',
+      last_name: 'ใจดี',
+      phone: '081-234-5678',
+      phone_normalized: '0812345678',
+      email: 'somchai@mahidol.ac.th',
+      participant_type: 'STUDENT',
+      faculty: 'คณะเทคนิคการแพทย์',
+      academic_year: 'ปี 3',
+      donation_experience: 'FIRST_TIME',
+      slot_id: 'ts-1',
+      status: 'REGISTERED',
+      source: 'ONLINE',
+      privacy_accepted: true,
+      registered_at: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
+      checked_in_at: null,
+      completed_at: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 'reg-demo-2',
+      event_id: defaultEvent.id,
+      registration_code: 'MBD26-DEMO02',
+      qr_token: 'MBD26_QR_MBD26-DEMO02_test456',
+      access_token: 'lvu_sec_demo000000000000000000000000000000000000000000000000000000000002',
+      first_name: 'สมหญิง',
+      last_name: 'รักเรียน',
+      phone: '089-876-5432',
+      phone_normalized: '0898765432',
+      email: 'somying@gmail.com',
+      participant_type: 'GENERAL_PUBLIC',
+      faculty: null,
+      academic_year: null,
+      donation_experience: 'RETURNING',
+      slot_id: 'ts-2',
+      status: 'CHECKED_IN',
+      source: 'ONLINE',
+      privacy_accepted: true,
+      registered_at: new Date(Date.now() - 3600000 * 24 * 1).toISOString(),
+      checked_in_at: new Date(Date.now() - 1800000).toISOString(),
+      completed_at: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+  ];
+}
+export const inMemoryRegistrations: Registration[] = globalState.__lvu_inMemoryRegistrations;
+
+if (!globalState.__lvu_inMemoryAuditLogs) globalState.__lvu_inMemoryAuditLogs = [];
+const inMemoryAuditLogs: AuditLog[] = globalState.__lvu_inMemoryAuditLogs;
+
+if (!globalState.__lvu_inMemoryCheckinEvents) globalState.__lvu_inMemoryCheckinEvents = [];
+const inMemoryCheckinEvents: CheckinEvent[] = globalState.__lvu_inMemoryCheckinEvents;
+
+if (!globalState.__lvu_inMemoryVerificationTokens) globalState.__lvu_inMemoryVerificationTokens = [];
+export const inMemoryVerificationTokens = globalState.__lvu_inMemoryVerificationTokens;
 
 export interface InMemoryStaffUser extends StaffProfile {
   email: string;
@@ -446,12 +476,14 @@ export async function registerDonorAtomic(input: {
       source
     );
     const code = generateRegistrationCode(nextSeq, source);
-    const token = generateQRToken(code);
+    const token = generateQRToken();
+    const accessToken = generateAccessToken();
     const newReg: Registration = {
       id: nextMemoryId('reg'),
       event_id: input.eventId,
       registration_code: code,
       qr_token: token,
+      access_token: accessToken,
       first_name: input.firstName,
       last_name: input.lastName,
       phone: input.phone,
@@ -478,6 +510,49 @@ export async function registerDonorAtomic(input: {
     return { success: true, registration: newReg };
   }
 
+  throw new Error('Database connection unconfigured in production environment.');
+}
+
+
+export async function createVerificationToken(registrationId: string, contactTarget: string): Promise<string> {
+  const token = generateAccessToken();
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+  inMemoryVerificationTokens.push({
+    id: nextMemoryId('vt'),
+    registration_id: registrationId,
+    token,
+    contact_target: contactTarget,
+    expires_at: expiresAt,
+    used_at: null,
+    created_at: new Date().toISOString(),
+  });
+  return token;
+}
+
+export async function consumeVerificationToken(token: string): Promise<Registration | null> {
+  const tokenClean = token.trim();
+  if (!tokenClean) return null;
+  const now = Date.now();
+  const vt = inMemoryVerificationTokens.find(
+    t => t.token === tokenClean && !t.used_at && new Date(t.expires_at).getTime() > now
+  );
+  if (!vt) return null;
+  vt.used_at = new Date().toISOString();
+  const reg = inMemoryRegistrations.find(r => r.id === vt.registration_id);
+  if (!reg) return null;
+  const slot = defaultSlots.find(s => s.id === reg.slot_id);
+  return { ...reg, time_slot: slot || null, event: defaultEvent };
+}
+
+export async function getRegistrationByAccessToken(token: string): Promise<Registration | null> {
+  const tokenClean = token.trim();
+  if (!tokenClean) return null;
+  if (isMemoryBackendAllowed()) {
+    const reg = inMemoryRegistrations.find(r => r.access_token === tokenClean);
+    if (!reg) return null;
+    const slot = defaultSlots.find(s => s.id === reg.slot_id);
+    return { ...reg, time_slot: slot || null, event: defaultEvent };
+  }
   throw new Error('Database connection unconfigured in production environment.');
 }
 

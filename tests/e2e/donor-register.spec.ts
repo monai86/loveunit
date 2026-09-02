@@ -28,7 +28,7 @@ test('donor can register online and reach the QR pass', async ({ page }) => {
   // Click an available preferred arrival slot (10:00+).
   const slot = page.locator('button[type="button"]').filter({ hasText: /10:00|11:00|12:00|13:00/ }).first();
   await slot.click();
-  await page.getByRole('checkbox').check();
+  await page.getByRole('checkbox', { name: /ข้าพเจ้าได้อ่านและยินยอม/i }).check();
 
   // Move to Step 4: Review
   await page.getByRole('button', { name: 'ตรวจสอบข้อมูล' }).click();
@@ -40,16 +40,18 @@ test('donor can register online and reach the QR pass', async ({ page }) => {
   await page.waitForURL(/\/registration\//, { timeout: 15_000 });
 
   expect(page.url()).toMatch(/\/registration\/LVU26-/);
+  // Clean URL: bearer token is transported via secure HttpOnly cookie, NOT in URL
+  expect(page.url()).not.toContain('token=');
 
-  // QR code rendered + donor name shown.
-  await expect(page.getByRole('img', { name: /QR Code/ })).toBeVisible();
+  // Ticket Pass actions rendered + donor name shown.
+  await expect(page.getByRole('button', { name: /บันทึกภาพตั๋ว/ })).toBeVisible();
   await expect(page.getByText(firstName)).toBeVisible();
   await expect(page.getByText(lastName)).toBeVisible();
 
   // Clean up created donor so test data does not linger in DB
   const match = page.url().match(/\/registration\/(LVU26-[0-9A-Z]+)/);
   if (match && match[1]) {
-    await page.request.post('/api/events/mumt-2026/cancel', {
+    await page.request.post('/api/registrations/cancel', {
       data: { registrationCode: match[1], reason: 'E2E test teardown cleanup' },
     });
   }

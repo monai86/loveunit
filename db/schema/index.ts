@@ -16,6 +16,7 @@ export * from './auth';
 export * from './waitlist';
 export * from './staff-invitations';
 export * from './staff-applications';
+export * from './rate-limits';
 
 // Relations
 export const eventsRelations = relations(events, ({ many }) => ({

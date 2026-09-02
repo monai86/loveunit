@@ -1,5 +1,8 @@
-// Concurrency stress test: simulates 300+ concurrent donors registering,
-// joining waitlists, looking up codes, cancelling, and re-registering simultaneously.
+// In-process concurrency correctness test:
+// Simulates concurrent JavaScript execution registering donors, looking up records,
+// cancelling with cryptographic access tokens, and re-registering simultaneously.
+// NOTE: This is an in-process correctness test, not an end-to-end distributed network load test.
+
 process.env.DATA_BACKEND = 'memory';
 
 import assert from 'node:assert/strict';
@@ -11,8 +14,8 @@ import {
 } from '../lib/db/store';
 import { POST as cancelApiPost } from '../app/api/registrations/cancel/route';
 
-async function runConcurrencyStressTest() {
-  console.log('🚀 Running 300+ Concurrent Users Stress Simulation Test...\n');
+async function runInProcessConcurrencyCorrectnessTest() {
+  console.log('🧪 Running In-Process Concurrency Correctness Test (300 concurrent registrations)...\n');
 
   const event = await getEventBySlug('mumt-2026');
   assert.ok(event, 'Event must exist');
@@ -22,7 +25,7 @@ async function runConcurrencyStressTest() {
   const initialCancelled = baselineKPIs.cancelledCount;
 
   const CONCURRENT_USERS = 300;
-  console.log(`Simulating ${CONCURRENT_USERS} simultaneous donor registrations...`);
+  console.log(`Simulating ${CONCURRENT_USERS} simultaneous in-process donor registrations...`);
 
   const startTime = Date.now();
 
@@ -53,7 +56,7 @@ async function runConcurrencyStressTest() {
   console.log(`- Total Requests: ${CONCURRENT_USERS}`);
   console.log(`- Successful Registrations: ${successful.length}`);
   console.log(`- Failed Registrations: ${failed.length}`);
-  console.log(`- Total Time: ${duration}ms (${(duration / CONCURRENT_USERS).toFixed(2)}ms per request avg)`);
+  console.log(`- Total Time: ${duration}ms (${(duration / CONCURRENT_USERS).toFixed(2)}ms per in-process call avg)`);
 
   assert.equal(successful.length, CONCURRENT_USERS, `All ${CONCURRENT_USERS} registrations must succeed`);
   assert.equal(failed.length, 0, 'No registration should fail under concurrency');
@@ -71,17 +74,15 @@ async function runConcurrencyStressTest() {
   assert.equal(lookupResults.every((r) => r !== null), true, 'All 300 lookups must find their ticket');
   console.log(`✓ 300 Lookups completed in ${lookupDuration}ms`);
 
-  // Test simultaneous self-cancellations (50 concurrent cancels)
-  console.log('\nSimulating 50 simultaneous donor self-cancellations...');
+  // Test simultaneous self-cancellations (50 concurrent cancels using possession access tokens)
+  console.log('\nSimulating 50 simultaneous donor self-cancellations with valid access tokens...');
   const cancelStart = Date.now();
-  const cancelledCodes = Array.from(codes).slice(0, 50);
-  const cancelPromises = cancelledCodes.map((code, idx) => {
-    const paddedIndex = String(idx + 1).padStart(3, '0');
-    const phone = `089${paddedIndex.padStart(7, '0')}`;
+  const cancelledRegistrations = successful.slice(0, 50).map(r => r.registration as { registration_code: string; access_token: string });
+  const cancelPromises = cancelledRegistrations.map((item) => {
     const req = new Request('http://localhost:3000/api/registrations/cancel', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ registrationCode: code, phone, reason: 'เปลี่ยนใจ' }),
+      body: JSON.stringify({ registrationCode: item.registration_code, token: item.access_token, reason: 'เปลี่ยนใจ' }),
     });
     return cancelApiPost(req);
   });
@@ -119,10 +120,10 @@ async function runConcurrencyStressTest() {
   assert.equal(kpis.totalRegistrations, initialActive + CONCURRENT_USERS, `Active registrations must equal ${initialActive + CONCURRENT_USERS}`);
   assert.equal(kpis.cancelledCount, initialCancelled + 50, `Cancelled count must equal ${initialCancelled + 50}`);
 
-  console.log(`\n🎉 300+ CONCURRENT USERS STRESS SIMULATION TEST PASSED!\n`);
+  console.log(`\n🎉 IN-PROCESS CONCURRENCY CORRECTNESS TEST PASSED!\n`);
 }
 
-runConcurrencyStressTest().catch((err) => {
-  console.error('❌ Concurrency stress test failed:', err);
+runInProcessConcurrencyCorrectnessTest().catch((err) => {
+  console.error('❌ In-process concurrency test failed:', err);
   process.exit(1);
 });

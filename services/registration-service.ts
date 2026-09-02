@@ -1,9 +1,20 @@
 import { db } from '@/db';
-import { registrations, timeSlots } from '@/db/schema';
+import { registrations, timeSlots, verificationTokens } from '@/db/schema';
 import { eq, and, ne, sql, ilike } from 'drizzle-orm';
-import { normalizePhoneNumber, generateRegistrationCode, generateQRToken } from '@/lib/utils/format';
-import { isMemoryBackendAllowed, registerDonorAtomic as memoryRegisterAtomic, inMemoryRegistrations, defaultSlots, defaultEvent } from '@/lib/db/store';
+import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, generateAccessToken } from '@/lib/utils/format';
+import {
+  isMemoryBackendAllowed,
+  registerDonorAtomic as memoryRegisterAtomic,
+  getRegistrationByAccessToken as memoryGetRegistrationByAccessToken,
+  createVerificationToken as memoryCreateVerificationToken,
+  consumeVerificationToken as memoryConsumeVerificationToken,
+  inMemoryRegistrations,
+  defaultSlots,
+  defaultEvent
+} from '@/lib/db/store';
 import { ParticipantType, DonationExperience, RegistrationSource } from '@/lib/types/database';
+
+const isDbActive = () => Boolean(db && process.env.DATA_BACKEND !== 'memory');
 
 export async function registerDonorAtomic(input: {
   eventId: string;
@@ -22,10 +33,9 @@ export async function registerDonorAtomic(input: {
   const phoneNormalized = normalizePhoneNumber(input.phone);
   const source = input.source || 'ONLINE';
 
-  if (db) {
+  if (isDbActive() && db) {
     return await db.transaction(async (tx) => {
       // 1. Acquire event-level advisory transaction lock to guarantee deterministic ordering
-      // and prevent lock ordering deadlocks under 200+ concurrent requests.
       await tx.execute(sql`SELECT pg_advisory_xact_lock(hashtext(${input.eventId}))`);
 
       // 2. Check duplicate normalized phone
@@ -51,7 +61,6 @@ export async function registerDonorAtomic(input: {
       }
 
       // 3. Validate the selected arrival window and retain a count for reports.
-      // Arrival windows intentionally have no registration capacity limit.
       if (input.slotId) {
         const slotResult = await tx.execute(
           sql`SELECT id FROM time_slots WHERE id = ${input.slotId} AND event_id = ${input.eventId} AND is_active = TRUE FOR UPDATE`
@@ -62,7 +71,6 @@ export async function registerDonorAtomic(input: {
           return { success: false, errorCode: 'SLOT_NOT_FOUND', message: 'ไม่พบช่วงเวลาที่เลือก' };
         }
 
-        // Increment booked_count for staff reporting only; it is not a limit.
         await tx
           .update(timeSlots)
           .set({ bookedCount: sql`${timeSlots.bookedCount} + 1` })
@@ -86,7 +94,8 @@ export async function registerDonorAtomic(input: {
       }
 
       const code = generateRegistrationCode(nextSeq, source);
-      const token = generateQRToken(code);
+      const token = generateQRToken();
+      const accessToken = generateAccessToken();
 
       const [newReg] = await tx
         .insert(registrations)
@@ -94,6 +103,7 @@ export async function registerDonorAtomic(input: {
           eventId: input.eventId,
           registrationCode: code,
           qrToken: token,
+          accessToken: accessToken,
           firstName: input.firstName,
           lastName: input.lastName,
           phone: input.phone,
@@ -122,10 +132,95 @@ export async function registerDonorAtomic(input: {
   throw new Error('DATABASE_URL is unconfigured in production environment.');
 }
 
-export async function getRegistrationByCode(code: string) {
-  const codeClean = code.trim().toUpperCase();
+export async function getRegistrationByAccessToken(token: string) {
+  const tokenClean = token.trim();
+  if (!tokenClean) return null;
 
-  if (db) {
+  if (isDbActive() && db) {
+    const result = await db.query.registrations.findFirst({
+      where: eq(registrations.accessToken, tokenClean),
+      with: {
+        timeSlot: true,
+        event: true,
+      },
+    });
+    return result || null;
+  }
+
+  if (isMemoryBackendAllowed()) {
+    return await memoryGetRegistrationByAccessToken(tokenClean);
+  }
+
+  throw new Error('DATABASE_URL is unconfigured in production environment.');
+}
+
+export async function createVerificationToken(registrationId: string, contactTarget: string): Promise<string> {
+  const token = generateAccessToken();
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+  if (isDbActive() && db) {
+    await db.insert(verificationTokens).values({
+      registrationId,
+      token,
+      contactTarget,
+      expiresAt,
+    });
+    return token;
+  }
+
+  if (isMemoryBackendAllowed()) {
+    return await memoryCreateVerificationToken(registrationId, contactTarget);
+  }
+
+  throw new Error('DATABASE_URL is unconfigured in production environment.');
+}
+
+export async function consumeVerificationToken(token: string) {
+  const tokenClean = token.trim();
+  if (!tokenClean) return null;
+
+  if (isDbActive() && db) {
+    const now = new Date();
+    const [vt] = await db
+      .select()
+      .from(verificationTokens)
+      .where(
+        and(
+          eq(verificationTokens.token, tokenClean),
+          sql`${verificationTokens.usedAt} IS NULL`,
+          sql`${verificationTokens.expiresAt} > ${now}`
+        )
+      )
+      .limit(1);
+
+    if (!vt) return null;
+
+    await db
+      .update(verificationTokens)
+      .set({ usedAt: now })
+      .where(eq(verificationTokens.id, vt.id));
+
+    const result = await db.query.registrations.findFirst({
+      where: eq(registrations.id, vt.registrationId),
+      with: {
+        timeSlot: true,
+        event: true,
+      },
+    });
+    return result || null;
+  }
+
+  if (isMemoryBackendAllowed()) {
+    return await memoryConsumeVerificationToken(tokenClean);
+  }
+
+  throw new Error('DATABASE_URL is unconfigured in production environment.');
+}
+
+export async function getRegistrationByCode(code: string) {
+  const codeClean = decodeURIComponent(code).trim().toUpperCase();
+
+  if (isDbActive() && db) {
     const result = await db.query.registrations.findFirst({
       where: eq(registrations.registrationCode, codeClean),
       with: {
@@ -137,18 +232,20 @@ export async function getRegistrationByCode(code: string) {
   }
 
   if (isMemoryBackendAllowed()) {
-    const reg = inMemoryRegistrations.find(r => r.registration_code.toUpperCase() === codeClean);
+    const reg = inMemoryRegistrations.find(
+      r => ((r as { registrationCode?: string }).registrationCode || r.registration_code || '').toUpperCase() === codeClean
+    );
     if (!reg) return null;
-    return { ...reg, time_slot: defaultSlots.find(s => s.id === reg.slot_id) || null, event: defaultEvent };
+    return { ...reg, time_slot: defaultSlots.find(s => s.id === (reg.slot_id || (reg as { slotId?: string }).slotId)) || null, event: defaultEvent };
   }
 
   throw new Error('DATABASE_URL is unconfigured in production environment.');
 }
 
 export async function getRegistrationByQRToken(token: string) {
-  const tokenClean = token.trim();
+  const tokenClean = decodeURIComponent(token).trim();
 
-  if (db) {
+  if (isDbActive() && db) {
     const result = await db.query.registrations.findFirst({
       where: eq(registrations.qrToken, tokenClean),
       with: {
@@ -159,19 +256,50 @@ export async function getRegistrationByQRToken(token: string) {
   }
 
   if (isMemoryBackendAllowed()) {
-    const reg = inMemoryRegistrations.find(r => r.qr_token === tokenClean);
+    const reg = inMemoryRegistrations.find(
+      r => ((r as { qrToken?: string }).qrToken || r.qr_token || '').trim() === tokenClean
+    );
     if (!reg) return null;
-    return { ...reg, time_slot: defaultSlots.find(s => s.id === reg.slot_id) || null };
+    return { ...reg, time_slot: defaultSlots.find(s => s.id === (reg.slot_id || (reg as { slotId?: string }).slotId)) || null, event: defaultEvent };
   }
 
   throw new Error('DATABASE_URL is unconfigured in production environment.');
 }
 
-/**
- * Looks up a donor's registration using phone + first/last name verification.
- * Used by the public "ลืม QR Code" recovery page. Returns the full registration
- * (with timeSlot/event relations) or null when nothing matches.
- */
+export async function findRegistrationByEmail(input: {
+  eventId: string;
+  email: string;
+}) {
+  const emailClean = input.email.trim().toLowerCase();
+  if (!emailClean) return null;
+
+  if (isDbActive() && db) {
+    const result = await db.query.registrations.findFirst({
+      where: and(
+        eq(registrations.eventId, input.eventId),
+        ilike(registrations.email, emailClean),
+        ne(registrations.status, 'CANCELLED')
+      ),
+      with: {
+        timeSlot: true,
+        event: true,
+      },
+      orderBy: (regs, { desc }) => [desc(regs.registeredAt)],
+    });
+    return result || null;
+  }
+
+  if (isMemoryBackendAllowed()) {
+    const reg = inMemoryRegistrations.find(
+      r => r.event_id === input.eventId && r.email && r.email.toLowerCase() === emailClean && r.status !== 'CANCELLED'
+    );
+    if (!reg) return null;
+    return { ...reg, time_slot: defaultSlots.find(s => s.id === reg.slot_id) || null, event: defaultEvent };
+  }
+
+  throw new Error('DATABASE_URL is unconfigured in production environment.');
+}
+
 export async function findRegistrationByPhoneAndName(input: {
   eventId: string;
   phone: string;
@@ -180,7 +308,7 @@ export async function findRegistrationByPhoneAndName(input: {
 }) {
   const phoneNormalized = normalizePhoneNumber(input.phone);
 
-  if (db) {
+  if (isDbActive() && db) {
     const result = await db.query.registrations.findFirst({
       where: and(
         eq(registrations.eventId, input.eventId),
@@ -214,10 +342,6 @@ export async function findRegistrationByPhoneAndName(input: {
   throw new Error('DATABASE_URL is unconfigured in production environment.');
 }
 
-/**
- * Looks up all non-cancelled registrations by normalized phone number for the specified event.
- * Returns an array of matching registrations (with timeSlot and event relations).
- */
 export async function findRegistrationsByPhone(input: {
   eventId: string;
   phone: string;
@@ -225,7 +349,7 @@ export async function findRegistrationsByPhone(input: {
   const phoneNormalized = normalizePhoneNumber(input.phone);
   if (!phoneNormalized) return [];
 
-  if (db) {
+  if (isDbActive() && db) {
     const results = await db.query.registrations.findMany({
       where: and(
         eq(registrations.eventId, input.eventId),
@@ -257,4 +381,3 @@ export async function findRegistrationsByPhone(input: {
 
   throw new Error('DATABASE_URL is unconfigured in production environment.');
 }
-

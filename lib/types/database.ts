@@ -54,6 +54,7 @@ export interface Registration {
   event_id: string;
   registration_code: string;
   qr_token: string;
+  access_token: string;
   first_name: string;
   last_name: string;
   phone: string;
@@ -76,6 +77,16 @@ export interface Registration {
   // Joined relation fields for convenience
   time_slot?: TimeSlot | null;
   event?: Event | null;
+}
+
+export interface VerificationToken {
+  id: string;
+  registration_id: string;
+  token: string;
+  contact_target: string;
+  expires_at: string;
+  used_at: string | null;
+  created_at: string;
 }
 
 export interface StaffProfile {

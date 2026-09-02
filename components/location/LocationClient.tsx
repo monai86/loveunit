@@ -130,7 +130,7 @@ export function LocationClient({
                 <MapPin className="h-5 w-5 text-[var(--burgundy-700)] shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-black text-sm text-[var(--burgundy-700)]">
-                    {isTh ? 'ห้องประชุม 217 (ชั้น 2)' : 'Meeting Room 217 (2nd Floor)'}
+                    {isTh ? 'ห้องประชุม 217 - 218 (ชั้น 2)' : 'Meeting Room 217 - 218 (2nd Floor)'}
                   </h3>
                   <p className="text-xs text-[var(--muted)] mt-0.5 leading-relaxed">
                     {isTh

@@ -14,6 +14,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 interface RegistrationPassClientProps {
   registrationCode: string;
+  accessToken?: string;
   firstName: string;
   lastName: string;
   phone: string;
@@ -27,6 +28,7 @@ interface RegistrationPassClientProps {
 
 export function RegistrationPassClient({
   registrationCode,
+  accessToken,
   firstName,
   lastName,
   phone,
@@ -52,20 +54,13 @@ export function RegistrationPassClient({
     setCancelLoading(true);
     setCancelError(null);
 
-    const phoneToSubmit = confirmPhone.trim() || phone.trim();
-    if (!phoneToSubmit) {
-      setCancelError(isTh ? 'กรุณากรอกเบอร์โทรศัพท์ที่ใช้ลงทะเบียน' : 'Please enter your registered phone number');
-      setCancelLoading(false);
-      return;
-    }
-
     try {
       const res = await fetch('/api/registrations/cancel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           registrationCode,
-          phone: phoneToSubmit,
+          token: accessToken,
           reason: cancelReason,
         }),
       });

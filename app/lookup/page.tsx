@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   AlertTriangle,
-  Search,
+  Mail,
   ShieldCheck,
   Loader2,
-  User,
-  Clock,
   ArrowRight,
   ArrowLeft,
   Heart,
@@ -16,14 +15,18 @@ import {
   XCircle,
   X,
   PlusCircle,
+  KeyRound,
+  Inbox
 } from 'lucide-react';
 import { DonorTicketPass } from '@/components/ui/DonorTicketPass';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { formatBangkokTime, isWalkInRecord } from '@/lib/utils/format';
 
 interface LookupResult {
+  id: string;
   registration_code: string;
   qr_token: string;
+  access_token: string;
   first_name: string;
   last_name?: string;
   last_name_initial: string;
@@ -32,17 +35,20 @@ interface LookupResult {
   phone?: string;
   status: string;
   registered_at?: string;
-  created_at?: string;
   time_slot: { time_label: string } | null;
   event: { name?: string; start_at?: string; venue_name?: string } | null;
 }
 
-export default function LookupPage() {
+function LookupContent() {
+  const searchParams = useSearchParams();
+  const tokenParam = searchParams.get('token');
+
   const { isTh, isEn } = useLanguage();
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [verifyLoading, setVerifyLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [matches, setMatches] = useState<LookupResult[]>([]);
+  const [requestedSuccess, setRequestedSuccess] = useState(false);
   const [selectedResult, setSelectedResult] = useState<LookupResult | null>(null);
 
   // Cancellation State
@@ -54,92 +60,81 @@ export default function LookupPage() {
     code: string;
     name: string;
   } | null>(null);
-  const searchControllerRef = useRef<AbortController | null>(null);
 
+  // Handle auto-verification if token is in URL (Magic Link flow)
   useEffect(() => {
-    return () => {
-      searchControllerRef.current?.abort();
-    };
-  }, []);
+    if (!tokenParam) return;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    let ignore = false;
+    async function verifyToken() {
+      setVerifyLoading(true);
+      setErrorMessage(null);
+      try {
+        const res = await fetch('/api/registrations/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: tokenParam }),
+        });
+        const data = await res.json();
+        if (ignore) return;
+
+        if (res.ok && data.success && data.registration) {
+          setSelectedResult(data.registration);
+        } else {
+          setErrorMessage(data.message || (isTh ? 'ลิงก์ยืนยันตัวตนไม่ถูกต้องหรือหมดอายุแล้ว' : 'Invalid or expired verification link'));
+        }
+      } catch {
+        if (!ignore) {
+          setErrorMessage(isTh ? 'เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย' : 'Network connection error');
+        }
+      } finally {
+        if (!ignore) setVerifyLoading(false);
+      }
+    }
+
+    verifyToken();
+    return () => { ignore = true; };
+  }, [tokenParam, isTh]);
+
+  const handleRequestMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
-    setMatches([]);
     setSelectedResult(null);
     setCancelledSuccessData(null);
 
-    const cleanedPhone = phone.replace(/\D/g, '');
-    if (cleanedPhone.length < 9) {
-      setErrorMessage(
-        isTh
-          ? 'กรุณากรอกเบอร์โทรศัพท์มือถือ 9-10 หลักให้ถูกต้อง'
-          : 'Please enter a valid 9-10 digit mobile phone number'
-      );
+    const emailClean = email.trim().toLowerCase();
+    if (!emailClean || !emailClean.includes('@')) {
+      setErrorMessage(isTh ? 'กรุณากรอกอีเมลให้ถูกต้อง' : 'Please enter a valid email address');
       return;
     }
-
-    searchControllerRef.current?.abort();
-    const controller = new AbortController();
-    searchControllerRef.current = controller;
 
     setLoading(true);
     try {
       const res = await fetch('/api/registrations/lookup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phone.trim() }),
-        signal: controller.signal,
+        body: JSON.stringify({ email: emailClean }),
       });
       const data = await res.json();
 
       if (res.ok && data.success) {
-        if (data.registration) {
-          // Exactly 1 match found
-          setSelectedResult(data.registration);
-        } else if (Array.isArray(data.matches) && data.matches.length > 0) {
-          if (data.matches.length === 1) {
-            setSelectedResult(data.matches[0]);
-          } else {
-            // Multiple matches found under this phone
-            setMatches(data.matches);
-          }
-        } else {
-          setErrorMessage(
-            isTh ? 'ไม่พบข้อมูลการลงทะเบียนที่ตรงกับเบอร์นี้' : 'No registration found for this number'
-          );
-        }
+        setRequestedSuccess(true);
       } else {
-        setErrorMessage(
-          data.message ||
-            (isTh ? 'ไม่พบข้อมูลการลงทะเบียนที่ตรงกับเบอร์โทรศัพท์นี้' : 'Registration record not found')
-        );
+        setErrorMessage(data.message || (isTh ? 'เกิดข้อผิดพลาดในการส่งคำขอ' : 'Request error'));
       }
-    } catch (err: unknown) {
-      if (err instanceof DOMException && err.name === 'AbortError') {
-        return;
-      }
-      setErrorMessage(
-        isTh
-          ? 'เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย กรุณาลองใหม่อีกครั้ง'
-          : 'Network error. Please try again.'
-      );
+    } catch {
+      setErrorMessage(isTh ? 'เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย' : 'Network connection error');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResetSearch = () => {
+  const handleReset = () => {
     setSelectedResult(null);
-    setMatches([]);
     setErrorMessage(null);
+    setRequestedSuccess(false);
     setCancelledSuccessData(null);
-  };
-
-  const handleOpenCancelModal = () => {
-    setCancelError(null);
-    setCancelReason('ติดภารกิจ / ธุระด่วน');
-    setCancelModalOpen(true);
+    setEmail('');
   };
 
   const handleConfirmCancel = async () => {
@@ -154,7 +149,7 @@ export default function LookupPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           registrationCode: selectedResult.registration_code,
-          phone: phone.trim() || selectedResult.phone,
+          token: selectedResult.access_token,
           reason: cancelReason,
         }),
       });
@@ -168,7 +163,6 @@ export default function LookupPage() {
         });
         setCancelModalOpen(false);
         setSelectedResult(null);
-        setMatches([]);
       } else {
         setCancelError(data.message || (isTh ? 'ไม่สามารถยกเลิกได้ กรุณาลองใหม่อีกครั้ง' : 'Failed to cancel registration'));
       }
@@ -185,8 +179,8 @@ export default function LookupPage() {
       <div className="mb-8 pb-6 border-b border-[var(--line)]">
         <div className="flex items-center gap-2 mb-2.5">
           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20">
-            <Search className="h-3.5 w-3.5 text-white" />
-            <span>{isTh ? 'ค้นหาตั๋วและ QR Code' : 'Find Ticket & QR Pass'}</span>
+            <KeyRound className="h-3.5 w-3.5 text-white" />
+            <span>{isTh ? 'ค้นหาตั๋วและ QR Code ปลอดภัย' : 'Secure Pass Recovery'}</span>
           </span>
         </div>
         <h1 className="text-2xl font-black text-[var(--ink)] sm:text-3xl font-display">
@@ -194,10 +188,20 @@ export default function LookupPage() {
         </h1>
         <p className="mt-2 text-sm text-[var(--muted)] font-medium leading-relaxed">
           {isTh
-            ? 'กรอกเบอร์โทรศัพท์มือถือที่ใช้ลงทะเบียน เพื่อเปิดดูตั๋ว QR Code หรือกดยกเลิกการลงทะเบียน'
-            : 'Enter your registered mobile phone number to view your pass or manage your registration.'}
+            ? 'ระบบยืนยันสิทธิ์ผ่าน Magic Link ส่งตรงถึงอีเมลของคุณ ป้องกันการเข้าถึงข้อมูลโดยไม่ได้รับอนุญาต'
+            : 'Access your ticket pass securely via Magic Link sent to your registered email.'}
         </p>
       </div>
+
+      {/* Verifying Token Loader */}
+      {verifyLoading && (
+        <div className="p-8 editorial-card text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-[var(--burgundy-700)] mx-auto" />
+          <p className="text-sm font-bold text-gray-800">
+            {isTh ? 'กำลังยืนยันสิทธิ์เข้าถึงตั๋ว...' : 'Verifying your pass token...'}
+          </p>
+        </div>
+      )}
 
       {/* Error Message */}
       {errorMessage && (
@@ -252,11 +256,10 @@ export default function LookupPage() {
 
               <button
                 type="button"
-                onClick={handleResetSearch}
+                onClick={handleReset}
                 className="editorial-btn-secondary min-h-11 flex-1 py-3 text-xs font-bold justify-center cursor-pointer"
               >
-                <Search className="h-4 w-4" />
-                <span>{isTh ? 'ค้นหาตั๋วเบอร์อื่น' : 'Search Another Ticket'}</span>
+                <span>{isTh ? 'ค้นหาตั๋วอื่น' : 'Search Another Ticket'}</span>
               </button>
             </div>
           </div>
@@ -268,15 +271,11 @@ export default function LookupPage() {
         <div className="space-y-4">
           <button
             type="button"
-            onClick={handleResetSearch}
+            onClick={handleReset}
             className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)] transition-colors py-1 cursor-pointer"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            <span>
-              {isTh
-                ? '← ค้นหาด้วยเบอร์อื่น หรือเลือกรายชื่ออื่น'
-                : '← Search another number / Choose name'}
-            </span>
+            <span>{isTh ? '← ค้นหาด้วยอีเมลอื่น' : '← Search with another email'}</span>
           </button>
 
           <DonorTicketPass
@@ -295,162 +294,88 @@ export default function LookupPage() {
             venue={
               selectedResult.event?.venue_name ||
               (isEn
-                ? 'Meeting Room 217, Sirividhaya Building, Mahidol University Salaya'
-                : 'ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา')
+                ? 'Meeting Room 217-218, Sirividhaya Building, Mahidol University Salaya'
+                : 'ห้องประชุม 217 - 218 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล ศาลายา')
             }
             qrToken={selectedResult.qr_token}
             isConfirmed={selectedResult.status !== 'CANCELLED'}
             status={selectedResult.status}
-            onReset={handleResetSearch}
-            resetLabel={isTh ? 'ค้นหาตั๋วของเบอร์อื่น' : 'Search Another Number'}
-            onCancel={selectedResult.status === 'REGISTERED' ? handleOpenCancelModal : undefined}
+            onReset={handleReset}
+            resetLabel={isTh ? 'ค้นหาตั๋วอื่น' : 'Search Another Ticket'}
+            onCancel={selectedResult.status === 'REGISTERED' ? () => setCancelModalOpen(true) : undefined}
             cancelLabel={isTh ? 'ขอยกเลิกการลงทะเบียน' : 'Cancel Registration'}
           />
         </div>
-      ) : !cancelledSuccessData && matches.length > 1 ? (
-        /* CASE 2: Multiple Matches Found -> Candidate Selection Picker */
-        <div className="space-y-5 animate-in fade-in-50 duration-200">
-          <div className="p-4 rounded-2xl bg-[var(--rose-100)] border border-[var(--burgundy-200)] text-[var(--burgundy-800)]">
-            <div className="flex items-center gap-2 font-black text-sm font-display">
-              <CheckCircle2 className="h-4 w-4 text-[var(--burgundy-700)]" />
-              <span>
-                {isTh
-                  ? `พบผู้ลงทะเบียนด้วยเบอร์นี้ ${matches.length} ท่าน`
-                  : `Found ${matches.length} registrations for this phone`}
-              </span>
-            </div>
-            <p className="mt-1 text-xs text-[var(--burgundy-700)] font-medium">
+      ) : !cancelledSuccessData && requestedSuccess ? (
+        /* CASE 2: Magic Link Sent Success Banner */
+        <div className="editorial-card p-6 sm:p-8 text-center space-y-5 animate-in fade-in duration-200">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-8 ring-emerald-50">
+            <Inbox className="h-8 w-8" />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-xl sm:text-2xl font-black text-[var(--ink)] font-display">
+              {isTh ? 'ส่งลิงก์ยืนยันตัวตนเรียบร้อยแล้ว' : 'Magic Link Sent'}
+            </h2>
+            <p className="text-xs sm:text-sm text-[var(--muted)] max-w-md mx-auto leading-relaxed">
               {isTh
-                ? 'กรุณาแตะเลือกชื่อของคุณด้านล่าง เพื่อเปิดตั๋ว ดู QR Code หรือยกเลิกการลงทะเบียน'
-                : 'Please tap your name below to open your QR Code pass or cancel registration.'}
+                ? 'หากอีเมลนี้ตรงกับข้อมูลที่เคยลงทะเบียนไว้ ระบบได้ส่งลิงก์สำหรับเปิดดูตั๋วและ QR Code ไปยังกล่องข้อความของคุณแล้ว (ลิงก์มีอายุ 15 นาที)'
+                : 'If this email is registered, we have sent a secure access link to your inbox (valid for 15 minutes).'}
             </p>
           </div>
 
-          <div className="space-y-3">
-            {matches.map((item, idx) => {
-              const isItemWalkIn = isWalkInRecord(item.registration_code);
-              const itemTimeLabel = isItemWalkIn
-                ? item.registered_at
-                  ? isTh
-                    ? `ลงทะเบียน Walk-in (${formatBangkokTime(item.registered_at)})`
-                    : `Walk-in (${formatBangkokTime(item.registered_at)})`
-                  : isTh
-                  ? 'ลงทะเบียน Walk-in'
-                  : 'Walk-in'
-                : item.time_slot?.time_label || '09:00 – 14:00 น.';
-
-              return (
-                <div
-                  key={item.registration_code || idx}
-                  onClick={() => setSelectedResult(item)}
-                  className="editorial-card p-4 sm:p-5 transition-all hover:border-[var(--burgundy-600)] hover:shadow-md cursor-pointer group"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1.5 min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono text-xs font-black text-[var(--burgundy-700)] bg-[var(--rose-100)] px-2 py-0.5 rounded-md">
-                          {item.registration_code}
-                        </span>
-                        <span className="text-[11px] font-bold text-gray-500">
-                          {item.participant_type === 'STUDENT'
-                            ? isTh
-                              ? 'นักศึกษา'
-                              : 'Student'
-                            : item.participant_type === 'STAFF'
-                            ? isTh
-                              ? 'บุคลากร'
-                              : 'Staff'
-                            : isTh
-                            ? 'บุคคลทั่วไป'
-                            : 'General'}
-                        </span>
-                      </div>
-
-                      <h3 className="text-base sm:text-lg font-black text-[var(--ink)] group-hover:text-[var(--burgundy-700)] transition-colors flex items-center gap-2">
-                        <User className="h-4 w-4 text-[var(--burgundy-600)] shrink-0" />
-                        <span>
-                          {item.first_name} {item.last_name || item.last_name_initial}
-                        </span>
-                      </h3>
-
-                      <div className="flex items-center gap-3 text-xs text-[var(--muted)] flex-wrap pt-0.5">
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3.5 w-3.5 text-gray-400" />
-                          <span>{itemTimeLabel}</span>
-                        </span>
-                        {item.faculty && <span>· {item.faculty}</span>}
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedResult(item);
-                      }}
-                      className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-2 text-xs font-bold text-white shadow-xs group-hover:shadow-md transition-all active:scale-95 cursor-pointer"
-                    >
-                      <span>{isTh ? 'ดูตั๋ว' : 'View Pass'}</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="pt-2 text-center">
+          <div className="pt-2">
             <button
               type="button"
-              onClick={handleResetSearch}
-              className="text-xs font-bold text-[var(--muted)] hover:text-[var(--ink)] underline py-2 cursor-pointer"
+              onClick={handleReset}
+              className="editorial-btn-secondary min-h-11 px-6 py-2.5 text-xs font-bold justify-center cursor-pointer"
             >
-              {isTh ? 'ค้นหาด้วยเบอร์โทรศัพท์อื่น' : 'Search with another phone number'}
+              <span>{isTh ? 'กรอกอีเมลอื่น' : 'Enter Another Email'}</span>
             </button>
           </div>
         </div>
-      ) : !cancelledSuccessData ? (
-        /* CASE 3: Initial Search Form (Phone Only) */
-        <form onSubmit={handleSubmit} className="editorial-card p-6 sm:p-8 space-y-6">
+      ) : !cancelledSuccessData && !verifyLoading ? (
+        /* CASE 3: Initial Request Form (Email Magic Link) */
+        <form onSubmit={handleRequestMagicLink} className="editorial-card p-6 sm:p-8 space-y-5">
           <div>
-            <label htmlFor="lk-phone" className="block text-xs font-bold text-[var(--ink)] mb-2">
-              {isTh ? 'เบอร์โทรศัพท์มือถือที่ลงทะเบียน' : 'Registered Mobile Phone'}{' '}
+            <label htmlFor="lk-email" className="block text-xs font-bold text-[var(--ink)] mb-2">
+              {isTh ? 'อีเมลที่ใช้ลงทะเบียน' : 'Registered Email Address'}{' '}
               <span className="text-red-600">*</span>
             </label>
             <div className="relative">
               <input
-                id="lk-phone"
-                type="tel"
+                id="lk-email"
+                type="email"
                 required
                 autoFocus
-                autoComplete="tel"
-                placeholder={isTh ? 'เช่น 0812345678' : 'e.g. 0812345678'}
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="editorial-input text-base sm:text-lg font-mono tracking-wider"
+                autoComplete="email"
+                placeholder={isTh ? 'เช่น somchai@student.mahidol.edu' : 'e.g. somchai@student.mahidol.edu'}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="editorial-input text-base sm:text-lg"
               />
             </div>
             <p className="mt-1.5 text-[11px] text-[var(--muted)]">
               {isTh
-                ? '* กรอกเบอร์มือถือที่เคยลงทะเบียนไว้เพื่อเปิดดูตั๋ว หรือกดยกเลิกการลงทะเบียน'
-                : '* Enter your registered mobile phone number to view or manage your ticket'}
+                ? '* ระบบจะส่งลิงก์ยืนยันสิทธิ์สำหรับเปิดดูตั๋วไปยังอีเมลนี้โดยอัตโนมัติ'
+                : '* A secure one-time magic access link will be sent to your email address.'}
             </p>
           </div>
 
           <button
             type="submit"
-            disabled={loading || !phone.trim()}
+            disabled={loading || !email.trim()}
             className="w-full inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-5 py-3 text-sm font-extrabold text-white shadow-md shadow-red-950/20 hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] hover:shadow-lg active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <span>{isTh ? 'กำลังค้นหาตั๋ว...' : 'Searching...'}</span>
+                <span>{isTh ? 'กำลังส่งคำขอ...' : 'Sending request...'}</span>
               </>
             ) : (
               <>
-                <Search className="h-4 w-4" />
-                <span>{isTh ? 'ค้นหาตั๋วและ QR Code ของฉัน' : 'Find My Pass & QR Code'}</span>
+                <Mail className="h-4 w-4" />
+                <span>{isTh ? 'ส่งลิงก์ยืนยันตัวตนเข้าอีเมล' : 'Send Magic Link to Email'}</span>
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
@@ -460,8 +385,8 @@ export default function LookupPage() {
             <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600 mt-0.5" />
             <span>
               {isTh
-                ? 'ระบบความปลอดภัย: ข้อมูลตั๋วจะแสดงเฉพาะรหัสลงทะเบียน รอบเวลา และ QR Code เฉพาะบุคคลสำหรับเช็กอิน'
-                : 'Security notice: Your pass contains your check-in QR Code and appointment details safely.'}
+                ? 'ความปลอดภัย: ระบบไม่เปิดเผยข้อมูลส่วนบุคคลหรือตั๋วให้แก่ผู้ที่ไม่มีสิทธิ์เข้าถึงอีเมลที่ลงทะเบียน'
+                : 'Security notice: Tickets and personal details are protected by email possession verification.'}
             </span>
           </div>
         </form>
@@ -487,6 +412,14 @@ export default function LookupPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function LookupPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-sm font-bold text-gray-500">กำลังโหลด...</div>}>
+      <LookupContent />
+    </Suspense>
   );
 }
 

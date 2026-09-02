@@ -114,10 +114,26 @@ export async function POST(
       });
     }
 
-    return NextResponse.json({
+    const regCode = pickField<string>(reg, 'registrationCode', 'registration_code') || '';
+    const accessToken = pickField<string>(reg, 'accessToken', 'access_token') || '';
+
+    const response = NextResponse.json({
       success: true,
       registration: result.registration,
+      redirectUrl: `/registration/${encodeURIComponent(regCode)}`,
     });
+
+    if (regCode && accessToken) {
+      response.cookies.set(`lvu_pass_${regCode}`, accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 7 * 24 * 3600, // 7 days
+      });
+    }
+
+    return response;
 
   } catch (error) {
     console.error('Error handling public registration:', error);

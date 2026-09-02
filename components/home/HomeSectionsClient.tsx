@@ -17,7 +17,6 @@ import {
   ShieldCheck,
   Microscope,
   Sparkles,
-  Gift,
   Heart,
   MapPin,
   Clock,
@@ -26,7 +25,8 @@ import {
   HeartPulse,
   Droplets,
   ChevronRight,
-  Check
+  Check,
+  BookOpen
 } from 'lucide-react';
 import { SocialLinks } from '@/components/common/SocialLinks';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
@@ -38,9 +38,9 @@ export function HomeSectionsClient() {
     ? [
         { 
           num: '01', 
-          title: 'ประเมินสุขภาพ', 
-          desc: 'ตรวจเช็กความพร้อมผ่านระบบออนไลน์', 
-          duration: 'ใช้เวลา ~2 นาที',
+          title: 'ประเมินความพร้อมเบื้องต้น', 
+          desc: 'ตรวจเช็กความพร้อมและประวัติสุขภาพเบื้องต้นผ่านระบบออนไลน์', 
+          duration: 'ใช้เวลา ~1 นาที',
           action: 'ทำแบบประเมิน',
           href: '/screening',
           icon: ShieldCheck,
@@ -48,8 +48,8 @@ export function HomeSectionsClient() {
         },
         { 
           num: '02', 
-          title: 'ลงทะเบียนจองรอบ', 
-          desc: 'เลือกช่วงเวลาระหว่าง 09.00 - 14.00 น.', 
+          title: 'ลงทะเบียนจองรอบเวลา', 
+          desc: 'เลือกช่วงเวลาเดินทางระหว่าง 09.00 - 14.00 น. เพื่อรับตั๋ว QR Pass', 
           duration: 'ใช้เวลา ~1 นาที',
           action: 'จองรอบเวลา',
           href: '/register',
@@ -58,9 +58,9 @@ export function HomeSectionsClient() {
         },
         { 
           num: '03', 
-          title: 'เตรียมร่างกาย', 
-          desc: 'นอนหลับ 5-6 ชม. & ดื่มน้ำ 500 มล.', 
-          duration: 'คืนก่อนวันงาน',
+          title: 'เตรียมร่างกายก่อนวันงาน', 
+          desc: 'นอนหลับ ≥ 5 ชม. เลี่ยงของมัน ≥ 6 ชม. & ดื่มน้ำ 300-500 มล.', 
+          duration: 'คืนก่อนและเช้าวันงาน',
           action: 'ดูวิธีเตรียมตัว',
           href: '/prepare',
           icon: HeartPulse,
@@ -68,9 +68,9 @@ export function HomeSectionsClient() {
         },
         { 
           num: '04', 
-          title: 'บริจาคโลหิต', 
-          desc: 'ใช้เวลาประมาณ 10-15 นาที ณ ห้อง 217', 
-          duration: 'วันงานจริง',
+          title: 'มาถึงงานและคัดกรองโดยเจ้าหน้าที่', 
+          desc: 'แสดง QR Pass ซักประวัติสุขภาพ และตรวจความเข้มข้นเลือด ณ ห้อง 217-218', 
+          duration: 'วันงานจริง (16 ก.ย. 69)',
           action: 'ดูแผนที่สถานที่',
           href: '/location',
           icon: Droplets,
@@ -78,8 +78,8 @@ export function HomeSectionsClient() {
         },
         { 
           num: '05', 
-          title: 'อาหารว่าง & ดูแลหลังบริจาค', 
-          desc: 'พักผ่อน 10-15 นาที พร้อมรับของว่างและเครื่องดื่มบำรุงสุขภาพ', 
+          title: 'บริจาคโลหิตและพักสังเกตอาการ', 
+          desc: 'เจาะเก็บโลหิต 10-15 นาที พร้อมรับของว่างและเครื่องดื่มบำรุงสุขภาพ', 
           duration: 'หลังบริจาค',
           action: 'คำแนะนำหลังบริจาค',
           href: '/prepare',
@@ -90,9 +90,9 @@ export function HomeSectionsClient() {
     : [
         { 
           num: '01', 
-          title: 'Self-Screening', 
-          desc: 'Check eligibility via online assessment', 
-          duration: 'Takes ~2 mins',
+          title: 'Preliminary Self-Screening', 
+          desc: 'Quick health and readiness self-evaluation via online checklist', 
+          duration: 'Takes ~1 min',
           action: 'Start Assessment',
           href: '/screening',
           icon: ShieldCheck,
@@ -100,8 +100,8 @@ export function HomeSectionsClient() {
         },
         { 
           num: '02', 
-          title: 'Select Time Slot', 
-          desc: 'Choose arrival time between 09:00 - 14:00', 
+          title: 'Reserve Arrival Slot', 
+          desc: 'Select preferred arrival window between 09:00 - 14:00 for QR pass', 
           duration: 'Takes ~1 min',
           action: 'Reserve Slot',
           href: '/register',
@@ -110,9 +110,9 @@ export function HomeSectionsClient() {
         },
         { 
           num: '03', 
-          title: 'Prepare Body', 
-          desc: 'Sleep 5-6+ hrs & drink 500 mL water', 
-          duration: 'Night before',
+          title: 'Pre-Donation Prep', 
+          desc: 'Sleep ≥ 5 hrs, avoid high-fat meals ≥ 6 hrs & drink 300-500 mL water', 
+          duration: 'Night before & morning',
           action: 'Prep Guide',
           href: '/prepare',
           icon: HeartPulse,
@@ -120,9 +120,9 @@ export function HomeSectionsClient() {
         },
         { 
           num: '04', 
-          title: 'Donate Blood', 
-          desc: 'Takes approx. 10-15 mins at Room 217', 
-          duration: 'Event Day',
+          title: 'Arrive & On-site Screening', 
+          desc: 'Present QR Pass, undergo health interview & Hb testing at Room 217-218', 
+          duration: 'Event Day (16 Sep 2026)',
           action: 'View Venue',
           href: '/location',
           icon: Droplets,
@@ -130,8 +130,8 @@ export function HomeSectionsClient() {
         },
         { 
           num: '05', 
-          title: 'Refreshments & Care', 
-          desc: 'Rest 10-15 mins with nourishing snacks & drinks', 
+          title: 'Donate & Recovery Care', 
+          desc: 'Donation collection (10-15 mins), rest and enjoy nourishing refreshments', 
           duration: 'Post-donation',
           action: 'Post-Donation Guide',
           href: '/prepare',
@@ -144,41 +144,41 @@ export function HomeSectionsClient() {
     ? [
         { 
           icon: GlassWater, 
-          title: 'ดื่มน้ำเปล่า 3-4 แก้ว (500 มล.)',
-          desc: 'ดื่มก่อนบริจาค 20-30 นาที ช่วยเพิ่มปริมาตรเลือดและลดอาการวิงเวียน',
+          title: 'ดื่มน้ำเปล่า 300–500 มล. (2–3 แก้ว)',
+          desc: 'ดื่มก่อนบริจาคประมาณ 30 นาที ช่วยเพิ่มปริมาตรเลือดและลดโอกาสเกิดอาการวิงเวียน',
           tag: 'สำคัญมาก'
         },
         { 
           icon: Utensils, 
-          title: 'รับประทานอาหารมื้อหลัก',
-          desc: 'กินอาหารก่อนมาบริจาค (หลีกเลี่ยงอาหารมัน) เพื่อให้ร่างกายมีพลังงาน',
+          title: 'รับประทานอาหารมื้อหลัก (ไขมันต่ำ)',
+          desc: 'รับประทานอาหารก่อนมาบริจาค (หลีกเลี่ยงอาหารมันจัด) เพื่อให้ร่างกายมีระดับน้ำตาลคงที่',
           tag: 'ก่อนบริจาค'
         },
         { 
           icon: Moon, 
           title: 'นอนหลับพักผ่อนให้เพียงพอ',
-          desc: 'นอนหลับอย่างน้อย 5-6 ชั่วโมงต่อเนื่องในคืนก่อนวันบริจาค',
-          tag: 'อย่างน้อย 5-6 ชม.'
+          desc: 'นอนหลับพักผ่อนติดต่อกันอย่างน้อย 5 ชั่วโมงในคืนก่อนวันบริจาค',
+          tag: 'อย่างน้อย 5 ชม.'
         },
       ]
     : [
         { 
           icon: GlassWater, 
-          title: 'Drink 3-4 glasses of water (500 mL)',
-          desc: 'Drink 20-30 mins prior to boost blood volume and prevent dizziness.',
+          title: 'Drink 300–500 mL water (2–3 glasses)',
+          desc: 'Drink approx. 30 mins prior to boost blood volume and prevent dizziness.',
           tag: 'Crucial'
         },
         { 
           icon: Utensils, 
-          title: 'Eat a proper light meal',
-          desc: 'Have a nutritious meal beforehand (avoid greasy foods) for energy.',
+          title: 'Eat a proper low-fat meal',
+          desc: 'Have a nutritious light meal beforehand (avoid greasy foods) for energy.',
           tag: 'Pre-donation'
         },
         { 
           icon: Moon, 
-          title: 'Get adequate restful sleep',
-          desc: 'Ensure at least 5-6 hours of continuous restful sleep the night before.',
-          tag: '≥ 5-6 Hours'
+          title: 'Get adequate continuous sleep',
+          desc: 'Ensure at least 5 hours of continuous restful sleep the night before.',
+          tag: '≥ 5 Hours'
         },
       ];
 
@@ -187,40 +187,40 @@ export function HomeSectionsClient() {
         { 
           icon: Wine, 
           title: 'งดเครื่องดื่มแอลกอฮอล์',
-          desc: 'งดดื่มสุรา/เบียร์อย่างน้อย 24 ชั่วโมง เพื่อป้องกันตับทำงานหนักและเลือดเจือจาง',
+          desc: 'งดดื่มสุรา/เบียร์อย่างน้อย 24 ชั่วโมง เพื่อป้องกันร่างกายขาดน้ำและหลอดเลือดขยายตัว',
           tag: 'งด 24 ชม.'
         },
         { 
           icon: Cigarette, 
           title: 'งดสูบบุหรี่',
-          desc: 'งดสูบบุหรี่ก่อนและหลังบริจาคอย่างน้อย 1 ชั่วโมง ป้องกันสารคาร์บอนมอนอกไซด์ในเลือด',
+          desc: 'งดสูบบุหรี่ก่อนและหลังบริจาคอย่างน้อย 1 ชั่วโมง ป้องกันภาวะออกซิเจนในเลือดลดลง',
           tag: 'งด 1 ชม.'
         },
         { 
           icon: XCircle, 
-          title: 'งดอาหารไขมันสูง',
-          desc: 'หลีกเลี่ยงข้าวขาหมู แกงกะทิ ของทอด ขนมหวาน เพื่อป้องกันพลาสมาขุ่น (Chylomicronemia)',
-          tag: 'มื้อก่อนบริจาค'
+          title: 'งดอาหารไขมันสูงอย่างน้อย 6 ชั่วโมง',
+          desc: 'หลีกเลี่ยงของทอด ข้าวมันไก่ ข้าวขาหมู แกงกะทิ อย่างน้อย 6 ชั่วโมง เพื่อป้องกันพลาสมาขุ่นขาว (Lipemic Plasma)',
+          tag: 'อย่างน้อย 6 ชม.'
         },
       ]
     : [
         { 
           icon: Wine, 
           title: 'Avoid Alcoholic Beverages',
-          desc: 'Abstain for at least 24 hours to reduce liver stress and prevent dilution.',
+          desc: 'Abstain for at least 24 hours to prevent dehydration and vasodilation.',
           tag: '24 Hours'
         },
         { 
           icon: Cigarette, 
           title: 'Avoid Smoking',
-          desc: 'Refrain from smoking 1 hour before and after to keep oxygen levels optimal.',
+          desc: 'Refrain from smoking 1 hour before and after to keep oxygenation optimal.',
           tag: '1 Hour'
         },
         { 
           icon: XCircle, 
-          title: 'Avoid High-Fat / Greasy Meals',
-          desc: 'Avoid fried foods and coconut milk to prevent turbid lipemic plasma.',
-          tag: 'Pre-meal'
+          title: 'Avoid High-Fat Meals for ≥ 6 Hours',
+          desc: 'Avoid fried foods and coconut milk for at least 6 hours to prevent lipemic plasma.',
+          tag: '≥ 6 Hours'
         },
       ];
 
@@ -228,9 +228,9 @@ export function HomeSectionsClient() {
     ? [
         { 
           icon: UserRound, 
-          title: 'อายุระหว่าง 17 - 70 ปีบริบูรณ์',
-          desc: 'อายุ 17 ปีต้องมีใบยินยอมจากผู้ปกครอง / ผู้บริจาคครั้งแรกอายุไม่เกิน 60 ปี',
-          tag: '17 - 70 ปี'
+          title: 'อายุตามเกณฑ์มาตรฐาน',
+          desc: 'อายุ 17–60 ปี (บริจาคครั้งแรก) / 60–65 ปี (บริจาคประจำในหน่วยเคลื่อนที่) อายุ 17 ปีต้องมีใบยินยอมจากผู้ปกครอง',
+          tag: '17 - 65 ปี (หน่วยเคลื่อนที่)'
         },
         { 
           icon: Scale, 
@@ -240,17 +240,17 @@ export function HomeSectionsClient() {
         },
         { 
           icon: ShieldCheck, 
-          title: 'ความเข้มข้นของโลหิต (ฮีโมโกลบิน)',
-          desc: 'หญิง ≥ 12.5 g/dL / ชาย ≥ 13.0 g/dL (ตรวจคัดกรองเบื้องต้นหน้างานฟรี)',
+          title: 'ความเข้มข้นโลหิต & สัญญาณชีพ',
+          desc: 'หญิง Hb ≥ 12.5 g/dL / ชาย Hb ≥ 13.0 g/dL, ความดัน 100–160/50–100 mmHg, ชีพจร 50–100 ครั้ง/นาที',
           tag: 'ตรวจคัดกรองฟรี'
         },
       ]
     : [
         { 
           icon: UserRound, 
-          title: 'Age 17 - 70 years old',
-          desc: 'Age 17 requires parental consent. First-time donors must be under 60.',
-          tag: '17 - 70 Yrs'
+          title: 'Age Eligibility Criteria',
+          desc: 'Age 17–60 (First-time donors) / 60–65 (Regular mobile donors). Age 17 requires parental consent form.',
+          tag: '17 - 65 Yrs (Mobile Unit)'
         },
         { 
           icon: Scale, 
@@ -260,8 +260,8 @@ export function HomeSectionsClient() {
         },
         { 
           icon: ShieldCheck, 
-          title: 'Hemoglobin Concentration',
-          desc: 'Female ≥ 12.5 g/dL / Male ≥ 13.0 g/dL (Complimentary on-site screening).',
+          title: 'Hemoglobin & Vital Signs',
+          desc: 'Female Hb ≥ 12.5 g/dL / Male Hb ≥ 13.0 g/dL, BP 100–160/50–100 mmHg, Pulse 50–100 bpm.',
           tag: 'Free Screening'
         },
       ];
@@ -312,10 +312,10 @@ export function HomeSectionsClient() {
                 {isTh ? 'สถานที่จัดกิจกรรม' : 'Event Venue'}
               </span>
               <span className="text-sm font-black text-[var(--ink)]">
-                {isTh ? 'ห้องประชุม 217 อาคารสิริวิทยา' : 'Meeting Room 217, Sirividhaya'}
+                {isTh ? 'ห้องประชุม 217 - 218 อาคารสิริวิทยา' : 'Meeting Room 217 - 218, Sirividhaya'}
               </span>
               <span className="text-xs text-[var(--muted)] block">
-                {isTh ? 'คณะศิลปศาสตร์ ม.มหิดล ศาลายา' : 'Mahidol University Salaya'}
+                {isTh ? 'คณะศิลปศาสตร์ ม.มหิดล ศาลายา' : 'Faculty of Liberal Arts, Mahidol Salaya'}
               </span>
             </div>
           </div>
@@ -329,22 +329,22 @@ export function HomeSectionsClient() {
             <div className="lg:col-span-8 space-y-4">
               <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1.5 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
                 <Sparkles className="h-3.5 w-3.5 fill-white text-white" />
-                <span>{isTh ? 'เครื่องมือใหม่: ประเมินความพร้อมก่อนเดินทาง' : 'Interactive Self-Screening Tool'}</span>
+                <span>{isTh ? 'เครื่องมือแนะนำ: ประเมินความพร้อมเบื้องต้นก่อนเดินทาง' : 'Preliminary Self-Screening Tool'}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-[var(--ink)] leading-snug">
                 {isTh ? (
                   <>
                     ตรวจเช็กความพร้อมของคุณด้วย <br className="hidden sm:inline" />
-                    <span className="inline-block whitespace-nowrap">“ระบบประเมินตนเอง (Self-Screening)”</span>
+                    <span className="inline-block whitespace-nowrap">“ระบบประเมินตนเองเบื้องต้น (Pre-Screening)”</span>
                   </>
                 ) : (
-                  'Evaluate your donation readiness in 2 minutes'
+                  'Evaluate your donation readiness in 1 minute'
                 )}
               </h2>
               <p className="text-sm sm:text-[15px] leading-relaxed text-[var(--muted)] font-medium max-w-2xl">
                 {isTh
-                  ? 'ประเมินสุขภาพ 24 ข้อตามแบบสอบถามมาตรฐานของศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (2567) ทราบผลทันทีว่าพร้อมบริจาค หรือต้องเว้นระยะเวลากี่วัน'
-                  : 'Evaluate your health against official Thai Red Cross Society standards. Instant results on eligibility and preparation guidance.'}
+                  ? 'ตรวจเช็กความพร้อมเบื้องต้น 10 ข้อหลักตามเกณฑ์ศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (2567) เพื่อเตรียมตัวอย่างมั่นใจก่อนเดินทาง (การตัดสินความพร้อมอย่างเป็นทางการจะดำเนินการโดยเจ้าหน้าที่ ณ จุดรับบริจาค)'
+                  : 'Evaluate your preliminary readiness against Thai Red Cross Society (2024) standards before traveling. Official donor eligibility is determined by on-site medical staff.'}
               </p>
               
               <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -353,7 +353,7 @@ export function HomeSectionsClient() {
                   className="editorial-btn-primary py-3 px-6 text-xs flex items-center gap-2 cursor-pointer"
                 >
                   <ShieldCheck className="h-4 w-4" />
-                  <span>{isTh ? 'เริ่มทำแบบประเมินสุขภาพตนเอง' : 'Start Self-Screening'}</span>
+                  <span>{isTh ? 'เริ่มทำแบบประเมินความพร้อม' : 'Start Self-Screening'}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
@@ -378,15 +378,15 @@ export function HomeSectionsClient() {
                 </li>
                 <li className="flex items-center gap-2 text-emerald-800">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>{isTh ? 'โรคประจำตัว และประวัติสุขภาพ' : 'Medical history & chronic diseases'}</span>
+                  <span>{isTh ? 'โรคประจำตัว และประวัติสุขภาพสำคัญ' : 'Medical history & chronic conditions'}</span>
                 </li>
                 <li className="flex items-center gap-2 text-emerald-800">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>{isTh ? 'ยาปฏิชีวนะ ยารักษาสิว และวัคซีน' : 'Antibiotics, acne medication & vaccines'}</span>
+                  <span>{isTh ? 'ยาปฏิชีวนะ ยารักษาสิว และแอลกอฮอล์' : 'Antibiotics, acne meds & alcohol'}</span>
                 </li>
                 <li className="flex items-center gap-2 text-emerald-800">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-                  <span>{isTh ? 'ทันตกรรม รอยสัก และพฤติกรรมเสี่ยง' : 'Dental, tattoos & travel/risk factors'}</span>
+                  <span>{isTh ? 'ทันตกรรม รอยสัก และหัตถการ' : 'Dental, tattoos & procedures'}</span>
                 </li>
               </ul>
             </div>
@@ -400,15 +400,15 @@ export function HomeSectionsClient() {
           <div className="max-w-2xl space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-3.5 py-1 text-xs font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
               <Sparkles className="h-3.5 w-3.5 fill-white text-white" />
-              <span>{isTh ? 'เส้นทางการเป็นผู้ให้' : 'Donor Journey'}</span>
+              <span>{isTh ? 'เส้นทางการเข้าร่วมกิจกรรม' : 'Event Participation Flow'}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-black text-[var(--ink)]">
-              {isTh ? '5 ขั้นตอนการบริจาคโลหิต' : '5 Steps of Blood Donation'}
+              {isTh ? '5 ขั้นตอนเข้าร่วม MUMT LoveUnit' : '5 Steps to Join MUMT LoveUnit'}
             </h2>
             <p className="text-[15px] leading-relaxed text-[var(--muted)] font-medium">
               {isTh 
-                ? 'ตั้งแต่วินาทีที่คุณกดลงทะเบียน ไปจนถึงการพักผ่อนหลังบริจาค — เราจัดระบบให้คุณสะดวกรวดเร็วและอุ่นใจทุกขั้นตอน'
-                : 'From online booking to post-donation care — smooth, coordinated, and comfortable.'}
+                ? 'ตั้งแต่วินาทีที่คุณกดลงทะเบียน ไปจนถึงการรับการตรวจคัดกรองและพักผ่อนหลังบริจาค — ระบบจัดเตรียมทุกขั้นตอนเพื่อความสะดวกและปลอดภัย'
+                : 'From online booking to on-site clinical screening and post-donation care — coordinated for your safety and comfort.'}
             </p>
           </div>
 
@@ -697,11 +697,27 @@ export function HomeSectionsClient() {
               </div>
 
               <div className="mt-5 pt-3 border-t border-[var(--burgundy-100)]/60 flex items-center justify-between text-[11px] font-bold text-[var(--burgundy-700)]">
-                <span>{isTh ? 'มาตรฐานสภากาชาดไทย' : 'Red Cross Standards'}</span>
+                <span>{isTh ? 'มาตรฐานสภากาชาดไทย (2567)' : 'Thai Red Cross Standards (2024)'}</span>
                 <ShieldCheck className="h-4 w-4 text-[var(--burgundy-700)]" />
               </div>
             </div>
 
+          </div>
+
+          {/* Standards & Citations Card */}
+          <div className="rounded-2xl bg-white p-4 sm:p-5 border border-[var(--line)] shadow-xs flex items-center gap-3 text-xs text-[var(--muted)] font-medium">
+            <BookOpen className="h-5 w-5 text-[var(--burgundy-700)] shrink-0" />
+            <p className="leading-relaxed">
+              {isTh ? (
+                <>
+                  <strong>แหล่งอ้างอิงทางการแพทย์:</strong> ศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย — <em>มาตรฐานธนาคารเลือดและงานบริการโลหิต ฉบับพิมพ์ครั้งที่ 5 (พ.ศ. 2567)</em> และ <em>คู่มือการรับบริจาคโลหิต (พ.ศ. 2564)</em>
+                </>
+              ) : (
+                <>
+                  <strong>Authoritative Medical Reference:</strong> National Blood Centre, Thai Red Cross Society — <em>Standards for Blood Banks and Transfusion Services, 5th Edition (2024)</em> and <em>Blood Donation Manual (2021)</em>.
+                </>
+              )}
+            </p>
           </div>
 
           {/* Interactive Quick-Check Bottom Banner */}
@@ -712,12 +728,12 @@ export function HomeSectionsClient() {
               </div>
               <div>
                 <h4 className="text-sm font-black text-[var(--ink)]">
-                  {isTh ? 'ต้องการประเมินความพร้อมแบบละเอียดก่อนเดินทาง?' : 'Want a full 2-minute eligibility self-check?'}
+                  {isTh ? 'ต้องการประเมินความพร้อมเบื้องต้นก่อนเดินทาง?' : 'Want a quick 1-minute readiness check?'}
                 </h4>
                 <p className="text-xs text-[var(--muted)] font-medium">
                   {isTh 
-                    ? 'เช็กประวัติสุขภาพ ยา วัคซีน และโรคประจำตัว ทราบผลทันทีไม่ต้องรอวันงาน' 
-                    : 'Check your health history, medication, vaccines, and readiness with instant results.'}
+                    ? 'เช็กประวัติสุขภาพ ยา วัคซีน และโรคประจำตัวเบื้องต้นอย่างรวดเร็ว' 
+                    : 'Check your health history, medications, and general readiness before traveling.'}
                 </p>
               </div>
             </div>
@@ -727,7 +743,7 @@ export function HomeSectionsClient() {
                 href="/screening"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] hover:from-[#C51D2C] hover:via-[#911426] hover:to-[#6E0F1D] text-white font-extrabold px-5 py-2.5 text-xs shadow-md shadow-red-950/20 active:scale-95 transition-all cursor-pointer border border-white/20"
               >
-                <span>{isTh ? 'ทำแบบประเมินตนเอง (2 นาที)' : 'Start 2-Min Quiz'}</span>
+                <span>{isTh ? 'ทำแบบประเมินตนเอง' : 'Start Assessment'}</span>
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>

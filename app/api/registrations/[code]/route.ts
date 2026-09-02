@@ -1,13 +1,23 @@
 import { NextResponse } from 'next/server';
 import { getRegistrationByCode } from '@/services/registration-service';
 import { pickField } from '@/lib/utils/format';
+import { checkRateLimit, rateLimitedResponse } from '@/lib/rate-limit';
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ code: string }> }
 ) {
   try {
+    if (!checkRateLimit(request, { limit: 60, windowMs: 60 * 1000 })) {
+      return rateLimitedResponse(60);
+    }
+
     const { code } = await params;
+    const url = new URL(request.url);
+    const tokenParam = url.searchParams.get('token');
+    const authHeader = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, '');
+    const token = (tokenParam || authHeader || '').trim();
+
     const registration = await getRegistrationByCode(code);
 
     if (!registration) {
@@ -15,6 +25,15 @@ export async function GET(
     }
 
     const regObj = registration;
+    const expectedToken = (pickField<string>(regObj, 'accessToken', 'access_token') || '').trim();
+
+    // Enforce private token verification: registration code alone is NOT an authorization secret
+    if (!token || token !== expectedToken) {
+      return NextResponse.json({
+        success: false,
+        message: 'สิทธิ์การเข้าถึงไม่ถูกต้อง ต้องระบุ Access Token เพื่อเปิดดูข้อมูลตั๋ว',
+      }, { status: 401 });
+    }
 
     const lastName = pickField<string>(regObj, 'lastName', 'last_name') || '';
     const safeRegistration = {

@@ -139,11 +139,29 @@ export function isWalkInRecord(input?: { source?: string; registrationCode?: str
 
 /**
  * Generates a random opaque QR token for secure server-side validation using cryptographically secure randomness.
- * No PII (personally identifiable information) is stored inside the QR code.
+ * No PII (personally identifiable information) and NO sequential registration codes are stored inside the QR code.
  */
-export function generateQRToken(registrationCode: string): string {
-  const uuid = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36);
-  return `LVU26_QR_${registrationCode}_${uuid.replace(/-/g, '')}`;
+export function generateQRToken(): string {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const arr = new Uint8Array(32);
+    crypto.getRandomValues(arr);
+    const hex = Array.from(arr).map((b) => b.toString(16).padStart(2, '0')).join('');
+    return `lvu_qr_${hex}`;
+  }
+  return `lvu_qr_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
+}
+
+/**
+ * Generates a high-entropy private access token (proof of possession) for donor ticket retrieval & cancellation.
+ */
+export function generateAccessToken(): string {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const arr = new Uint8Array(32);
+    crypto.getRandomValues(arr);
+    const hex = Array.from(arr).map((b) => b.toString(16).padStart(2, '0')).join('');
+    return `lvu_sec_${hex}`;
+  }
+  return `lvu_sec_${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
 }
 
 /**

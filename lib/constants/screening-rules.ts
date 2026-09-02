@@ -8,6 +8,8 @@
  * 4. สภากาชาดไทย (redcross.or.th)
  */
 
+import { MEDICAL_STANDARDS } from './medical';
+
 export interface ScreeningQuestion {
   id: string;
   category: 'PHYSICAL' | 'MEDICATIONS_VACCINES' | 'PROCEDURES_LIFESTYLE';
@@ -65,7 +67,7 @@ export const OFFICIAL_SCREENING_QUESTIONS: ScreeningQuestion[] = [
     number: 1,
     question: 'วันนี้ท่านรู้สึกสบายดี สุขภาพแข็งแรง ไม่มีอาการเจ็บป่วย เป็นไข้ หวัด เจ็บคอ อ่อนเพลีย หรือท้องเสีย?',
     questionEn: 'Do you feel well, healthy, and free of fever, cough, cold, sore throat, severe fatigue, or diarrhea today?',
-    subtext: 'ผู้บริจาคต้องมีสุขภาพแข็งแรงสมบูรณ์ในวันที่มาบริจาค เพื่อความปลอดภัยของทั้งตัวท่านและโลหิตที่ได้',
+    subtext: 'ผู้บริจาคต้องมีสุขภาพแข็งแรงสมบูรณ์ในวันที่มาบริจาค เพื่อความปลอดภัยของทั้งตัวท่านและคุณภาพโลหิต',
     subtextEn: 'Donors must be in good general health on donation day for both donor wellness and optimal blood quality.',
     idealAnswer: true,
     deferralType: 'TEMPORARY',
@@ -82,55 +84,55 @@ export const OFFICIAL_SCREENING_QUESTIONS: ScreeningQuestion[] = [
     id: 'q-sleep-rest',
     category: 'PHYSICAL',
     number: 2,
-    question: 'เมื่อคืนที่ผ่านมา ท่านได้นอนหลับพักผ่อนเพียงพอ ไม่น้อยกว่า 5-6 ชั่วโมงติดต่อกัน?',
-    questionEn: 'Did you get at least 5-6 hours of continuous, restful sleep last night?',
-    subtext: 'การอดนอนหรือพักผ่อนไม่เพียงพอ เพิ่มความเสี่ยงต่อการหน้ามืด เป็นลม หรือความดันโลหิตตกอย่างมาก',
+    question: 'เมื่อคืนที่ผ่านมา ท่านได้นอนหลับพักผ่อนติดต่อกันอย่างน้อย 5 ชั่วโมง?',
+    questionEn: 'Did you get at least 5 hours of continuous, restful sleep last night?',
+    subtext: 'การอดนอนหรือพักผ่อนไม่เพียงพอ เพิ่มความเสี่ยงต่อการหน้ามืด เป็นลม หรือความดันโลหิตตก',
     subtextEn: 'Inadequate sleep significantly increases the risk of vasovagal syncope, dizziness, or acute hypotension.',
     idealAnswer: true,
     deferralType: 'TEMPORARY',
-    deferralReason: 'พักผ่อนไม่เพียงพอ (< 5 ชั่วโมง)',
+    deferralReason: 'พักผ่อนไม่เพียงพอ (< 5 ชั่วโมงติดต่อกัน)',
     deferralReasonEn: 'Insufficient sleep (< 5 hours of continuous rest)',
     deferralDurationDays: 1,
     deferralDurationText: 'งดบริจาคในวันนี้ พักผ่อนให้เต็มที่แล้วมาใหม่ในวันถัดไป',
     deferralDurationTextEn: 'Defer for today. Get adequate sleep and return another day.',
-    guidance: 'ควรนอนหลับอย่างน้อย 5-6 ชั่วโมง เพื่อให้หลอดเลือดและระดับความดันโลหิตปรับตัวได้อย่างราบรื่น',
-    guidanceEn: '5-6 hours of continuous sleep allows cardiovascular tone to adapt smoothly during donation.',
+    guidance: 'ควรนอนหลับติดต่อกันอย่างน้อย 5 ชั่วโมง เพื่อให้หลอดเลือดและระดับความดันโลหิตปรับตัวได้อย่างราบรื่น',
+    guidanceEn: 'At least 5 hours of continuous sleep allows cardiovascular tone to adapt smoothly during donation.',
     officialReference: 'คู่มือ 2564 หน้า 23 ข้อ 2 & มาตรฐาน 2567',
   },
   {
     id: 'q-weight-age',
     category: 'PHYSICAL',
     number: 3,
-    question: 'ท่านมีน้ำหนักตัวตั้งแต่ 45 กิโลกรัมขึ้นไป และมีอายุระหว่าง 17-70 ปีบริบูรณ์?',
-    questionEn: 'Is your body weight at least 45 kg (99 lbs) and are you between 17-70 years of age?',
-    subtext: 'อายุ 17 ปีบริบูรณ์ต้องมีหนังสือยินยอมจากผู้ปกครอง / ผู้บริจาคครั้งแรกอายุต้องไม่เกิน 60 ปี',
-    subtextEn: 'Age 17 requires signed parental consent form. First-time donors must be under 60 years old.',
+    question: 'ท่านมีน้ำหนักตัวตั้งแต่ 45 กิโลกรัมขึ้นไป และมีอายุอยู่ในเกณฑ์ที่สามารถบริจาคในหน่วยนี้ได้?',
+    questionEn: 'Is your body weight at least 45 kg (99 lbs) and is your age within eligible criteria for this mobile unit?',
+    subtext: 'อายุ 17 ปีบริบูรณ์ต้องมีหนังสือยินยอมจากผู้ปกครอง / ผู้บริจาคครั้งแรกอายุต้องไม่เกิน 60 ปี / ผู้บริจาคประจำอายุ 60–65 ปี (สำหรับหน่วยเคลื่อนที่นี้ไม่รับผู้บริจาคอายุเกิน 65 ปี)',
+    subtextEn: 'Age 17 requires parental consent form. First-time donors must be ≤ 60 years. Regular donors aged 60–65. (Donors > 65 years cannot donate at mobile units and must donate at fixed blood centres).',
     idealAnswer: true,
     deferralType: 'TEMPORARY',
-    deferralReason: 'น้ำหนักตัวไม่ถึงเกณฑ์ (น้อยกว่า 45 กก.) หรืออยู่นอกเกณฑ์ช่วงอายุ',
-    deferralReasonEn: 'Body weight under 45 kg or outside eligible age criteria',
+    deferralReason: 'น้ำหนักตัวไม่ถึงเกณฑ์ (น้อยกว่า 45 กก.) หรืออยู่นอกเกณฑ์ช่วงอายุสำหรับหน่วยรับบริจาคโลหิตเคลื่อนที่',
+    deferralReasonEn: 'Body weight under 45 kg or outside eligible age criteria for mobile collection unit',
     deferralDurationDays: 30,
-    deferralDurationText: 'ต้องมีน้ำหนักตัวไม่น้อยกว่า 45 กก. จึงจะสามารถบริจาคโลหิตได้',
-    deferralDurationTextEn: 'Must weigh at least 45 kg to donate blood safely',
-    guidance: 'ปริมาตรโลหิตที่เจาะสัมพันธ์กับน้ำหนักตัว ผู้ที่มีน้ำหนักต่ำกว่า 45 กก. มีความเสี่ยงต่อภาวะช็อกจากการสูญเสียปริมาตรเลือด',
-    guidanceEn: 'Donation blood volume is calculated relative to total weight; under 45 kg risks hypovolemia.',
+    deferralDurationText: 'ต้องมีน้ำหนักตัวไม่น้อยกว่า 45 กก. และอยู่ในช่วงอายุตามเกณฑ์มาตรฐาน',
+    deferralDurationTextEn: 'Must weigh at least 45 kg and meet age eligibility criteria',
+    guidance: 'ปริมาตรโลหิตที่เจาะสัมพันธ์กับน้ำหนักตัว ผู้มีน้ำหนักต่ำกว่า 45 กก. เสี่ยงต่อภาวะช็อกจากการสูญเสียปริมาตรเลือด และผู้มีอายุ >65 ปีต้องรับการตรวจสุขภาพประจำปีและบริจาค ณ ศูนย์บริการโลหิตประจำที่',
+    guidanceEn: 'Donation volume is calculated relative to total weight. Under 45 kg risks hypovolemia. Donors > 65 years must donate at fixed blood centres with annual health checks.',
     officialReference: 'มาตรฐาน 2567 บทที่ 2 ข้อ 2.1.1 & 2.1.2',
   },
   {
     id: 'q-meal-water',
     category: 'PHYSICAL',
     number: 4,
-    question: 'ท่านได้รับประทานอาหารมื้อหลัก (ไม่ใช่อาหารมันจัด) และดื่มน้ำอย่างน้อย 3-4 แก้วก่อนมาบริจาค?',
-    questionEn: 'Have you eaten a healthy meal (avoiding heavy/fatty foods) and drunk 3-4 glasses of water before donating?',
-    subtext: 'หลีกเลี่ยงของทอด ข้าวมันไก่ ข้าวขาหมู แกงกะทิ ภายใน 3-4 ชั่วโมง เพื่อป้องกันพลาสมาขุ่นขาว (Lipemic Plasma)',
-    subtextEn: 'Avoid oily/fried foods within 3-4 hours to prevent lipemic (milky white) plasma.',
+    question: 'ท่านได้รับประทานอาหารมื้อหลัก (หลีกเลี่ยงอาหารไขมันสูงอย่างน้อย 6 ชั่วโมง) และดื่มน้ำ 300–500 มล. ก่อนมาบริจาค?',
+    questionEn: 'Have you eaten a non-fatty meal (avoiding high-fat foods for at least 6 hours) and drunk 300–500 mL of water before donation?',
+    subtext: 'หลีกเลี่ยงของทอด ข้าวมันไก่ ข้าวขาหมู แกงกะทิ อย่างน้อย 6 ชั่วโมง (ไม่อดอาหาร) เพื่อป้องกันพลาสมาขุ่นขาว (Lipemic Plasma)',
+    subtextEn: 'Avoid oily/fried foods at least 6 hours before donation (do not fast) to prevent lipemic (milky white) plasma.',
     idealAnswer: true,
     deferralType: 'CAUTION',
-    deferralReason: 'ยังไม่ได้รับประทานอาหาร หรือรับประทานอาหารไขมันสูงมา',
-    deferralReasonEn: 'Fasting or recent high-fat meal consumption',
+    deferralReason: 'ยังไม่ได้รับประทานอาหาร หรือรับประทานอาหารไขมันสูงมาภายใน 6 ชั่วโมง',
+    deferralReasonEn: 'Fasting or recent high-fat meal consumption within 6 hours',
     deferralDurationDays: 1,
-    deferralDurationText: 'รับประทานอาหารมื้อเบาและดื่มน้ำ 3-4 แก้วก่อนเข้าเจาะบริจาค',
-    deferralDurationTextEn: 'Have a light meal and drink 3-4 glasses of water before donation.',
+    deferralDurationText: 'รับประทานอาหารมื้อเบาไขมันต่ำและดื่มน้ำ 300–500 มล. (2–3 แก้ว) ประมาณ 30 นาทีก่อนบริจาค',
+    deferralDurationTextEn: 'Have a light low-fat meal and drink 300–500 mL of water ~30 minutes before donation.',
     guidance: 'การดื่มน้ำช่วยเพิ่มปริมาตรสารน้ำในหลอดเลือด ลดโอกาสหน้ามืดเป็นลม และอาหารไขมันต่ำช่วยให้พลาสมามีคุณภาพดีพร้อมส่งต่อให้ผู้ป่วย',
     guidanceEn: 'Hydration expands plasma volume to prevent syncope, and low-fat meals ensure clear, transfusable plasma.',
     officialReference: 'คู่มือ 2564 หน้า 23 ข้อ 3',
@@ -183,15 +185,15 @@ export const OFFICIAL_SCREENING_QUESTIONS: ScreeningQuestion[] = [
     number: 7,
     question: 'ท่านรับประทานยารักษาสิวกลุ่มอนุพันธ์วิตามินเอ (Isotretinoin / Roaccutane / Acnotin / Sotret) ในช่วง 1 เดือนที่ผ่านมาหรือไม่?',
     questionEn: 'Have you taken oral retinoid acne medications (Isotretinoin / Roaccutane / Acnotin) within the past month?',
-    subtext: 'หรือยากลุ่ม Acitretin (Neotigason) ในช่วง 3 ปี / Finasteride (ยาปลูกผม) ในช่วง 1 เดือน',
-    subtextEn: 'Or Acitretin within 3 years / Finasteride (hair loss) within 1 month',
+    subtext: 'หรือยากลุ่ม Acitretin (Neotigason) ในช่วง 3 ปี / Finasteride (ยาปลูกผม) ในช่วง 1 เดือน / Dutasteride ในช่วง 6 เดือน',
+    subtextEn: 'Or Acitretin within 3 years / Finasteride within 1 month / Dutasteride within 6 months',
     idealAnswer: false,
     deferralType: 'TEMPORARY',
     deferralReason: 'ยารักษาสิวกลุ่มวิตามินเอ มีผลทำให้ทารกในครรภ์พิการรุนแรง (Teratogenic)',
     deferralReasonEn: 'Oral retinoids are highly teratogenic to developing fetuses',
     deferralDurationDays: 30,
-    deferralDurationText: 'Isotretinoin งด 1 เดือน (4 สัปดาห์) / Acitretin งด 3 ปี',
-    deferralDurationTextEn: 'Isotretinoin: defer 1 month / Acitretin: defer 3 years',
+    deferralDurationText: 'Isotretinoin งด 1 เดือน (4 สัปดาห์) / Acitretin งด 3 ปี / Finasteride งด 1 เดือน',
+    deferralDurationTextEn: 'Isotretinoin: defer 1 month / Acitretin: defer 3 years / Finasteride: defer 1 month',
     guidance: 'หากโลหิตที่มีตัวยานี้ถูกนำไปให้หญิงตั้งครรภ์ จะทำให้ทารกในครรภ์เกิดความพิการแต่กำเนิดอย่างรุนแรง',
     guidanceEn: 'Residual retinoids transfused to a pregnant recipient cause devastating congenital birth defects.',
     officialReference: 'มาตรฐาน 2567 ข้อ 2.2.5.2 & คู่มือ 2564 หน้า 70 ข้อ 2',
@@ -248,7 +250,7 @@ export const OFFICIAL_SCREENING_QUESTIONS: ScreeningQuestion[] = [
     subtextEn: 'In accordance with National Blood Centre (Thai Red Cross Society) safety guidelines.',
     idealAnswer: false,
     deferralType: 'PERMANENT',
-    deferralReason: 'โรคเรื้อรังร้ายแรง โรคติดต่อทางกระแสเลือด หรือพฤติกรรมเสี่ยงทางเพศ',
+    deferralReason: 'โรคเรื้อรังสำคัญ โรคติดต่อทางกระแสเลือด หรือพฤติกรรมเสี่ยงทางเพศ',
     deferralReasonEn: 'High-risk clinical conditions, bloodborne viral carriage, or behavioral risk criteria',
     guidance: 'เพื่อความปลอดภัยสูงสุดของผู้บริจาคและผู้ป่วยที่รับโลหิต ผู้ที่มีประวัติกลุ่มนี้เป็นเกณฑ์งดบริจาคถาวร',
     guidanceEn: 'For donor wellness and recipient safety, these conditions require permanent deferral.',
@@ -325,12 +327,12 @@ export function evaluateScreeningAnswers(
     return {
       status: 'PERMANENT_DEFERRAL',
       summaryTitle: isEn
-        ? 'We are sorry, you are currently not eligible to donate blood (Permanent Deferral)'
-        : 'ขออภัย ท่านยังไม่สามารถบริจาคโลหิตได้ (งดบริจาคถาวร)',
-      summaryBadge: isEn ? 'Not Eligible' : 'ไม่ผ่านเกณฑ์การบริจาค',
+        ? 'Preliminary Guidance: Permanent Deferral Criteria Met'
+        : 'คำแนะนำเบื้องต้น: อยู่ในเกณฑ์งดบริจาคโลหิตถาวร',
+      summaryBadge: isEn ? 'Permanent Deferral' : 'เกณฑ์งดบริจาคถาวร',
       summaryMessage: isEn
-        ? 'Based on your medical history, for the safety of both yourself and the blood recipient, you meet permanent deferral criteria. However, you can still support by sharing campaign news and participating in volunteer activities.'
-        : 'จากข้อมูลประวัติสุขภาพ เพื่อความปลอดภัยสูงสุดของตัวท่านเองและผู้ป่วยที่รับโลหิต ท่านอยู่ในเกณฑ์ที่ต้องงดบริจาคโลหิตอย่างถาวร แต่ท่านยังสามารถร่วมเป็นส่วนหนึ่งในการประชาสัมพันธ์ ส่งต่อข่าวสาร และทำกิจกรรมจิตอาสาช่วยเหลือสังคมได้',
+        ? 'Based on your medical history, you meet permanent deferral criteria under National Blood Centre standards for your safety and recipient protection. You can still support our campaign through volunteering and public awareness!'
+        : 'จากข้อมูลประวัติสุขภาพ เพื่อความปลอดภัยสูงสุดของตัวท่านเองและผู้ป่วยที่รับโลหิต ท่านอยู่ในเกณฑ์ที่ต้องงดบริจาคโลหิตอย่างถาวรตามมาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย ทั้งนี้ท่านยังสามารถร่วมสนับสนุนโครงการผ่านการส่งต่อข่าวสารและกิจกรรมจิตอาสาได้',
       colorClass: 'bg-red-50 border-red-300 text-red-900',
       flaggedQuestions: flagged,
       canProceedToRegister: false,
@@ -341,12 +343,12 @@ export function evaluateScreeningAnswers(
     return {
       status: 'TEMPORARY_DEFERRAL',
       summaryTitle: isEn
-        ? 'Temporary Deferral Required'
-        : 'ท่านต้องงดบริจาคโลหิตชั่วคราว',
-      summaryBadge: isEn ? 'Temporary Deferral' : 'งดบริจาคชั่วคราว',
+        ? 'Preliminary Guidance: Temporary Deferral Recommended'
+        : 'คำแนะนำเบื้องต้น: ควรเลื่อนการบริจาคโลหิตชั่วคราว',
+      summaryBadge: isEn ? 'Temporary Deferral' : 'ควรเลื่อนชั่วคราว',
       summaryMessage: isEn
-        ? `You have temporary health or medication factors that require waiting for safety. You will be eligible to donate again around ${earliestDateStr || 'in the future'}.`
-        : `ท่านมีปัจจัยทางสุขภาพ การใช้ยา หรือหัตถการที่ต้องเว้นระยะเวลาความปลอดภัยชั่วคราว โดยท่านจะสามารถกลับมาบริจาคได้ประมาณวันที่ ${earliestDateStr || 'ตามระยะเวลาที่กำหนด'}`,
+        ? `Based on your responses, there are temporary health, procedure, or medication factors that require a safety waiting period. You will be eligible to be evaluated again around ${earliestDateStr || 'the specified waiting period'}.`
+        : `จากข้อมูลที่ท่านตอบ มีปัจจัยทางสุขภาพ การใช้ยา หรือหัตถการที่ควรเว้นระยะเวลาความปลอดภัยชั่วคราว โดยคาดว่าจะสามารถเข้ารับการประเมินได้อีกครั้งประมาณวันที่ ${earliestDateStr || 'ตามระยะเวลาที่กำหนด'}`,
       colorClass: 'bg-amber-50 border-amber-300 text-amber-900',
       flaggedQuestions: flagged,
       earliestEligibleDate: earliestDateStr,
@@ -358,12 +360,12 @@ export function evaluateScreeningAnswers(
     return {
       status: 'CAUTION',
       summaryTitle: isEn
-        ? 'Eligible with Pre-Donation Care & On-Site Screening'
-        : 'สามารถบริจาคได้ (เตรียมตัวเพิ่มเติมและคัดกรองหน้างาน)',
-      summaryBadge: isEn ? 'Eligible (With Care)' : 'ผ่านเกณฑ์ (มีข้อควรระวัง)',
+        ? 'Preliminary Guidance: Additional Pre-Donation Preparation Recommended'
+        : 'คำแนะนำเบื้องต้น: ควรเตรียมความพร้อมเพิ่มเติมก่อนรับการประเมินหน้างาน',
+      summaryBadge: isEn ? 'Preparation Needed' : 'ควรเตรียมตัวเพิ่มเติม',
       summaryMessage: isEn
-        ? 'You are eligible to donate. Please drink 3-4 glasses of water, have a light meal, and inform the on-site screening staff about your condition before donation.'
-        : 'ท่านสามารถบริจาคโลหิตได้ กรุณาดื่มน้ำ 3-4 แก้ว รับประทานอาหารมื้อหลักที่มีไขมันต่ำ และแจ้งเจ้าหน้าที่คัดกรองหน้างานอีกครั้งก่อนเจาะบริจาค',
+        ? 'Please drink 300–500 mL of water, have a non-fatty meal, and inform the on-site screening staff about your condition before donation.'
+        : 'แนะนำให้ดื่มน้ำ 300–500 มล. (2–3 แก้ว) รับประทานอาหารมื้อหลักที่มีไขมันต่ำ และแจ้งเจ้าหน้าที่คัดกรองหน้างานเพื่อประเมินความพร้อมก่อนเจาะบริจาค',
       colorClass: 'bg-blue-50 border-blue-300 text-blue-900',
       flaggedQuestions: flagged,
       canProceedToRegister: true,
@@ -373,12 +375,12 @@ export function evaluateScreeningAnswers(
   return {
     status: 'ELIGIBLE',
     summaryTitle: isEn
-      ? 'Congratulations! You Meet Pre-Screening Readiness Criteria'
-      : 'ยินดีด้วย! ท่านผ่านการประเมินความพร้อมเบื้องต้น',
-    summaryBadge: isEn ? 'Ready to Donate' : 'พร้อมบริจาคโลหิต',
+      ? 'Preliminary Self-Screening Complete'
+      : 'จากข้อมูลเบื้องต้น ไม่พบปัจจัยที่ระบบใช้แจ้งให้เลื่อนการบริจาค',
+    summaryBadge: isEn ? 'Ready for On-site Screening' : 'พร้อมรับการประเมินหน้างาน',
     summaryMessage: isEn
-      ? 'Your preliminary self-screening is complete. Please proceed to reserve your arrival time slot. (Note: On-site screening by Thai Red Cross staff is required before donation).'
-      : 'ท่านมีความพร้อมเบื้องต้นในการบริจาคโลหิต สามารถดำเนินการเลือกรอบเวลาเดินทางได้เลย (หมายเหตุ: ท่านจะต้องผ่านการตรวจวัดความเข้มข้นโลหิตและคัดกรองกับเจ้าหน้าที่หน้างานอีกครั้ง)',
+      ? 'Based on your answers, no preliminary deferral factors were identified. You may proceed to choose your arrival time slot. (Official eligibility is determined on-site by Thai Red Cross medical staff after medical questionnaire review and hemoglobin screening).'
+      : 'จากข้อมูลที่ท่านตอบ ไม่พบข้อบ่งชี้ที่ต้องเลื่อนการบริจาคในเบื้องต้น สามารถดำเนินการเลือกช่วงเวลาเดินทางเพื่อมาเข้ารับการประเมินและคัดกรองโดยเจ้าหน้าที่ ณ จุดรับบริจาคโลหิต (ทั้งนี้ ผู้บริจาคทุกท่านจะต้องผ่านการซักประวัติตรวจคัดกรองและตรวจความเข้มข้นโลหิตโดยเจ้าหน้าที่สภากาชาดหน้างานก่อนการบริจาคจริง)',
     colorClass: 'bg-emerald-50 border-emerald-300 text-emerald-900',
     flaggedQuestions: [],
     canProceedToRegister: true,

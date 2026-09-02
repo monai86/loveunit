@@ -14,6 +14,7 @@ export interface ConfirmationInput {
   phone?: string;
   faculty?: string | null;
   registrationCode: string;
+  accessToken?: string;
   qrToken?: string;
   registeredAt?: string;
   slot?: { startAt?: string; endAt?: string; start_at?: string; end_at?: string } | null;
@@ -26,13 +27,13 @@ export type EmailDeliveryResult =
   | { status: 'skipped'; reason: 'missing-recipient' | 'smtp-not-configured' }
   | { status: 'failed'; error: string };
 
-function isSmtpConfigured(): boolean {
+export function isSmtpConfigured(): boolean {
   return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS);
 }
 
 let sharedTransporter: nodemailer.Transporter | null = null;
 
-function getTransporter(): nodemailer.Transporter {
+export function getTransporter(): nodemailer.Transporter {
   if (!sharedTransporter) {
     sharedTransporter = nodemailer.createTransport({
       pool: true,
@@ -305,7 +306,7 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
                     <tr>
                       <td style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.55;color:#0F172A;">
                         <strong style="color:#B45309;">4. รับประทานอาหารมื้อหลักล่วงหน้า</strong>
-                        <span style="color:#64748B;font-size:12px;display:block;margin-top:2px;">หลีกเลี่ยงอาหารที่มีไขมันสูงและงดเครื่องดื่มแอลกอฮอล์</span>
+                        <span style="color:#64748B;font-size:12px;display:block;margin-top:2px;">หลีกเลี่ยงอาหารที่มีไขมันสูงอย่างน้อย 6 ชั่วโมง และงดเครื่องดื่มแอลกอฮอล์</span>
                       </td>
                     </tr>
                   </table>
@@ -313,7 +314,7 @@ function buildHtml(input: ConfirmationInput, hasQrCode: boolean): string {
 
                 <!-- Action CTA Button with Crimson Red Gradient -->
                 <div style="margin:28px 0 8px;text-align:center;">
-                  <a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}" style="display:inline-block;background:linear-gradient(135deg, #DC2626 0%, #B91C1C 50%, #991B1B 100%);background-color:#B91C1C;color:#FFFFFF;text-decoration:none;padding:14px 34px;border-radius:9999px;font-size:14.5px;font-weight:700;letter-spacing:.02em;box-shadow:0 4px 16px rgba(185,28,28,0.28);white-space:nowrap;">
+                  <a href="${appUrl}/registration/${encodeURIComponent(input.registrationCode)}${input.accessToken ? `?token=${encodeURIComponent(input.accessToken)}` : ''}" style="display:inline-block;background:linear-gradient(135deg, #DC2626 0%, #B91C1C 50%, #991B1B 100%);background-color:#B91C1C;color:#FFFFFF;text-decoration:none;padding:14px 34px;border-radius:9999px;font-size:14.5px;font-weight:700;letter-spacing:.02em;box-shadow:0 4px 16px rgba(185,28,28,0.28);white-space:nowrap;">
                     เปิดดูตั๋วลงทะเบียนออนไลน์ &rarr;
                   </a>
                 </div>
@@ -381,10 +382,10 @@ function buildText(input: ConfirmationInput): string {
 1. อย่าลืมนำบัตรประชาชนมาด้วย (National ID Required) หรือบัตรประจำตัวผู้บริจาคตัวจริง
 2. ดื่มน้ำ 3–4 แก้วก่อนมาถึงจุดรับบริจาค
 3. พักผ่อนให้เพียงพอ 6–8 ชั่วโมง ไม่อดนอนในคืนก่อนวันบริจาค
-4. รับประทานอาหารมื้อหลักล่วงหน้า (เลี่ยงอาหารมันจัดและแอลกอฮอล์)
+4. รับประทานอาหารมื้อหลักล่วงหน้า (หลีกเลี่ยงอาหารที่มีไขมันสูงอย่างน้อย 6 ชั่วโมง และงดเครื่องดื่มแอลกอฮอล์)
 
 เปิดดูตั๋วลงทะเบียนออนไลน์และ QR Code ของคุณ:
-${appUrl}/registration/${encodeURIComponent(input.registrationCode)}
+${appUrl}/registration/${encodeURIComponent(input.registrationCode)}${input.accessToken ? `?token=${encodeURIComponent(input.accessToken)}` : ''}
 
 ตรวจสอบหรือยกเลิกการลงทะเบียน:
 ${appUrl}/lookup
@@ -594,7 +595,7 @@ function buildReminderHtml(input: ConfirmationInput, hasQrCode: boolean): string
                     <tr>
                       <td style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.55;color:#0F172A;">
                         <strong style="color:#B45309;">4. รับประทานอาหารมื้อหลักล่วงหน้า</strong>
-                        <span style="color:#64748B;font-size:12px;display:block;margin-top:2px;">หลีกเลี่ยงอาหารที่มีไขมันสูงและงดเครื่องดื่มแอลกอฮอล์</span>
+                        <span style="color:#64748B;font-size:12px;display:block;margin-top:2px;">หลีกเลี่ยงอาหารที่มีไขมันสูงอย่างน้อย 6 ชั่วโมง และงดเครื่องดื่มแอลกอฮอล์</span>
                       </td>
                     </tr>
                   </table>
@@ -664,7 +665,7 @@ Faculty of Medical Technology, Mahidol University
 1. อย่าลืมนำบัตรประชาชนมาด้วย (National ID Required) หรือบัตรผู้บริจาคตัวจริง
 2. ดื่มน้ำ 3–4 แก้วก่อนมาถึงจุดรับบริจาค
 3. พักผ่อนให้เพียงพอ 6–8 ชั่วโมง ไม่อดนอนในคืนก่อนวันบริจาค
-4. รับประทานอาหารมื้อหลักล่วงหน้า (เลี่ยงอาหารมันจัดและแอลกอฮอล์)
+4. รับประทานอาหารมื้อหลักล่วงหน้า (หลีกเลี่ยงอาหารที่มีไขมันสูงอย่างน้อย 6 ชั่วโมง และงดเครื่องดื่มแอลกอฮอล์)
 
 เปิดดูตั๋วลงทะเบียนออนไลน์ของฉัน:
 ${appUrl}/registration/${encodeURIComponent(input.registrationCode)}
@@ -762,6 +763,52 @@ export async function sendDonorPreparationReminder(input: ConfirmationInput): Pr
     return { status: 'sent' };
   } catch (error) {
     console.error('[email] Failed to send reminder email:', error);
+    return {
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Unknown SMTP error',
+    };
+  }
+}
+
+/**
+ * Sends an expiring Magic Link (or recovery token) to the donor's registered email.
+ */
+export async function sendMagicLinkEmail(input: {
+  to: string;
+  token: string;
+  firstName?: string;
+  registrationCode?: string;
+}): Promise<EmailDeliveryResult> {
+  if (!input.to) return { status: 'skipped', reason: 'missing-recipient' };
+
+  if (!isSmtpConfigured()) {
+    console.log(`[email] SMTP not configured — skipping magic link email to ${input.to}`);
+    return { status: 'skipped', reason: 'smtp-not-configured' };
+  }
+
+  const appUrl = getPublicAppUrl();
+  const verifyUrl = `${appUrl}/lookup?token=${encodeURIComponent(input.token)}`;
+  const transporter = getTransporter();
+  const fromAddress = process.env.SMTP_FROM || `MUMT Blood Donation 2026 <${process.env.SMTP_USER || 'mumt68blooddonation@gmail.com'}>`;
+  const replyToAddress = process.env.SMTP_USER || 'mumt68blooddonation@gmail.com';
+  const recipientName = input.firstName ? escapeHtml(input.firstName) : 'ผู้บริจาคโลหิต';
+
+  try {
+    await transporter.sendMail({
+      from: fromAddress,
+      to: input.to,
+      replyTo: replyToAddress,
+      subject: 'ลิงก์ยืนยันตัวตนสำหรับเปิดดูตั๋วบริจาคโลหิต MUMT LoveUnit (Magic Link)',
+      text: `สวัสดีคุณ ${input.firstName || 'ผู้บริจาค'}\n\nคุณได้ขอลิงก์สำหรับเข้าถึงตั๋วและ QR Code สำหรับกิจกรรมบริจาคโลหิต MUMT LoveUnit\n\nเปิดดูตั๋วของคุณได้ที่ลิงก์นี้ (ลิงก์มีอายุ 15 นาที):\n${verifyUrl}\n\nหากคุณไม่ได้เป็นผู้ส่งคำขอนี้ โปรดเพิกเฉยต่ออีเมลนี้\n\nคณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล\n999 ถ.พุทธมณฑลสาย 4 ต.ศาลายา อ.พุทธมณฑล จ.นครปฐม 73170`,
+      html: `<!DOCTYPE html><html><body style="font-family:'Prompt',sans-serif;background:#F8F9FA;padding:20px;color:#0F172A;"><div style="max-width:560px;margin:0 auto;background:#fff;padding:24px;border-radius:16px;border:1px solid #E2E8F0;"><h2 style="color:#A6192E;margin-top:0;">ยืนยันตัวตนเพื่อเปิดดูตั๋วบริจาคโลหิต</h2><p>สวัสดีคุณ <strong>${recipientName}</strong></p><p>คุณได้ขอลิงก์เข้าถึงตั๋วและ QR Code สำหรับเข้าร่วมกิจกรรม MUMT LoveUnit</p><div style="text-align:center;margin:24px 0;"><a href="${verifyUrl}" style="display:inline-block;background:linear-gradient(135deg, #DC2626 0%, #B91C1C 50%, #991B1B 100%);color:#fff;text-decoration:none;padding:14px 28px;border-radius:9999px;font-weight:bold;font-size:14px;">เปิดดูตั๋วและ QR Code ของฉัน &rarr;</a></div><p style="font-size:12px;color:#64748B;">* ลิงก์นี้มีอายุ 15 นาที และใช้ได้ครั้งเดียว หากคุณไม่ได้เป็นผู้ส่งคำขอ โปรดเพิกเฉยต่ออีเมลนี้</p><hr style="border:none;border-top:1px solid #F1F5F9;margin:20px 0;"><p style="font-size:11px;color:#94A3B8;text-align:center;">คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ศาลายา</p></div></body></html>`,
+      headers: {
+        'X-Auto-Response-Suppress': 'OOF, AutoReply',
+        'Precedence': 'bulk',
+      },
+    });
+    return { status: 'sent' };
+  } catch (error) {
+    console.error('[email] Failed to send magic link email:', error);
     return {
       status: 'failed',
       error: error instanceof Error ? error.message : 'Unknown SMTP error',

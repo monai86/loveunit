@@ -86,7 +86,7 @@ async function main() {
     { contentKey: 'hero_poster', title: 'โปสเตอร์ประชาสัมพันธ์โครงการ', description: 'โปสเตอร์หลัก MUMT Blood Donation 2026 ครั้งที่ 9', altText: 'โปสเตอร์หลัก MUMT Blood Donation 2026', displayOrder: 1 },
     { contentKey: 'location_infographic', title: 'แผนที่สถานที่จัดงาน อาคารสิริวิทยา คณะศิลปศาสตร์', description: 'ผังห้องประชุม 217 ชั้น 2 อาคารสิริวิทยา', altText: 'แผนที่สถานที่จัดงาน อาคารสิริวิทยา', displayOrder: 2 },
     { contentKey: 'transportation_infographic', title: 'การเดินทางและจุดจอดรถ', description: 'ข้อมูลการเดินทางด้วยรถสาธารณะ รถรางมหิดล และจุดจอดรถยนต์', altText: 'ข้อมูลการเดินทาง', displayOrder: 3 },
-    { contentKey: 'preparation_infographic', title: 'การเตรียมตัวก่อนบริจาคโลหิต', description: 'ข้อปฏิบัติ พักผ่อน 6-8 ชม. ดื่มน้ำ 3-4 แก้ว และงดอาหารไขมันสูง', altText: 'การเตรียมตัวก่อนบริจาคโลหิต', displayOrder: 4 },
+    { contentKey: 'preparation_infographic', title: 'การเตรียมตัวก่อนบริจาคโลหิต', description: 'ข้อปฏิบัติ พักผ่อน 6-8 ชม. ดื่มน้ำ 3-4 แก้ว และงดอาหารไขมันสูงอย่างน้อย 6 ชั่วโมง', altText: 'การเตรียมตัวก่อนบริจาคโลหิต', displayOrder: 4 },
     { contentKey: 'what_to_bring', title: 'สิ่งที่ต้องเตรียมมาในวันงาน', description: 'บัตรประจำตัวประชาชน หรือบัตรผู้บริจาคโลหิตสภากาชาดไทย', altText: 'สิ่งที่ต้องเตรียมมาในวันงาน', displayOrder: 5 },
     { contentKey: 'booth_infographic', title: 'นิทรรศการบูธกิจกรรมให้ความรู้', description: 'กิจกรรมความรู้หมู่เลือด นิทรรศการเทคนิคการแพทย์', altText: 'บูธกิจกรรมให้ความรู้', displayOrder: 6 },
     { contentKey: 'sponsor_banner', title: 'ผู้สนับสนุนโครงการ', description: 'ขอขอบคุณผู้สนับสนุนกิจกรรมบริจาคโลหิต MUMT ครั้งที่ 9', altText: 'ผู้สนับสนุนโครงการ', displayOrder: 7 },

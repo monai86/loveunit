@@ -340,7 +340,7 @@ export default function KnowledgePage() {
                   </div>
                   <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900">
                     <p className="font-bold">{isTh ? '✓ Non-reactive:' : '✓ Non-reactive:'}</p>
-                    <p>{isTh ? 'ปลอดภัยจากเชื้อไวรัสในระดับพันธุกรรม' : 'Genomically clear of viral pathogens'}</p>
+                    <p>{isTh ? 'ไม่พบสารพันธุกรรมของเชื้อไวรัสที่ตรวจ (HIV RNA, HCV RNA, HBV DNA) ในระดับที่ตรวจวัดได้ด้วยวิธี ID-NAT ตามขีดจำกัดความไวของการทดสอบ' : 'Viral nucleic acids (HIV RNA, HCV RNA, HBV DNA) are undetectable by ID-NAT assay within test analytical sensitivity limits'}</p>
                   </div>
                   <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-900">
                     <p className="font-bold">{isTh ? '⚠️ Reactive:' : '⚠️ Reactive:'}</p>
@@ -398,6 +398,11 @@ export default function KnowledgePage() {
                   </tbody>
                 </table>
               </div>
+              <p className="text-[11px] text-[var(--muted)] leading-relaxed">
+                {isTh
+                  ? '* หมายเหตุ: ค่าระยะฟักตัว (Diagnostic Window Period) เป็นค่าประมาณการเปรียบเทียบตามมาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (บทที่ 4 การทดสอบโลหิตบริจาค, 2568) และแนวทางองค์การอนามัยโลก (WHO Blood Transfusion Safety, 2009 / Busch et al.) การตรวจคัดกรองในห้องปฏิบัติการใช้เสริมสร้างความปลอดภัยสูงสุดแต่ไม่สามารถทดแทนการคัดกรองประวัติสุขภาพตนเองได้อย่างสมบูรณ์'
+                  : '* Note: Diagnostic window periods are estimated comparative ranges based on Thai Red Cross Society Standards (Chapter 4, 2025) and WHO Blood Transfusion Safety Guidelines (2009 / Busch et al.). Laboratory testing complements but does not replace donor behavioral self-deferral.'}
+              </p>
             </div>
 
             <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-200 text-xs text-blue-900 space-y-1">

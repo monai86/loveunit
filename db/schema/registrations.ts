@@ -18,6 +18,7 @@ export const registrations = pgTable('registrations', {
   eventId: uuid('event_id').references(() => events.id, { onDelete: 'cascade' }).notNull(),
   registrationCode: text('registration_code').notNull().unique(),
   qrToken: text('qr_token').notNull().unique(),
+  accessToken: text('access_token').notNull().unique(),
   firstName: text('first_name').notNull(),
   lastName: text('last_name').notNull(),
   phone: text('phone').notNull(),
@@ -44,4 +45,18 @@ export const registrations = pgTable('registrations', {
   index('idx_registrations_event_source').on(t.eventId, t.source),
   index('idx_registrations_slot_id').on(t.slotId),
   index('idx_registrations_registered_at').on(t.registeredAt),
+  index('idx_registrations_access_token').on(t.accessToken),
+]);
+
+export const verificationTokens = pgTable('verification_tokens', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  registrationId: uuid('registration_id').references(() => registrations.id, { onDelete: 'cascade' }).notNull(),
+  token: text('token').notNull().unique(),
+  contactTarget: text('contact_target').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  usedAt: timestamp('used_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+  index('idx_verification_tokens_token').on(t.token),
+  index('idx_verification_tokens_reg_id').on(t.registrationId),
 ]);

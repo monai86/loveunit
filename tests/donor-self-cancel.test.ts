@@ -1,5 +1,5 @@
 // Donor self-cancellation integration test suite:
-//   - Tests public cancel endpoint logic & security verification
+//   - Tests public cancel endpoint logic & possession verification
 //   - Verifies monotonic registration sequence progression
 //   - Verifies immediate re-registration capability with identical phone
 
@@ -12,7 +12,6 @@ import {
   getRegistrationByCode,
   isTransitionAllowed,
 } from '../lib/db/store';
-import { findRegistrationsByPhone } from '../services/registration-service';
 import { POST as cancelApiPost } from '../app/api/registrations/cancel/route';
 
 async function runDonorSelfCancelTests() {
@@ -33,48 +32,49 @@ async function runDonorSelfCancelTests() {
 
   assert.strictEqual(regA.success, true, 'Initial registration must succeed');
   const codeA = regA.registration!.registration_code;
-  console.log(`✓ Registered donor A with code ${codeA}`);
+  const tokenA = regA.registration!.access_token;
+  assert.ok(tokenA, 'Registration must return high-entropy access token');
+  console.log(`✓ Registered donor A with code ${codeA} and access token`);
 
-  // ---- Test 2: Security guard - Wrong phone number cannot cancel registration ----
-  console.log('Test 2: Security Check - Wrong phone number is rejected');
-  const wrongPhoneReq = new Request('http://localhost:3000/api/registrations/cancel', {
+  // ---- Test 2: Security guard - Missing or wrong token cannot cancel registration ----
+  console.log('Test 2: Security Check - Wrong or missing token is rejected');
+  const wrongTokenReq = new Request('http://localhost:3000/api/registrations/cancel', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       registrationCode: codeA,
-      phone: '0899999999', // Different phone
-      reason: 'ทดสอบผิดเบอร์',
+      token: 'lvu_sec_wrongtoken00000000000000000000000000000000000000000000000000000000',
+      reason: 'ทดสอบผิดโทเค็น',
     }),
   });
 
-  const wrongPhoneRes = await cancelApiPost(wrongPhoneReq);
-  assert.strictEqual(wrongPhoneRes.status, 403, 'Wrong phone number must return 403 Forbidden');
-  const wrongPhoneData = await wrongPhoneRes.json();
-  assert.strictEqual(wrongPhoneData.success, false);
-  assert.match(wrongPhoneData.message, /เบอร์โทรศัพท์ไม่ตรง/);
-  console.log('✓ Wrong phone number safely rejected with 403');
+  const wrongTokenRes = await cancelApiPost(wrongTokenReq);
+  assert.strictEqual(wrongTokenRes.status, 401, 'Wrong token must return 401 Unauthorized');
+  const wrongTokenData = await wrongTokenRes.json();
+  assert.strictEqual(wrongTokenData.success, false);
+  console.log('✓ Wrong access token safely rejected with 401');
 
-  // ---- Test 3: Successful donor self-cancellation via API ----
-  console.log('Test 3: Correct phone number successfully cancels registration');
-  const correctPhoneReq = new Request('http://localhost:3000/api/registrations/cancel', {
+  // ---- Test 3: Successful donor self-cancellation via API with valid Access Token ----
+  console.log('Test 3: Valid Access Token successfully cancels registration');
+  const correctTokenReq = new Request('http://localhost:3000/api/registrations/cancel', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       registrationCode: codeA,
-      phone: '0812345601',
+      token: tokenA,
       reason: 'ติดภารกิจด่วน',
     }),
   });
 
-  const correctPhoneRes = await cancelApiPost(correctPhoneReq);
-  assert.strictEqual(correctPhoneRes.status, 200, 'Valid cancellation must return 200 OK');
-  const correctPhoneData = await correctPhoneRes.json();
-  assert.strictEqual(correctPhoneData.success, true);
-  assert.strictEqual(correctPhoneData.registrationCode, codeA);
+  const correctTokenRes = await cancelApiPost(correctTokenReq);
+  assert.strictEqual(correctTokenRes.status, 200, 'Valid cancellation must return 200 OK');
+  const correctTokenData = await correctTokenRes.json();
+  assert.strictEqual(correctTokenData.success, true);
+  assert.strictEqual(correctTokenData.registrationCode, codeA);
 
   const updatedRegA = await getRegistrationByCode(codeA);
   assert.strictEqual(updatedRegA?.status, 'CANCELLED', 'Status must be updated to CANCELLED');
-  console.log('✓ Donor A registration cancelled successfully via public API');
+  console.log('✓ Donor A registration cancelled successfully with valid access token');
 
   // ---- Test 4: Cannot cancel an already cancelled registration ----
   console.log('Test 4: Cannot cancel already cancelled registration');
@@ -83,7 +83,7 @@ async function runDonorSelfCancelTests() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       registrationCode: codeA,
-      phone: '0812345601',
+      token: tokenA,
     }),
   });
   const repeatCancelRes = await cancelApiPost(repeatCancelReq);
@@ -142,18 +142,6 @@ async function runDonorSelfCancelTests() {
   const seqB = parseInt(codeB.replace('LVU26-', ''), 10);
   assert.strictEqual(seqB, seqNew + 1, 'Next registration code must continue monotonically without rollback');
   console.log(`✓ Subsequent donor B received code ${codeB} (monotonic sequence preserved)`);
-
-  // ---- Test 8: Phone lookup returns only active registration ----
-  console.log('Test 8: Phone lookup returns only active registration');
-  const lookupActive = await findRegistrationsByPhone({
-    eventId: defaultEvent.id,
-    phone: '0812345601',
-  });
-  assert.strictEqual(lookupActive.length, 1, 'Lookup must return 1 active registration for this phone');
-  const activeReg = lookupActive[0] as { registration_code?: string; registrationCode?: string };
-  const activeCode = activeReg.registration_code || activeReg.registrationCode;
-  assert.strictEqual(activeCode, codeARe, 'Lookup must return the new active code');
-  console.log('✓ Lookup correctly returns only active registration');
 
   console.log('\n🎉 ALL DONOR SELF-CANCELLATION TESTS PASSED SUCCESSFULLY!');
 }
