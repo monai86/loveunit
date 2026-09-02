@@ -99,9 +99,9 @@ export async function POST(
         eventDateLabel: 'พุธ 16 กันยายน 2569 (09:00 – 14:00 น.)',
       };
 
-      // Non-blocking asynchronous dispatch so the HTTP response returns immediately (<50ms)
-      // while SMTP delivers in the background without freezing the client.
-      sendRegistrationConfirmation(emailPayload).then((delivery) => {
+      // Guarantee email delivery finishes before response context closes
+      try {
+        const delivery = await sendRegistrationConfirmation(emailPayload);
         if (delivery.status !== 'sent') {
           console.warn('[email] Registration confirmation was not delivered', {
             registrationCode: emailPayload.registrationCode,
@@ -109,9 +109,9 @@ export async function POST(
             ...(delivery.status === 'skipped' ? { reason: delivery.reason } : { error: delivery.error }),
           });
         }
-      }).catch((err) => {
+      } catch (err) {
         console.error('[email] Async email dispatch error:', err);
-      });
+      }
     }
 
     const regCode = pickField<string>(reg, 'registrationCode', 'registration_code') || '';

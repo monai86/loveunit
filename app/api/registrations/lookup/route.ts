@@ -55,15 +55,17 @@ export async function POST(request: Request) {
       const verificationToken = await createVerificationToken(regId, regEmail);
       testToken = verificationToken;
 
-      // Dispatch magic link email asynchronously
-      sendMagicLinkEmail({
-        to: regEmail,
-        token: verificationToken,
-        firstName: regFirstName,
-        registrationCode: regCode,
-      }).catch((err) => {
+      // Dispatch magic link email
+      try {
+        await sendMagicLinkEmail({
+          to: regEmail,
+          token: verificationToken,
+          firstName: regFirstName,
+          registrationCode: regCode,
+        });
+      } catch (err) {
         console.error('[email] Error sending magic link email:', err);
-      });
+      }
     }
 
     // Enumeration Resistance: Always return an identical generic response
