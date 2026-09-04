@@ -338,7 +338,7 @@ export default function ScreeningPage() {
                       isActive
                         ? 'border-[var(--burgundy-700)] bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-2xs ring-1.5 ring-[var(--burgundy-700)]'
                         : isDone
-                        ? 'border-emerald-200 bg-emerald-50/50 text-emerald-900'
+                        ? 'border-gray-300 bg-gray-50 text-gray-800'
                         : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
                     }`}
                   >
@@ -346,7 +346,7 @@ export default function ScreeningPage() {
                       <span className="text-[10px] font-bold uppercase text-gray-400 font-mono">
                         {isTh ? `หมวด ${idx + 1}` : `Part ${idx + 1}`}
                       </span>
-                      {isDone && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />}
+                      {isDone && <CheckCircle2 className="h-3.5 w-3.5 text-gray-500" />}
                     </div>
                     <span className="font-bold text-xs sm:text-sm leading-snug break-words">{shortTitle}</span>
                   </button>
@@ -382,9 +382,7 @@ export default function ScreeningPage() {
                     className={`p-3.5 sm:p-4 rounded-xl border transition-all ${
                       currentVal === undefined
                         ? 'border-gray-200 bg-white hover:border-gray-300'
-                        : currentVal === q.idealAnswer
-                        ? 'border-emerald-200 bg-emerald-50/20'
-                        : 'border-amber-200 bg-amber-50/30'
+                        : 'border-gray-300 bg-gray-50/50'
                     }`}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
