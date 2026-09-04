@@ -5,8 +5,8 @@ import path from 'node:path';
 import { OFFICIAL_SCREENING_QUESTIONS, evaluateScreeningAnswers } from '../lib/constants/screening-rules';
 
 describe('Screening Consistency & Non-Diagnostic Framing', () => {
-  it('should dynamically have 10 official screening questions', () => {
-    assert.strictEqual(OFFICIAL_SCREENING_QUESTIONS.length, 10);
+  it('should have 7 consolidated official screening questions', () => {
+    assert.strictEqual(OFFICIAL_SCREENING_QUESTIONS.length, 7);
   });
 
   it('should not contain stale "24 ข้อ" in screening layout or rules', () => {
@@ -28,7 +28,7 @@ describe('Screening Consistency & Non-Diagnostic Framing', () => {
     assert.strictEqual(result.flaggedQuestions.length, 0);
   });
 
-  it('should detect permanent deferral on chronic viral/cardiac risk and block registration', () => {
+  it('should detect permanent guidance on chronic disease history and guide to personal wellness', () => {
     const answers: Record<string, boolean> = {
       'q-chronic-viral-risks': true, // answered YES to chronic disease
     };
@@ -39,9 +39,9 @@ describe('Screening Consistency & Non-Diagnostic Framing', () => {
     assert.ok(result.flaggedQuestions.some(f => f.question.id === 'q-chronic-viral-risks'));
   });
 
-  it('should detect temporary deferral on recent tattoo/piercing with 120-day deferral', () => {
+  it('should detect temporary interval on recent procedures/tattoo/dental with 120-day interval', () => {
     const answers: Record<string, boolean> = {
-      'q-tattoo-piercing': true, // answered YES to recent tattoo
+      'q-procedures-tattoo-dental': true, // answered YES to recent procedures
     };
 
     const result = evaluateScreeningAnswers(answers, 'th');

@@ -79,7 +79,7 @@ export function HomeSectionsClient() {
         { 
           num: '05', 
           title: 'บริจาคโลหิตและพักสังเกตอาการ', 
-          desc: 'เจาะเก็บโลหิต 10-15 นาที พร้อมรับของว่างและเครื่องดื่มบำรุงสุขภาพ', 
+          desc: 'เจาะเก็บโลหิต 10-15 นาที พร้อมรับของว่าง เครื่องดื่ม และของที่ระลึกสำหรับผู้บริจาค 100 ท่านแรก', 
           duration: 'หลังบริจาค',
           action: 'คำแนะนำหลังบริจาค',
           href: '/prepare',
@@ -131,7 +131,7 @@ export function HomeSectionsClient() {
         { 
           num: '05', 
           title: 'Donate & Recovery Care', 
-          desc: 'Donation collection (10-15 mins), rest and enjoy nourishing refreshments', 
+          desc: 'Blood donation collection (10-15 mins), recovery refreshments, and exclusive souvenirs for the first 100 donors', 
           duration: 'Post-donation',
           action: 'Post-Donation Guide',
           href: '/prepare',

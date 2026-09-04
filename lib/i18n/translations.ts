@@ -102,18 +102,18 @@ export const TRANSLATIONS = {
     // Step 3 Form
     section3: { th: '03. เลือกรอบเวลาเดินทาง', en: '03. Choose Arrival Time Slot' },
     slotNotice: {
-      th: '💡 เลือกรอบเวลาแนะนำการเดินทางมาถึงเพื่อช่วยกระจายความหนาแน่น ท่านสามารถเดินทางมาถึงและยืนยันตัวตนได้ตลอดช่วงเวลากิจกรรม (09:00 - 14:00 น.)',
-      en: '💡 Choose your estimated arrival window to balance donor traffic. You are welcome to arrive and verify attendance anytime during event hours (09:00 AM - 02:00 PM).'
+      th: 'การลงทะเบียนล่วงหน้ามีวัตถุประสงค์เพื่อช่วยให้การจัดสรรและบริหารจัดการหน้างานเป็นไปอย่างราบรื่น ลดความแออัด และเตรียมพร้อมรองรับทั้งผู้ที่เดินทางมาแบบ walk-in และผู้ที่ลงทะเบียนล่วงหน้าได้อย่างมีประสิทธิภาพ ทั้งนี้ แต่ละช่วงเวลาไม่ใช่การล็อกคิว โดยลำดับการเข้ารับบริการจะยึดตามเวลาที่เดินทางมาถึงและการตรวจคัดกรองหน้างาน',
+      en: 'Advance registration is designed to streamline on-site management, reduce congestion, and smoothly accommodate both walk-in and registered donors. Time slot selection is for arrival distribution and is not a locked queue. Service order follows your arrival and on-site clinical screening.'
     },
     privacyNotice: {
-      title: { th: 'ประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA Privacy Notice)', en: 'Personal Data Protection Notice (PDPA)' },
+      title: { th: 'ประกาศคุ้มครองข้อมูลส่วนบุคคล', en: 'Personal Data Protection Notice' },
       body: {
-        th: 'คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จ.ราชบุรี สภากาชาดไทย ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลตาม พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562 (PDPA) ข้อมูลของท่าน (ชื่อ-นามสกุล, เบอร์โทรศัพท์, สังกัด) จะถูกจัดเก็บและใช้เฉพาะเพื่อการจัดสรรรอบเวลา ออกตั๋วลงทะเบียนออนไลน์ (Digital Ticket Pass) ยืนยันตัวตน และประสานงานหน้างานเท่านั้น โดยไม่มีการเปิดเผยต่อบุคคลภายนอก และจะลบทำลายข้อมูลออกจากระบบภายใน 30 วันหลังเสร็จสิ้นโครงการ (ทั้งนี้ แบบประเมินสุขภาพเบื้องต้นถูกประมวลผลบนอุปกรณ์ของท่านโดยตรง ไม่มีการบันทึกประวัติสุขภาพลงฐานข้อมูล)',
-        en: 'Faculty of Medical Technology, Mahidol University, together with Regional Blood Centre 4 Ratchaburi, Thai Red Cross Society, respects your privacy under the Personal Data Protection Act B.E. 2562 (PDPA). Your information (name, phone, affiliation) is processed solely for arrival scheduling, digital ticket generation, identity verification, and on-site event coordination without unauthorized third-party disclosure, and will be securely deleted within 30 days post-event. Preliminary health screening is computed locally on your device without storing health records in databases.'
+        th: 'คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล ร่วมกับ ภาคบริการโลหิตแห่งชาติที่ 4 จังหวัดราชบุรี สภากาชาดไทย ให้ความสำคัญกับการคุ้มครองข้อมูลส่วนบุคคลตามพระราชบัญญัติคุ้มครองข้อมูลส่วนบุคคล พุทธศักราช 2562 ทั้งนี้ แบบประเมินสุขภาพเบื้องต้นจะไม่มีการบันทึกไว้ในระบบหรือฐานข้อมูลใดทั้งสิ้น โดยระบบจะจัดเก็บเฉพาะข้อมูลติดต่อ ได้แก่ ชื่อ นามสกุล หมายเลขโทรศัพท์ อีเมล และสังกัด เพื่อใช้ในการจัดสรรรอบเวลา ออกตั๋วลงทะเบียนออนไลน์ ยืนยันตัวตน ประสานงานหน้างาน และนำไปใช้สำหรับการพัฒนาปรับปรุงโครงการ เพื่อให้ทราบประวัติผู้ที่เคยร่วมบริจาคกับโครงการ รวมถึงการเสริมสร้างความสัมพันธ์และการมีส่วนร่วมของผู้บริจาคโลหิตในระยะยาว โดยไม่มีการเปิดเผยต่อบุคคลภายนอก',
+        en: 'Faculty of Medical Technology, Mahidol University, together with Regional Blood Centre 4 Ratchaburi, Thai Red Cross Society, respects your privacy under the Personal Data Protection Act. Preliminary health assessment results will not be recorded or stored in any database. The system only stores contact details, including your name, phone number, email, and affiliation, to manage arrival scheduling, generate digital passes, verify identity on-site, and support continuous project improvement, historical donor tracking, and ongoing donor engagement without unauthorized third-party disclosure.'
       },
       accept: {
-        th: 'ข้าพเจ้าได้อ่านและยินยอมตามประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA) และรับทราบคำแนะนำการเตรียมตัว',
-        en: 'I have read and consent to the Personal Data Protection (PDPA) notice and acknowledge preparation guidelines.'
+        th: 'ข้าพเจ้าได้อ่านและยินยอมตามประกาศคุ้มครองข้อมูลส่วนบุคคล และรับทราบคำแนะนำการเตรียมตัว',
+        en: 'I have read and consent to the Personal Data Protection Notice and acknowledge preparation guidelines.'
       }
     },
     

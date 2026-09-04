@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, Calendar, Clock, MapPin, ArrowRight, Search, Sparkles } from 'lucide-react';
+import { Heart, Calendar, Clock, MapPin, ArrowRight, Search, Sparkles, Gift } from 'lucide-react';
 import { formatThaiDate, formatTimeRange, isEventDay } from '@/lib/utils/format';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
@@ -50,6 +50,11 @@ export function HeroClient({
     date: isEn ? enDate : thDate,
     time: isEn ? enTime : thTime,
     venue: isEn ? 'Meeting Room 217, Sirividhaya Building' : 'ห้องประชุม 217 อาคารสิริวิทยา',
+    souvenirBadge: isEn ? 'Special Privilege' : 'สิทธิพิเศษ',
+    souvenirTitle: isEn ? 'First 100 donors receive a special commemorative souvenir!' : 'ผู้บริจาค 100 ท่านแรก รับของที่ระลึกสุดพิเศษ!',
+    souvenirDesc: isEn
+      ? 'Exclusive commemorative souvenir awarded to the first 100 donors upon donation on-site.'
+      : 'มอบของที่ระลึกสุดพิเศษแทนคำขอบคุณสำหรับผู้บริจาคโลหิตสำเร็จ 100 ท่านแรก ณ จุดบริการ',
     ctaRegister: isEn ? 'Register to donate blood' : 'ลงทะเบียนบริจาคโลหิตออนไลน์',
     ctaPrepare: isEn ? 'Prepare before donating' : 'ดูการเตรียมตัวก่อนบริจาค',
   };
@@ -97,21 +102,70 @@ export function HeroClient({
               </p>
 
               {/* Event Facts & Action Buttons - Unified Width & Perfect Symmetry */}
-              <div className="space-y-3.5 pt-1 w-full">
+              <div className="space-y-4 pt-1 w-full">
                 
-                {/* Event Facts: 3-column cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full">
-                  <div className="flex items-center gap-2.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-3 text-xs text-[var(--cream)] font-bold shadow-2xs">
-                    <Calendar className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
-                    <span className="truncate">{copy.date}</span>
+                {/* 100 Donors Special Souvenir Banner */}
+                <div className="flex items-center gap-3.5 rounded-2xl bg-gradient-to-r from-amber-400/20 via-amber-300/25 to-amber-500/15 border border-amber-300/40 p-3.5 sm:p-4 text-amber-100 shadow-md backdrop-blur-xs">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-white shrink-0 shadow-sm border border-amber-200/40">
+                    <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
-                  <div className="flex items-center gap-2.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-3 text-xs text-[var(--cream)] font-bold shadow-2xs">
-                    <Clock className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
-                    <span className="truncate">{copy.time}</span>
+                  <div className="space-y-0.5 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-black uppercase tracking-wider bg-amber-400/30 text-amber-200 px-2 py-0.5 rounded-md font-mono border border-amber-300/30">
+                        {copy.souvenirBadge}
+                      </span>
+                      <span className="text-xs sm:text-sm md:text-base font-black text-amber-100">
+                        {copy.souvenirTitle}
+                      </span>
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-amber-200/90 font-medium">
+                      {copy.souvenirDesc}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-2.5 rounded-2xl bg-white/10 backdrop-blur-xs border border-white/15 px-3.5 py-3 text-xs text-[var(--cream)] font-bold shadow-2xs">
-                    <MapPin className="h-4 w-4 text-[var(--burgundy-300)] shrink-0" />
-                    <span className="truncate">{copy.venue}</span>
+                </div>
+
+                {/* Event Facts: Enlarged & High-Visibility Date, Time, Venue Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 w-full">
+                  <div className="flex items-center gap-3 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 p-3.5 text-[var(--cream)] shadow-sm hover:bg-white/20 transition-all">
+                    <div className="p-2.5 rounded-xl bg-white/10 text-amber-200 shrink-0 border border-white/15 shadow-xs">
+                      <Calendar className="h-5 w-5 shrink-0" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-amber-200/90">
+                        {isEn ? 'Date' : 'วันที่'}
+                      </span>
+                      <span className="block text-xs sm:text-sm font-extrabold text-[var(--cream)] leading-snug">
+                        {copy.date}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 p-3.5 text-[var(--cream)] shadow-sm hover:bg-white/20 transition-all">
+                    <div className="p-2.5 rounded-xl bg-white/10 text-amber-200 shrink-0 border border-white/15 shadow-xs">
+                      <Clock className="h-5 w-5 shrink-0" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-amber-200/90">
+                        {isEn ? 'Time' : 'เวลา'}
+                      </span>
+                      <span className="block text-xs sm:text-sm font-extrabold text-[var(--cream)] leading-snug">
+                        {copy.time}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 p-3.5 text-[var(--cream)] shadow-sm hover:bg-white/20 transition-all">
+                    <div className="p-2.5 rounded-xl bg-white/10 text-amber-200 shrink-0 border border-white/15 shadow-xs">
+                      <MapPin className="h-5 w-5 shrink-0" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-amber-200/90">
+                        {isEn ? 'Venue' : 'สถานที่'}
+                      </span>
+                      <span className="block text-xs sm:text-sm font-extrabold text-[var(--cream)] leading-snug break-words">
+                        {copy.venue}
+                      </span>
+                    </div>
                   </div>
                 </div>
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle, User, ShieldCheck, MapPin, Building, Calendar, CheckCircle2, Edit3 } from 'lucide-react';
+import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle, User, ShieldCheck, MapPin, Building, Calendar, CheckCircle2, Edit3, Info } from 'lucide-react';
 import { MAHIDOL_FACULTIES, ACADEMIC_YEARS } from '@/lib/constants/mahidol';
 import { formatTimeRange, formatBangkokTime, isEventDay } from '@/lib/utils/format';
 import { isTimeSlotSelectable } from '@/lib/registration/slot-availability';
@@ -727,7 +727,7 @@ function RegisterContent() {
                             {isTh ? (
                               <>
                                 <span className="inline-block whitespace-nowrap">ข้าพเจ้าได้อ่านและยินยอมตาม</span>{' '}
-                                <span className="inline-block whitespace-nowrap">ประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>{' '}
+                                <span className="inline-block whitespace-nowrap">ประกาศคุ้มครองข้อมูลส่วนบุคคล</span>{' '}
                                 <span className="inline-block whitespace-nowrap">
                                   และรับทราบคำแนะนำการเตรียมตัว <span className="text-red-600 font-bold">*</span>
                                 </span>
@@ -749,13 +749,19 @@ function RegisterContent() {
               {/* STEP 3: TIME SLOT SELECTION & PR CHANNEL (Advance Mode Only) */}
               {!isWalkInMode && step === 3 && (
                 <div className="space-y-4">
-                  <div className="space-y-1 border-b border-[var(--rose-100)] pb-2">
+                  <div className="space-y-3 border-b border-[var(--rose-100)] pb-3">
                     <h3 className="text-sm font-bold text-[var(--burgundy-700)] uppercase tracking-wider font-mono">
                       {tReg.section3[language]}
                     </h3>
-                    <p className="text-xs text-[var(--muted)] leading-relaxed break-words">
-                      {tReg.slotNotice[language]}
-                    </p>
+                    <div className="p-3.5 rounded-xl bg-blue-50/80 border border-blue-200/80 text-blue-950 space-y-1">
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-blue-900">
+                        <Info className="h-4 w-4 text-blue-700 shrink-0" />
+                        <span>{isTh ? 'วัตถุประสงค์การเลือกรอบเวลา' : 'Time Slot Selection Purpose'}</span>
+                      </div>
+                      <p className="text-xs leading-relaxed text-blue-900/90 pl-5.5 break-words">
+                        {tReg.slotNotice[language]}
+                      </p>
+                    </div>
                   </div>
 
                   {slotsLoading ? (
@@ -888,7 +894,7 @@ function RegisterContent() {
                         {isTh ? (
                           <>
                             <span className="inline-block whitespace-nowrap">ข้าพเจ้าได้อ่านและยินยอมตาม</span>{' '}
-                            <span className="inline-block whitespace-nowrap">ประกาศคุ้มครองข้อมูลส่วนบุคคล (PDPA)</span>{' '}
+                            <span className="inline-block whitespace-nowrap">ประกาศคุ้มครองข้อมูลส่วนบุคคล</span>{' '}
                             <span className="inline-block whitespace-nowrap">
                               และรับทราบคำแนะนำการเตรียมตัว <span className="text-red-600 font-bold">*</span>
                             </span>

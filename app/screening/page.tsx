@@ -95,7 +95,7 @@ export default function ScreeningPage() {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] px-4 py-1.5 text-xs sm:text-sm font-bold text-white shadow-sm shadow-red-950/20 border border-white/20">
               <ShieldCheck className="h-4 w-4 text-white" />
-              <span>{isTh ? 'เกณฑ์มาตรฐานศูนย์บริการโลหิตแห่งชาติ สภากาชาดไทย (ฉบับย่อ 10 ข้อหลัก)' : 'National Blood Centre Criteria (Essential 10-Item Quick Check)'}</span>
+              <span>{isTh ? 'เกณฑ์มาตรฐานศูนย์บริการโลหิต (ฉบับย่อ 7 ข้อหลัก)' : 'Blood Service Centre Criteria (Essential 7-Item Quick Check)'}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--ink)] tracking-tight leading-tight">
               {isTh ? 'แบบประเมินความพร้อมตนเองก่อนบริจาคโลหิต' : 'Donor Pre-Screening Readiness'}
@@ -122,15 +122,15 @@ export default function ScreeningPage() {
             <p className="leading-relaxed text-amber-950/90 font-medium break-words">
               {isTh ? (
                 <>
-                  แบบประเมินนี้เป็นเพียง <strong>การเตรียมความพร้อมเบื้องต้นด้วยตนเอง (แนะนำให้ทำก่อนเดินทางไม่เกิน 24 ชั่วโมง)</strong> โดยไม่มีการบันทึกประวัติสุขภาพเข้าสู่ฐานข้อมูลสภากาชาดไทย
+                  แบบประเมินนี้เป็นเพียง <strong>การเตรียมความพร้อมของตัวเองเท่านั้น</strong> โดยไม่มีการบันทึกประวัติสุขภาพเข้าสู่ฐานข้อมูลศูนย์บริการโลหิต
                   <br className="hidden sm:block" />
-                  <strong>ผู้บริจาคทุกท่านจะต้องเข้ารับการตรวจคัดกรอง ซักประวัติสุขภาพ และตรวจวัดความเข้มข้นของโลหิตโดยเจ้าหน้าที่สภากาชาดหน้างานอีกครั้งก่อนการเจาะบริจาคจริง</strong>
+                  <strong>ผู้บริจาคทุกท่านจะต้องทำแบบประเมินสุขภาพ ซักประวัติ และตรวจวัดความเข้มข้นโลหิตจากเจ้าหน้าที่หน้างานจริงอีกครั้งก่อนการเจาะบริจาค</strong>
                 </>
               ) : (
                 <>
-                  This self-assessment is for <strong>preliminary readiness screening only (recommended within 24 hours prior to donation)</strong>. Responses are not stored in Thai Red Cross databases.
+                  This self-assessment is for <strong>personal preparation only</strong>. Responses are not stored in Blood Service Centre databases.
                   <br className="hidden sm:block" />
-                  <strong>All donors must undergo formal health screening, medical questionnaire review, and on-site hemoglobin testing with Thai Red Cross medical staff before actual donation.</strong>
+                  <strong>All donors must complete formal health screening, questionnaire review, and on-site hemoglobin testing with actual staff before donation.</strong>
                 </>
               )}
             </p>
@@ -230,12 +230,12 @@ export default function ScreeningPage() {
               <div className="space-y-1.5 border-b border-[var(--line)] pb-3.5">
                 <h3 className="text-xl font-black text-[var(--ink)] flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-amber-600" />
-                  <span>{isTh ? 'ข้อกำหนดและคำแนะนำที่เกี่ยวข้องกับคำตอบของท่าน' : 'Flagged Criteria & Clinical Guidance'}</span>
+                  <span>{isTh ? 'ข้อแนะนำการเตรียมตัวและเกณฑ์ระยะเวลาความพร้อม' : 'Preparation Guidance & Readiness Criteria'}</span>
                 </h3>
                 <p className="text-xs sm:text-sm text-[var(--muted)]">
                   {isTh
-                    ? 'รายละเอียดข้อจำกัดทางสุขภาพ ระยะเวลาที่ต้องงด และแนวทางปฏิบัติ'
-                    : 'Details on identified health restrictions, safety deferral periods, and recommendations.'}
+                    ? 'รายละเอียดเกณฑ์ระยะเวลาความพร้อมและคำแนะนำวิธีปฏิบัติตัวเพื่อให้พร้อมบริจาค'
+                    : 'Details on readiness time intervals and pre-donation preparation instructions.'}
                 </p>
               </div>
 
@@ -258,13 +258,13 @@ export default function ScreeningPage() {
 
                     <div className="p-3 rounded-lg bg-amber-50/90 border border-amber-200 text-amber-950 font-medium flex items-start gap-2.5">
                       <AlertTriangle className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
-                      <span className="leading-relaxed break-words"><strong>{isTh ? 'เหตุผล:' : 'Reason:'}</strong> {item.reason}</span>
+                      <span className="leading-relaxed break-words"><strong>{isTh ? 'ข้อมูล:' : 'Note:'}</strong> {item.reason}</span>
                     </div>
 
                     {item.durationText && (
                       <p className="text-xs sm:text-sm font-bold text-[var(--burgundy-700)] flex items-center gap-2">
                         <Clock className="h-4 w-4" />
-                        <span>{isTh ? 'ระยะเวลางด:' : 'Duration:'} {item.durationText}</span>
+                        <span>{item.durationText}</span>
                       </p>
                     )}
 

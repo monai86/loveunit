@@ -62,7 +62,7 @@ describe('i18n Unified Translation Dictionary', () => {
     assert.ok(ACADEMIC_YEARS.length > 0, 'ACADEMIC_YEARS should not be empty');
   });
 
-  it('should ensure all 10 essential screening questions and categories have English translations', () => {
+  it('should ensure all 7 essential screening questions and categories have English translations', () => {
     assert.strictEqual(SCREENING_CATEGORIES.length, 3);
     for (const cat of SCREENING_CATEGORIES) {
       assert.ok(cat.title && cat.title.length > 0, 'Category title missing');
@@ -71,7 +71,7 @@ describe('i18n Unified Translation Dictionary', () => {
       assert.ok(cat.descEn && cat.descEn.length > 0, 'Category descEn missing');
     }
 
-    assert.strictEqual(OFFICIAL_SCREENING_QUESTIONS.length, 10);
+    assert.strictEqual(OFFICIAL_SCREENING_QUESTIONS.length, 7);
     for (const q of OFFICIAL_SCREENING_QUESTIONS) {
       assert.ok(q.question && q.question.length > 0, `Question ${q.id} missing th question`);
       assert.ok(q.questionEn && q.questionEn.length > 0, `Question ${q.id} missing en question`);
