@@ -45,25 +45,23 @@ jobs:
     steps:
       - id: check
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
         run: |
-          if [ -n "$DATABASE_URL" ]; then
+          if [ -n "$TEST_DATABASE_URL" ]; then
             echo "has_db=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_db=false" >> "$GITHUB_OUTPUT"
           fi
 
-  # Neon integration suite (tests/db.integration.test.ts) against a real Neon
-  # DB. Creates a disposable scratch database, runs the real Drizzle migrations,
-  # exercises the service layer, then drops it. Only runs when the DATABASE_URL
-  # secret is configured; PRs without secrets skip this job cleanly (the suite
-  # also skips itself if DATABASE_URL is absent).
+  # Neon integration suite (tests/db.integration.test.ts) against an isolated
+  # test DB. Only runs when the dedicated TEST_DATABASE_URL secret is configured;
+  # NEVER runs against production DATABASE_URL.
   neon-integration:
     runs-on: ubuntu-latest
     needs: check-db-config
     if: ${{ needs.check-db-config.outputs.has_db == 'true' }}
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -75,18 +73,17 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Neon integration tests (real DB, disposable scratch database)
+      - name: Neon integration tests (disposable test database)
         run: npm run test:db
 
-  # Playwright E2E against a production (standalone) server on a real Neon DB.
-  # Only runs when the DATABASE_URL secret is configured (see H-103 in docs);
-  # PRs without secrets skip this job cleanly.
+  # Playwright E2E against an isolated test DB.
+  # Only runs when the dedicated TEST_DATABASE_URL secret is configured.
   e2e:
     runs-on: ubuntu-latest
     needs: check-db-config
     if: ${{ needs.check-db-config.outputs.has_db == 'true' }}
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
       BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
       BETTER_AUTH_URL: http://localhost:3003
       NEXT_PUBLIC_APP_URL: http://localhost:3003

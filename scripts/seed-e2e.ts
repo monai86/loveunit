@@ -29,7 +29,9 @@ async function main() {
       ilike(registrations.firstName, 'วอล์กอิน%'),
       ilike(registrations.firstName, 'กากาาก%'),
       ilike(registrations.firstName, 'สมชาย%'),
-      ilike(registrations.firstName, 'สมหญิง%')
+      ilike(registrations.firstName, 'สมหญิง%'),
+      ilike(registrations.firstName, 'พิธา%'),
+      ilike(registrations.lastName, '%ทดสอบ%')
     ));
 
     const allSlots = await db.select().from(timeSlots);

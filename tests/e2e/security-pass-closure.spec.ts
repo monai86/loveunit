@@ -94,5 +94,12 @@ test.describe('MUMT LoveUnit - Security Closure & Real Production E2E Verificati
     // 7. Verify /location page
     await page.goto('/location');
     await expect(page.getByRole('heading', { name: /ห้องประชุม 217/i })).toBeVisible();
+
+    // 8. Clean up created donor so test data does not linger in DB
+    if (regCode) {
+      await page.request.post('/api/registrations/cancel', {
+        data: { registrationCode: regCode, reason: 'E2E test teardown cleanup' },
+      }).catch(() => {});
+    }
   });
 });
