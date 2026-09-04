@@ -50,11 +50,11 @@ export function HeroClient({
     date: isEn ? enDate : thDate,
     time: isEn ? enTime : thTime,
     venue: isEn ? 'Meeting Room 217, Sirividhaya Building' : 'ห้องประชุม 217 อาคารสิริวิทยา',
-    souvenirBadge: isEn ? 'Special Privilege' : 'สิทธิพิเศษ',
-    souvenirTitle: isEn ? 'First 100 donors receive a special commemorative souvenir!' : 'ผู้บริจาค 100 ท่านแรก รับของที่ระลึกสุดพิเศษ!',
+    souvenirBadge: isEn ? 'Commemorative Gift' : 'ของที่ระลึก',
+    souvenirTitle: isEn ? 'First 100 donors receive a commemorative souvenir' : 'ผู้บริจาค 100 ท่านแรก รับของที่ระลึกแทนคำขอบคุณ',
     souvenirDesc: isEn
-      ? 'Exclusive commemorative souvenir awarded to the first 100 donors upon donation on-site.'
-      : 'มอบของที่ระลึกสุดพิเศษแทนคำขอบคุณสำหรับผู้บริจาคโลหิตสำเร็จ 100 ท่านแรก ณ จุดบริการ',
+      ? 'Available at the post-donation station on event day (while supplies last).'
+      : 'มอบให้ ณ จุดบริการหลังเสร็จสิ้นการบริจาคโลหิตในวันงาน (ของที่ระลึกมีจำนวนจำกัด)',
     ctaRegister: isEn ? 'Register to donate blood' : 'ลงทะเบียนบริจาคโลหิตออนไลน์',
     ctaPrepare: isEn ? 'Prepare before donating' : 'ดูการเตรียมตัวก่อนบริจาค',
   };
@@ -104,21 +104,21 @@ export function HeroClient({
               {/* Event Facts & Action Buttons - Unified Width & Perfect Symmetry */}
               <div className="space-y-4 pt-1 w-full">
                 
-                {/* 100 Donors Special Souvenir Banner */}
-                <div className="flex items-center gap-3.5 rounded-2xl bg-gradient-to-r from-amber-400/20 via-amber-300/25 to-amber-500/15 border border-amber-300/40 p-3.5 sm:p-4 text-amber-100 shadow-md backdrop-blur-xs">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-white shrink-0 shadow-sm border border-amber-200/40">
-                    <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                {/* 100 Donors Souvenir Notice */}
+                <div className="flex items-center gap-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-3.5 sm:p-4 text-[var(--cream)] shadow-xs transition-colors hover:bg-white/[0.13]">
+                  <div className="p-2.5 rounded-xl bg-white/10 text-amber-200 shrink-0 border border-white/15 shadow-2xs">
+                    <Gift className="h-5 w-5 text-amber-200" />
                   </div>
                   <div className="space-y-0.5 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[10px] font-black uppercase tracking-wider bg-amber-400/30 text-amber-200 px-2 py-0.5 rounded-md font-mono border border-amber-300/30">
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-white/10 text-amber-200 px-2 py-0.5 rounded-md font-mono border border-white/15">
                         {copy.souvenirBadge}
                       </span>
-                      <span className="text-xs sm:text-sm md:text-base font-black text-amber-100">
+                      <span className="text-xs sm:text-sm md:text-base font-bold text-[var(--cream)]">
                         {copy.souvenirTitle}
                       </span>
                     </div>
-                    <p className="text-[11px] sm:text-xs text-amber-200/90 font-medium">
+                    <p className="text-[11px] sm:text-xs text-[var(--cream-dim)] font-medium">
                       {copy.souvenirDesc}
                     </p>
                   </div>
