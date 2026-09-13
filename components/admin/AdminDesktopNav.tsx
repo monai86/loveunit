@@ -8,7 +8,8 @@ import {
   Users, 
   Shield, 
   FileText, 
-  ScrollText 
+  ScrollText,
+  BarChart3 
 } from 'lucide-react';
 
 interface NavItem {
@@ -21,6 +22,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: '/mt70', label: 'แดชบอร์ด', icon: LayoutDashboard, exact: true },
   { href: '/mt70/registrations', label: 'รายชื่อผู้ลงทะเบียน', icon: Users },
+  { href: '/mt70/analytics', label: 'สถิติเจาะลึก', icon: BarChart3 },
   { href: '/mt70/staff', label: 'จัดการ Staff', icon: Shield },
   { href: '/mt70/content', label: 'สื่อ & โปสเตอร์', icon: FileText },
   { href: '/mt70/audit-logs', label: 'Audit Log', icon: ScrollText },

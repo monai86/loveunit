@@ -9,7 +9,8 @@ import {
   Shield, 
   FileText, 
   ScrollText, 
-  QrCode 
+  QrCode,
+  BarChart3 
 } from 'lucide-react';
 
 export function AdminMobileNav() {
@@ -18,6 +19,7 @@ export function AdminMobileNav() {
   const navItems = [
     { href: '/mt70', label: 'แดชบอร์ด', icon: LayoutDashboard, exact: true },
     { href: '/mt70/registrations', label: 'ผู้บริจาค', icon: Users },
+    { href: '/mt70/analytics', label: 'สถิติ', icon: BarChart3 },
     { href: '/mt70/staff', label: 'Staff', icon: Shield },
     { href: '/mt70/content', label: 'สื่อ/โปสเตอร์', icon: FileText },
     { href: '/mt70/audit-logs', label: 'Audit Log', icon: ScrollText },
