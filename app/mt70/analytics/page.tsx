@@ -50,11 +50,11 @@ export default async function AnalyticsPage() {
     dailyMap.set(day, (dailyMap.get(day) || 0) + 1);
   }
   const sortedDays = [...dailyMap.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  let cumulative = 0;
-  const dailyGrowth = sortedDays.map(([date, count]) => {
-    cumulative += count;
-    return { date, count, cumulative };
-  });
+  const dailyGrowth = sortedDays.reduce<Array<{ date: string; count: number; cumulative: number }>>((acc, [date, count]) => {
+    const prev = acc.length > 0 ? acc[acc.length - 1].cumulative : 0;
+    acc.push({ date, count, cumulative: prev + count });
+    return acc;
+  }, []);
 
   // Hourly heatmap
   const hourlyHeatmap: Record<string, Record<number, number>> = {};
