@@ -48,15 +48,15 @@ export function AdminDesktopNav() {
             href={item.href}
             prefetch={true}
             aria-current={isActive ? 'page' : undefined}
-            className={`flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-bold transition-all ${
+            className={`flex h-10 shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-bold transition-all duration-200 ${
               isActive
-                ? 'bg-[var(--rose-100)] text-[var(--burgundy-700)] shadow-2xs font-black'
-                : 'text-[var(--ink)] hover:bg-gray-100/80 hover:text-[var(--burgundy-700)]'
+                ? 'bg-gradient-to-r from-[var(--burgundy-700)] to-[var(--burgundy-800)] text-white shadow-md shadow-rose-950/15 font-black scale-[1.02]'
+                : 'text-gray-700 hover:bg-rose-50/80 hover:text-[var(--burgundy-700)]'
             }`}
           >
             <Icon 
               className={`h-4 w-4 transition-colors ${
-                isActive ? 'text-[var(--burgundy-700)]' : 'text-[var(--muted)]'
+                isActive ? 'text-rose-100' : 'text-gray-400 group-hover:text-[var(--burgundy-700)]'
               }`} 
             />
             <span>{item.label}</span>

@@ -341,19 +341,19 @@ export default function AdminRegistrationsPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="rounded-2xl border border-[var(--line)] bg-white p-4 shadow-2xs space-y-3">
+      <div className="rounded-2xl border border-rose-100/90 bg-white/95 p-4 shadow-[0_4px_20px_-4px_rgba(110,16,30,0.05)] space-y-3 backdrop-blur-xs">
         <div className="flex flex-col gap-3 md:flex-row md:items-center">
           
           <div className="relative flex-1">
             <label htmlFor="reg-search" className="sr-only">ค้นหาผู้ลงทะเบียน</label>
-            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-rose-700/60" />
             <input
               id="reg-search"
               type="text"
               placeholder="ค้นหารหัส, ชื่อ-นามสกุล, หรือเบอร์โทรศัพท์..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-[var(--line)] pl-11 pr-3 py-2 text-xs font-medium text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--burgundy-700)]/20 focus:border-[var(--burgundy-700)]"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50/60 pl-11 pr-3 py-2 text-xs font-medium text-[var(--ink)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/25 focus:border-rose-400 transition-all shadow-2xs"
             />
           </div>
 
@@ -362,7 +362,7 @@ export default function AdminRegistrationsPage() {
               aria-label="กรองตามประเภทผู้เข้าร่วม"
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="w-full rounded-xl border border-[var(--line)] px-2.5 py-2 text-xs font-medium text-[var(--ink)] bg-white shadow-2xs"
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-semibold text-[var(--ink)] bg-white shadow-2xs focus:outline-none focus:ring-2 focus:ring-rose-500/20"
             >
               <option value="ALL">ทุกประเภท</option>
               <option value="STUDENT">นักศึกษา</option>
@@ -374,7 +374,7 @@ export default function AdminRegistrationsPage() {
               aria-label="กรองตามสถานะ"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full rounded-xl border border-[var(--line)] px-2.5 py-2 text-xs font-medium text-[var(--ink)] bg-white shadow-2xs"
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-semibold text-[var(--ink)] bg-white shadow-2xs focus:outline-none focus:ring-2 focus:ring-rose-500/20"
             >
               <option value="ALL">ทุกสถานะ</option>
               <option value="REGISTERED">ลงทะเบียนแล้ว</option>
@@ -387,7 +387,7 @@ export default function AdminRegistrationsPage() {
               aria-label="กรองตามประสบการณ์"
               value={filterExperience}
               onChange={(e) => setFilterExperience(e.target.value)}
-              className="w-full rounded-xl border border-[var(--line)] px-2.5 py-2 text-xs font-medium text-[var(--ink)] bg-white shadow-2xs"
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-xs font-semibold text-[var(--ink)] bg-white shadow-2xs focus:outline-none focus:ring-2 focus:ring-rose-500/20"
             >
               <option value="ALL">ทุกประสบการณ์</option>
               <option value="FIRST_TIME">บริจาคครั้งแรก</option>
@@ -399,20 +399,20 @@ export default function AdminRegistrationsPage() {
       </div>
 
       {/* Data View */}
-      <div className="rounded-2xl border border-[var(--line)] bg-white shadow-2xs overflow-hidden">
+      <div className="rounded-2xl border border-rose-100/90 bg-white/95 shadow-[0_4px_20px_-4px_rgba(110,16,30,0.05)] overflow-hidden backdrop-blur-xs">
         {loading ? (
-          <div className="flex py-16 justify-center items-center gap-2 text-xs text-gray-500">
-            <Loader2 className="h-4 w-4 animate-spin text-[var(--burgundy-700)]" />
+          <div className="flex py-16 justify-center items-center gap-2 text-xs text-gray-500 font-bold">
+            <Loader2 className="h-5 w-5 animate-spin text-[var(--burgundy-700)]" />
             <span>กำลังโหลดข้อมูล...</span>
           </div>
         ) : filteredList.length === 0 ? (
-          <div className="py-16 text-center text-xs text-gray-400">
+          <div className="py-16 text-center text-xs text-gray-400 font-bold">
             ไม่พบข้อมูลผู้ลงทะเบียนตามที่ค้นหา
           </div>
         ) : (
           <>
             {/* Mobile Card View */}
-            <div className="block md:hidden divide-y divide-gray-100">
+            <div className="block md:hidden divide-y divide-rose-100/70">
               {filteredList.map((row) => {
                 const badge = getRegistrationStatusBadge(row.status);
                 const isWalkIn = isWalkInRecord(row.registration_code) || (row as { source?: string }).source === 'WALK_IN';
@@ -421,12 +421,12 @@ export default function AdminRegistrationsPage() {
                   : (row.time_slot ? formatTimeRange(row.time_slot.start_at, row.time_slot.end_at) : '09:00 – 14:00 น.');
 
                 return (
-                  <div key={row.id} className="p-3.5 space-y-2.5">
+                  <div key={row.id} className="p-4 space-y-2.5 bg-white hover:bg-rose-50/20 transition-colors">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono font-bold text-xs text-[var(--burgundy-700)] bg-[var(--rose-100)] px-2 py-0.5 rounded">
+                      <span className="font-mono font-black text-xs text-[var(--burgundy-700)] bg-rose-50/90 border border-rose-200/60 px-2.5 py-1 rounded-lg">
                         {row.registration_code}
                       </span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${badge.colorClass}`}>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${badge.colorClass}`}>
                         {badge.label}
                       </span>
                     </div>
@@ -442,14 +442,14 @@ export default function AdminRegistrationsPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-700">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 text-gray-700 border border-gray-200/60">
                           {getParticipantTypeLabel(row.participant_type)}
                         </span>
                         {row.faculty && <span className="block text-[10px] text-gray-400 mt-0.5">{row.faculty}</span>}
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-gray-100">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-rose-100/60">
                       <span className="text-gray-500 font-mono text-[11px] flex items-center gap-1">
                         <Calendar className="h-3 w-3 text-gray-400 shrink-0" />
                         <span>{timeLabel}</span>
@@ -458,7 +458,7 @@ export default function AdminRegistrationsPage() {
                         <Link
                           href={`/registration/${row.registration_code}`}
                           target="_blank"
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200 text-xs font-bold text-[var(--burgundy-700)] hover:bg-[var(--rose-100)]"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50/80 border border-rose-200/60 text-xs font-bold text-[var(--burgundy-700)] hover:bg-rose-100 transition-all"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           <span>ดูบัตร</span>
@@ -467,7 +467,7 @@ export default function AdminRegistrationsPage() {
                           <button
                             type="button"
                             onClick={(event) => openEditModal(row, event.currentTarget)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200 text-xs font-bold text-[var(--burgundy-700)] hover:bg-[var(--rose-100)]"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-gray-200 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-all cursor-pointer"
                           >
                             <Edit2 className="h-3.5 w-3.5" />
                             <span>แก้ไข</span>
@@ -477,7 +477,7 @@ export default function AdminRegistrationsPage() {
                           <button
                             type="button"
                             onClick={(event) => openDeleteModal(row, event.currentTarget)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-50 border border-red-200 text-xs font-bold text-red-700 hover:bg-red-100"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-50 border border-red-200 text-xs font-bold text-red-700 hover:bg-red-100 transition-all cursor-pointer"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                             <span>ลบ</span>
@@ -493,7 +493,7 @@ export default function AdminRegistrationsPage() {
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left text-xs text-[var(--ink)] min-w-[700px]">
-                <thead className="bg-gray-50/80 border-b border-[var(--line)] text-gray-600 font-bold">
+                <thead className="bg-gradient-to-r from-rose-50 via-red-50/60 to-rose-50 border-b border-rose-200/70 text-[var(--burgundy-800)] font-bold text-xs uppercase tracking-wider">
                   <tr>
                     <th className="p-3.5 whitespace-nowrap">รหัส</th>
                     <th className="p-3.5 whitespace-nowrap">ชื่อ-นามสกุล</th>
@@ -504,7 +504,7 @@ export default function AdminRegistrationsPage() {
                     <th className="p-3.5 text-right whitespace-nowrap">การจัดการ</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 font-medium">
+                <tbody className="divide-y divide-rose-100/70 font-medium bg-white">
                   {filteredList.map((row) => {
                     const badge = getRegistrationStatusBadge(row.status);
                     const isWalkIn = isWalkInRecord(row.registration_code) || (row as { source?: string }).source === 'WALK_IN';

@@ -28,7 +28,7 @@ export function AdminMobileNav() {
   return (
     <nav 
       aria-label="เมนูผู้ดูแลระบบบนมือถือ" 
-      className="sticky top-16 z-30 flex items-center gap-1.5 overflow-x-auto border-b border-[var(--line)] bg-white/95 backdrop-blur-md px-3 py-2 md:hidden no-scrollbar shadow-2xs"
+      className="sticky top-16 z-30 flex items-center gap-1.5 overflow-x-auto border-b border-rose-100/80 bg-white/95 backdrop-blur-md px-3 py-2.5 md:hidden no-scrollbar shadow-sm"
     >
       {navItems.map((item) => {
         const Icon = item.icon;
@@ -43,11 +43,11 @@ export function AdminMobileNav() {
             aria-current={isActive ? 'page' : undefined}
             className={`inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
               isActive
-                ? 'bg-[var(--burgundy-700)] text-white shadow-xs'
-                : 'bg-gray-50 text-[var(--ink)] border border-gray-200/60 hover:bg-[var(--rose-100)] hover:text-[var(--burgundy-700)]'
+                ? 'bg-gradient-to-r from-[var(--burgundy-700)] to-[var(--burgundy-800)] text-white shadow-sm shadow-rose-950/20 font-black'
+                : 'bg-white text-gray-700 border border-gray-200/80 hover:bg-rose-50 hover:text-[var(--burgundy-700)]'
             }`}
           >
-            <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-[var(--burgundy-700)]'}`} />
+            <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-rose-100' : 'text-[var(--burgundy-700)]'}`} />
             <span>{item.label}</span>
           </Link>
         );
@@ -55,9 +55,9 @@ export function AdminMobileNav() {
 
       <Link
         href="/staff/checkin"
-        className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-800 transition-all hover:bg-emerald-100"
+        className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-3 py-1.5 text-xs font-black text-white shadow-sm shadow-emerald-700/20 transition-all hover:brightness-105"
       >
-        <QrCode className="h-3.5 w-3.5 text-emerald-700" />
+        <QrCode className="h-3.5 w-3.5 text-white" />
         <span>สแกน QR</span>
       </Link>
     </nav>
