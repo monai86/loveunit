@@ -133,8 +133,12 @@ async function runHardeningTests() {
   const { isEventDay, generateRegistrationCode: genCode } = await import('../lib/utils/format');
   const eventDayDate = new Date('2026-09-16T10:00:00+07:00');
   const otherDayDate = new Date('2026-09-15T10:00:00+07:00');
-  assert.strictEqual(isEventDay(eventDayDate), true, '2026-09-16 must be detected as event day');
+  const before8AmDate = new Date('2026-09-16T07:59:59+07:00');
+  const exactly8AmDate = new Date('2026-09-16T08:00:00+07:00');
+  assert.strictEqual(isEventDay(eventDayDate), true, '2026-09-16 10:00 must be detected as event day');
   assert.strictEqual(isEventDay(otherDayDate), false, '2026-09-15 must not be event day');
+  assert.strictEqual(isEventDay(before8AmDate), false, 'Before 8:00 AM on 2026-09-16 must not be Walk-in yet');
+  assert.strictEqual(isEventDay(exactly8AmDate), true, 'At 8:00 AM on 2026-09-16 must switch to Walk-in');
 
   const onlineCode = genCode(1, 'ONLINE');
   const walkinCode = genCode(1, 'WALK_IN');

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, Calendar, Clock, MapPin, ArrowRight, Search, Sparkles, Gift } from 'lucide-react';
+import { Heart, Calendar, Clock, MapPin, ArrowRight, Search, Gift } from 'lucide-react';
 import { formatThaiDate, formatTimeRange, isEventDay } from '@/lib/utils/format';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
@@ -55,7 +55,9 @@ export function HeroClient({
     souvenirDesc: isEn
       ? 'Available at the post-donation station on event day (while supplies last).'
       : 'มอบให้ ณ จุดบริการหลังเสร็จสิ้นการบริจาคโลหิตในวันงาน (ของที่ระลึกมีจำนวนจำกัด)',
-    ctaRegister: isEn ? 'Register to donate blood' : 'ลงทะเบียนบริจาคโลหิตออนไลน์',
+    ctaRegister: isEn
+      ? (eventDay ? 'Walk-in Registration' : 'Register to donate blood')
+      : (eventDay ? 'ลงทะเบียน Walk-in' : 'ลงทะเบียนบริจาคโลหิตออนไลน์'),
     ctaPrepare: isEn ? 'Prepare before donating' : 'ดูการเตรียมตัวก่อนบริจาค',
   };
 
@@ -70,8 +72,11 @@ export function HeroClient({
             <span className="brand-chip rise-in whitespace-nowrap text-xs font-bold shadow-2xs">
               {eventDay ? (
                 <>
-                  <Sparkles className="h-3.5 w-3.5 fill-current shrink-0 text-amber-300" />
-                  <span className="font-extrabold text-amber-200">{isEn ? 'Event Day · Walk-in Open' : 'วันจัดกิจกรรม · เปิด Walk-in แล้ว'}</span>
+                  <span className="relative flex h-2 w-2 mr-0.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-300" />
+                  </span>
+                  <span className="font-extrabold text-amber-200">{isEn ? 'Event Day · Walk-in Registration' : 'วันจัดกิจกรรม · ลงทะเบียน Walk-in'}</span>
                 </>
               ) : (
                 <>

@@ -298,9 +298,12 @@ function RegisterContent() {
         <div className="mb-8 pb-6 border-b border-[var(--line)]">
           <div className="flex items-center gap-2 mb-2.5">
             {isWalkInMode ? (
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20">
-                <Sparkles className="h-3.5 w-3.5 text-amber-300 animate-pulse" />
-                <span>{tReg.walkinBadge[language]}</span>
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/70 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                </span>
+                <span className="font-bold tracking-normal">{tReg.walkinBadge[language]}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20 hover:shadow-md transition-all">

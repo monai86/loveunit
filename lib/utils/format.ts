@@ -60,26 +60,44 @@ export function nextRegistrationSequence(codes: string[], source: 'ONLINE' | 'WA
   return largest + 1;
 }
 
+function isBangkokWalkInActive(d: Date): boolean {
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      hour12: false,
+    }).formatToParts(d);
+
+    const year = parts.find((p) => p.type === 'year')?.value;
+    const month = parts.find((p) => p.type === 'month')?.value;
+    const day = parts.find((p) => p.type === 'day')?.value;
+    const hour = parseInt(parts.find((p) => p.type === 'hour')?.value || '0', 10);
+
+    const dateStr = `${year}-${month}-${day}`;
+    // Switches to Walk-in on event day (2026-09-16) at 08:00 AM Bangkok time onwards
+    return dateStr === '2026-09-16' && hour >= 8;
+  } catch {
+    const bangkokOffsetMs = 7 * 60 * 60 * 1000;
+    const bangkokTime = new Date(d.getTime() + bangkokOffsetMs + d.getTimezoneOffset() * 60 * 1000);
+    const y = bangkokTime.getFullYear();
+    const m = String(bangkokTime.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(bangkokTime.getDate()).padStart(2, '0');
+    const h = bangkokTime.getHours();
+    return `${y}-${m}-${dayStr}` === '2026-09-16' && h >= 8;
+  }
+}
+
 /**
- * Determines whether the given date (or current time) falls on the MUMT LoveUnit event day (2026-09-16 in Bangkok timezone).
+ * Determines whether the given date (or current time) falls on the MUMT LoveUnit event day
+ * and is active for Walk-in registration (2026-09-16 from 08:00 AM onwards in Bangkok timezone).
  * Supports simulation flags (NEXT_PUBLIC_FORCE_EVENT_DAY, query params, or localStorage) when called without an explicit date.
  */
 export function isEventDay(date?: Date): boolean {
   if (date) {
-    try {
-      const bangkokDateStr = new Intl.DateTimeFormat('en-CA', {
-        timeZone: 'Asia/Bangkok',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }).format(date);
-      return bangkokDateStr === '2026-09-16';
-    } catch {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}` === '2026-09-16';
-    }
+    return isBangkokWalkInActive(date);
   }
 
   if (typeof process !== 'undefined' && (process.env.NEXT_PUBLIC_FORCE_EVENT_DAY === 'true' || process.env.FORCE_EVENT_DAY === 'true')) {
@@ -94,21 +112,7 @@ export function isEventDay(date?: Date): boolean {
     } catch {}
   }
 
-  const now = new Date();
-  try {
-    const bangkokDateStr = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Asia/Bangkok',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(now);
-    return bangkokDateStr === '2026-09-16';
-  } catch {
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}` === '2026-09-16';
-  }
+  return isBangkokWalkInActive(new Date());
 }
 
 /**
