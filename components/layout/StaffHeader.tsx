@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { QrCode, UserPlus, BarChart3, LogOut, Loader2, LayoutDashboard, ClipboardList, ArrowLeft } from 'lucide-react';
+import { QrCode, UserPlus, BarChart3, LogOut, Loader2, LayoutDashboard, ClipboardList, ArrowLeft, Shield } from 'lucide-react';
 import { authClient } from '@/lib/auth/client';
 
 export function StaffHeader() {
@@ -34,8 +34,9 @@ export function StaffHeader() {
 
   const tabs = [
     { href: '/staff/overview', label: 'ภาพรวม & รายชื่อ', icon: LayoutDashboard },
+    { href: '/staff/analytics', label: 'สถิติเจาะลึก', icon: BarChart3 },
     { href: '/staff/walk-in', label: 'ลงทะเบียน Walk-in', icon: UserPlus },
-    ...(isAdmin ? [{ href: '/mt70', label: 'แดชบอร์ด Admin', icon: BarChart3 }] : []),
+    ...(isAdmin ? [{ href: '/mt70', label: 'แดชบอร์ด Admin', icon: Shield }] : []),
   ];
 
   return (
@@ -74,7 +75,7 @@ export function StaffHeader() {
         <nav className="hidden items-center gap-1.5 md:flex">
           {tabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = pathname === tab.href || (tab.href !== '/mt70' && tab.href !== '/admin' && pathname.startsWith(tab.href));
+            const isActive = pathname === tab.href || (tab.href !== '/mt70' && tab.href !== '/admin' && tab.href !== '/staff/overview' && pathname.startsWith(tab.href));
             return (
               <Link
                 key={tab.href}
@@ -108,7 +109,7 @@ export function StaffHeader() {
               href="/mt70"
               className="inline-flex md:hidden items-center gap-1 rounded-xl bg-gradient-to-r from-[var(--burgundy-800)] to-[var(--burgundy-600)] px-2.5 py-1.5 text-[11px] font-black text-white shadow-xs"
             >
-              <BarChart3 className="h-3.5 w-3.5 text-amber-300" />
+              <Shield className="h-3.5 w-3.5 text-amber-300" />
               <span>Admin</span>
             </Link>
           )}
@@ -126,12 +127,16 @@ export function StaffHeader() {
 
     </header>
     <nav 
-      className={`fixed inset-x-0 bottom-0 z-50 grid h-[calc(4.75rem+env(safe-area-inset-bottom))] ${isAdmin ? 'grid-cols-4' : 'grid-cols-3'} items-end border-t border-rose-100/80 bg-white/95 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(51,25,31,0.06)] backdrop-blur md:hidden`} 
+      className={`fixed inset-x-0 bottom-0 z-50 grid h-[calc(4.75rem+env(safe-area-inset-bottom))] ${isAdmin ? 'grid-cols-5' : 'grid-cols-4'} items-end border-t border-rose-100/80 bg-white/95 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(51,25,31,0.06)] backdrop-blur md:hidden`} 
       aria-label="เมนูหน้างาน"
     >
-      <Link href="/staff/overview" className={`flex h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${pathname.startsWith('/staff/overview') ? 'text-[var(--burgundy-700)] font-black' : 'text-[var(--muted)]'}`}>
+      <Link href="/staff/overview" className={`flex h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${pathname === '/staff/overview' ? 'text-[var(--burgundy-700)] font-black' : 'text-[var(--muted)]'}`}>
         <ClipboardList className="h-5 w-5" />
         <span>ภาพรวม</span>
+      </Link>
+      <Link href="/staff/analytics" className={`flex h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-bold ${pathname.startsWith('/staff/analytics') ? 'text-[var(--burgundy-700)] font-black' : 'text-[var(--muted)]'}`}>
+        <BarChart3 className="h-5 w-5" />
+        <span>สถิติ</span>
       </Link>
       <Link href="/staff/checkin" aria-label="เปิดหน้าสแกน QR" className="-mt-6 flex h-14 w-14 justify-self-center flex-col items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-rose-700 to-red-800 text-[10px] font-black text-white shadow-lg shadow-rose-900/30 active:scale-95 transition-transform">
         <QrCode className="h-5 w-5" />
@@ -143,7 +148,7 @@ export function StaffHeader() {
       </Link>
       {isAdmin && (
         <Link href="/mt70" className="flex h-12 flex-col items-center justify-center gap-0.5 text-[10px] font-black text-[var(--burgundy-700)]">
-          <BarChart3 className="h-5 w-5 text-[var(--burgundy-700)]" />
+          <Shield className="h-5 w-5 text-[var(--burgundy-700)]" />
           <span>Admin</span>
         </Link>
       )}

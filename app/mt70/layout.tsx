@@ -54,14 +54,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                   />
                 </div>
                 <div className="shrink-0 flex flex-col justify-center">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm font-bold text-[var(--ink)] tracking-tight whitespace-nowrap font-display">
-                      MUMT LoveUnit <span className="text-[var(--burgundy-700)] font-extrabold">ครั้งที่ 9</span>
-                    </span>
-                    <span className="inline-flex px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-amber-500/10 border border-amber-300/70 text-amber-900 text-[10px] font-black uppercase font-mono tracking-wider shadow-2xs">
-                      {isSuper ? '★ SUPER ADMIN' : 'ADMIN'}
-                    </span>
-                  </div>
+                  <span className="text-xs sm:text-sm font-bold text-[var(--ink)] tracking-tight whitespace-nowrap font-display">
+                    MUMT LoveUnit <span className="text-[var(--burgundy-700)] font-extrabold">ครั้งที่ 9</span>
+                  </span>
                   <span className="text-[11px] text-[var(--muted)] whitespace-nowrap block leading-tight font-medium mt-0.5">
                     ระบบบัญชาการและแดชบอร์ดแอดมิน
                   </span>

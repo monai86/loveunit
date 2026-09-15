@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CheckCircle2, ClipboardList, Loader2, RefreshCw, Search, Users, UserCheck } from 'lucide-react';
+import Link from 'next/link';
+import { CheckCircle2, ClipboardList, Loader2, RefreshCw, Search, Users, UserCheck, BarChart3 } from 'lucide-react';
 import { getRegistrationStatusBadge, pickField, formatBangkokTime, isRegistrationEligibleForSouvenir } from '@/lib/utils/format';
 import { summarizeStaffRegistrations } from '@/lib/staff/registration-summary';
 import type { RegistrationStatus } from '@/lib/types/database';
@@ -251,7 +252,14 @@ export default function StaffOverviewPage() {
               ดูรายชื่อ สถานะเช็กอิน และสถิติหน้างานแบบเรียลไทม์ {lastUpdated && <span className="text-xs text-[var(--muted)] font-mono">· อัปเดตล่าสุด {lastUpdated.toLocaleTimeString('th-TH')} น.</span>}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <Link
+              href="/staff/analytics"
+              className="inline-flex min-h-11 items-center justify-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl bg-gradient-to-br from-rose-50 to-white hover:bg-rose-100/70 border border-rose-200/90 text-xs font-bold text-[var(--burgundy-700)] shadow-2xs transition-all hover:shadow-xs hover:-translate-y-0.5 active:scale-95"
+            >
+              <BarChart3 className="h-4 w-4 text-[var(--burgundy-700)]" />
+              <span>สถิติเจาะลึก</span>
+            </Link>
             <div className="rounded-2xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-500/5 border border-emerald-300/80 px-4 py-2 text-right shadow-2xs">
               <span className="block text-xl font-black font-mono leading-none text-emerald-950">{summary.attendanceRatePercent}%</span>
               <span className="text-[11px] font-extrabold text-emerald-800">อัตรามาถึงงาน</span>

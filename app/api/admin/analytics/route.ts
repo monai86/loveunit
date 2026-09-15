@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getEventBySlug } from '@/services/event-service';
-import { requireReadOnlyAdmin } from '@/lib/auth/server';
+import { requireStaff } from '@/lib/auth/server';
 import { getErrorMessage } from '@/lib/utils/format';
 import { db } from '@/db';
 import { registrations, timeSlots } from '@/db/schema';
@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     try {
-      await requireReadOnlyAdmin();
+      await requireStaff();
     } catch (err: unknown) {
       const status = getErrorMessage(err) === 'UNAUTHORIZED' ? 401 : 403;
       return NextResponse.json({ success: false, message: 'ไม่มีสิทธิ์เข้าถึงสถิติเจาะลึก' }, { status });

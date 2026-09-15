@@ -80,6 +80,7 @@ interface AnalyticsData {
 
 interface AnalyticsDashboardProps {
   initialData: AnalyticsData | null;
+  backLink?: { href: string; label: string };
 }
 
 // ── Helpers ──
@@ -118,7 +119,10 @@ function formatThaiDate(dateStr: string): string {
 }
 
 // ── Component ──
-export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
+export function AnalyticsDashboard({
+  initialData,
+  backLink = { href: '/mt70', label: 'แดชบอร์ด' },
+}: AnalyticsDashboardProps) {
   const [data, setData] = useState<AnalyticsData | null>(initialData);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string>(() =>
@@ -199,11 +203,11 @@ export function AnalyticsDashboard({ initialData }: AnalyticsDashboardProps) {
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
             <Link
-              href="/mt70"
+              href={backLink.href}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50/80 border border-rose-200/60 text-xs font-bold text-[var(--burgundy-700)] hover:bg-rose-100 transition-all"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              <span>แดชบอร์ด</span>
+              <span>{backLink.label}</span>
             </Link>
             <span className="text-gray-300">›</span>
             <span className="text-xs font-bold text-[var(--burgundy-700)] bg-rose-50/60 px-2.5 py-0.5 rounded-full border border-rose-100">
