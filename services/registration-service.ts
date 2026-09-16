@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { registrations, timeSlots, verificationTokens } from '@/db/schema';
+import { registrations, timeSlots, verificationTokens, checkinEvents } from '@/db/schema';
 import { eq, and, ne, sql, ilike } from 'drizzle-orm';
 import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, generateAccessToken } from '@/lib/utils/format';
 import {
@@ -97,6 +97,11 @@ export async function registerDonorAtomic(input: {
       const token = generateQRToken();
       const accessToken = generateAccessToken();
 
+      const now = new Date();
+      const isWalkIn = source === 'WALK_IN';
+      const initialStatus = isWalkIn ? 'CHECKED_IN' : 'REGISTERED';
+      const initialCheckedInAt = isWalkIn ? now : null;
+
       const [newReg] = await tx
         .insert(registrations)
         .values({
@@ -115,11 +120,24 @@ export async function registerDonorAtomic(input: {
           donationExperience: input.donationExperience as DonationExperience,
           prChannel: input.prChannel || null,
           slotId: input.slotId || null,
-          status: 'REGISTERED',
+          status: initialStatus,
+          checkedInAt: initialCheckedInAt,
           source: source as RegistrationSource,
           privacyAccepted: true,
+          registeredAt: now,
+          updatedAt: now,
         })
         .returning();
+
+      if (isWalkIn) {
+        await tx.insert(checkinEvents).values({
+          eventId: input.eventId,
+          registrationId: newReg.id,
+          action: 'STATUS_CHANGE_CHECKED_IN',
+          performedBy: null,
+          metadata: { reason: 'WALK_IN_AUTO_CHECKIN' },
+        });
+      }
 
       return { success: true, registration: newReg };
     });

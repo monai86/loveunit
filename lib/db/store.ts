@@ -478,6 +478,11 @@ export async function registerDonorAtomic(input: {
     const code = generateRegistrationCode(nextSeq, source);
     const token = generateQRToken();
     const accessToken = generateAccessToken();
+    const isWalkIn = source === 'WALK_IN';
+    const initialStatus = isWalkIn ? 'CHECKED_IN' : 'REGISTERED';
+    const nowIso = new Date().toISOString();
+    const initialCheckedInAt = isWalkIn ? nowIso : null;
+
     const newReg: Registration = {
       id: nextMemoryId('reg'),
       event_id: input.eventId,
@@ -495,18 +500,31 @@ export async function registerDonorAtomic(input: {
       donation_experience: input.donationExperience,
       pr_channel: input.prChannel || null,
       slot_id: input.slotId || null,
-      status: 'REGISTERED',
+      status: initialStatus,
       source: source,
       privacy_accepted: true,
-      registered_at: new Date().toISOString(),
-      checked_in_at: null,
+      registered_at: nowIso,
+      checked_in_at: initialCheckedInAt,
       completed_at: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      created_at: nowIso,
+      updated_at: nowIso,
       time_slot: slot || null,
     };
 
     inMemoryRegistrations.push(newReg);
+
+    if (isWalkIn) {
+      inMemoryCheckinEvents.push({
+        id: nextMemoryId('chk'),
+        event_id: input.eventId,
+        registration_id: newReg.id,
+        action: 'STATUS_CHANGE_CHECKED_IN',
+        performed_by: 'WALK_IN_AUTO_CHECKIN',
+        metadata: null,
+        created_at: nowIso,
+      });
+    }
+
     return { success: true, registration: newReg };
   }
 

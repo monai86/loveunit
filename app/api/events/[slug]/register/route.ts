@@ -49,7 +49,7 @@ export async function POST(
     }
 
     const input = parseResult.data;
-    const isWalkIn = input.source === 'WALK_IN' || (isEventDayNow && !input.slotId);
+    const isWalkIn = input.source === 'WALK_IN' || isEventDayNow || !input.slotId;
     const source = isWalkIn ? 'WALK_IN' : (input.source || 'ONLINE');
 
     let targetSlotId = input.slotId;
