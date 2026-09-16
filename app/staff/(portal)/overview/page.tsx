@@ -367,6 +367,7 @@ export default function StaffOverviewPage() {
     { 
       label: 'ลงทะเบียนทั้งหมด', 
       value: summary.total, 
+      subLabel: breakdown.walkIns.total > 0 ? `รวม Walk-in ${breakdown.walkIns.total} คน` : 'รวมทุกช่องทาง',
       icon: Users, 
       bgGradient: 'bg-gradient-to-br from-rose-500/[0.09] via-white to-red-500/[0.04]',
       border: 'border-rose-200/80 hover:border-rose-300',
@@ -377,8 +378,9 @@ export default function StaffOverviewPage() {
       glow: 'bg-rose-500/10',
     },
     { 
-      label: 'รอเช็กอิน', 
+      label: 'รอเช็คอิน', 
       value: summary.waiting, 
+      subLabel: 'ยังไม่มาถึงหน้างาน',
       icon: ClipboardList, 
       bgGradient: 'bg-gradient-to-br from-amber-500/[0.09] via-white to-orange-500/[0.04]',
       border: 'border-amber-200/80 hover:border-amber-300',
@@ -389,8 +391,9 @@ export default function StaffOverviewPage() {
       glow: 'bg-amber-500/10',
     },
     { 
-      label: 'เช็กอินแล้ว', 
+      label: 'เช็คอินเข้างานแล้ว', 
       value: summary.checkedIn, 
+      subLabel: summary.inQueue > 0 ? `รอรับบริการ ${summary.inQueue} · สำเร็จ ${summary.completed}` : `คิดเป็น ${summary.attendanceRatePercent}% ของทั้งหมด`,
       icon: UserCheck, 
       bgGradient: 'bg-gradient-to-br from-blue-500/[0.09] via-white to-indigo-500/[0.04]',
       border: 'border-blue-200/80 hover:border-blue-300',
@@ -403,6 +406,7 @@ export default function StaffOverviewPage() {
     { 
       label: 'บริจาคสำเร็จ', 
       value: summary.completed, 
+      subLabel: `บริจาคสำเร็จ ${summary.completed} คน`,
       icon: CheckCircle2, 
       bgGradient: 'bg-gradient-to-br from-emerald-500/[0.09] via-white to-teal-500/[0.04]',
       border: 'border-emerald-200/80 hover:border-emerald-300',
@@ -464,7 +468,7 @@ export default function StaffOverviewPage() {
         </header>
 
         <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4" aria-label="สถิติผู้ลงทะเบียน">
-          {cards.map(({ label, value, icon: Icon, bgGradient, border, iconBg, textColor, labelColor, topLine, glow }) => (
+          {cards.map(({ label, value, subLabel, icon: Icon, bgGradient, border, iconBg, textColor, labelColor, topLine, glow }) => (
             <article 
               key={label} 
               className={`relative overflow-hidden p-4 sm:p-5 rounded-2xl border ${border} ${bgGradient} shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] space-y-3 flex flex-col justify-between transition-all duration-300 hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-0.5`}
@@ -482,7 +486,7 @@ export default function StaffOverviewPage() {
               </div>
               <div>
                 <p className={`text-2xl sm:text-4xl font-black font-mono tracking-tight ${textColor}`}>{value}</p>
-                <p className={`mt-1 text-[11px] font-bold ${labelColor} opacity-90`}>{label}</p>
+                <p className={`mt-1 text-[11px] font-bold ${labelColor} opacity-90 truncate`}>{subLabel || label}</p>
               </div>
             </article>
           ))}

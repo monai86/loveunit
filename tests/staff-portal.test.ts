@@ -15,10 +15,11 @@ const summary = summarizeStaffRegistrations([
 assert.deepEqual(summary, {
   total: 5,
   waiting: 1,
-  checkedIn: 2,
+  inQueue: 2,
+  checkedIn: 3,
   completed: 1,
   cancelled: 1,
   attendanceRatePercent: 60,
 });
 
-console.log('✓ Staff portal shows totals and each operational status correctly');
+console.log('✓ Staff portal shows totals and cumulative checked-in count correctly');
