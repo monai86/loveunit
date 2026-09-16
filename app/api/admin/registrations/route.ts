@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { getEventBySlug } from '@/services/event-service';
 import { deleteDonorRegistration, getAllRegistrations, updateDonorRegistration } from '@/services/admin-service';
 import { requireAdmin, requireReadOnlyAdmin } from '@/lib/auth/server';
-import { getErrorMessage } from '@/lib/utils/format';
+import { getErrorMessage, pickField } from '@/lib/utils/format';
 import { adminRegistrationUpdateSchema } from '@/lib/validation/schemas';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     try {
       await requireReadOnlyAdmin();
@@ -19,7 +19,38 @@ export async function GET() {
       return NextResponse.json({ success: false, message: 'ไม่พบกิจกรรม' }, { status: 404 });
     }
 
-    const registrations = await getAllRegistrations(event.id);
+    let registrations = await getAllRegistrations(event.id);
+
+    const { searchParams } = new URL(request.url);
+    const q = (searchParams.get('q') || '').trim().toLowerCase();
+    const qDigits = q.replace(/\D/g, '');
+
+    if (q) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      registrations = (registrations as any[]).filter((r) => {
+        const firstName = String(pickField(r, 'firstName', 'first_name') || '').toLowerCase();
+        const lastName = String(pickField(r, 'lastName', 'last_name') || '').toLowerCase();
+        const fullName = `${firstName} ${lastName}`.trim();
+        const code = String(pickField(r, 'registrationCode', 'registration_code') || '').toLowerCase();
+        const phone = String(pickField(r, 'phone', 'phone') || '').toLowerCase();
+        const phoneDigits = phone.replace(/\D/g, '');
+        const faculty = String(pickField(r, 'faculty', 'faculty') || '').toLowerCase();
+        const email = String(pickField(r, 'email', 'email') || '').toLowerCase();
+
+        const matchesText =
+          fullName.includes(q) ||
+          firstName.includes(q) ||
+          lastName.includes(q) ||
+          code.includes(q) ||
+          phone.includes(q) ||
+          faculty.includes(q) ||
+          email.includes(q);
+
+        const matchesPhone = qDigits.length >= 3 && phoneDigits.includes(qDigits);
+
+        return matchesText || matchesPhone;
+      });
+    }
 
     return NextResponse.json({
       success: true,

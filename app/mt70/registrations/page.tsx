@@ -1,19 +1,20 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { 
   Search, 
   FileSpreadsheet, 
-  ArrowLeft,
-  Loader2,
-  Eye,
-  Edit2,
-  Trash2,
-  Calendar,
-  Phone,
-  AlertTriangle,
-  RefreshCw
+  ArrowLeft, 
+  Loader2, 
+  Eye, 
+  Edit2, 
+  Trash2, 
+  Calendar, 
+  Phone, 
+  AlertTriangle, 
+  RefreshCw,
+  X
 } from 'lucide-react';
 import { Registration, TimeSlot } from '@/lib/types/database';
 import { formatTimeRange, formatBangkokTime, isWalkInRecord, getParticipantTypeLabel, getRegistrationStatusBadge } from '@/lib/utils/format';
@@ -74,7 +75,6 @@ export default function AdminRegistrationsPage() {
   const [loading, setLoading] = useState(true);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   
   // Filters
   const [filterType, setFilterType] = useState<string>('ALL');
@@ -101,16 +101,11 @@ export default function AdminRegistrationsPage() {
     }).catch(() => setCanManage(false));
   }, []);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => setDebouncedSearchQuery(searchQuery), 250);
-    return () => window.clearTimeout(timer);
-  }, [searchQuery]);
-
   const loadData = useCallback(async (isInitial = false) => {
     try {
       if (!isInitial) setIsRefreshing(true);
 
-      const res = await fetch(`/api/admin/registrations?q=${encodeURIComponent(debouncedSearchQuery)}`);
+      const res = await fetch('/api/admin/registrations');
       const data = await res.json();
       if (res.ok && data.success) {
         setRegistrations((data.registrations || []).map(normalizeRegistration));
@@ -132,7 +127,7 @@ export default function AdminRegistrationsPage() {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [debouncedSearchQuery]);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -165,13 +160,43 @@ export default function AdminRegistrationsPage() {
     };
   }, [loadData, editingRow, deletingRow]);
 
-  // Client-side filtering
-  const filteredList = registrations.filter(r => {
-    if (filterType !== 'ALL' && r.participant_type !== filterType) return false;
-    if (filterStatus !== 'ALL' && r.status !== filterStatus) return false;
-    if (filterExperience !== 'ALL' && r.donation_experience !== filterExperience) return false;
-    return true;
-  });
+  // Client-side filtering (0ms instant response)
+  const filteredList = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const qDigits = searchQuery.replace(/\D/g, '');
+
+    return registrations.filter((r) => {
+      if (filterType !== 'ALL' && r.participant_type !== filterType) return false;
+      if (filterStatus !== 'ALL' && r.status !== filterStatus) return false;
+      if (filterExperience !== 'ALL' && r.donation_experience !== filterExperience) return false;
+
+      if (q) {
+        const firstName = (r.first_name || '').toLowerCase();
+        const lastName = (r.last_name || '').toLowerCase();
+        const fullName = `${firstName} ${lastName}`.trim();
+        const code = (r.registration_code || '').toLowerCase();
+        const phone = (r.phone || '').toLowerCase();
+        const phoneDigits = (r.phone || '').replace(/\D/g, '');
+        const faculty = (r.faculty || '').toLowerCase();
+        const email = (r.email || '').toLowerCase();
+
+        const matchesText =
+          fullName.includes(q) ||
+          firstName.includes(q) ||
+          lastName.includes(q) ||
+          code.includes(q) ||
+          phone.includes(q) ||
+          faculty.includes(q) ||
+          email.includes(q);
+
+        const matchesPhone = qDigits.length >= 3 && phoneDigits.includes(qDigits);
+
+        if (!matchesText && !matchesPhone) return false;
+      }
+
+      return true;
+    });
+  }, [registrations, filterType, filterStatus, filterExperience, searchQuery]);
 
   const openEditModal = (row: Registration, trigger?: HTMLButtonElement) => {
     editTriggerRef.current = trigger || null;
@@ -353,8 +378,18 @@ export default function AdminRegistrationsPage() {
               placeholder="ค้นหารหัส, ชื่อ-นามสกุล, หรือเบอร์โทรศัพท์..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 bg-gray-50/60 pl-11 pr-3 py-2 text-xs font-medium text-[var(--ink)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/25 focus:border-rose-400 transition-all shadow-2xs"
+              className="w-full rounded-xl border border-gray-200 bg-gray-50/60 pl-11 pr-9 py-2 text-xs font-medium text-[var(--ink)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500/25 focus:border-rose-400 transition-all shadow-2xs"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-200/60 transition cursor-pointer"
+                title="ล้างคำค้นหา"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full md:w-auto">
