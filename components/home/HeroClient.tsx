@@ -56,8 +56,8 @@ export function HeroClient({
       ? 'Available at the post-donation station on event day (while supplies last).'
       : 'มอบให้ ณ จุดบริการหลังเสร็จสิ้นการบริจาคโลหิตในวันงาน (ของที่ระลึกมีจำนวนจำกัด)',
     ctaRegister: isEn
-      ? (eventDay ? 'Walk-in Registration' : 'Register to donate blood')
-      : (eventDay ? 'ลงทะเบียน Walk-in' : 'ลงทะเบียนบริจาคโลหิตออนไลน์'),
+      ? (eventDay ? 'Walk-in Closed (Thank you for your interest)' : 'Register to donate blood')
+      : (eventDay ? 'ปิดรับลงทะเบียน Walk-in แล้ว (ขอบคุณที่ให้ความสนใจ)' : 'ลงทะเบียนบริจาคโลหิตออนไลน์'),
     ctaPrepare: isEn ? 'Prepare before donating' : 'ดูการเตรียมตัวก่อนบริจาค',
   };
 
@@ -73,10 +73,11 @@ export function HeroClient({
               {eventDay ? (
                 <>
                   <span className="relative flex h-2 w-2 mr-0.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-300" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-300" />
                   </span>
-                  <span className="font-extrabold text-amber-200">{isEn ? 'Event Day · Walk-in Registration' : 'วันจัดกิจกรรม · ลงทะเบียน Walk-in'}</span>
+                  <span className="font-extrabold text-amber-200">
+                    {isEn ? 'Event Day · Walk-in Closed (Thank You)' : 'วันจัดกิจกรรม · ปิดรับ Walk-in แล้ว (ขอบคุณที่ให้ความสนใจ)'}
+                  </span>
                 </>
               ) : (
                 <>

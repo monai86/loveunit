@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle, User, ShieldCheck, MapPin, Building, Calendar, CheckCircle2, Edit3, Info } from 'lucide-react';
+import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle, User, ShieldCheck, MapPin, Building, Calendar, CheckCircle2, Edit3, Info, Search } from 'lucide-react';
 import { MAHIDOL_FACULTIES, ACADEMIC_YEARS } from '@/lib/constants/mahidol';
 import { formatTimeRange, formatBangkokTime, isEventDay } from '@/lib/utils/format';
 import { isTimeSlotSelectable } from '@/lib/registration/slot-availability';
@@ -298,12 +298,9 @@ function RegisterContent() {
         <div className="mb-8 pb-6 border-b border-[var(--line)]">
           <div className="flex items-center gap-2 mb-2.5">
             {isWalkInMode ? (
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white/70 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
-                </span>
-                <span className="font-bold tracking-normal">{tReg.walkinBadge[language]}</span>
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-100 text-[var(--burgundy-700)] border border-rose-200">
+                <span className="h-2 w-2 rounded-full bg-[var(--burgundy-700)]" />
+                <span className="font-bold tracking-normal">{isTh ? 'ปิดรับ Walk-in สำหรับวันนี้แล้ว' : 'Walk-in Registration Closed'}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20 hover:shadow-md transition-all">
@@ -317,15 +314,69 @@ function RegisterContent() {
             )}
           </div>
           <h1 className="text-2xl font-black text-[var(--ink)] sm:text-4xl font-display">
-            {isWalkInMode ? tReg.walkinTitle[language] : tReg.title[language]}
+            {isWalkInMode ? (isTh ? 'ปิดรับลงทะเบียน Walk-in สำหรับวันนี้แล้ว' : 'Walk-in Registration Closed') : tReg.title[language]}
           </h1>
           <p className="mt-2 text-sm text-[var(--muted)] font-medium leading-relaxed">
-            {isWalkInMode ? tReg.walkinSubtitle[language] : tReg.subtitle[language]}
+            {isWalkInMode ? (isTh ? 'เนื่องจากคิวผู้บริจาคโลหิตเต็มขีดความสามารถของหน่วยบริการแล้ว ทางโครงการขอขอบพระคุณทุกท่านเป็นอย่างยิ่ง' : 'Full capacity has been reached for today. Thank you for your interest and support.') : tReg.subtitle[language]}
           </p>
         </div>
 
-        {/* Asymmetric 2-Column Desktop Form Shell */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        {/* Asymmetric 2-Column Desktop Form Shell OR Closed Card */}
+        {isWalkInMode ? (
+          <div className="editorial-card p-6 sm:p-12 text-center max-w-2xl mx-auto space-y-6 shadow-sm border-rose-200 bg-gradient-to-b from-white via-rose-50/20 to-white">
+            <div className="mx-auto w-16 h-16 rounded-3xl bg-gradient-to-br from-rose-500 to-red-600 text-white flex items-center justify-center shadow-lg shadow-rose-600/25">
+              <Heart className="h-8 w-8 fill-white/20" />
+            </div>
+
+            <div className="space-y-2">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-rose-100 text-[var(--burgundy-700)] border border-rose-200 shadow-2xs">
+                ● {isTh ? 'ปิดรับลงทะเบียน Walk-in สำหรับวันนี้แล้ว' : 'Walk-in Registration Closed for Today'}
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--ink)] font-display tracking-tight pt-2">
+                {isTh ? 'ปิดรับลงทะเบียน Walk-in หน้างานแล้ว' : 'On-site Walk-in Registration Closed'}
+              </h2>
+              <p className="text-sm text-[var(--muted)] font-medium max-w-lg mx-auto leading-relaxed">
+                {isTh
+                  ? 'เนื่องจากมีผู้บริจาคโลหิตให้ความสนใจเข้าร่วมกิจกรรมอย่างล้นหลาม และคิวการให้บริการเต็มขีดความสามารถของหน่วยบริการโลหิตเคลื่อนที่แล้ว'
+                  : 'Due to overwhelming interest and the mobile blood donation unit reaching full operating capacity for today.'}
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-gradient-to-br from-rose-50/90 via-white to-red-50/50 border border-rose-200/90 p-5 sm:p-6 text-center space-y-2 shadow-2xs">
+              <p className="text-xs sm:text-sm font-bold text-[var(--burgundy-900)] leading-relaxed">
+                {isTh ? (
+                  <>
+                    โครงการ MUMT LoveUnit คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล<br className="hidden sm:block" />
+                    ขอขอบพระคุณทุกท่านเป็นอย่างยิ่งที่ให้ความสนใจและมาร่วมเป็นส่วนหนึ่งในการส่งต่อโอกาสและต่อชีวิตให้แก่ผู้ป่วยในวันนี้ 🙏❤️
+                  </>
+                ) : (
+                  <>
+                    The MUMT LoveUnit team, Faculty of Medical Technology, Mahidol University,<br className="hidden sm:block" />
+                    sincerely thanks everyone for your incredible support, kindness, and dedication to saving lives today 🙏❤️
+                  </>
+                )}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <Link
+                href="/lookup"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--burgundy-700)] to-[var(--burgundy-800)] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all active:scale-95"
+              >
+                <Search className="h-4 w-4" />
+                <span>{isTh ? 'ค้นหาตั๋ว / QR Code ผู้ลงทะเบียน' : 'Find My Registration Pass'}</span>
+              </Link>
+              <Link
+                href="/"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs sm:text-sm font-bold transition-all shadow-2xs"
+              >
+                <span>{isTh ? 'กลับสู่หน้าหลัก' : 'Back to Home'}</span>
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           
           {/* Left Progress Column (Desktop Only — 4 Cols) */}
           <div className="hidden md:block md:col-span-4 editorial-card p-6 space-y-6">
@@ -1117,6 +1168,8 @@ function RegisterContent() {
             <span>🔍 {isTh ? 'เคยลงทะเบียนแล้ว? ค้นหาตั๋ว/QR' : 'Already registered? Find pass'}</span>
           </Link>
         </div>
+        </>
+        )}
 
         {/* WAITLIST CONFIRMATION MODAL (for full slots) */}
         {waitlistSlot && (

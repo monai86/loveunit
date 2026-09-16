@@ -274,8 +274,8 @@ export function AdminDashboardClient({
             <span className="font-extrabold text-[var(--ink)]">สถิติภาพรวม</span>
             <span className="text-[10px] text-gray-400 font-normal">(อัปเดตอัตโนมัติ)</span>
           </h2>
-          <span className="text-[11px] font-bold text-emerald-800 bg-emerald-500/10 px-3 py-0.5 rounded-full border border-emerald-200/80 shadow-2xs">
-            ● เปิดรับลงทะเบียนต่อเนื่อง
+          <span className="text-[11px] font-bold text-rose-800 bg-rose-500/10 px-3 py-0.5 rounded-full border border-rose-200/80 shadow-2xs">
+            ● ปิดรับ Walk-in แล้ว (เต็มความจุ)
           </span>
         </div>
 

@@ -30,6 +30,14 @@ export async function POST(
     const isEventDayNow = isEventDay();
     const isWithinWindow = (now >= openAt && now <= closeAt) || isEventDayNow;
 
+    // Walk-in registration is closed for today per organizer announcement
+    if (isEventDayNow) {
+      return NextResponse.json({
+        success: false,
+        message: 'ขณะนี้ปิดรับลงทะเบียน Walk-in สำหรับวันนี้แล้ว เนื่องจากคิวเต็มความจุ ทางโครงการขอขอบพระคุณทุกท่านที่ให้ความสนใจเป็นอย่างยิ่ง',
+      }, { status: 400 });
+    }
+
     if (!isStatusOpen || !isWithinWindow) {
       return NextResponse.json({
         success: false,
