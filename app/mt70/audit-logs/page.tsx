@@ -138,8 +138,9 @@ export default function AdminAuditLogsPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-right font-mono text-[10px] text-gray-400">
-                    โดย: {log.performedBy || 'ระบบ'}
+                  <div className="text-right text-xs">
+                    <span className="text-gray-400 text-[10px] block">ผู้ดำเนินการ:</span>
+                    <strong className="font-bold text-[var(--ink)]">{log.performedBy || 'ระบบ'}</strong>
                   </div>
                 </div>
               </div>
@@ -170,7 +171,20 @@ export default function AdminAuditLogsPage() {
                     </td>
                     <td className="px-4 py-3 font-bold text-[var(--ink)] whitespace-nowrap">{log.donorName || '-'}</td>
                     <td className="px-4 py-3 font-mono text-[11px] text-gray-500 whitespace-nowrap">{log.registrationCode || '-'}</td>
-                    <td className="px-4 py-3 font-mono text-[11px] text-gray-500 whitespace-nowrap">{log.performedBy || 'ระบบ'}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {log.performedBy && !['ระบบ', 'ระบบ (Walk-in)', 'ผู้บริจาค (ตนเอง)'].includes(log.performedBy) ? (
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold shadow-2xs">
+                            {log.performedBy.slice(0, 1)}
+                          </span>
+                          <span className="font-bold text-[var(--ink)] text-xs">{log.performedBy}</span>
+                        </div>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-gray-100 text-gray-600">
+                          {log.performedBy || 'ระบบ'}
+                        </span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
