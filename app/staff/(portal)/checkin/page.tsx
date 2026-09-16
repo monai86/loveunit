@@ -20,7 +20,8 @@ import {
   Search,
   Phone,
   Clock,
-  Check
+  Check,
+  ScanLine
 } from 'lucide-react';
 import { formatTimeRange, formatBangkokTime, getRegistrationStatusBadge, isWalkInRecord, type SouvenirEligibilityDetails } from '@/lib/utils/format';
 import type { ParticipantType, RegistrationStatus } from '@/lib/types/database';
@@ -145,6 +146,8 @@ export default function StaffCheckinPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [searching, setSearching] = useState(false);
   const [registration, setRegistration] = useState<RegistrationDetail | null>(null);
+  // Guardrail: When a donor is checked in during this scan/lookup session, disable completing immediately.
+  const [justCheckedIn, setJustCheckedIn] = useState(false);
 
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; text: string } | null>(null);
 
@@ -155,6 +158,7 @@ export default function StaffCheckinPage() {
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchFilter, setSearchFilter] = useState<'ALL' | 'ONLINE' | 'WALK_IN'>('ALL');
   const [searchQuickCheckinId, setSearchQuickCheckinId] = useState<string | null>(null);
+  const [justCheckedInFromSearchIds, setJustCheckedInFromSearchIds] = useState<string[]>([]);
   const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -230,6 +234,7 @@ export default function StaffCheckinPage() {
           status: 'CHECKED_IN' as RegistrationStatus,
           checkedInAt: nowIso,
         };
+        setJustCheckedInFromSearchIds((prev) => [...prev, item.id]);
         setSearchResults((prev) => prev.map((r) => (r.id === item.id ? updated : r)));
         setMessage({ type: 'success', text: `เช็คอินสำเร็จ: คุณ${item.firstName} ${item.lastName}` });
       } else {
@@ -293,6 +298,7 @@ export default function StaffCheckinPage() {
       if (res.ok && data.success && Array.isArray(data.registrations) && data.registrations.length > 0) {
         const found = mapRegistration(data.registrations[0]);
         setRegistration(found);
+        setJustCheckedIn(false);
 
         if (found.status === 'REGISTERED') {
           if (soundEnabled) playAudioChime('success');
@@ -533,7 +539,10 @@ export default function StaffCheckinPage() {
         setRegistration(updatedReg);
 
         if (targetStatus === 'CHECKED_IN') {
+          setJustCheckedIn(true);
           if (soundEnabled) playAudioChime('success');
+        } else {
+          setJustCheckedIn(false);
         }
         if (targetStatus === 'COMPLETED') {
           if (soundEnabled) playAudioChime('souvenir');
@@ -565,6 +574,11 @@ export default function StaffCheckinPage() {
         checkedInAt: targetStatus === 'CHECKED_IN' ? nowIso : registration.checkedInAt,
         completedAt: targetStatus === 'COMPLETED' ? nowIso : registration.completedAt,
       });
+      if (targetStatus === 'CHECKED_IN') {
+        setJustCheckedIn(true);
+      } else {
+        setJustCheckedIn(false);
+      }
       if (soundEnabled) playAudioChime('success');
       setMessage({
         type: 'warning',
@@ -793,7 +807,10 @@ export default function StaffCheckinPage() {
 
               <button 
                 type="button" 
-                onClick={() => setRegistration(null)} 
+                onClick={() => {
+                  setRegistration(null);
+                  setJustCheckedIn(false);
+                }} 
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition active:scale-90 cursor-pointer"
                 aria-label="ปิดหน้าต่าง"
               >
@@ -846,7 +863,7 @@ export default function StaffCheckinPage() {
                 </button>
               )}
 
-              {registration.status === 'CHECKED_IN' && (
+              {registration.status === 'CHECKED_IN' && !justCheckedIn && (
                 <button
                   type="button"
                   disabled={actionLoading}
@@ -862,6 +879,19 @@ export default function StaffCheckinPage() {
                 </button>
               )}
 
+              {registration.status === 'CHECKED_IN' && justCheckedIn && (
+                <div className="rounded-2xl p-4 text-center space-y-2 border bg-emerald-50/90 border-emerald-200 text-emerald-950 animate-in fade-in-50 duration-200">
+                  <div className="flex items-center justify-center gap-2 font-black text-xs sm:text-sm text-emerald-900">
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-600 shrink-0" />
+                    <span>เช็คอินเข้างานสำเร็จเรียบร้อยแล้ว</span>
+                  </div>
+                  <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed font-medium">
+                    เมื่อผู้บริจาคบริจาคโลหิตเสร็จสิ้นแล้ว <br />
+                    <span className="font-bold text-slate-900">กรุณาสแกน QR Code หรือค้นหาชื่อใหม่อีกครั้ง</span> เพื่อบันทึกบริจาคสำเร็จ
+                  </p>
+                </div>
+              )}
+
               {registration.status === 'COMPLETED' && (
                 <div className="rounded-xl p-3.5 text-center flex items-center justify-center gap-2 font-black text-xs border bg-emerald-50 border-emerald-200 text-emerald-900">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
@@ -871,10 +901,18 @@ export default function StaffCheckinPage() {
 
               <button
                 type="button"
-                onClick={() => setRegistration(null)}
-                className="min-h-11 w-full rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-xs font-bold text-slate-700 transition cursor-pointer"
+                onClick={() => {
+                  setRegistration(null);
+                  setJustCheckedIn(false);
+                }}
+                className={`min-h-12 w-full rounded-xl active:scale-[0.99] text-xs font-bold transition cursor-pointer flex items-center justify-center gap-2 ${
+                  justCheckedIn
+                    ? 'bg-gradient-to-r from-slate-900 to-slate-800 hover:from-slate-800 hover:to-slate-700 text-white shadow-md font-black ring-2 ring-slate-900/10'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
               >
-                สแกนคนถัดไป (Scan Next)
+                <ScanLine className="h-4 w-4" />
+                <span>สแกนคนถัดไป (Scan Next)</span>
               </button>
             </div>
           </section>
@@ -1010,6 +1048,7 @@ export default function StaffCheckinPage() {
                         key={donor.id}
                         onClick={() => {
                           setRegistration(donor);
+                          setJustCheckedIn(justCheckedInFromSearchIds.includes(donor.id));
                           setSearchModalOpen(false);
                         }}
                         className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-white border border-slate-200 hover:border-[var(--burgundy-300)] hover:shadow-md transition cursor-pointer"
@@ -1078,18 +1117,26 @@ export default function StaffCheckinPage() {
                           )}
 
                           {isCheckedIn && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setRegistration(donor);
-                                setSearchModalOpen(false);
-                              }}
-                              className="min-h-9 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-xs font-black text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer"
-                            >
-                              <CheckCircle2 className="h-3.5 w-3.5" />
-                              <span>บันทึกบริจาค</span>
-                            </button>
+                            justCheckedInFromSearchIds.includes(donor.id) ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-xl">
+                                <Check className="h-3.5 w-3.5 text-emerald-600" />
+                                <span>เช็คอินแล้ว</span>
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setRegistration(donor);
+                                  setJustCheckedIn(false);
+                                  setSearchModalOpen(false);
+                                }}
+                                className="min-h-9 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-xs font-black text-white shadow-xs transition flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                <span>บันทึกบริจาค</span>
+                              </button>
+                            )
                           )}
 
                           {isCompleted && (
