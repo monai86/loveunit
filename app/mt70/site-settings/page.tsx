@@ -18,13 +18,10 @@ import {
   Loader2, 
   Layers, 
   Sliders, 
-  Sun, 
   Check, 
   Eye, 
   Megaphone,
   Heart,
-  HelpCircle,
-  ExternalLink,
   ShieldCheck,
   Zap
 } from 'lucide-react';
@@ -1061,7 +1058,7 @@ export default function AdminSiteSettingsPage() {
 
             {urgentBannerEnabled && (
               <div className="space-y-2 pt-2 animate-in fade-in">
-                <label className="text-xs font-bold text-gray-700">ข้อความประกาศด่วน (เช่น "รอบเช้าเต็มแล้ว เปิดรับ Walk-in หน้างาน")</label>
+                <label className="text-xs font-bold text-gray-700">ข้อความประกาศด่วน (เช่น &ldquo;รอบเช้าเต็มแล้ว เปิดรับ Walk-in หน้างาน&rdquo;)</label>
                 <input
                   type="text"
                   value={urgentBannerText}
