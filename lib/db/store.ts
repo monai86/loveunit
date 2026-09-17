@@ -971,3 +971,44 @@ export async function updateMemorySlotCapacity(slotId: string, capacity: number,
   }
   return null;
 }
+
+export async function createMemorySlot(data: {
+  event_id: string;
+  start_at: string;
+  end_at: string;
+  capacity: number;
+  is_active?: boolean;
+}): Promise<TimeSlot> {
+  const newSlot: TimeSlot = {
+    id: `ts-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    event_id: data.event_id,
+    start_at: data.start_at,
+    end_at: data.end_at,
+    capacity: data.capacity,
+    booked_count: 0,
+    is_active: data.is_active ?? true,
+    created_at: new Date().toISOString(),
+  };
+  defaultSlots.push(newSlot);
+  return { ...newSlot };
+}
+
+export async function updateMemorySlot(
+  slotId: string,
+  updates: Partial<Pick<TimeSlot, 'start_at' | 'end_at' | 'capacity' | 'is_active'>>
+): Promise<TimeSlot | null> {
+  const slot = defaultSlots.find(s => s.id === slotId);
+  if (!slot) return null;
+  if (updates.start_at !== undefined) slot.start_at = updates.start_at;
+  if (updates.end_at !== undefined) slot.end_at = updates.end_at;
+  if (updates.capacity !== undefined) slot.capacity = updates.capacity;
+  if (updates.is_active !== undefined) slot.is_active = updates.is_active;
+  return { ...slot };
+}
+
+export async function deleteMemorySlot(slotId: string): Promise<boolean> {
+  const idx = defaultSlots.findIndex(s => s.id === slotId);
+  if (idx === -1) return false;
+  defaultSlots.splice(idx, 1);
+  return true;
+}

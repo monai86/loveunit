@@ -1,5 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getEventBySlug, getTimeSlots, updateEventSettings, updateTimeSlotSettings } from '@/services/event-service';
+import { 
+  getEventBySlug, 
+  getAllTimeSlots, 
+  updateEventSettings, 
+  updateTimeSlotDetails,
+  createTimeSlot,
+  deleteTimeSlot
+} from '@/services/event-service';
 import { getAdminContentBlocks, updateEventContentBlock } from '@/services/content-service';
 import { recordAuditLog } from '@/services/admin-service';
 import { requireAdmin, requireReadOnlyAdmin } from '@/lib/auth/server';
@@ -19,10 +26,33 @@ export async function GET() {
       return NextResponse.json({ success: false, message: 'ไม่พบข้อมูลกิจกรรม' }, { status: 404 });
     }
 
-    const [slots, contentBlocks] = await Promise.all([
-      getTimeSlots(event.id),
+    const [rawSlots, contentBlocks] = await Promise.all([
+      getAllTimeSlots(event.id),
       getAdminContentBlocks(event.id),
     ]);
+
+    const slots = (rawSlots as Array<Record<string, unknown>>).map((s) => {
+      const startAtVal = s.startAt || s.start_at;
+      const endAtVal = s.endAt || s.end_at;
+      const startAt = startAtVal instanceof Date ? startAtVal.toISOString() : String(startAtVal || '');
+      const endAt = endAtVal instanceof Date ? endAtVal.toISOString() : String(endAtVal || '');
+      const isActive = s.isActive !== undefined ? Boolean(s.isActive) : (s.is_active !== undefined ? Boolean(s.is_active) : true);
+      const capacity = Number(s.capacity ?? 35);
+      const bookedCount = Number(s.bookedCount ?? s.booked_count ?? 0);
+      return {
+        id: String(s.id),
+        eventId: String(s.eventId || s.event_id || event.id),
+        startAt,
+        endAt,
+        start_at: startAt,
+        end_at: endAt,
+        capacity,
+        bookedCount,
+        booked_count: bookedCount,
+        isActive,
+        is_active: isActive,
+      };
+    });
 
     return NextResponse.json({
       success: true,
@@ -47,7 +77,7 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { eventUpdates, slotUpdates, contentBlockUpdates } = body;
+    const { eventUpdates, slotUpdates, createdSlots, deletedSlotIds, contentBlockUpdates } = body;
 
     let updatedEvent = null;
     if (eventUpdates) {
@@ -57,12 +87,41 @@ export async function PUT(request: Request) {
       }
     }
 
-    if (slotUpdates && Array.isArray(slotUpdates)) {
-      const currentEvent = await getEventBySlug('mumt-2026');
-      if (currentEvent) {
+    const currentEvent = await getEventBySlug('mumt-2026');
+    if (currentEvent) {
+      // 1. Delete slots if any
+      if (deletedSlotIds && Array.isArray(deletedSlotIds)) {
+        for (const slotId of deletedSlotIds) {
+          if (slotId && typeof slotId === 'string') {
+            await deleteTimeSlot(slotId, currentEvent.id);
+          }
+        }
+      }
+
+      // 2. Create new slots if any
+      if (createdSlots && Array.isArray(createdSlots)) {
+        for (const slot of createdSlots) {
+          if (slot.startAt && slot.endAt) {
+            await createTimeSlot(currentEvent.id, {
+              startAt: slot.startAt,
+              endAt: slot.endAt,
+              capacity: Number(slot.capacity || 35),
+              isActive: slot.isActive !== undefined ? Boolean(slot.isActive) : true,
+            });
+          }
+        }
+      }
+
+      // 3. Update existing slots
+      if (slotUpdates && Array.isArray(slotUpdates)) {
         for (const slot of slotUpdates) {
-          if (slot.id && typeof slot.capacity === 'number') {
-            await updateTimeSlotSettings(slot.id, currentEvent.id, slot.capacity, slot.isActive);
+          if (slot.id) {
+            await updateTimeSlotDetails(slot.id, currentEvent.id, {
+              startAt: slot.startAt || slot.start_at,
+              endAt: slot.endAt || slot.end_at,
+              capacity: typeof slot.capacity === 'number' ? slot.capacity : undefined,
+              isActive: slot.isActive !== undefined ? Boolean(slot.isActive) : (slot.is_active !== undefined ? Boolean(slot.is_active) : undefined),
+            });
           }
         }
       }

@@ -149,12 +149,87 @@ export async function updateEventSettings(slug: string, updates: {
   return { success: true, event: updated };
 }
 
+export async function getAllTimeSlots(eventId: string) {
+  if (db) {
+    try {
+      const result = await db
+        .select()
+        .from(timeSlots)
+        .where(eq(timeSlots.eventId, eventId))
+        .orderBy(asc(timeSlots.startAt));
+      if (result.length > 0) {
+        return result;
+      }
+    } catch (err) {
+      console.warn('DB query failed for getAllTimeSlots, fallback to default:', err);
+    }
+  }
+
+  return defaultSlots
+    .filter(s => s.event_id === eventId || !s.event_id)
+    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
+}
+
 export async function updateTimeSlotSettings(slotId: string, eventId: string, capacity: number, isActive?: boolean) {
+  return updateTimeSlotDetails(slotId, eventId, { capacity, isActive });
+}
+
+export async function createTimeSlot(eventId: string, data: {
+  startAt: string | Date;
+  endAt: string | Date;
+  capacity: number;
+  isActive?: boolean;
+}) {
+  cache.delete(`slots:${eventId}`);
+  const startAtDate = new Date(data.startAt);
+  const endAtDate = new Date(data.endAt);
+  const isActive = data.isActive ?? true;
+
+  if (db) {
+    try {
+      const [inserted] = await db
+        .insert(timeSlots)
+        .values({
+          eventId,
+          startAt: startAtDate,
+          endAt: endAtDate,
+          capacity: data.capacity,
+          bookedCount: 0,
+          isActive,
+        })
+        .returning();
+      if (inserted) return { success: true, slot: inserted };
+    } catch (err) {
+      console.warn('DB insert failed in createTimeSlot:', err);
+    }
+  }
+
+  const { createMemorySlot } = await import('@/lib/db/store');
+  const created = await createMemorySlot({
+    event_id: eventId,
+    start_at: startAtDate.toISOString(),
+    end_at: endAtDate.toISOString(),
+    capacity: data.capacity,
+    is_active: isActive,
+  });
+  return { success: true, slot: created };
+}
+
+export async function updateTimeSlotDetails(slotId: string, eventId: string, updates: {
+  startAt?: string | Date;
+  endAt?: string | Date;
+  capacity?: number;
+  isActive?: boolean;
+}) {
   cache.delete(`slots:${eventId}`);
   if (db) {
     try {
-      const updateData: Record<string, unknown> = { capacity };
-      if (isActive !== undefined) updateData.isActive = isActive;
+      const updateData: Record<string, unknown> = {};
+      if (updates.capacity !== undefined) updateData.capacity = updates.capacity;
+      if (updates.isActive !== undefined) updateData.isActive = updates.isActive;
+      if (updates.startAt !== undefined) updateData.startAt = new Date(updates.startAt);
+      if (updates.endAt !== undefined) updateData.endAt = new Date(updates.endAt);
+
       const [updated] = await db
         .update(timeSlots)
         .set(updateData)
@@ -162,11 +237,32 @@ export async function updateTimeSlotSettings(slotId: string, eventId: string, ca
         .returning();
       if (updated) return { success: true, slot: updated };
     } catch (err) {
-      console.warn('DB update failed in updateTimeSlotSettings:', err);
+      console.warn('DB update failed in updateTimeSlotDetails:', err);
     }
   }
 
-  const { updateMemorySlotCapacity } = await import('@/lib/db/store');
-  const updated = await updateMemorySlotCapacity(slotId, capacity, isActive);
+  const { updateMemorySlot } = await import('@/lib/db/store');
+  const updated = await updateMemorySlot(slotId, {
+    start_at: updates.startAt ? new Date(updates.startAt).toISOString() : undefined,
+    end_at: updates.endAt ? new Date(updates.endAt).toISOString() : undefined,
+    capacity: updates.capacity,
+    is_active: updates.isActive,
+  });
   return { success: true, slot: updated };
+}
+
+export async function deleteTimeSlot(slotId: string, eventId: string) {
+  cache.delete(`slots:${eventId}`);
+  if (db) {
+    try {
+      await db.delete(timeSlots).where(eq(timeSlots.id, slotId));
+      return { success: true };
+    } catch (err) {
+      console.warn('DB delete failed in deleteTimeSlot:', err);
+    }
+  }
+
+  const { deleteMemorySlot } = await import('@/lib/db/store');
+  await deleteMemorySlot(slotId);
+  return { success: true };
 }

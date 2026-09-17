@@ -23,7 +23,9 @@ import {
   Megaphone,
   Heart,
   ShieldCheck,
-  Zap
+  Zap,
+  Plus,
+  Trash2
 } from 'lucide-react';
 import { SiteTheme, EventContentBlock } from '@/lib/types/database';
 
@@ -44,11 +46,16 @@ interface EventData {
 
 interface SlotData {
   id: string;
-  start_at: string;
-  end_at: string;
+  start_at?: string;
+  end_at?: string;
+  startAt?: string;
+  endAt?: string;
   capacity: number;
   booked_count?: number;
+  bookedCount?: number;
   is_active: boolean;
+  isActive?: boolean;
+  isNew?: boolean;
 }
 
 // Curated Accessible Presets
@@ -170,6 +177,64 @@ function getContrastNotice(bgColorHex: string, textColorHex: string) {
   }
 }
 
+// Helpers for friendly Thai Date/Time conversion and ISO synchronization
+function parseIsoToDateTimeParts(isoString: string | undefined): { date: string; time: string } {
+  if (!isoString) return { date: '2026-09-16', time: '09:00' };
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return { date: '2026-09-16', time: '09:00' };
+    
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Bangkok',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const date = formatter.format(d);
+
+    const timeFormatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Bangkok',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const time = timeFormatter.format(d);
+    return { date, time };
+  } catch {
+    return { date: '2026-09-16', time: '09:00' };
+  }
+}
+
+function combineDateAndTimeToIso(dateStr: string, timeStr: string): string {
+  const d = dateStr || '2026-09-16';
+  const t = timeStr || '09:00';
+  return `${d}T${t}:00+07:00`;
+}
+
+function formatThaiDateTimeDisplay(isoString: string | undefined): string {
+  if (!isoString) return '-';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return '-';
+    return d.toLocaleDateString('th-TH', {
+      timeZone: 'Asia/Bangkok',
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }) + ' น.';
+  } catch {
+    return '-';
+  }
+}
+
+function updateSlotTime(isoString: string | undefined, newTimeHHmm: string, fallbackDateStr: string): string {
+  const baseDate = isoString ? parseIsoToDateTimeParts(isoString).date : fallbackDateStr;
+  return combineDateAndTimeToIso(baseDate, newTimeHHmm);
+}
+
 export default function AdminSiteSettingsPage() {
   const [activeTab, setActiveTab] = useState<'theme' | 'event' | 'content' | 'media'>('theme');
   const [loading, setLoading] = useState(true);
@@ -200,6 +265,7 @@ export default function AdminSiteSettingsPage() {
   // Event & Slots State
   const [eventData, setEventData] = useState<EventData | null>(null);
   const [slots, setSlots] = useState<SlotData[]>([]);
+  const [deletedSlotIds, setDeletedSlotIds] = useState<string[]>([]);
   const [contentBlocks, setContentBlocks] = useState<EventContentBlock[]>([]);
 
   // Emergency banner toggle & text
@@ -272,6 +338,128 @@ export default function AdminSiteSettingsPage() {
     return getContrastNotice(theme.primary_color, theme.button_text_color);
   }, [theme.primary_color, theme.button_text_color]);
 
+  // Time Slot Management Handlers
+  const handleAddSlot = () => {
+    const eventDate = eventData?.start_at ? parseIsoToDateTimeParts(eventData.start_at).date : '2026-09-16';
+    let nextStart = '14:00';
+    let nextEnd = '15:00';
+    if (slots.length > 0) {
+      const lastSlot = slots[slots.length - 1];
+      const lastEnd = parseIsoToDateTimeParts(lastSlot.endAt || lastSlot.end_at).time;
+      if (lastEnd) {
+        nextStart = lastEnd;
+        const [h, m] = lastEnd.split(':').map(Number);
+        const endH = ((h + 1) % 24).toString().padStart(2, '0');
+        nextEnd = `${endH}:${(m || 0).toString().padStart(2, '0')}`;
+      }
+    }
+
+    const newSlot: SlotData = {
+      id: `new-${Date.now()}`,
+      start_at: combineDateAndTimeToIso(eventDate, nextStart),
+      end_at: combineDateAndTimeToIso(eventDate, nextEnd),
+      startAt: combineDateAndTimeToIso(eventDate, nextStart),
+      endAt: combineDateAndTimeToIso(eventDate, nextEnd),
+      capacity: 35,
+      booked_count: 0,
+      bookedCount: 0,
+      is_active: true,
+      isActive: true,
+      isNew: true,
+    };
+
+    setSlots((prev) => [...prev, newSlot]);
+    setSuccessMsg('เพิ่มรอบเวลาใหม่แล้ว คุณสามารถปรับช่วงเวลาและความจุได้ทันที');
+    setTimeout(() => setSuccessMsg(null), 3000);
+  };
+
+  const handleResetStandardSlots = () => {
+    const eventDate = eventData?.start_at ? parseIsoToDateTimeParts(eventData.start_at).date : '2026-09-16';
+    const toDelete = slots.filter((s) => !s.isNew && !s.id.startsWith('new-')).map((s) => s.id);
+    if (toDelete.length > 0) {
+      setDeletedSlotIds((prev) => Array.from(new Set([...prev, ...toDelete])));
+    }
+
+    const standardSlots: SlotData[] = [
+      {
+        id: `new-${Date.now()}-1`,
+        start_at: combineDateAndTimeToIso(eventDate, '09:00'),
+        end_at: combineDateAndTimeToIso(eventDate, '11:00'),
+        startAt: combineDateAndTimeToIso(eventDate, '09:00'),
+        endAt: combineDateAndTimeToIso(eventDate, '11:00'),
+        capacity: 9999,
+        booked_count: 0,
+        bookedCount: 0,
+        is_active: true,
+        isActive: true,
+        isNew: true,
+      },
+      {
+        id: `new-${Date.now()}-2`,
+        start_at: combineDateAndTimeToIso(eventDate, '11:00'),
+        end_at: combineDateAndTimeToIso(eventDate, '13:00'),
+        startAt: combineDateAndTimeToIso(eventDate, '11:00'),
+        endAt: combineDateAndTimeToIso(eventDate, '13:00'),
+        capacity: 9999,
+        booked_count: 0,
+        bookedCount: 0,
+        is_active: true,
+        isActive: true,
+        isNew: true,
+      },
+      {
+        id: `new-${Date.now()}-3`,
+        start_at: combineDateAndTimeToIso(eventDate, '13:00'),
+        end_at: combineDateAndTimeToIso(eventDate, '14:00'),
+        startAt: combineDateAndTimeToIso(eventDate, '13:00'),
+        endAt: combineDateAndTimeToIso(eventDate, '14:00'),
+        capacity: 9999,
+        booked_count: 0,
+        bookedCount: 0,
+        is_active: true,
+        isActive: true,
+        isNew: true,
+      },
+    ];
+    setSlots(standardSlots);
+    setSuccessMsg('รีเซ็ตรอบเวลาเป็น 3 รอบมาตรฐานของงานเรียบร้อยแล้ว (อย่าลืมกดบันทึก)');
+    setTimeout(() => setSuccessMsg(null), 3000);
+  };
+
+  const handleDeleteSlot = (index: number) => {
+    const target = slots[index];
+    const booked = target.bookedCount ?? target.booked_count ?? 0;
+    if (booked > 0) {
+      const confirm = window.confirm(
+        `รอบเวลานี้มีผู้ลงทะเบียนแล้ว ${booked} คน หากลบรอบนี้ อาจทำให้ข้อมูลประวัติของผู้บริจาคไม่ตรงกับรอบเวลา\n\nแนะนำให้กด "ปิดรอบนี้" แทนการลบ\n\nคุณแน่ใจหรือไม่ว่าต้องการลบอย่างถาวร?`
+      );
+      if (!confirm) return;
+    }
+
+    if (!target.isNew && !target.id.startsWith('new-')) {
+      setDeletedSlotIds((prev) => [...prev, target.id]);
+    }
+    setSlots((prev) => prev.filter((_, idx) => idx !== index));
+    setSuccessMsg('ลบรอบเวลาแล้ว (กดบันทึกเพื่อยืนยันการเปลี่ยนแปลง)');
+    setTimeout(() => setSuccessMsg(null), 3000);
+  };
+
+  const handleUpdateSlotTime = (index: number, type: 'start' | 'end', timeHHmm: string) => {
+    const eventDate = eventData?.start_at ? parseIsoToDateTimeParts(eventData.start_at).date : '2026-09-16';
+    setSlots((prev) =>
+      prev.map((s, idx) => {
+        if (idx !== index) return s;
+        const currentIso = type === 'start' ? (s.startAt || s.start_at) : (s.endAt || s.end_at);
+        const newIso = updateSlotTime(currentIso, timeHHmm, eventDate);
+        if (type === 'start') {
+          return { ...s, startAt: newIso, start_at: newIso };
+        } else {
+          return { ...s, endAt: newIso, end_at: newIso };
+        }
+      })
+    );
+  };
+
   // Save changes
   const handleSaveAll = async () => {
     setSaving(true);
@@ -289,7 +477,9 @@ export default function AdminSiteSettingsPage() {
       // 2. Prepare Site updates
       const sitePayload: {
         eventUpdates?: Record<string, unknown>;
-        slotUpdates?: Array<{ id: string; capacity: number; isActive: boolean }>;
+        slotUpdates?: Array<{ id: string; startAt: string; endAt: string; capacity: number; isActive: boolean }>;
+        createdSlots?: Array<{ startAt: string; endAt: string; capacity: number; isActive: boolean }>;
+        deletedSlotIds?: string[];
         contentBlockUpdates?: Array<{ id: string; title: string; description: string; isVisible: boolean }>;
       } = {};
 
@@ -308,12 +498,23 @@ export default function AdminSiteSettingsPage() {
         };
       }
 
-      if (slots.length > 0) {
-        sitePayload.slotUpdates = slots.map((s) => ({
-          id: s.id,
-          capacity: Number(s.capacity) || 35,
-          isActive: s.is_active,
-        }));
+      if (slots.length > 0 || deletedSlotIds.length > 0) {
+        sitePayload.deletedSlotIds = deletedSlotIds;
+        sitePayload.createdSlots = [];
+        sitePayload.slotUpdates = [];
+
+        for (const s of slots) {
+          const startAt = s.startAt || s.start_at || '';
+          const endAt = s.endAt || s.end_at || '';
+          const capacity = Number(s.capacity) || 35;
+          const isActive = s.isActive !== undefined ? Boolean(s.isActive) : Boolean(s.is_active);
+
+          if (s.isNew || s.id.startsWith('new-')) {
+            sitePayload.createdSlots.push({ startAt, endAt, capacity, isActive });
+          } else {
+            sitePayload.slotUpdates.push({ id: s.id, startAt, endAt, capacity, isActive });
+          }
+        }
       }
 
       // Update urgent banner block if found
@@ -338,7 +539,14 @@ export default function AdminSiteSettingsPage() {
       const [themeRes, siteRes] = await Promise.all([themePromise, sitePromise]);
 
       if (themeRes.ok && siteRes.ok) {
-        setSuccessMsg('🎉 บันทึกการตั้งค่าเว็บไซต์และธีมเรียบร้อยแล้ว ข้อมูลหน้าบ้านอัปเดตทันที!');
+        setSuccessMsg('🎉 บันทึกการตั้งค่าเว็บไซต์ กำหนดการ และรอบเวลาเรียบร้อยแล้ว ข้อมูลหน้าบ้านอัปเดตทันที!');
+        setDeletedSlotIds([]);
+        // Re-fetch site settings to sync persistent DB slot IDs
+        const refreshRes = await fetch('/api/admin/site-settings');
+        if (refreshRes.ok) {
+          const sData = await refreshRes.json();
+          if (sData.slots) setSlots(sData.slots);
+        }
         setTimeout(() => setSuccessMsg(null), 5000);
       } else {
         const errorJson = await (themeRes.ok ? siteRes.json() : themeRes.json());
@@ -912,26 +1120,95 @@ export default function AdminSiteSettingsPage() {
                 </select>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-700">เวลาเริ่มจัดกิจกรรม (Start Date/Time)</label>
-                <input
-                  type="text"
-                  value={eventData.start_at}
-                  onChange={(e) => setEventData({ ...eventData, start_at: e.target.value })}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-mono text-gray-800"
-                  placeholder="2026-09-16T09:00:00+07:00"
-                />
+              {/* Event Start Date & Time with Interactive Calendar & Time Picker */}
+              <div className="space-y-2 rounded-2xl bg-gray-50/80 p-4 border border-gray-200/80 shadow-2xs">
+                <div className="flex flex-wrap items-center justify-between gap-1.5">
+                  <label className="text-xs font-extrabold text-gray-800 flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4 text-[var(--burgundy-700)]" />
+                    เวลาเริ่มจัดกิจกรรม (Start Date & Time)
+                  </label>
+                  <span className="text-[11px] font-bold text-[var(--burgundy-700)] bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200/60">
+                    {formatThaiDateTimeDisplay(eventData.start_at)}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <span className="text-[11px] font-bold text-gray-600 block mb-1">📅 เลือกวันที่</span>
+                    <input
+                      type="date"
+                      value={parseIsoToDateTimeParts(eventData.start_at).date}
+                      onChange={(e) => {
+                        const parts = parseIsoToDateTimeParts(eventData.start_at);
+                        setEventData({ ...eventData, start_at: combineDateAndTimeToIso(e.target.value, parts.time) });
+                      }}
+                      className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-900 shadow-2xs focus:border-[var(--burgundy-700)] focus:ring-1 focus:ring-[var(--burgundy-700)]"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-gray-600 block mb-1">⏰ เลือกเวลา</span>
+                    <input
+                      type="time"
+                      value={parseIsoToDateTimeParts(eventData.start_at).time}
+                      onChange={(e) => {
+                        const parts = parseIsoToDateTimeParts(eventData.start_at);
+                        setEventData({ ...eventData, start_at: combineDateAndTimeToIso(parts.date, e.target.value) });
+                      }}
+                      className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-900 shadow-2xs focus:border-[var(--burgundy-700)] focus:ring-1 focus:ring-[var(--burgundy-700)]"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-700">เวลาสิ้นสุดกิจกรรม (End Date/Time)</label>
-                <input
-                  type="text"
-                  value={eventData.end_at}
-                  onChange={(e) => setEventData({ ...eventData, end_at: e.target.value })}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-xs font-mono text-gray-800"
-                  placeholder="2026-09-16T14:00:00+07:00"
-                />
+              {/* Event End Date & Time with Interactive Calendar & Time Picker */}
+              <div className="space-y-2 rounded-2xl bg-gray-50/80 p-4 border border-gray-200/80 shadow-2xs">
+                <div className="flex flex-wrap items-center justify-between gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs font-extrabold text-gray-800 flex items-center gap-1.5">
+                      <Clock className="h-4 w-4 text-[var(--burgundy-700)]" />
+                      เวลาสิ้นสุดกิจกรรม (End Date & Time)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const startParts = parseIsoToDateTimeParts(eventData.start_at);
+                        const endParts = parseIsoToDateTimeParts(eventData.end_at);
+                        setEventData({ ...eventData, end_at: combineDateAndTimeToIso(startParts.date, endParts.time) });
+                      }}
+                      className="text-[10px] font-bold text-[var(--burgundy-700)] hover:underline"
+                    >
+                      (ใช้วันเดียวกับวันเริ่ม)
+                    </button>
+                  </div>
+                  <span className="text-[11px] font-bold text-[var(--burgundy-700)] bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200/60">
+                    {formatThaiDateTimeDisplay(eventData.end_at)}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <span className="text-[11px] font-bold text-gray-600 block mb-1">📅 เลือกวันที่</span>
+                    <input
+                      type="date"
+                      value={parseIsoToDateTimeParts(eventData.end_at).date}
+                      onChange={(e) => {
+                        const parts = parseIsoToDateTimeParts(eventData.end_at);
+                        setEventData({ ...eventData, end_at: combineDateAndTimeToIso(e.target.value, parts.time) });
+                      }}
+                      className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-900 shadow-2xs focus:border-[var(--burgundy-700)] focus:ring-1 focus:ring-[var(--burgundy-700)]"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold text-gray-600 block mb-1">⏰ เลือกเวลา</span>
+                    <input
+                      type="time"
+                      value={parseIsoToDateTimeParts(eventData.end_at).time}
+                      onChange={(e) => {
+                        const parts = parseIsoToDateTimeParts(eventData.end_at);
+                        setEventData({ ...eventData, end_at: combineDateAndTimeToIso(parts.date, e.target.value) });
+                      }}
+                      className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-900 shadow-2xs focus:border-[var(--burgundy-700)] focus:ring-1 focus:ring-[var(--burgundy-700)]"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-1.5 sm:col-span-2">
@@ -956,72 +1233,255 @@ export default function AdminSiteSettingsPage() {
             </div>
           </div>
 
-          {/* Time Slots & Capacities */}
-          <div className="rounded-2xl border border-rose-100 bg-white p-6 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
+          {/* Time Slots & Capacities - Dynamic Multi-Slot Real-Time Manager */}
+          <div className="rounded-2xl border border-rose-100 bg-white p-6 shadow-xs space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-4">
               <div>
                 <h3 className="text-base font-extrabold text-gray-900 flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-[var(--burgundy-700)]" />
+                  <Clock className="h-5 w-5 text-[var(--burgundy-700)]" />
                   จัดการรอบเวลาและโควตาที่นั่ง (Time Slots & Capacity)
                 </h3>
                 <p className="text-xs text-gray-500 mt-0.5">
-                  ปรับจำนวนความจุผู้บริจาคต่อรอบเวลา หรือปิดรับเฉพาะบางรอบ
+                  เพิ่ม/ลดรอบเวลา ปรับช่วงเวลา และกำหนดโควตาผู้บริจาคต่อรอบ โดยส่งผลไปยังหน้าลงทะเบียนของผู้ใช้งานทันทีแบบ Realtime
                 </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleResetStandardSlots}
+                  className="px-3 py-1.5 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold transition-all shadow-2xs"
+                >
+                  ⚡ รีเซ็ต 3 รอบมาตรฐาน
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddSlot}
+                  className="px-3.5 py-1.5 rounded-xl bg-[var(--burgundy-700)] text-white hover:bg-[var(--burgundy-800)] text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  เพิ่มรอบเวลาใหม่
+                </button>
               </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-gray-700">
-                <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50/70 text-gray-500 font-bold uppercase">
-                    <th className="px-4 py-3">ช่วงเวลา</th>
-                    <th className="px-4 py-3">ความจุ (คน)</th>
-                    <th className="px-4 py-3">สถานะเปิดรับ</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {slots.map((slot, index) => {
-                    const startLabel = slot.start_at ? new Date(slot.start_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : '';
-                    const endLabel = slot.end_at ? new Date(slot.end_at).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : '';
-                    return (
-                      <tr key={slot.id || index} className="hover:bg-rose-50/30">
-                        <td className="px-4 py-3 font-bold text-gray-900">
-                          {startLabel} - {endLabel} น.
-                        </td>
-                        <td className="px-4 py-3">
-                          <input
-                            type="number"
-                            min="1"
-                            max="200"
-                            value={slot.capacity}
-                            onChange={(e) => {
-                              const val = Number(e.target.value);
-                              setSlots((prev) => prev.map((s, idx) => idx === index ? { ...s, capacity: val } : s));
-                            }}
-                            className="w-24 rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-bold text-gray-800"
-                          />
-                        </td>
-                        <td className="px-4 py-3">
+            {slots.length === 0 ? (
+              <div className="text-center py-10 rounded-2xl bg-gray-50 border border-dashed border-gray-200">
+                <p className="text-xs font-bold text-gray-500">ยังไม่มีการกำหนดรอบเวลา</p>
+                <button
+                  type="button"
+                  onClick={handleAddSlot}
+                  className="mt-3 px-4 py-2 rounded-xl bg-[var(--burgundy-700)] text-white text-xs font-bold inline-flex items-center gap-1.5"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  เพิ่มรอบแรก
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {slots.map((slot, index) => {
+                  const startTime = parseIsoToDateTimeParts(slot.startAt || slot.start_at).time;
+                  const endTime = parseIsoToDateTimeParts(slot.endAt || slot.end_at).time;
+                  const isActive = slot.isActive !== undefined ? slot.isActive : slot.is_active;
+                  const booked = slot.bookedCount ?? slot.booked_count ?? 0;
+                  const capacity = slot.capacity ?? 35;
+
+                  return (
+                    <div
+                      key={slot.id || index}
+                      className={`p-4 rounded-2xl border transition-all ${
+                        isActive
+                          ? 'bg-white border-rose-100 shadow-xs hover:border-rose-300'
+                          : 'bg-gray-50/70 border-gray-200 opacity-75'
+                      }`}
+                    >
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        {/* Slot Time Range */}
+                        <div className="space-y-1.5 min-w-[280px]">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-rose-100 text-[var(--burgundy-700)] text-[11px] font-extrabold">
+                              {index + 1}
+                            </span>
+                            <span className="text-xs font-extrabold text-gray-900">
+                              ช่วงเวลา: {startTime} – {endTime} น.
+                            </span>
+                            {slot.isNew && (
+                              <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
+                                รอบใหม่
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 pt-0.5">
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] font-bold text-gray-400">เริ่ม</span>
+                              <input
+                                type="time"
+                                value={startTime}
+                                onChange={(e) => handleUpdateSlotTime(index, 'start', e.target.value)}
+                                className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs font-bold text-gray-800 focus:border-[var(--burgundy-700)] focus:ring-1 focus:ring-[var(--burgundy-700)]"
+                              />
+                            </div>
+                            <span className="text-gray-400 text-xs font-bold">–</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] font-bold text-gray-400">ถึง</span>
+                              <input
+                                type="time"
+                                value={endTime}
+                                onChange={(e) => handleUpdateSlotTime(index, 'end', e.target.value)}
+                                className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs font-bold text-gray-800 focus:border-[var(--burgundy-700)] focus:ring-1 focus:ring-[var(--burgundy-700)]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Capacity & Stepper */}
+                        <div className="space-y-1.5">
+                          <span className="text-[11px] font-bold text-gray-500 block">
+                            ความจุผู้บริจาค (คน)
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="inline-flex items-center rounded-xl border border-gray-300 bg-white shadow-2xs overflow-hidden">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const cur = Number(slot.capacity) || 35;
+                                  setSlots((prev) =>
+                                    prev.map((s, idx) =>
+                                      idx === index ? { ...s, capacity: Math.max(1, cur - 5) } : s
+                                    )
+                                  );
+                                }}
+                                className="px-2.5 py-1 text-gray-500 hover:bg-gray-100 text-xs font-bold transition-all"
+                              >
+                                -
+                              </button>
+                              <input
+                                type="number"
+                                min="1"
+                                max="9999"
+                                value={slot.capacity}
+                                onChange={(e) => {
+                                  const val = Math.max(1, Number(e.target.value));
+                                  setSlots((prev) =>
+                                    prev.map((s, idx) => (idx === index ? { ...s, capacity: val } : s))
+                                  );
+                                }}
+                                className="w-16 text-center text-xs font-extrabold text-gray-900 border-x border-gray-200 py-1 focus:outline-hidden"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const cur = Number(slot.capacity) || 35;
+                                  setSlots((prev) =>
+                                    prev.map((s, idx) =>
+                                      idx === index ? { ...s, capacity: cur + 5 } : s
+                                    )
+                                  );
+                                }}
+                                className="px-2.5 py-1 text-gray-500 hover:bg-gray-100 text-xs font-bold transition-all"
+                              >
+                                +
+                              </button>
+                            </div>
+
+                            {/* Quick capacity presets */}
+                            <div className="hidden sm:flex items-center gap-1">
+                              {[35, 50, 100].map((capVal) => (
+                                <button
+                                  key={capVal}
+                                  type="button"
+                                  onClick={() =>
+                                    setSlots((prev) =>
+                                      prev.map((s, idx) =>
+                                        idx === index ? { ...s, capacity: capVal } : s
+                                      )
+                                    )
+                                  }
+                                  className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all ${
+                                    slot.capacity === capVal
+                                      ? 'bg-rose-50 border-[var(--burgundy-700)] text-[var(--burgundy-700)]'
+                                      : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                  }`}
+                                >
+                                  {capVal}
+                                </button>
+                              ))}
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSlots((prev) =>
+                                    prev.map((s, idx) =>
+                                      idx === index ? { ...s, capacity: 9999 } : s
+                                    )
+                                  )
+                                }
+                                className={`px-2 py-0.5 rounded-lg text-[10px] font-bold border transition-all ${
+                                  slot.capacity === 9999
+                                    ? 'bg-rose-50 border-[var(--burgundy-700)] text-[var(--burgundy-700)]'
+                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                }`}
+                              >
+                                ไม่จำกัด
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Bookings & Progress */}
+                        <div className="space-y-1 min-w-[140px]">
+                          <span className="text-[11px] font-bold text-gray-500 block">
+                            ยอดลงทะเบียนปัจจุบัน
+                          </span>
+                          <div className="text-xs font-extrabold text-gray-800">
+                            {booked} / {capacity >= 9999 ? 'ไม่จำกัด' : `${capacity} คน`}
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                            <div
+                              className="bg-[var(--burgundy-700)] h-1.5 rounded-full transition-all"
+                              style={{
+                                width: `${Math.min(100, capacity > 0 ? (booked / capacity) * 100 : 0)}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Status Toggle & Delete */}
+                        <div className="flex items-center gap-2 pt-2 lg:pt-0">
                           <button
                             type="button"
                             onClick={() => {
-                              setSlots((prev) => prev.map((s, idx) => idx === index ? { ...s, is_active: !s.is_active } : s));
+                              setSlots((prev) =>
+                                prev.map((s, idx) => {
+                                  if (idx !== index) return s;
+                                  const currentActive = s.isActive !== undefined ? s.isActive : s.is_active;
+                                  return { ...s, is_active: !currentActive, isActive: !currentActive };
+                                })
+                              );
                             }}
-                            className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all ${
-                              slot.is_active
-                                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 ${
+                              isActive
+                                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-200'
+                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200'
                             }`}
                           >
-                            {slot.is_active ? 'เปิดรับ' : 'ปิดรอบนี้'}
+                            <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                            {isActive ? 'เปิดรับ' : 'ปิดรอบนี้'}
                           </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteSlot(index)}
+                            className="p-1.5 rounded-xl text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-all"
+                            title="ลบรอบเวลานี้"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
