@@ -25,7 +25,8 @@ import {
   ShieldCheck,
   Zap,
   Plus,
-  Trash2
+  Trash2,
+  QrCode
 } from 'lucide-react';
 import { SiteTheme, EventContentBlock } from '@/lib/types/database';
 
@@ -262,6 +263,9 @@ export default function AdminSiteSettingsPage() {
     button_gradient_angle: 90,
   });
 
+  // Interactive Live Preview active screen tab
+  const [previewScreen, setPreviewScreen] = useState<'home' | 'register' | 'pass'>('home');
+
   // Event & Slots State
   const [eventData, setEventData] = useState<EventData | null>(null);
   const [slots, setSlots] = useState<SlotData[]>([]);
@@ -313,7 +317,8 @@ export default function AdminSiteSettingsPage() {
   // Broadcast preview updates to the ThemeInjector on this tab
   const updateThemeField = (updates: Partial<SiteTheme>) => {
     setTheme((prev) => {
-      const next = { ...prev, ...updates };
+      const nextPresetName = updates.preset_name !== undefined ? updates.preset_name : 'custom';
+      const next = { ...prev, ...updates, preset_name: nextPresetName };
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('site-theme-preview', { detail: next }));
       }
@@ -322,14 +327,14 @@ export default function AdminSiteSettingsPage() {
   };
 
   const applyPreset = (preset: typeof THEME_PRESETS[0]) => {
-    updateThemeField(preset.theme);
+    updateThemeField({ ...preset.theme, preset_name: preset.id });
     setSuccessMsg(`เลือกใช้ชุดสี "${preset.name}" แล้ว`);
     setTimeout(() => setSuccessMsg(null), 3000);
   };
 
   const resetThemeToDefault = () => {
     const defaultPreset = THEME_PRESETS[0];
-    updateThemeField(defaultPreset.theme);
+    updateThemeField({ ...defaultPreset.theme, preset_name: 'default' });
     setSuccessMsg('กู้คืนธีมเป็น "สไตล์ทางการปัจจุบัน (Default MUMT 2026)" เรียบร้อยแล้ว');
     setTimeout(() => setSuccessMsg(null), 3000);
   };
@@ -872,104 +877,212 @@ export default function AdminSiteSettingsPage() {
             </div>
 
             {/* 3. Gradient Controls */}
-            <div className="rounded-2xl border border-rose-100 bg-white p-5 sm:p-6 shadow-xs space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-extrabold text-gray-900 flex items-center gap-2">
-                    <Layers className="h-4 w-4 text-[var(--burgundy-700)]" />
-                    การไล่เฉดสี (Gradient Controls)
-                  </h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    เปิด/ปิด และปรับองศาการไล่เฉดสีของ Hero Banner และปุ่มกด
-                  </p>
-                </div>
-
-                {/* Toggle Hero Gradient */}
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={theme.hero_gradient_enabled}
-                    onChange={(e) => updateThemeField({ hero_gradient_enabled: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--burgundy-700)]"></div>
-                  <span className="ml-2 text-xs font-bold text-gray-700">เปิด Gradient</span>
-                </label>
+            <div className="rounded-2xl border border-rose-100 bg-white p-5 sm:p-6 shadow-xs space-y-6">
+              <div>
+                <h3 className="text-base font-extrabold text-gray-900 flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-[var(--burgundy-700)]" />
+                  การไล่เฉดสี (Gradient Controls)
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  เปิด/ปิด และปรับทิศทางองศาการไล่เฉดสีของ Hero Banner และปุ่มกดหลัก
+                </p>
               </div>
 
-              {theme.hero_gradient_enabled && (
-                <div className="space-y-4 pt-2 border-t border-gray-100 animate-in fade-in">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700">สีเริ่มต้น (Start Color)</label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={theme.hero_gradient_start}
-                          onChange={(e) => updateThemeField({ hero_gradient_start: e.target.value })}
-                          className="h-9 w-12 cursor-pointer rounded-lg border border-gray-300 p-0.5 bg-white"
-                        />
-                        <input
-                          type="text"
-                          value={theme.hero_gradient_start}
-                          onChange={(e) => updateThemeField({ hero_gradient_start: e.target.value })}
-                          className="flex-1 rounded-xl border border-gray-300 px-3 py-1.5 text-xs font-mono font-bold text-gray-800 uppercase"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-gray-700">สีปลายทาง (End Color)</label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={theme.hero_gradient_end}
-                          onChange={(e) => updateThemeField({ hero_gradient_end: e.target.value })}
-                          className="h-9 w-12 cursor-pointer rounded-lg border border-gray-300 p-0.5 bg-white"
-                        />
-                        <input
-                          type="text"
-                          value={theme.hero_gradient_end}
-                          onChange={(e) => updateThemeField({ hero_gradient_end: e.target.value })}
-                          className="flex-1 rounded-xl border border-gray-300 px-3 py-1.5 text-xs font-mono font-bold text-gray-800 uppercase"
-                        />
-                      </div>
-                    </div>
+              {/* 3.1 Hero Banner Gradient */}
+              <div className="p-4 rounded-xl border border-gray-200/80 bg-gray-50/50 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">
+                      1. ไล่เฉดสีส่วนหัวเว็บไซต์ (Hero Banner Gradient)
+                    </h4>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      ส่วนแบนเนอร์ด้านบนสุดของหน้าหลัก และบัตรคิว
+                    </p>
                   </div>
-
-                  {/* Angle slider */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between text-xs font-bold text-gray-700">
-                      <span>ทิศทางและมุมองศาการไล่สี: {theme.hero_gradient_angle}°</span>
-                      <div className="flex gap-2">
-                        {[90, 135, 180].map((deg) => (
-                          <button
-                            key={deg}
-                            type="button"
-                            onClick={() => updateThemeField({ hero_gradient_angle: deg })}
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                              theme.hero_gradient_angle === deg
-                                ? 'bg-[var(--burgundy-700)] text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            {deg}° {deg === 90 ? 'แนวนอน' : deg === 180 ? 'แนวตั้ง' : 'มุมเฉียง'}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
                     <input
-                      type="range"
-                      min="0"
-                      max="360"
-                      step="5"
-                      value={theme.hero_gradient_angle}
-                      onChange={(e) => updateThemeField({ hero_gradient_angle: Number(e.target.value) })}
-                      className="w-full accent-[var(--burgundy-700)] cursor-pointer"
+                      type="checkbox"
+                      checked={theme.hero_gradient_enabled}
+                      onChange={(e) => updateThemeField({ hero_gradient_enabled: e.target.checked })}
+                      className="sr-only peer"
                     />
-                  </div>
+                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--burgundy-700)]"></div>
+                    <span className="ml-2 text-xs font-bold text-gray-700">เปิด Hero Gradient</span>
+                  </label>
                 </div>
-              )}
+
+                {theme.hero_gradient_enabled && (
+                  <div className="space-y-3 pt-2 border-t border-gray-200 animate-in fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-gray-700">สีเริ่มต้น (Start Color)</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={theme.hero_gradient_start}
+                            onChange={(e) => updateThemeField({ hero_gradient_start: e.target.value })}
+                            className="h-8 w-11 cursor-pointer rounded-lg border border-gray-300 p-0.5 bg-white"
+                          />
+                          <input
+                            type="text"
+                            value={theme.hero_gradient_start}
+                            onChange={(e) => updateThemeField({ hero_gradient_start: e.target.value })}
+                            className="flex-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-mono font-bold text-gray-800 uppercase"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-gray-700">สีปลายทาง (End Color)</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={theme.hero_gradient_end}
+                            onChange={(e) => updateThemeField({ hero_gradient_end: e.target.value })}
+                            className="h-8 w-11 cursor-pointer rounded-lg border border-gray-300 p-0.5 bg-white"
+                          />
+                          <input
+                            type="text"
+                            value={theme.hero_gradient_end}
+                            onChange={(e) => updateThemeField({ hero_gradient_end: e.target.value })}
+                            className="flex-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-mono font-bold text-gray-800 uppercase"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Angle slider */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs font-bold text-gray-700">
+                        <span>ทิศทางมุมองศา: {theme.hero_gradient_angle}°</span>
+                        <div className="flex gap-1.5">
+                          {[90, 135, 180].map((deg) => (
+                            <button
+                              key={deg}
+                              type="button"
+                              onClick={() => updateThemeField({ hero_gradient_angle: deg })}
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                theme.hero_gradient_angle === deg
+                                  ? 'bg-[var(--burgundy-700)] text-white'
+                                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                              }`}
+                            >
+                              {deg}° {deg === 90 ? 'แนวนอน' : deg === 180 ? 'แนวตั้ง' : 'มุมเฉียง'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        step="5"
+                        value={theme.hero_gradient_angle ?? 140}
+                        onChange={(e) => updateThemeField({ hero_gradient_angle: Number(e.target.value) })}
+                        className="w-full accent-[var(--burgundy-700)] cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 3.2 Button Gradient */}
+              <div className="p-4 rounded-xl border border-gray-200/80 bg-gray-50/50 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-black text-gray-800 uppercase tracking-wider">
+                      2. ไล่เฉดสีปุ่มกดหลัก (Primary Button Gradient)
+                    </h4>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      ปุ่มลงทะเบียน, ปุ่มยืนยัน, และปุ่ม CTA ทั่วทั้งเว็บ
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={theme.button_gradient_enabled}
+                      onChange={(e) => updateThemeField({ button_gradient_enabled: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[var(--burgundy-700)]"></div>
+                    <span className="ml-2 text-xs font-bold text-gray-700">เปิด Button Gradient</span>
+                  </label>
+                </div>
+
+                {theme.button_gradient_enabled && (
+                  <div className="space-y-3 pt-2 border-t border-gray-200 animate-in fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-gray-700">สีเริ่มต้นปุ่ม (Start Color)</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={theme.button_gradient_start || theme.primary_color}
+                            onChange={(e) => updateThemeField({ button_gradient_start: e.target.value })}
+                            className="h-8 w-11 cursor-pointer rounded-lg border border-gray-300 p-0.5 bg-white"
+                          />
+                          <input
+                            type="text"
+                            value={theme.button_gradient_start || theme.primary_color}
+                            onChange={(e) => updateThemeField({ button_gradient_start: e.target.value })}
+                            className="flex-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-mono font-bold text-gray-800 uppercase"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-gray-700">สีปลายทางปุ่ม (End Color)</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="color"
+                            value={theme.button_gradient_end || theme.primary_hover_color}
+                            onChange={(e) => updateThemeField({ button_gradient_end: e.target.value })}
+                            className="h-8 w-11 cursor-pointer rounded-lg border border-gray-300 p-0.5 bg-white"
+                          />
+                          <input
+                            type="text"
+                            value={theme.button_gradient_end || theme.primary_hover_color}
+                            onChange={(e) => updateThemeField({ button_gradient_end: e.target.value })}
+                            className="flex-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-mono font-bold text-gray-800 uppercase"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Angle slider */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs font-bold text-gray-700">
+                        <span>ทิศทางมุมองศาปุ่ม: {theme.button_gradient_angle ?? 90}°</span>
+                        <div className="flex gap-1.5">
+                          {[90, 135, 180].map((deg) => (
+                            <button
+                              key={deg}
+                              type="button"
+                              onClick={() => updateThemeField({ button_gradient_angle: deg })}
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                (theme.button_gradient_angle ?? 90) === deg
+                                  ? 'bg-[var(--burgundy-700)] text-white'
+                                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100'
+                              }`}
+                            >
+                              {deg}° {deg === 90 ? 'แนวนอน' : deg === 180 ? 'แนวตั้ง' : 'มุมเฉียง'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="360"
+                        step="5"
+                        value={theme.button_gradient_angle ?? 90}
+                        onChange={(e) => updateThemeField({ button_gradient_angle: Number(e.target.value) })}
+                        className="w-full accent-[var(--burgundy-700)] cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -986,85 +1099,251 @@ export default function AdminSiteSettingsPage() {
                 </span>
               </div>
 
-              {/* Simulated Screen Container */}
-              <div 
-                className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm transition-all"
-                style={{ backgroundColor: theme.bg_color }}
-              >
-                {/* Mini Hero Banner */}
-                <div 
-                  className="p-5 text-white space-y-3 relative overflow-hidden transition-all"
-                  style={{
-                    background: theme.preset_name === 'default'
-                      ? 'radial-gradient(100% 75% at 85% 0%, rgba(240, 100, 85, 0.32) 0%, transparent 60%), radial-gradient(90% 80% at 10% 100%, rgba(210, 45, 60, 0.38) 0%, transparent 65%), radial-gradient(60% 60% at 50% 30%, rgba(185, 25, 45, 0.25) 0%, transparent 70%), linear-gradient(140deg, #9C1528 0%, #7E0E1D 30%, #5E0B17 65%, #3B060F 100%)'
-                      : theme.hero_gradient_enabled
-                        ? `linear-gradient(${theme.hero_gradient_angle}deg, ${theme.hero_gradient_start}, ${theme.hero_gradient_end})`
-                        : theme.primary_hover_color,
-                  }}
+              {/* View Switcher Tabs */}
+              <div className="flex p-1 bg-gray-100/80 rounded-xl gap-1">
+                <button
+                  type="button"
+                  onClick={() => setPreviewScreen('home')}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
+                    previewScreen === 'home'
+                      ? 'bg-white text-gray-900 shadow-xs'
+                      : 'text-gray-500 hover:text-gray-900'
+                  }`}
                 >
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-white/15 px-2.5 py-0.5 rounded-full backdrop-blur-md">
-                    <Heart className="h-2.5 w-2.5 fill-current text-rose-300" />
-                    <span>ครั้งที่ 9 · MUMT Blood Donation</span>
-                  </span>
-                  
-                  <div>
-                    <div className="text-base font-extrabold tracking-tight font-display">
-                      เติมรักให้เต็ม <span className="text-amber-300">UNIT</span>
-                    </div>
-                    <div className="text-xs text-rose-100 font-medium mt-0.5">
-                      ต่อชีวิตด้วยโลหิตคุณ 2026
-                    </div>
-                  </div>
-
-                  {/* Action CTA Button */}
-                  <div className="pt-2">
-                    <button
-                      type="button"
-                      className="w-full py-2 px-3 rounded-xl text-xs font-bold shadow-sm transition-transform active:scale-95 flex items-center justify-center gap-1.5"
-                      style={{
-                        background: theme.preset_name === 'default'
-                          ? 'linear-gradient(to right, #D92231, #A6192E, #7E1120)'
-                          : theme.button_gradient_enabled
-                            ? `linear-gradient(${theme.button_gradient_angle}deg, ${theme.button_gradient_start}, ${theme.button_gradient_end})`
-                            : theme.primary_color,
-                        color: theme.button_text_color,
-                      }}
-                    >
-                      <span>ลงทะเบียนจองรอบเวลา</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Mini Surface Card */}
-                <div className="p-4 space-y-3">
-                  <div 
-                    className="p-3.5 rounded-xl border border-gray-100 shadow-2xs space-y-2 transition-all"
-                    style={{ backgroundColor: theme.surface_color }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-gray-800">รอบเวลา 09:00 - 10:00 น.</span>
-                      <span 
-                        className="text-[10px] font-extrabold px-2 py-0.5 rounded-md"
-                        style={{
-                          backgroundColor: `${theme.accent_color}15`,
-                          color: theme.accent_color,
-                        }}
-                      >
-                        ว่าง 25 ที่นั่ง
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-gray-500 leading-tight">
-                      ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล
-                    </p>
-                  </div>
-
-                  <div className="text-center">
-                    <p className="text-[10px] text-gray-400">
-                      *ทุกหน้าของเว็บไซต์จะใช้ชุดสีและ Gradient ตามที่เห็นในตัวอย่างนี้ทันที
-                    </p>
-                  </div>
-                </div>
+                  หน้าแรก
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewScreen('register')}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
+                    previewScreen === 'register'
+                      ? 'bg-white text-gray-900 shadow-xs'
+                      : 'text-gray-500 hover:text-gray-900'
+                  }`}
+                >
+                  หน้าลงทะเบียน
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewScreen('pass')}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-center ${
+                    previewScreen === 'pass'
+                      ? 'bg-white text-gray-900 shadow-xs'
+                      : 'text-gray-500 hover:text-gray-900'
+                  }`}
+                >
+                  หน้าบัตรคิว
+                </button>
               </div>
+
+              {/* Simulated Screen Container */}
+              {(() => {
+                const previewHeroBg = theme.hero_gradient_enabled
+                  ? (theme.preset_name === 'default'
+                      ? 'radial-gradient(100% 75% at 85% 0%, rgba(240, 100, 85, 0.32) 0%, transparent 60%), radial-gradient(90% 80% at 10% 100%, rgba(210, 45, 60, 0.38) 0%, transparent 65%), radial-gradient(60% 60% at 50% 30%, rgba(185, 25, 45, 0.25) 0%, transparent 70%), linear-gradient(140deg, #9C1528 0%, #7E0E1D 30%, #5E0B17 65%, #3B060F 100%)'
+                      : `linear-gradient(${theme.hero_gradient_angle ?? 140}deg, ${theme.hero_gradient_start}, ${theme.hero_gradient_end})`)
+                  : (theme.primary_hover_color || theme.primary_color);
+
+                const previewBtnBg = theme.button_gradient_enabled
+                  ? (theme.preset_name === 'default'
+                      ? 'linear-gradient(to right, #D92231, #A6192E, #7E1120)'
+                      : `linear-gradient(${theme.button_gradient_angle ?? 90}deg, ${theme.button_gradient_start}, ${theme.button_gradient_end})`)
+                  : theme.primary_color;
+
+                return (
+                  <div 
+                    className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm transition-all"
+                    style={{ backgroundColor: theme.bg_color }}
+                  >
+                    {/* 1. SCREEN: HOME */}
+                    {previewScreen === 'home' && (
+                      <div className="animate-in fade-in space-y-3 pb-3">
+                        {/* Mini Hero Banner */}
+                        <div 
+                          className="p-5 text-white space-y-3 relative overflow-hidden transition-all"
+                          style={{ background: previewHeroBg }}
+                        >
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-white/15 px-2.5 py-0.5 rounded-full backdrop-blur-md">
+                            <Heart className="h-2.5 w-2.5 fill-current text-rose-300" />
+                            <span>ครั้งที่ 9 · MUMT Blood Donation</span>
+                          </span>
+                          
+                          <div>
+                            <div className="text-base font-extrabold tracking-tight font-display">
+                              เติมรักให้เต็ม <span className="text-amber-300">UNIT</span>
+                            </div>
+                            <div className="text-xs text-rose-100 font-medium mt-0.5">
+                              ต่อชีวิตด้วยโลหิตคุณ 2026
+                            </div>
+                          </div>
+
+                          {/* Action CTA Button */}
+                          <div className="pt-2">
+                            <button
+                              type="button"
+                              className="w-full py-2 px-3 rounded-xl text-xs font-bold shadow-sm transition-transform active:scale-95 flex items-center justify-center gap-1.5"
+                              style={{
+                                background: previewBtnBg,
+                                color: theme.button_text_color,
+                              }}
+                            >
+                              <span>ลงทะเบียนจองรอบเวลา</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Mini Surface Card */}
+                        <div className="px-4 space-y-2">
+                          <div 
+                            className="p-3.5 rounded-xl border border-gray-100 shadow-2xs space-y-2 transition-all"
+                            style={{ backgroundColor: theme.surface_color }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-gray-800">รอบเวลา 09:00 - 10:00 น.</span>
+                              <span 
+                                className="text-[10px] font-extrabold px-2 py-0.5 rounded-md"
+                                style={{
+                                  backgroundColor: `${theme.accent_color}18`,
+                                  color: theme.accent_color,
+                                }}
+                              >
+                                ว่าง 25 ที่นั่ง
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-gray-500 leading-tight">
+                              ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 2. SCREEN: REGISTER FORM */}
+                    {previewScreen === 'register' && (
+                      <div className="animate-in fade-in space-y-3 pb-4">
+                        {/* Header strip */}
+                        <div 
+                          className="px-4 py-3 text-white transition-all flex items-center justify-between"
+                          style={{ background: previewHeroBg }}
+                        >
+                          <span className="text-xs font-extrabold">ลงทะเบียนบริจาคโลหิต</span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20">
+                            ขั้นตอนที่ 1/2
+                          </span>
+                        </div>
+
+                        <div className="px-4 space-y-3">
+                          <div 
+                            className="p-4 rounded-xl border border-gray-100 shadow-2xs space-y-3 transition-all"
+                            style={{ backgroundColor: theme.surface_color }}
+                          >
+                            <div className="space-y-1">
+                              <span className="text-[11px] font-bold text-gray-700">ชื่อ - นามสกุล</span>
+                              <div className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-700 bg-gray-50/50">
+                                นศ.เทคนิคการแพทย์ ม.มหิดล
+                              </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <span className="text-[11px] font-bold text-gray-700">หมู่โลหิต</span>
+                              <div className="grid grid-cols-4 gap-1.5">
+                                {['A', 'B', 'O', 'AB'].map((blood, idx) => (
+                                  <div
+                                    key={blood}
+                                    className={`text-center py-1 rounded-md text-[11px] font-black border transition-all ${
+                                      idx === 2
+                                        ? 'text-white border-transparent'
+                                        : 'border-gray-200 text-gray-600 bg-gray-50'
+                                    }`}
+                                    style={idx === 2 ? { background: theme.primary_color } : {}}
+                                  >
+                                    {blood}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+
+                            <button
+                              type="button"
+                              className="w-full py-2 px-3 rounded-xl text-xs font-bold shadow-sm transition-transform active:scale-95 flex items-center justify-center gap-1.5 mt-2"
+                              style={{
+                                background: previewBtnBg,
+                                color: theme.button_text_color,
+                              }}
+                            >
+                              <span>ตรวจสอบ & ดำเนินการต่อ</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 3. SCREEN: PASS / TICKET */}
+                    {previewScreen === 'pass' && (
+                      <div className="animate-in fade-in space-y-3 p-4">
+                        <div 
+                          className="rounded-2xl border border-gray-200 overflow-hidden shadow-2xs transition-all"
+                          style={{ backgroundColor: theme.surface_color }}
+                        >
+                          {/* Ticket Header */}
+                          <div 
+                            className="p-3.5 text-white text-center space-y-1 transition-all"
+                            style={{ background: previewHeroBg }}
+                          >
+                            <div className="text-[10px] uppercase font-bold tracking-widest text-rose-200">
+                              MUMT PASS 2026
+                            </div>
+                            <div className="text-sm font-black font-display">
+                              บัตรคิวบริจาคโลหิต
+                            </div>
+                          </div>
+
+                          {/* Ticket Body */}
+                          <div className="p-4 text-center space-y-3">
+                            <div 
+                              className="inline-block px-3 py-1 rounded-full text-xs font-black"
+                              style={{
+                                backgroundColor: `${theme.accent_color}18`,
+                                color: theme.accent_color,
+                              }}
+                            >
+                              ลำดับคิวของคุณ: A-042
+                            </div>
+
+                            {/* Simulated QR Box */}
+                            <div className="flex flex-col items-center justify-center py-2">
+                              <div 
+                                className="p-3 rounded-xl border-2 border-dashed flex items-center justify-center"
+                                style={{ borderColor: theme.primary_color }}
+                              >
+                                <QrCode className="h-14 w-14" style={{ color: theme.primary_color }} />
+                              </div>
+                              <span className="text-[10px] text-gray-400 mt-1.5">สแกนยืนยันตัวตน ณ จุดลงทะเบียน</span>
+                            </div>
+
+                            <button
+                              type="button"
+                              className="w-full py-2 px-3 rounded-xl text-xs font-bold shadow-sm transition-transform active:scale-95 flex items-center justify-center gap-1.5"
+                              style={{
+                                background: previewBtnBg,
+                                color: theme.button_text_color,
+                              }}
+                            >
+                              <span>บันทึกภาพบัตรคิว</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="p-3 text-center border-t border-gray-100 bg-white/70">
+                      <p className="text-[10px] text-gray-500 font-medium">
+                        *หน้าเว็บจริงทุกหน้าจะปรับโทนสีและ Gradient ทันทีหลังกด &ldquo;บันทึกและเผยแพร่&rdquo;
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>

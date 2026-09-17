@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getSiteTheme, updateSiteTheme } from '@/services/theme-service';
 import { recordAuditLog } from '@/services/admin-service';
 import { requireAdmin, requireReadOnlyAdmin } from '@/lib/auth/server';
@@ -36,6 +37,13 @@ export async function PUT(request: Request) {
 
     if (!res.success) {
       return NextResponse.json({ success: false, message: 'บันทึกการตั้งค่าธีมไม่สำเร็จ' }, { status: 400 });
+    }
+
+    // Revalidate public layouts and pages so Next.js clears any SSR cache immediately
+    try {
+      revalidatePath('/', 'layout');
+    } catch (e) {
+      console.warn('Revalidate layout skipped:', e);
     }
 
     await recordAuditLog({
