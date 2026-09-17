@@ -46,7 +46,7 @@ export default async function HomePage() {
       )}
 
       {/* HERO — full-bleed red field with TH/EN toggle */}
-      <HeroClient description={event.description} startAt={startAt} endAt={endAt} />
+      <HeroClient description={event.description} startAt={startAt} endAt={endAt} status={event.status} />
 
       {/* Main Home Sections with unified reactive language support */}
       <HomeSectionsClient />

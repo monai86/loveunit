@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Heart, Clock, Check, ArrowRight, ArrowLeft, Sparkles, AlertTriangle, User, ShieldCheck, MapPin, Building, Calendar, CheckCircle2, Edit3, Info, Search } from 'lucide-react';
 import { MAHIDOL_FACULTIES, ACADEMIC_YEARS } from '@/lib/constants/mahidol';
-import { formatTimeRange, formatBangkokTime, isEventDay } from '@/lib/utils/format';
+import { formatTimeRange, formatBangkokTime } from '@/lib/utils/format';
 import { isTimeSlotSelectable } from '@/lib/registration/slot-availability';
 import { LoadingOverlay } from '@/components/common/LoadingOverlay';
 import { useLanguage, TRANSLATIONS } from '@/lib/i18n/LanguageContext';
@@ -38,9 +38,9 @@ function RegisterContent() {
   const { language, isTh, isEn } = useLanguage();
   const tReg = TRANSLATIONS.register;
 
-  // Determine if Walk-in mode is active (either event day 2026-09-16 or ?mode=walkin)
+  // Determine if Walk-in mode is active (query ?mode=walkin)
   const isWalkInQuery = searchParams.get('mode') === 'walkin';
-  const isWalkInMode = isWalkInQuery || isEventDay();
+  const isWalkInMode = isWalkInQuery;
 
   const totalSteps = isWalkInMode ? 3 : 4;
 
@@ -64,8 +64,11 @@ function RegisterContent() {
   // Wizard state
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [slotsLoading, setSlotsLoading] = useState(!isWalkInMode);
+  const [slotsLoading, setSlotsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Dynamic Event Status from Admin Settings
+  const [eventStatus, setEventStatus] = useState<string>('REGISTRATION_OPEN');
 
   // Available Time Slots
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
@@ -104,36 +107,40 @@ function RegisterContent() {
     privacyAccepted: false,
   });
 
-  // Fetch Time Slots on Mount (if advance mode)
+  // Fetch Event Status & Time Slots on Mount
   useEffect(() => {
-    if (isWalkInMode) return;
-
     let ignore = false;
-    async function fetchSlots() {
+    async function fetchEventAndSlots() {
       try {
         const res = await fetch('/api/events/mumt-2026/slots', { cache: 'no-store' });
         if (ignore) return;
         if (res.ok) {
           const data = await res.json();
-          const slots: TimeSlot[] = (data.slots || []).map((s: ApiSlot) => {
-            const capacity = s.capacity ?? s.max_capacity ?? 0;
-            const booked = s.bookedCount ?? s.booked_count ?? 0;
-            const remaining = capacity - booked;
-            const status =
-              s.status === 'FULL' || remaining <= 0
-                ? 'FULL'
-                : s.status === 'LIMITED' || remaining <= 15
-                ? 'LIMITED'
-                : 'AVAILABLE';
-            return {
-              id: s.id,
-              timeSlot: formatTimeRange(s.startAt || s.start_at || '', s.endAt || s.end_at || ''),
-              maxCapacity: capacity,
-              currentBooked: booked,
-              remainingCapacity: remaining,
-              status,
-            };
-          });
+          if (data.event?.status) {
+            setEventStatus(data.event.status);
+          }
+          const rawSlots = data.slots || [];
+          const slots: TimeSlot[] = rawSlots
+            .filter((s: Record<string, unknown>) => s.isActive !== false && s.is_active !== false)
+            .map((s: ApiSlot) => {
+              const capacity = s.capacity ?? s.max_capacity ?? 0;
+              const booked = s.bookedCount ?? s.booked_count ?? 0;
+              const remaining = capacity - booked;
+              const status =
+                s.status === 'FULL' || remaining <= 0
+                  ? 'FULL'
+                  : s.status === 'LIMITED' || remaining <= 15
+                  ? 'LIMITED'
+                  : 'AVAILABLE';
+              return {
+                id: s.id,
+                timeSlot: formatTimeRange(s.startAt || s.start_at || '', s.endAt || s.end_at || ''),
+                maxCapacity: capacity,
+                currentBooked: booked,
+                remainingCapacity: remaining,
+                status,
+              };
+            });
           setTimeSlots(slots);
         } else {
           setErrorMessage(tReg.errSlotLoad[language]);
@@ -141,12 +148,14 @@ function RegisterContent() {
       } catch {
         if (!ignore) setErrorMessage(tReg.errNetwork[language]);
       } finally {
-        if (!ignore) setSlotsLoading(false);
+        if (!ignore) {
+          setSlotsLoading(false);
+        }
       }
     }
-    fetchSlots();
+    fetchEventAndSlots();
     return () => { ignore = true; };
-  }, [isWalkInMode, language, tReg.errSlotLoad, tReg.errNetwork]);
+  }, [language, tReg.errSlotLoad, tReg.errNetwork]);
 
   // Validation
   const validateStep1 = () => {
@@ -297,10 +306,20 @@ function RegisterContent() {
         {/* Header Banner */}
         <div className="mb-8 pb-6 border-b border-[var(--line)]">
           <div className="flex items-center gap-2 mb-2.5">
-            {isWalkInMode ? (
+            {eventStatus === 'REGISTRATION_CLOSED' ? (
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                <span className="h-2 w-2 rounded-full bg-amber-600" />
+                <span className="font-bold tracking-normal">{isTh ? 'ปิดรับลงทะเบียนชั่วคราว' : 'Registration Closed'}</span>
+              </span>
+            ) : eventStatus === 'COMPLETED' ? (
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-200">
+                <span className="h-2 w-2 rounded-full bg-emerald-600" />
+                <span className="font-bold tracking-normal">{isTh ? 'กิจกรรมเสร็จสิ้นแล้ว' : 'Event Completed'}</span>
+              </span>
+            ) : isWalkInMode ? (
               <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-rose-100 text-[var(--burgundy-700)] border border-rose-200">
                 <span className="h-2 w-2 rounded-full bg-[var(--burgundy-700)]" />
-                <span className="font-bold tracking-normal">{isTh ? 'ปิดรับ Walk-in สำหรับวันนี้แล้ว' : 'Walk-in Registration Closed'}</span>
+                <span className="font-bold tracking-normal">{isTh ? 'ลงทะเบียน Walk-in หน้างาน' : 'On-site Walk-in Registration'}</span>
               </span>
             ) : (
               <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-gradient-to-r from-[#D92231] via-[#A6192E] to-[#7E1120] text-white shadow-sm shadow-red-950/20 border border-white/20 hover:shadow-md transition-all">
@@ -314,47 +333,101 @@ function RegisterContent() {
             )}
           </div>
           <h1 className="text-2xl font-black text-[var(--ink)] sm:text-4xl font-display">
-            {isWalkInMode ? (isTh ? 'ปิดรับลงทะเบียน Walk-in สำหรับวันนี้แล้ว' : 'Walk-in Registration Closed') : tReg.title[language]}
+            {eventStatus === 'REGISTRATION_CLOSED'
+              ? (isTh ? 'ขณะนี้ระบบปิดรับลงทะเบียน' : 'Registration is Closed')
+              : eventStatus === 'COMPLETED'
+              ? (isTh ? 'กิจกรรมบริจาคโลหิตเสร็จสิ้นแล้ว' : 'Event Completed')
+              : isWalkInMode
+              ? (isTh ? 'ลงทะเบียน Walk-in หน้างาน' : 'Walk-in Registration')
+              : tReg.title[language]}
           </h1>
           <p className="mt-2 text-sm text-[var(--muted)] font-medium leading-relaxed">
-            {isWalkInMode ? (isTh ? 'เนื่องจากคิวผู้บริจาคโลหิตเต็มขีดความสามารถของหน่วยบริการแล้ว ทางโครงการขอขอบพระคุณทุกท่านเป็นอย่างยิ่ง' : 'Full capacity has been reached for today. Thank you for your interest and support.') : tReg.subtitle[language]}
+            {eventStatus === 'REGISTRATION_CLOSED'
+              ? (isTh
+                  ? 'ขอขอบพระคุณทุกท่านเป็นอย่างยิ่งที่ให้ความสนใจเข้าร่วมกิจกรรม หากมีการเปิดรับเพิ่มเติมจะแจ้งให้ทราบผ่านช่องทางประชาสัมพันธ์'
+                  : 'Thank you very much for your interest. Further announcements will be made via public channels.')
+              : eventStatus === 'COMPLETED'
+              ? (isTh
+                  ? 'โครงการ MUMT LoveUnit ขอขอบพระคุณทุกท่านที่มาร่วมต่อชีวิตด้วยโลหิตคุณ'
+                  : 'The MUMT LoveUnit project sincerely thanks everyone for saving lives with your blood.')
+              : isWalkInMode
+              ? (isTh
+                  ? 'กรุณากรอกข้อมูลเพื่อรับบัตรคิวและเข้ารับการตรวจคัดกรองบริจาคโลหิต'
+                  : 'Please fill in your details to receive your queue pass.')
+              : tReg.subtitle[language]}
           </p>
         </div>
 
         {/* Asymmetric 2-Column Desktop Form Shell OR Closed Card */}
-        {isWalkInMode ? (
-          <div className="editorial-card p-6 sm:p-12 text-center max-w-2xl mx-auto space-y-6 shadow-sm border-rose-200 bg-gradient-to-b from-white via-rose-50/20 to-white">
-            <div className="mx-auto w-16 h-16 rounded-3xl bg-gradient-to-br from-rose-500 to-red-600 text-white flex items-center justify-center shadow-lg shadow-rose-600/25">
+        {eventStatus === 'REGISTRATION_CLOSED' ? (
+          <div className="editorial-card p-6 sm:p-12 text-center max-w-2xl mx-auto space-y-6 shadow-sm border-amber-200 bg-gradient-to-b from-white via-amber-50/20 to-white">
+            <div className="mx-auto w-16 h-16 rounded-3xl bg-gradient-to-br from-amber-500 to-rose-600 text-white flex items-center justify-center shadow-lg shadow-amber-600/25">
               <Heart className="h-8 w-8 fill-white/20" />
             </div>
 
             <div className="space-y-2">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-rose-100 text-[var(--burgundy-700)] border border-rose-200 shadow-2xs">
-                ● {isTh ? 'ปิดรับลงทะเบียน Walk-in สำหรับวันนี้แล้ว' : 'Walk-in Registration Closed for Today'}
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-900 border border-amber-200 shadow-2xs">
+                ● {isTh ? 'ปิดรับลงทะเบียนชั่วคราว' : 'Registration Closed'}
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-[var(--ink)] font-display tracking-tight pt-2">
-                {isTh ? 'ปิดรับลงทะเบียน Walk-in หน้างานแล้ว' : 'On-site Walk-in Registration Closed'}
+                {isTh ? 'ขณะนี้ระบบปิดรับลงทะเบียนบริจาคโลหิต' : 'Online Registration is Currently Closed'}
               </h2>
               <p className="text-sm text-[var(--muted)] font-medium max-w-lg mx-auto leading-relaxed">
                 {isTh
-                  ? 'เนื่องจากมีผู้บริจาคโลหิตให้ความสนใจเข้าร่วมกิจกรรมอย่างล้นหลาม และคิวการให้บริการเต็มขีดความสามารถของหน่วยบริการโลหิตเคลื่อนที่แล้ว'
-                  : 'Due to overwhelming interest and the mobile blood donation unit reaching full operating capacity for today.'}
+                  ? 'เนื่องจากมีผู้ลงทะเบียนครบตามโควตาที่กำหนด หรือระบบปิดรับการลงทะเบียนชั่วคราว ทางโครงการขอขอบพระคุณทุกท่านที่ให้ความสนใจเป็นอย่างยิ่ง'
+                  : 'Full quota has been reached or registration is currently closed. Thank you very much for your interest and support.'}
               </p>
             </div>
 
-            <div className="rounded-2xl bg-gradient-to-br from-rose-50/90 via-white to-red-50/50 border border-rose-200/90 p-5 sm:p-6 text-center space-y-2 shadow-2xs">
+            <div className="rounded-2xl bg-gradient-to-br from-amber-50/90 via-white to-rose-50/50 border border-amber-200/90 p-5 sm:p-6 text-center space-y-2 shadow-2xs">
               <p className="text-xs sm:text-sm font-bold text-[var(--burgundy-900)] leading-relaxed">
                 {isTh ? (
                   <>
                     โครงการ MUMT LoveUnit คณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล<br className="hidden sm:block" />
-                    ขอขอบพระคุณทุกท่านเป็นอย่างยิ่งที่ให้ความสนใจและมาร่วมเป็นส่วนหนึ่งในการส่งต่อโอกาสและต่อชีวิตให้แก่ผู้ป่วยในวันนี้ 🙏❤️
+                    ขอขอบพระคุณทุกท่านเป็นอย่างยิ่งที่ให้ความสนใจและมาร่วมเป็นส่วนหนึ่งในการส่งต่อโอกาสและต่อชีวิตให้แก่ผู้ป่วย 🙏❤️
                   </>
                 ) : (
                   <>
                     The MUMT LoveUnit team, Faculty of Medical Technology, Mahidol University,<br className="hidden sm:block" />
-                    sincerely thanks everyone for your incredible support, kindness, and dedication to saving lives today 🙏❤️
+                    sincerely thanks everyone for your incredible support and dedication to saving lives 🙏❤️
                   </>
                 )}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <Link
+                href="/lookup"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[var(--burgundy-700)] to-[var(--burgundy-800)] text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all active:scale-95"
+              >
+                <Search className="h-4 w-4" />
+                <span>{isTh ? 'ค้นหาตั๋ว / QR Code ผู้ลงทะเบียน' : 'Find My Registration Pass'}</span>
+              </Link>
+              <Link
+                href="/"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 text-xs sm:text-sm font-bold transition-all shadow-2xs"
+              >
+                <span>{isTh ? 'กลับสู่หน้าหลัก' : 'Back to Home'}</span>
+              </Link>
+            </div>
+          </div>
+        ) : eventStatus === 'COMPLETED' ? (
+          <div className="editorial-card p-6 sm:p-12 text-center max-w-2xl mx-auto space-y-6 shadow-sm border-emerald-200 bg-gradient-to-b from-white via-emerald-50/20 to-white">
+            <div className="mx-auto w-16 h-16 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-lg shadow-emerald-600/25">
+              <CheckCircle2 className="h-8 w-8 text-white" />
+            </div>
+
+            <div className="space-y-2">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-200 shadow-2xs">
+                ● {isTh ? 'กิจกรรมเสร็จสิ้นแล้ว' : 'Event Completed'}
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[var(--ink)] font-display tracking-tight pt-2">
+                {isTh ? 'กิจกรรมบริจาคโลหิตเสร็จสิ้นแล้ว' : 'Blood Donation Event Completed'}
+              </h2>
+              <p className="text-sm text-[var(--muted)] font-medium max-w-lg mx-auto leading-relaxed">
+                {isTh
+                  ? 'ทางคณะเทคนิคการแพทย์ มหาวิทยาลัยมหิดล และภาคบริการโลหิตแห่งชาติที่ 4 จ.ราชบุรี ขอขอบพระคุณผู้บริจาคทุกท่านที่ได้ร่วมบริจาคโลหิตช่วยชีวิตเพื่อนมนุษย์'
+                  : 'Mahidol University Faculty of Medical Technology sincerely thanks all donors.'}
               </p>
             </div>
 

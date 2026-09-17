@@ -30,15 +30,23 @@ export async function POST(
     const isEventDayNow = isEventDay();
     const isWithinWindow = (now >= openAt && now <= closeAt) || isEventDayNow;
 
-    // Walk-in registration is closed for today per organizer announcement
-    if (isEventDayNow) {
+    // 1. Explicit event status check (Super Admin control)
+    if (event.status === 'REGISTRATION_CLOSED') {
       return NextResponse.json({
         success: false,
-        message: 'ขณะนี้ปิดรับลงทะเบียน Walk-in สำหรับวันนี้แล้ว เนื่องจากคิวเต็มความจุ ทางโครงการขอขอบพระคุณทุกท่านที่ให้ความสนใจเป็นอย่างยิ่ง',
+        message: 'ขณะนี้ระบบปิดรับลงทะเบียนชั่วคราว ทางโครงการขอขอบพระคุณทุกท่านที่ให้ความสนใจเป็นอย่างยิ่ง',
       }, { status: 400 });
     }
 
-    if (!isStatusOpen || !isWithinWindow) {
+    if (event.status === 'COMPLETED') {
+      return NextResponse.json({
+        success: false,
+        message: 'กิจกรรมบริจาคโลหิตได้เสร็จสิ้นลงแล้ว ทางโครงการขอขอบพระคุณผู้บริจาคทุกท่าน',
+      }, { status: 400 });
+    }
+
+    // 2. Window and status validation
+    if (!isStatusOpen && !isWithinWindow) {
       return NextResponse.json({
         success: false,
         message: 'ระบบไม่ได้เปิดให้ลงทะเบียนในขณะนี้ หรือเลยช่วงเวลาจัดกิจกรรมแล้ว',
@@ -57,13 +65,25 @@ export async function POST(
     }
 
     const input = parseResult.data;
-    const isWalkIn = input.source === 'WALK_IN' || isEventDayNow || !input.slotId;
+    const isWalkIn = input.source === 'WALK_IN' || !input.slotId;
     const source = isWalkIn ? 'WALK_IN' : (input.source || 'ONLINE');
 
     let targetSlotId = input.slotId;
     if (!targetSlotId) {
       const activeSlots = await getTimeSlots(event.id);
       targetSlotId = activeSlots[0]?.id || '';
+    } else {
+      const allSlots = await getTimeSlots(event.id);
+      const selectedSlot = allSlots.find((s) => String(s.id) === String(targetSlotId));
+      if (selectedSlot) {
+        const isSlotActive = (selectedSlot as Record<string, unknown>).isActive !== false && (selectedSlot as Record<string, unknown>).is_active !== false;
+        if (!isSlotActive) {
+          return NextResponse.json({
+            success: false,
+            message: 'รอบเวลาที่เลือกถูกปิดรับการลงทะเบียนแล้ว กรุณาเลือกรอบเวลาอื่น',
+          }, { status: 400 });
+        }
+      }
     }
 
     const result = await registerDonorAtomic({

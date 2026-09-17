@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, Calendar, Clock, MapPin, ArrowRight, Search, Gift } from 'lucide-react';
-import { formatThaiDate, formatTimeRange, isEventDay } from '@/lib/utils/format';
+import { formatThaiDate, formatTimeRange } from '@/lib/utils/format';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 // Official caption (EN) from the event poster — Regional Blood Centre 4, Ratchaburi.
@@ -25,13 +25,16 @@ export function HeroClient({
   description,
   startAt,
   endAt,
+  status,
 }: {
   description: string;
   startAt: string;
   endAt: string;
+  status?: string;
 }) {
   const { isEn } = useLanguage();
-  const eventDay = isEventDay();
+  const isClosed = status === 'REGISTRATION_CLOSED';
+  const isCompleted = status === 'COMPLETED';
 
   const start = startAt ? new Date(startAt) : null;
   const end = endAt ? new Date(endAt) : null;
@@ -55,9 +58,11 @@ export function HeroClient({
     souvenirDesc: isEn
       ? 'Available at the post-donation station on event day (while supplies last).'
       : 'มอบให้ ณ จุดบริการหลังเสร็จสิ้นการบริจาคโลหิตในวันงาน (ของที่ระลึกมีจำนวนจำกัด)',
-    ctaRegister: isEn
-      ? (eventDay ? 'Walk-in Closed (Thank you for your interest)' : 'Register to donate blood')
-      : (eventDay ? 'ปิดรับลงทะเบียน Walk-in แล้ว (ขอบคุณที่ให้ความสนใจ)' : 'ลงทะเบียนบริจาคโลหิตออนไลน์'),
+    ctaRegister: isClosed
+      ? (isEn ? 'Registration Closed (Thank you)' : 'ปิดรับลงทะเบียนแล้ว (ขอบคุณที่ให้ความสนใจ)')
+      : isCompleted
+      ? (isEn ? 'Event Completed (Thank you)' : 'กิจกรรมเสร็จสิ้นแล้ว (ขอบคุณที่ร่วมบริจาค)')
+      : (isEn ? 'Register to donate blood' : 'ลงทะเบียนบริจาคโลหิตออนไลน์'),
     ctaPrepare: isEn ? 'Prepare before donating' : 'ดูการเตรียมตัวก่อนบริจาค',
   };
 
@@ -70,13 +75,22 @@ export function HeroClient({
           {/* Top Bar: Event Badge (Clean & focused, language switch handled on Navbar) */}
           <div className="flex items-center justify-start gap-3 mb-6 sm:mb-8">
             <span className="brand-chip rise-in whitespace-nowrap text-xs font-bold shadow-2xs">
-              {eventDay ? (
+              {isClosed ? (
                 <>
                   <span className="relative flex h-2 w-2 mr-0.5">
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-300" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-300" />
                   </span>
                   <span className="font-extrabold text-amber-200">
-                    {isEn ? 'Event Day · Walk-in Closed (Thank You)' : 'วันจัดกิจกรรม · ปิดรับ Walk-in แล้ว (ขอบคุณที่ให้ความสนใจ)'}
+                    {isEn ? 'Registration Temporarily Closed' : 'ขณะนี้ปิดรับลงทะเบียนชั่วคราว'}
+                  </span>
+                </>
+              ) : isCompleted ? (
+                <>
+                  <span className="relative flex h-2 w-2 mr-0.5">
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-300" />
+                  </span>
+                  <span className="font-extrabold text-emerald-200">
+                    {isEn ? 'Event Completed' : 'กิจกรรมเสร็จสิ้นเรียบร้อยแล้ว'}
                   </span>
                 </>
               ) : (

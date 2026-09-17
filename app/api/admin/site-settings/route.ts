@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { 
   getEventBySlug, 
   getAllTimeSlots, 
@@ -153,6 +154,17 @@ export async function PUT(request: Request) {
         contentBlockUpdatesCount: contentBlockUpdates?.length || 0,
       },
     });
+
+    try {
+      revalidatePath('/', 'layout');
+      revalidatePath('/register');
+      revalidatePath('/mt70');
+      revalidatePath('/mt70/site-settings');
+      revalidatePath('/screening');
+      revalidatePath('/location');
+    } catch (revalErr) {
+      console.warn('Revalidation warning:', revalErr);
+    }
 
     return NextResponse.json({
       success: true,
