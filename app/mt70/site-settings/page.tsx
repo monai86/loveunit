@@ -26,7 +26,14 @@ import {
   Zap,
   Plus,
   Trash2,
-  QrCode
+  QrCode,
+  MapPin,
+  ArrowRight,
+  Search,
+  Gift,
+  Copy,
+  User,
+  Download
 } from 'lucide-react';
 import { SiteTheme, EventContentBlock } from '@/lib/types/database';
 
@@ -1088,15 +1095,28 @@ export default function AdminSiteSettingsPage() {
 
           {/* Live Preview Column (5 cols) */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="sticky top-24 rounded-2xl border border-gray-200 bg-white p-5 sm:p-6 shadow-md space-y-4">
+            <div className="sticky top-20 rounded-2xl border border-gray-200 bg-white p-4 sm:p-5 shadow-lg space-y-4">
               <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                 <div className="flex items-center gap-2">
                   <Eye className="h-4 w-4 text-[var(--burgundy-700)]" />
                   <h3 className="text-sm font-extrabold text-gray-900">ตัวอย่างหน้าจอสด (Live Preview)</h3>
                 </div>
                 <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Zap className="h-3 w-3" /> Realtime
+                  <Zap className="h-3 w-3" /> Realtime Sync
                 </span>
+              </div>
+
+              {/* Browser / Device Chrome Header */}
+              <div className="rounded-xl border border-gray-200 bg-gray-100/90 p-2 flex items-center justify-between gap-2 shadow-2xs">
+                <div className="flex items-center gap-1.5 px-1">
+                  <span className="h-2.5 w-2.5 rounded-full bg-rose-400"></span>
+                  <span className="h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+                </div>
+                <div className="flex-1 max-w-[220px] rounded-lg bg-white px-2.5 py-1 text-[11px] font-mono text-gray-500 text-center truncate border border-gray-200/80 shadow-2xs">
+                  mumt-loveunit.vercel.app{previewScreen === 'home' ? '' : previewScreen === 'register' ? '/register' : '/registration/LVU26-A042'}
+                </div>
+                <span className="text-[10px] font-bold text-gray-400 uppercase">Preview</span>
               </div>
 
               {/* View Switcher Tabs */}
@@ -1110,7 +1130,7 @@ export default function AdminSiteSettingsPage() {
                       : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
-                  หน้าแรก
+                  1. หน้าแรก (Home)
                 </button>
                 <button
                   type="button"
@@ -1121,7 +1141,7 @@ export default function AdminSiteSettingsPage() {
                       : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
-                  หน้าลงทะเบียน
+                  2. ลงทะเบียน
                 </button>
                 <button
                   type="button"
@@ -1132,7 +1152,7 @@ export default function AdminSiteSettingsPage() {
                       : 'text-gray-500 hover:text-gray-900'
                   }`}
                 >
-                  หน้าบัตรคิว
+                  3. บัตรคิว Pass
                 </button>
               </div>
 
@@ -1152,54 +1172,149 @@ export default function AdminSiteSettingsPage() {
 
                 return (
                   <div 
-                    className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm transition-all"
+                    className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm transition-all max-h-[640px] overflow-y-auto"
                     style={{ backgroundColor: theme.bg_color }}
                   >
-                    {/* 1. SCREEN: HOME */}
+                    {/* ==============================================
+                        VIEW 1: HOME PAGE (HERO & SECTIONS)
+                       ============================================== */}
                     {previewScreen === 'home' && (
-                      <div className="animate-in fade-in space-y-3 pb-3">
-                        {/* Mini Hero Banner */}
+                      <div className="animate-in fade-in space-y-4 pb-4">
+                        {/* 1.1 Authentic Top Nav Bar */}
                         <div 
-                          className="p-5 text-white space-y-3 relative overflow-hidden transition-all"
+                          className="px-4 py-2.5 text-white flex items-center justify-between border-b border-white/10"
                           style={{ background: previewHeroBg }}
                         >
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-white/15 px-2.5 py-0.5 rounded-full backdrop-blur-md">
-                            <Heart className="h-2.5 w-2.5 fill-current text-rose-300" />
-                            <span>ครั้งที่ 9 · MUMT Blood Donation</span>
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <Heart className="h-4 w-4 fill-current text-rose-300" />
+                            <span className="text-xs font-black tracking-tight font-display">MUMT LOVE UNIT</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] font-bold text-white/80">
+                            <span>กำหนดการ</span>
+                            <span>เตรียมตัว</span>
+                            <span className="bg-white/20 px-1.5 py-0.5 rounded text-[9px] text-white">TH</span>
+                          </div>
+                        </div>
+
+                        {/* 1.2 Authentic Hero Banner */}
+                        <div 
+                          className="px-4 py-5 text-white space-y-3.5 relative overflow-hidden transition-all shadow-inner"
+                          style={{ background: previewHeroBg }}
+                        >
+                          {/* Top Brand Chip */}
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-white/15 px-2.5 py-0.5 rounded-full backdrop-blur-md border border-white/20 text-rose-100 shadow-2xs">
+                              <Heart className="h-2.5 w-2.5 fill-current text-rose-300" />
+                              <span>ครั้งที่ 9 · MUMT Blood Donation 2026</span>
+                            </span>
+                          </div>
                           
+                          {/* Campaign Headline */}
                           <div>
-                            <div className="text-base font-extrabold tracking-tight font-display">
-                              เติมรักให้เต็ม <span className="text-amber-300">UNIT</span>
+                            <div className="text-xl sm:text-2xl font-bold tracking-tight font-display leading-tight">
+                              เติมรักให้เต็ม <span className="font-extrabold text-amber-200 tracking-wider">UNIT</span>
                             </div>
-                            <div className="text-xs text-rose-100 font-medium mt-0.5">
-                              ต่อชีวิตด้วยโลหิตคุณ 2026
+                            <div className="text-sm font-bold text-rose-100/90 mt-0.5">
+                              ต่อชีวิตด้วยโลหิตคุณ
                             </div>
                           </div>
 
-                          {/* Action CTA Button */}
-                          <div className="pt-2">
+                          {/* Souvenir Notice (Official 100 Donors Card) */}
+                          <div className="flex items-center gap-2.5 rounded-xl bg-white/12 backdrop-blur-md border border-white/15 p-2.5 text-white shadow-2xs">
+                            <div className="p-1.5 rounded-lg bg-white/15 text-amber-200 shrink-0">
+                              <Gift className="h-4 w-4 text-amber-200" />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[9px] font-bold uppercase tracking-wider bg-white/15 text-amber-200 px-1.5 py-0.2 rounded font-mono">
+                                  ของที่ระลึก
+                                </span>
+                                <span className="text-[11px] font-bold text-white truncate">
+                                  ผู้บริจาค 100 ท่านแรก รับของที่ระลึก
+                                </span>
+                              </div>
+                              <p className="text-[10px] text-rose-100/80 mt-0.5 truncate">
+                                มอบให้ ณ จุดบริการหลังเสร็จสิ้นการบริจาคในวันงาน
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* 3 Event Fact Cards */}
+                          <div className="grid grid-cols-3 gap-1.5 text-white">
+                            <div className="rounded-lg bg-white/15 backdrop-blur-md border border-white/20 p-2 text-center">
+                              <div className="flex items-center justify-center gap-1 text-[9px] text-amber-200 font-mono font-bold">
+                                <Calendar className="h-3 w-3" /> วันที่
+                              </div>
+                              <div className="text-[10px] font-extrabold text-white mt-0.5 truncate">
+                                16 ก.ย. 69
+                              </div>
+                            </div>
+                            <div className="rounded-lg bg-white/15 backdrop-blur-md border border-white/20 p-2 text-center">
+                              <div className="flex items-center justify-center gap-1 text-[9px] text-amber-200 font-mono font-bold">
+                                <Clock className="h-3 w-3" /> เวลา
+                              </div>
+                              <div className="text-[10px] font-extrabold text-white mt-0.5 truncate">
+                                09:00 - 15:00
+                              </div>
+                            </div>
+                            <div className="rounded-lg bg-white/15 backdrop-blur-md border border-white/20 p-2 text-center">
+                              <div className="flex items-center justify-center gap-1 text-[9px] text-amber-200 font-mono font-bold">
+                                <MapPin className="h-3 w-3" /> สถานที่
+                              </div>
+                              <div className="text-[10px] font-extrabold text-white mt-0.5 truncate">
+                                ห้อง 217 สิริวิทยา
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Primary CTA Button */}
+                          <div className="pt-1">
                             <button
                               type="button"
-                              className="w-full py-2 px-3 rounded-xl text-xs font-bold shadow-sm transition-transform active:scale-95 flex items-center justify-center gap-1.5"
+                              className="w-full py-2.5 px-4 rounded-xl text-xs font-black shadow-md transition-transform active:scale-98 flex items-center justify-center gap-2"
                               style={{
                                 background: previewBtnBg,
                                 color: theme.button_text_color,
                               }}
                             >
-                              <span>ลงทะเบียนจองรอบเวลา</span>
+                              <span>ลงทะเบียนบริจาคโลหิตออนไลน์</span>
+                              <ArrowRight className="h-4 w-4" />
                             </button>
+                          </div>
+
+                          {/* Secondary 2-Column Actions */}
+                          <div className="grid grid-cols-2 gap-2 pt-0.5">
+                            <div className="py-1.5 px-2 rounded-xl border border-amber-300/40 bg-amber-400/10 text-amber-200 text-center text-[10px] font-bold truncate">
+                              ประเมินความพร้อมตนเอง
+                            </div>
+                            <div className="py-1.5 px-2 rounded-xl border border-white/20 bg-white/10 text-white text-center text-[10px] font-bold flex items-center justify-center gap-1 truncate">
+                              <Search className="h-3 w-3" />
+                              <span>ค้นหาตั๋ว / QR</span>
+                            </div>
                           </div>
                         </div>
 
-                        {/* Mini Surface Card */}
-                        <div className="px-4 space-y-2">
+                        {/* 1.3 Page Body: Slots & 5 Steps Section */}
+                        <div className="px-3.5 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-gray-900 font-display">
+                              รอบเวลาเปิดรับลงทะเบียน (Time Slots)
+                            </span>
+                            <span className="text-[10px] font-bold text-gray-500">
+                              ห้อง 217 อาคารสิริวิทยา
+                            </span>
+                          </div>
+
+                          {/* Mini Slot Card 1 */}
                           <div 
-                            className="p-3.5 rounded-xl border border-gray-100 shadow-2xs space-y-2 transition-all"
+                            className="p-3 rounded-xl border border-gray-200/80 shadow-2xs space-y-2 transition-all"
                             style={{ backgroundColor: theme.surface_color }}
                           >
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-gray-800">รอบเวลา 09:00 - 10:00 น.</span>
+                              <div className="flex items-center gap-1.5">
+                                <Clock className="h-3.5 w-3.5 text-gray-500" />
+                                <span className="text-xs font-black text-gray-800 font-mono">09:00 - 10:00 น.</span>
+                              </div>
                               <span 
                                 className="text-[10px] font-extrabold px-2 py-0.5 rounded-md"
                                 style={{
@@ -1210,49 +1325,170 @@ export default function AdminSiteSettingsPage() {
                                 ว่าง 25 ที่นั่ง
                               </span>
                             </div>
-                            <p className="text-[11px] text-gray-500 leading-tight">
-                              ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล
-                            </p>
+                            <div className="flex items-center justify-between pt-1">
+                              <span className="text-[10px] text-gray-500 truncate">
+                                โควตารวม 50 คน (จองแล้ว 25)
+                              </span>
+                              <button
+                                type="button"
+                                className="py-1 px-3 rounded-lg text-[10px] font-bold shadow-2xs transition-transform active:scale-95"
+                                style={{
+                                  background: previewBtnBg,
+                                  color: theme.button_text_color,
+                                }}
+                              >
+                                จองรอบนี้
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Mini Slot Card 2 */}
+                          <div 
+                            className="p-3 rounded-xl border border-gray-200/80 shadow-2xs space-y-2 transition-all"
+                            style={{ backgroundColor: theme.surface_color }}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <Clock className="h-3.5 w-3.5 text-gray-500" />
+                                <span className="text-xs font-black text-gray-800 font-mono">10:00 - 11:00 น.</span>
+                              </div>
+                              <span 
+                                className="text-[10px] font-extrabold px-2 py-0.5 rounded-md"
+                                style={{
+                                  backgroundColor: `${theme.accent_color}18`,
+                                  color: theme.accent_color,
+                                }}
+                              >
+                                ว่าง 18 ที่นั่ง
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between pt-1">
+                              <span className="text-[10px] text-gray-500 truncate">
+                                โควตารวม 50 คน (จองแล้ว 32)
+                              </span>
+                              <button
+                                type="button"
+                                className="py-1 px-3 rounded-lg text-[10px] font-bold shadow-2xs transition-transform active:scale-95"
+                                style={{
+                                  background: previewBtnBg,
+                                  color: theme.button_text_color,
+                                }}
+                              >
+                                จองรอบนี้
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    {/* 2. SCREEN: REGISTER FORM */}
+                    {/* ==============================================
+                        VIEW 2: REGISTER FORM (WIZARD)
+                       ============================================== */}
                     {previewScreen === 'register' && (
                       <div className="animate-in fade-in space-y-3 pb-4">
                         {/* Header strip */}
                         <div 
-                          className="px-4 py-3 text-white transition-all flex items-center justify-between"
+                          className="px-4 py-3.5 text-white transition-all space-y-1 shadow-xs"
                           style={{ background: previewHeroBg }}
                         >
-                          <span className="text-xs font-extrabold">ลงทะเบียนบริจาคโลหิต</span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20">
-                            ขั้นตอนที่ 1/2
-                          </span>
+                          <div className="flex items-center justify-between text-[10px] text-rose-200 font-bold">
+                            <span className="flex items-center gap-1">
+                              <ArrowLeft className="h-3 w-3" /> กลับหน้าหลัก
+                            </span>
+                            <span className="bg-white/20 px-2 py-0.5 rounded-full text-white">
+                              ขั้นตอน 1 จาก 3
+                            </span>
+                          </div>
+                          <div className="text-sm font-extrabold font-display">
+                            ลงทะเบียนบริจาคโลหิตออนไลน์
+                          </div>
                         </div>
 
-                        <div className="px-4 space-y-3">
+                        {/* Wizard Step Tracker */}
+                        <div className="px-4 pt-1">
+                          <div className="flex items-center justify-between text-[10px] font-bold">
+                            <div className="flex items-center gap-1" style={{ color: theme.primary_color }}>
+                              <span className="h-4 w-4 rounded-full text-white flex items-center justify-center text-[9px] font-black" style={{ background: theme.primary_color }}>1</span>
+                              <span>ประเภทผู้บริจาค</span>
+                            </div>
+                            <div className="h-0.5 flex-1 mx-2 bg-gray-200"></div>
+                            <div className="flex items-center gap-1 text-gray-400">
+                              <span className="h-4 w-4 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[9px] font-black">2</span>
+                              <span>ข้อมูลส่วนตัว</span>
+                            </div>
+                            <div className="h-0.5 flex-1 mx-2 bg-gray-200"></div>
+                            <div className="flex items-center gap-1 text-gray-400">
+                              <span className="h-4 w-4 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[9px] font-black">3</span>
+                              <span>รอบเวลา</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Form Card */}
+                        <div className="px-3.5 space-y-3">
                           <div 
-                            className="p-4 rounded-xl border border-gray-100 shadow-2xs space-y-3 transition-all"
+                            className="p-4 rounded-xl border border-gray-200/80 shadow-2xs space-y-3 transition-all"
                             style={{ backgroundColor: theme.surface_color }}
                           >
-                            <div className="space-y-1">
-                              <span className="text-[11px] font-bold text-gray-700">ชื่อ - นามสกุล</span>
-                              <div className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-700 bg-gray-50/50">
-                                นศ.เทคนิคการแพทย์ ม.มหิดล
+                            {/* Type selector */}
+                            <div className="space-y-1.5">
+                              <span className="text-[11px] font-bold text-gray-700">ประเภทผู้เข้าร่วม</span>
+                              <div className="grid grid-cols-3 gap-1.5">
+                                <div 
+                                  className="p-2 rounded-lg border text-center transition-all cursor-pointer"
+                                  style={{
+                                    borderColor: theme.primary_color,
+                                    backgroundColor: `${theme.primary_color}0C`,
+                                  }}
+                                >
+                                  <div className="text-[11px] font-black" style={{ color: theme.primary_color }}>นักศึกษา</div>
+                                  <div className="text-[9px] text-gray-500">ม.มหิดล</div>
+                                </div>
+                                <div className="p-2 rounded-lg border border-gray-200 text-center bg-gray-50">
+                                  <div className="text-[11px] font-bold text-gray-700">บุคลากร</div>
+                                  <div className="text-[9px] text-gray-400">ม.มหิดล</div>
+                                </div>
+                                <div className="p-2 rounded-lg border border-gray-200 text-center bg-gray-50">
+                                  <div className="text-[11px] font-bold text-gray-700">บุคคลทั่วไป</div>
+                                  <div className="text-[9px] text-gray-400">ประชาชน</div>
+                                </div>
                               </div>
                             </div>
 
-                            <div className="space-y-1.5">
-                              <span className="text-[11px] font-bold text-gray-700">หมู่โลหิต</span>
+                            {/* Inputs Mockup */}
+                            <div className="space-y-1">
+                              <span className="text-[11px] font-bold text-gray-700">ชื่อ - นามสกุล</span>
+                              <div className="w-full rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-800 bg-white">
+                                นายแพทย์ตัวอย่าง รักเรียน
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-bold text-gray-700">เบอร์โทรศัพท์</span>
+                                <div className="w-full rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs text-gray-800 bg-white font-mono">
+                                  081-234-5678
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[11px] font-bold text-gray-700">คณะ / สังกัด</span>
+                                <div className="w-full rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs text-gray-800 bg-white truncate">
+                                  คณะเทคนิคการแพทย์
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Blood group pills */}
+                            <div className="space-y-1">
+                              <span className="text-[11px] font-bold text-gray-700">หมู่โลหิต (Blood Group)</span>
                               <div className="grid grid-cols-4 gap-1.5">
                                 {['A', 'B', 'O', 'AB'].map((blood, idx) => (
                                   <div
                                     key={blood}
-                                    className={`text-center py-1 rounded-md text-[11px] font-black border transition-all ${
+                                    className={`text-center py-1.5 rounded-lg text-xs font-black border transition-all ${
                                       idx === 2
-                                        ? 'text-white border-transparent'
+                                        ? 'text-white border-transparent shadow-xs'
                                         : 'border-gray-200 text-gray-600 bg-gray-50'
                                     }`}
                                     style={idx === 2 ? { background: theme.primary_color } : {}}
@@ -1263,82 +1499,153 @@ export default function AdminSiteSettingsPage() {
                               </div>
                             </div>
 
+                            {/* Next CTA */}
                             <button
                               type="button"
-                              className="w-full py-2 px-3 rounded-xl text-xs font-bold shadow-sm transition-transform active:scale-95 flex items-center justify-center gap-1.5 mt-2"
+                              className="w-full py-2.5 px-3 rounded-xl text-xs font-black shadow-md transition-transform active:scale-98 flex items-center justify-center gap-1.5 mt-2"
                               style={{
                                 background: previewBtnBg,
                                 color: theme.button_text_color,
                               }}
                             >
-                              <span>ตรวจสอบ & ดำเนินการต่อ</span>
+                              <span>ดำเนินการต่อไปยังขั้นตอนถัดไป</span>
+                              <ArrowRight className="h-3.5 w-3.5" />
                             </button>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    {/* 3. SCREEN: PASS / TICKET */}
+                    {/* ==============================================
+                        VIEW 3: PASS / TICKET (OFFICIAL DONOR PASS)
+                       ============================================== */}
                     {previewScreen === 'pass' && (
-                      <div className="animate-in fade-in space-y-3 p-4">
+                      <div className="animate-in fade-in space-y-3 p-3.5">
                         <div 
-                          className="rounded-2xl border border-gray-200 overflow-hidden shadow-2xs transition-all"
+                          className="rounded-2xl border border-gray-200/90 overflow-hidden shadow-md transition-all"
                           style={{ backgroundColor: theme.surface_color }}
                         >
-                          {/* Ticket Header */}
+                          {/* Ticket Header matching DonorTicketPass */}
                           <div 
-                            className="p-3.5 text-white text-center space-y-1 transition-all"
+                            className="p-4 text-white text-center space-y-1 transition-all"
                             style={{ background: previewHeroBg }}
                           >
-                            <div className="text-[10px] uppercase font-bold tracking-widest text-rose-200">
-                              MUMT PASS 2026
+                            <div className="text-[9px] uppercase font-bold tracking-widest text-rose-200">
+                              MUMT LOVEUNIT 2026 · คณะเทคนิคการแพทย์ ม.มหิดล
                             </div>
-                            <div className="text-sm font-black font-display">
-                              บัตรคิวบริจาคโลหิต
+                            <div className="text-base font-black font-display tracking-tight">
+                              ตั๋วลงทะเบียนบริจาคโลหิต
                             </div>
+                            <div className="text-[10px] font-bold text-rose-100 uppercase">
+                              บัตรยืนยันสิทธิ์เข้าร่วมกิจกรรม (OFFICIAL DIGITAL PASS)
+                            </div>
+                          </div>
+
+                          {/* Ticket Notch Cutout Divider */}
+                          <div className="relative flex items-center justify-between px-2 bg-white">
+                            <div className="-ml-5 h-5 w-5 rounded-full border-r border-rose-200" style={{ backgroundColor: theme.bg_color }} />
+                            <div className="flex-1 border-b-2 border-dashed border-rose-200 mx-2" />
+                            <div className="-mr-5 h-5 w-5 rounded-full border-l border-rose-200" style={{ backgroundColor: theme.bg_color }} />
                           </div>
 
                           {/* Ticket Body */}
-                          <div className="p-4 text-center space-y-3">
+                          <div className="p-4 space-y-3.5">
+                            {/* Registration Code Block */}
                             <div 
-                              className="inline-block px-3 py-1 rounded-full text-xs font-black"
+                              className="rounded-xl border p-3 flex items-center justify-between"
                               style={{
-                                backgroundColor: `${theme.accent_color}18`,
-                                color: theme.accent_color,
+                                backgroundColor: `${theme.accent_color}10`,
+                                borderColor: `${theme.accent_color}25`,
                               }}
                             >
-                              ลำดับคิวของคุณ: A-042
+                              <div>
+                                <div className="text-[9px] font-black uppercase tracking-wider" style={{ color: theme.accent_color }}>
+                                  หมายเลขลงทะเบียน
+                                </div>
+                                <div className="font-mono text-xl font-black tracking-wider" style={{ color: theme.primary_color }}>
+                                  LVU26-A042
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg bg-white border border-gray-200 text-gray-700 shadow-2xs">
+                                <Copy className="h-3 w-3" /> คัดลอกรหัส
+                              </div>
+                            </div>
+
+                            {/* 2-Column Appointment Details */}
+                            <div className="grid grid-cols-2 gap-2 text-left">
+                              <div className="rounded-lg border border-gray-100 bg-gray-50/80 p-2 space-y-0.5">
+                                <div className="text-[9px] font-bold text-gray-500 flex items-center gap-1">
+                                  <User className="h-3 w-3 text-[#A6192E]" /> ผู้ลงทะเบียน
+                                </div>
+                                <div className="text-xs font-black text-gray-900 truncate">
+                                  นายแพทย์ตัวอย่าง รักเรียน
+                                </div>
+                              </div>
+
+                              <div className="rounded-lg border border-gray-100 bg-gray-50/80 p-2 space-y-0.5">
+                                <div className="text-[9px] font-bold text-gray-500 flex items-center gap-1">
+                                  <Calendar className="h-3 w-3 text-[#A6192E]" /> วันจัดกิจกรรม
+                                </div>
+                                <div className="text-xs font-black text-gray-900 truncate">
+                                  16 ก.ย. 2569
+                                </div>
+                              </div>
+
+                              <div 
+                                className="rounded-lg border p-2 space-y-0.5 col-span-2"
+                                style={{
+                                  backgroundColor: `${theme.accent_color}0A`,
+                                  borderColor: `${theme.accent_color}20`,
+                                }}
+                              >
+                                <div className="text-[9px] font-bold flex items-center gap-1" style={{ color: theme.accent_color }}>
+                                  <Clock className="h-3 w-3" /> รอบเวลาเดินทางมาถึง
+                                </div>
+                                <div className="text-sm font-black font-mono" style={{ color: theme.primary_color }}>
+                                  09:00 – 10:00 น.
+                                </div>
+                                <div className="text-[10px] text-gray-600">
+                                  ห้องประชุม 217 อาคารสิริวิทยา คณะศิลปศาสตร์ ม.มหิดล
+                                </div>
+                              </div>
                             </div>
 
                             {/* Simulated QR Box */}
-                            <div className="flex flex-col items-center justify-center py-2">
+                            <div className="flex flex-col items-center justify-center py-2 bg-gray-50/80 rounded-xl border border-dashed border-gray-200">
                               <div 
-                                className="p-3 rounded-xl border-2 border-dashed flex items-center justify-center"
+                                className="p-2.5 rounded-xl bg-white border-2 flex items-center justify-center shadow-xs"
                                 style={{ borderColor: theme.primary_color }}
                               >
-                                <QrCode className="h-14 w-14" style={{ color: theme.primary_color }} />
+                                <QrCode className="h-16 w-16" style={{ color: theme.primary_color }} />
                               </div>
-                              <span className="text-[10px] text-gray-400 mt-1.5">สแกนยืนยันตัวตน ณ จุดลงทะเบียน</span>
+                              <span className="text-[10px] font-bold text-gray-500 mt-1.5">
+                                แสดง QR Code ต่อเจ้าหน้าที่ ณ จุดลงทะเบียนวันงาน
+                              </span>
                             </div>
 
-                            <button
-                              type="button"
-                              className="w-full py-2 px-3 rounded-xl text-xs font-bold shadow-sm transition-transform active:scale-95 flex items-center justify-center gap-1.5"
-                              style={{
-                                background: previewBtnBg,
-                                color: theme.button_text_color,
-                              }}
-                            >
-                              <span>บันทึกภาพบัตรคิว</span>
-                            </button>
+                            {/* Action Buttons */}
+                            <div className="space-y-1.5 pt-1">
+                              <button
+                                type="button"
+                                className="w-full py-2 px-3 rounded-xl text-xs font-black shadow-md transition-transform active:scale-98 flex items-center justify-center gap-1.5"
+                                style={{
+                                  background: previewBtnBg,
+                                  color: theme.button_text_color,
+                                }}
+                              >
+                                <Download className="h-3.5 w-3.5" />
+                                <span>บันทึกภาพบัตรคิว</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     )}
 
-                    <div className="p-3 text-center border-t border-gray-100 bg-white/70">
+                    {/* Bottom Status Footer */}
+                    <div className="p-2.5 text-center border-t border-gray-100 bg-white/80">
                       <p className="text-[10px] text-gray-500 font-medium">
-                        *หน้าเว็บจริงทุกหน้าจะปรับโทนสีและ Gradient ทันทีหลังกด &ldquo;บันทึกและเผยแพร่&rdquo;
+                        *ทุกปุ่ม พื้นหลัง และสีบนหน้าเว็บจริงจะซิงก์ตามตัวอย่างนี้ทันทีเมื่อบันทึก
                       </p>
                     </div>
                   </div>
