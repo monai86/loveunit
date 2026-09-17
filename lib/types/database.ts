@@ -154,3 +154,24 @@ export interface DashboardKPIs {
   }>;
   prChannelBreakdown?: Record<string, number>;
 }
+
+export interface SiteTheme {
+  id?: string;
+  theme_key: string;
+  preset_name: string;
+  primary_color: string;
+  primary_hover_color: string;
+  button_text_color: string;
+  bg_color: string;
+  surface_color: string;
+  accent_color: string;
+  hero_gradient_enabled: boolean;
+  hero_gradient_start: string;
+  hero_gradient_end: string;
+  hero_gradient_angle: number;
+  button_gradient_enabled: boolean;
+  button_gradient_start: string;
+  button_gradient_end: string;
+  button_gradient_angle: number;
+  updated_at?: string;
+}

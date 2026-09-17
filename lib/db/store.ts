@@ -13,7 +13,8 @@ import {
   DonationExperience,
   RegistrationStatus,
   StaffProfile,
-  StaffRole
+  StaffRole,
+  SiteTheme
 } from '@/lib/types/database';
 import { normalizePhoneNumber, generateRegistrationCode, generateQRToken, generateAccessToken, nextRegistrationSequence, isRegistrationEligibleForSouvenir, getSouvenirEligibilityDetails, isWalkInRecord, type SouvenirEligibilityDetails } from '@/lib/utils/format';
 
@@ -59,6 +60,19 @@ export const defaultEvent: Event = {
 };
 
 export const defaultContentBlocks: EventContentBlock[] = [
+  {
+    id: 'cb-urgent-banner',
+    event_id: defaultEvent.id,
+    content_key: 'urgent_banner',
+    title: 'ประกาศด่วน',
+    description: '',
+    image_url: null,
+    alt_text: null,
+    display_order: 0,
+    is_visible: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
   {
     id: 'cb-1',
     event_id: defaultEvent.id,
@@ -902,4 +916,58 @@ export async function recordAuditLog(params: {
   metadata?: Record<string, unknown>;
 }) {
   return logAuditAction(params.action, params.entityType, params.entityId, params.actorId, params.metadata);
+}
+
+// ==========================================
+// SITE THEME & EVENT SETTINGS IN-MEMORY
+// ==========================================
+
+export const defaultSiteTheme: SiteTheme = {
+  theme_key: 'default',
+  preset_name: 'default',
+  primary_color: '#6E101E',
+  primary_hover_color: '#560D19',
+  button_text_color: '#FFFFFF',
+  bg_color: '#FBF7F6',
+  surface_color: '#FFFFFF',
+  accent_color: '#A81B2D',
+  hero_gradient_enabled: true,
+  hero_gradient_start: '#9C1528',
+  hero_gradient_end: '#3B060F',
+  hero_gradient_angle: 140,
+  button_gradient_enabled: true,
+  button_gradient_start: '#D92231',
+  button_gradient_end: '#7E1120',
+  button_gradient_angle: 90,
+  updated_at: new Date().toISOString(),
+};
+
+let currentSiteTheme: SiteTheme = { ...defaultSiteTheme };
+
+export async function getMemorySiteTheme(): Promise<SiteTheme> {
+  return { ...currentSiteTheme };
+}
+
+export async function updateMemorySiteTheme(updates: Partial<SiteTheme>): Promise<SiteTheme> {
+  currentSiteTheme = {
+    ...currentSiteTheme,
+    ...updates,
+    updated_at: new Date().toISOString(),
+  };
+  return { ...currentSiteTheme };
+}
+
+export async function updateMemoryEvent(updates: Partial<Event>): Promise<Event> {
+  Object.assign(defaultEvent, updates, { updated_at: new Date().toISOString() });
+  return { ...defaultEvent };
+}
+
+export async function updateMemorySlotCapacity(slotId: string, capacity: number, isActive?: boolean): Promise<TimeSlot | null> {
+  const slot = defaultSlots.find(s => s.id === slotId);
+  if (slot) {
+    slot.capacity = capacity;
+    if (isActive !== undefined) slot.is_active = isActive;
+    return { ...slot };
+  }
+  return null;
 }

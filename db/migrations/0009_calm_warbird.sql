@@ -1,0 +1,21 @@
+CREATE TABLE "site_themes" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"theme_key" text DEFAULT 'default' NOT NULL,
+	"preset_name" text DEFAULT 'classic' NOT NULL,
+	"primary_color" text DEFAULT '#6E101E' NOT NULL,
+	"primary_hover_color" text DEFAULT '#560D19' NOT NULL,
+	"button_text_color" text DEFAULT '#FFFFFF' NOT NULL,
+	"bg_color" text DEFAULT '#FBF7F6' NOT NULL,
+	"surface_color" text DEFAULT '#FFFFFF' NOT NULL,
+	"accent_color" text DEFAULT '#A81B2D' NOT NULL,
+	"hero_gradient_enabled" boolean DEFAULT false NOT NULL,
+	"hero_gradient_start" text DEFAULT '#560D19' NOT NULL,
+	"hero_gradient_end" text DEFAULT '#8A1426' NOT NULL,
+	"hero_gradient_angle" integer DEFAULT 135 NOT NULL,
+	"button_gradient_enabled" boolean DEFAULT false NOT NULL,
+	"button_gradient_start" text DEFAULT '#6E101E' NOT NULL,
+	"button_gradient_end" text DEFAULT '#A81B2D' NOT NULL,
+	"button_gradient_angle" integer DEFAULT 90 NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "site_themes_theme_key_unique" UNIQUE("theme_key")
+);

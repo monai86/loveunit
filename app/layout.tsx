@@ -8,6 +8,8 @@ import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { OfflineBanner } from "@/components/pwa/OfflineBanner";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
+import { ThemeInjector } from "@/components/theme/ThemeInjector";
+import { getSiteTheme } from "@/services/theme-service";
 
 const prompt = Prompt({
   subsets: ["thai", "latin"],
@@ -106,10 +108,13 @@ export const metadata: Metadata = {
   category: "health",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const initialTheme = await getSiteTheme().catch(() => null);
+
   return (
     <html lang="th" className={`h-full antialiased ${prompt.variable} ${notoSansThai.variable}`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col bg-[var(--bg)] text-[var(--ink)] pb-16 lg:pb-0" suppressHydrationWarning>
+        <ThemeInjector initialTheme={initialTheme} />
         <LanguageProvider>
           <JsonLd />
           <a

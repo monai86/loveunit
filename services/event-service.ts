@@ -92,3 +92,81 @@ export async function getTimeSlots(eventId: string) {
   const fallback = defaultSlots.filter(s => s.is_active).sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
   return setCache(cacheKey, fallback, 5_000);
 }
+
+export async function updateEventSettings(slug: string, updates: {
+  name?: string;
+  shortName?: string;
+  description?: string;
+  startAt?: string;
+  endAt?: string;
+  venueName?: string;
+  venueDetail?: string;
+  registrationOpenAt?: string;
+  registrationCloseAt?: string;
+  status?: 'DRAFT' | 'PUBLISHED' | 'REGISTRATION_OPEN' | 'REGISTRATION_CLOSED' | 'COMPLETED' | 'ARCHIVED';
+}) {
+  cache.delete(`event:slug:${slug}`);
+  if (db) {
+    try {
+      const updateData: Record<string, unknown> = { updatedAt: new Date() };
+      if (updates.name !== undefined) updateData.name = updates.name;
+      if (updates.shortName !== undefined) updateData.shortName = updates.shortName;
+      if (updates.description !== undefined) updateData.description = updates.description;
+      if (updates.startAt !== undefined) updateData.startAt = new Date(updates.startAt);
+      if (updates.endAt !== undefined) updateData.endAt = new Date(updates.endAt);
+      if (updates.venueName !== undefined) updateData.venueName = updates.venueName;
+      if (updates.venueDetail !== undefined) updateData.venueDetail = updates.venueDetail;
+      if (updates.registrationOpenAt !== undefined) updateData.registrationOpenAt = new Date(updates.registrationOpenAt);
+      if (updates.registrationCloseAt !== undefined) updateData.registrationCloseAt = new Date(updates.registrationCloseAt);
+      if (updates.status !== undefined) updateData.status = updates.status;
+
+      const [updated] = await db
+        .update(events)
+        .set(updateData)
+        .where(eq(events.slug, slug))
+        .returning();
+
+      if (updated) return { success: true, event: updated };
+    } catch (err) {
+      console.warn('DB update failed in updateEventSettings:', err);
+    }
+  }
+
+  // Fallback to memory
+  const { updateMemoryEvent } = await import('@/lib/db/store');
+  const updated = await updateMemoryEvent({
+    name: updates.name,
+    short_name: updates.shortName,
+    description: updates.description,
+    start_at: updates.startAt,
+    end_at: updates.endAt,
+    venue_name: updates.venueName,
+    venue_detail: updates.venueDetail,
+    registration_open_at: updates.registrationOpenAt,
+    registration_close_at: updates.registrationCloseAt,
+    status: updates.status,
+  });
+  return { success: true, event: updated };
+}
+
+export async function updateTimeSlotSettings(slotId: string, eventId: string, capacity: number, isActive?: boolean) {
+  cache.delete(`slots:${eventId}`);
+  if (db) {
+    try {
+      const updateData: Record<string, unknown> = { capacity };
+      if (isActive !== undefined) updateData.isActive = isActive;
+      const [updated] = await db
+        .update(timeSlots)
+        .set(updateData)
+        .where(eq(timeSlots.id, slotId))
+        .returning();
+      if (updated) return { success: true, slot: updated };
+    } catch (err) {
+      console.warn('DB update failed in updateTimeSlotSettings:', err);
+    }
+  }
+
+  const { updateMemorySlotCapacity } = await import('@/lib/db/store');
+  const updated = await updateMemorySlotCapacity(slotId, capacity, isActive);
+  return { success: true, slot: updated };
+}
